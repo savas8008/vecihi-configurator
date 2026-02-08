@@ -29,8 +29,51 @@
 <script src="js/outputs_page.js"></script>
     <link rel="stylesheet" href="style.css"> 
     <style>
-	
-</style>
+    /* OSD ve diğer özel stiller */
+    #prev_horizon {
+        width: 32% !important; 
+        text-align: center;
+    }
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    .osd-monitor-frame {
+        border-color: #1a1a1a !important;
+        background: #000;
+    }
+    .osd-element-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    .osd-element-list::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 10px;
+    }
+    #osd-preview-screen {
+        background: yellow;
+        background-image: linear-gradient(to bottom, #1a2a3a 0%, #0c0c0c 50%, #2a1a0a 100%);
+        border: 5px solid #222 !important;
+        position: relative;
+    }
+    .osd-draggable {
+        color: #e0e0e0;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        text-shadow: 1px 1px 0px #000;
+        font-weight: bold;
+        font-size: 10px;
+        z-index: 5;
+        white-space: nowrap;
+    }
+    .osd-crosshair {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        color: yellow;
+        font-size: 24px;
+        pointer-events: none;
+    }
+    </style>
 
 </head>
 <body>
@@ -117,7 +160,7 @@
         </div>
 
         <div id="3d-canvas-container"
-             style="width:100%; height:280px; background:#334; border-radius:12px; position:relative; overflow:hidden; min-height:240px;">
+             style="width:100%; height:280px; background:#e2e8f0; border-radius:12px; position:relative; overflow:hidden; min-height:240px;">
         </div>
 
         <div class="row justify-content-center mt-3 mb-0">
@@ -1649,82 +1692,6 @@
     </div>
 </div>
 
-<style>
-#prev_horizon {
-    /* %50 yerine gerçek boyut (17 karakter / 53 sütun ≈ %32) */
-    width: 32% !important; 
-    
-    /* Metni kutunun içinde ortala */
-    text-align: center;
-    
-    /* (İsteğe bağlı) Hizalamayı kolaylaştırmak için arka plana geçici renk verin */
-    /* background-color: rgba(0, 255, 0, 0.2); */
-}
-    /* OSD Yanıp Sönme Efekti */
-    @keyframes blink {
-        0% { opacity: 1; }
-        50% { opacity: 0; }
-        100% { opacity: 1; }
-    }
-    
-    .osd-monitor-frame {
-        border-color: #1a1a1a !important;
-        background: #000;
-    }
-
-    /* Scrollbar Tasarımı */
-    .osd-element-list::-webkit-scrollbar {
-        width: 4px;
-    }
-    .osd-element-list::-webkit-scrollbar-thumb {
-        background: #444;
-        border-radius: 10px;
-    }
-	/* FPV Ekranını daha gerçekçi yapalım */
-#osd-preview-screen {
-    background: yellow;
-    /* Yapay Ufuk ve Yer Gökyüzü simülasyonu */
-    background-image: 
-        linear-gradient(to bottom, #1a2a3a 0%, #0c0c0c 50%, #2a1a0a 100%);
-    border: 5px solid #222 !important;
-    position: relative;
-}
-
-/* DJI OSD Yeşili ve Karakter Fontu */
-.osd-draggable {
-    color: #e0e0e0; /* DJI ana metin rengi */
-    font-family: 'JetBrains Mono', 'Courier New', monospace;
-    text-shadow: 2px 2px 0px #000;
-    font-weight: bold;
-    font-size: 14px;
-    z-index: 5;
-}
-
-/* Sürükleme sırasında aktif olan öğe */
-.osd-draggable {
-    color: #e0e0e0;
-    font-family: 'JetBrains Mono', 'Courier New', monospace;
-    text-shadow: 1px 1px 0px #000; /* Gölgeyi biraz kıstım */
-    font-weight: bold;
-    
-    /* DEĞİŞİKLİK: Fontu küçültüyoruz ki 53 karakter sığsın */
-    font-size: 10px; /* Veya 11px deneyebilirsiniz */
-    
-    z-index: 5;
-    white-space: nowrap; /* Yazıların alt satıra kaymasını engelle */
-}
-
-/* Ekranın ortasına sabit bir referans noktası (Crosshair) */
-.osd-crosshair {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    color: yellow;
-    font-size: 24px;
-    pointer-events: none;
-}
-</style>
-
 <script>
     // JS: Checkbox ile Önizleme Elemanlarını Gizle/Göster
     document.querySelectorAll('.osd-toggle').forEach(el => {
@@ -2112,14 +2079,15 @@
         function updateConnectionStatus() {
             const isConnected = !!port;
             $('btnConnect').classList.toggle('d-none', isConnected);
-            $('btnConnectPrompt').classList.toggle('d-none', isConnected);
+            // $('btnConnectPrompt').classList.toggle('d-none', isConnected); // CSS ile gizlendi
             $('btnDisconnect').classList.toggle('d-none', !isConnected);
-            $('connectionPrompt').classList.toggle('d-none', isConnected);
+            // $('connectionPrompt').classList.toggle('d-none', isConnected); // CSS ile gizlendi
             $('statusIndicator').className = `status-indicator ${isConnected ? 'status-connected' : 'status-off'}`;
             $('connectionStatus').textContent = isConnected ? 'Bağlandı' : 'Bağlantı Yok';
 
             document.querySelectorAll('.page').forEach(page => {
-                page.style.display = isConnected ? (page.classList.contains('active') ? 'block' : 'none') : 'none';
+                // Bağlantı olmasa bile aktif sayfayı göster
+                page.style.display = page.classList.contains('active') ? 'block' : 'none';
             });
 
             if (!isConnected) {
