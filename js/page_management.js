@@ -227,28 +227,89 @@ function setupSaveButtonListeners() {
  * @brief Bağlantı durumuna göre UI'ı günceller
  */
 function updateConnectionStatus() {
-    const connected = !!port;
+    // 1. Bağlantı Durumunu Kontrol Et (Daha kapsamlı kontrol)
+    let connected = false;
+    if (typeof window.isConnected === 'function') {
+        connected = window.isConnected();
+    }
+    // Yedek kontrol: Fonksiyon false dönse bile port nesnesi açıksa bağlıdır
+    if (!connected && window.port) {
+        connected = true;
+    }
     
-    $('btnConnect').classList.toggle('d-none', connected);
-    $('btnConnectPrompt').classList.toggle('d-none', connected);
-    $('btnDisconnect').classList.toggle('d-none', !connected);
-    $('connectionPrompt').classList.toggle('d-none', connected);
-    $('statusIndicator').className = `status-indicator ${connected ? 'status-connected' : 'status-off'}`;
-    $('connectionStatus').textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
+    // Element seçici helper (Global $ yoksa diye)
+    const el = (id) => document.getElementById(id);
+    
+    const btnConnect = el('btnConnect');
+    if (btnConnect) btnConnect.classList.toggle('d-none', connected);
+    
+    const btnConnectPrompt = el('btnConnectPrompt');
+    if (btnConnectPrompt) btnConnectPrompt.classList.toggle('d-none', connected);
+    
+    const btnDisconnect = el('btnDisconnect');
+    if (btnDisconnect) btnDisconnect.classList.toggle('d-none', !connected);
+    
+    // Connection Prompt Yönetimi (ZORLA GÖSTER/GİZLE)
+    const prompt = el('connectionPrompt');
+    if (prompt) {
+        if (connected) {
+            // Bağlıysa: GİZLE
+            prompt.classList.add('d-none');
+            prompt.style.setProperty('display', 'none', 'important');
+        } else {
+            // Bağlı değilse: GÖSTER
+            prompt.classList.remove('d-none');
+            prompt.style.setProperty('display', 'flex', 'important');
+        }
+    }
 
-    // Sayfaların görünürlüğünü ayarla
+    const statusInd = el('statusIndicator');
+    if (statusInd) statusInd.className = `status-indicator ${connected ? 'status-connected' : 'status-off'}`;
+    
+    const connStatus = el('connectionStatus');
+    if (connStatus) connStatus.textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
+
+    // Navigasyon menüsünü yönet (Bağlantı yoksa devre dışı bırak)
+    document.querySelectorAll('.nav-link').forEach(nav => {
+        if (connected) {
+            nav.style.opacity = '1';
+            nav.style.pointerEvents = 'auto';
+            nav.style.cursor = 'pointer';
+        } else {
+            nav.style.opacity = '0.5';
+            nav.style.pointerEvents = 'none';
+            nav.style.cursor = 'not-allowed';
+        }
+    });
+
+    // Sayfaların görünürlüğünü ayarla (ZORLA GİZLE)
     document.querySelectorAll('.page').forEach(page => {
-        page.style.display = connected ? (page.classList.contains('active') ? 'block' : 'none') : 'none';
+        if (connected) {
+            if (page.classList.contains('active')) {
+                page.style.removeProperty('display'); // Varsa !important temizle
+                page.style.display = 'block';
+            } else {
+                page.style.display = 'none';
+            }
+        } else {
+            // Bağlantı yoksa kesinlikle gizle
+            page.style.setProperty('display', 'none', 'important');
+        }
     });
 
     // Bağlantı kesildiğinde güvenlik önlemleri
     if (!connected) {
-        stopThrottleUpdates();
-        if (throttleSlider) throttleSlider.disabled = true;
-        if (safetyCheck) safetyCheck.checked = false;
-        safetyChecked = false;
-        updateThrottle(1000);
-        updateSafetyWarning();
+        if (typeof stopThrottleUpdates === 'function') stopThrottleUpdates();
+        
+        const slider = el('throttleSlider');
+        if (slider) slider.disabled = true;
+        
+        const safety = el('safetyCheck');
+        if (safety) safety.checked = false;
+        
+        if (typeof safetyChecked !== 'undefined') safetyChecked = false;
+        if (typeof updateThrottle === 'function') updateThrottle(1000);
+        if (typeof updateSafetyWarning === 'function') updateSafetyWarning();
     }
 }
 
@@ -264,59 +325,6 @@ function initPageManagement() {
     
     // Varsayılan sayfa
     changePage('calibration');
-}
-
-function savePageData(page) {
-    if (!isConnected) {
-        showModal('Uyarı', 'Lütfen önce cihaza bağlanın.', 'warning');
-        return;
-    }
-
-    const btn = $('btnSave' + page.charAt(0).toUpperCase() + page.slice(1));
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i> Kaydediliyor...';
-    }
-
-    let saveCommand = '';
-    let payload = null;
-
-    switch (page) {
-        case 'calibration':
-            saveCalibration();
-            resetSaveButton(btn);
-            return;
-
-        case 'outputs':
-            saveOutputsConfig();
-            resetSaveButton(btn);
-            return;
-
-        case 'transmitter':
-            saveTransmitterConfig();
-            resetSaveButton(btn);
-            return;
-
-        case 'modes':
-            saveFlightModesConfig();
-            resetSaveButton(btn);
-            return;
-
-        case 'pid':
-            savePIDConfig();
-            resetSaveButton(btn);
-            return;
-
-        case 'advanced':
-            saveAdvancedConfig();
-            resetSaveButton(btn);
-            return;
-            
-        default:
-            log(`❌ Bilinmeyen sayfa: ${page}`, 'error');
-            resetSaveButton(btn);
-            return;
-    }
 }
 
 

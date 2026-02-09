@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -29,7 +29,7 @@
 <script src="js/outputs_page.js"></script>
     <link rel="stylesheet" href="style.css"> 
     <style>
-    /* OSD ve diğer özel stiller */
+    /* OSD ve diÄŸer Ã¶zel stiller */
     #prev_horizon {
         width: 32% !important; 
         text-align: center;
@@ -110,10 +110,9 @@
             <div class="col-lg-2 col-md-3 mb-3 panel2">
                 <div class="sidebar rounded p-3">
                     <ul class="nav flex-column">
-    <a class="nav-link" href="#" data-page="sensors">
-        <i class="bi bi-radar me-2"></i> + Sensörler
-    </a>                        <li class="nav-item"><a class="nav-link active" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> Kalibrasyon</a></li>
-                        <li  class="nav-item"><a class="nav-link"  href="#" data-page="outputs"><i class="bi bi-plug me-2"></i> Konfigürasyon</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="sensors"><i class="bi bi-radar me-2"></i> Sensörler</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> Kalibrasyon</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="outputs"><i class="bi bi-plug me-2"></i> Konfigürasyon</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="transmitter"><i class="bi bi-controller me-2"></i> Kumanda</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i> Uçuş Modları</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="pid"><i class="bi bi-graph-up me-2"></i> PID</a></li>
@@ -537,7 +536,7 @@
             <div class="throttle-value" id="throttleValue">1000</div>
             <input type="range" class="throttle-slider" min="1000" max="2000" value="1000" id="throttleSlider" disabled>
             <div class="d-flex justify-content-between w-100 mt-2">
-              <small>1000μs</small><small>2000μs</small>
+              <small>1000Î¼s</small><small>2000Î¼s</small>
             </div>
 
             <div class="form-check mt-3">
@@ -991,7 +990,7 @@
                     <div class="pid-parameter">
                         <div class="pid-label"><span class="pid-name">TPA</span><span class="pid-value" id="tpaValue"></span></div>
                         <input type="range" class="pid-slider" min="0" max="100" step="1" value="" id="tpaPSlider">
-                        <small class="text-muted d-block mt-2"> throtle veya pitot tüpü varsa hava hızı arttıkça PIFF kazancını yüzde bazında düşürür.</small>
+                        <small class="text-muted d-block mt-2"> throttle veya pitot tüpü varsa hava hızı arttıkça PIFF kazancını yüzde bazında düşürür.</small>
                     </div>
                 </div>
              </div>
@@ -1238,6 +1237,7 @@
 
                         <!-- İkinci Satır: Gaz Ayarları & Kazançlar & L1 -->
                         <div class="row g-4">
+                            <!-- Gaz (Throttle) AyarlarÄ± -->
                             <!-- Gaz (Throttle) Ayarları -->
                             <div class="col-md-4 border-end border-secondary">
                                 <h6 class="text-muted border-bottom border-secondary pb-1">Gaz (Throttle) Ayarları</h6>
@@ -1679,10 +1679,6 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-info py-2 small border-0 bg-info-subtle text-info-emphasis">
-                        <i class="bi bi-info-circle-fill me-2"></i> DJI O4 Lite ünitesi için UART2 (TX2/RX2) portu kullanılır.
-                    </div>
-
                     <button type="button" class="btn btn-warning w-100 shadow-sm mt-auto" id="btnSaveOSD">
                         <i class="bi bi-cloud-upload me-2 "></i>Ayarları Cihaza Kaydet
                     </button>
@@ -1693,7 +1689,7 @@
 </div>
 
 <script>
-    // JS: Checkbox ile Önizleme Elemanlarını Gizle/Göster
+    // JS: Checkbox ile Ã–nizleme ElemanlarÄ±nÄ± Gizle/GÃ¶ster
     document.querySelectorAll('.osd-toggle').forEach(el => {
         el.addEventListener('change', function() {
             const target = document.getElementById(this.dataset.target);
@@ -1703,7 +1699,7 @@
         });
     });
 
-    // Kaydet Butonu Logiği
+    // Kaydet Butonu LogiÄŸi
     document.getElementById('btnSaveOSD').addEventListener('click', function() {
         console.log("OSD Yapılandırması Kaydediliyor...");
         // ESP32'ye gönderilecek veri paketi hazırlama buraya gelecek
@@ -1790,7 +1786,7 @@
                         <div class="d-flex flex-wrap gap-1">
                             <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('advanced_page_data')" title="Gelişmiş ayarları oku">GELİŞMİŞ</button>
                             <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('pid_page_data')" title="PID ayarlarını oku">PID</button>
-                            <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('calibration_page_data')" title="Kalibrasyon verisini oku">KALİBR.</button>
+                            <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('calibration_page_data')" title="Kalibrasyon verisini oku">KALİB.</button>
                             <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('outputs_page_data')" title="Çıkış ayarlarını oku">ÇIKIŞLAR</button>
                             <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('modes_page_data')" title="Uçuş modlarını oku">MODLAR</button>
                             <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('transmitter_page_data')" title="Alıcı ayarlarını oku">ALICI</button>
@@ -1918,12 +1914,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // 3D Model Değişkenleri
+        // 3D Model DeÄŸiÅŸkenleri
 
         let scene, camera, renderer, airplaneModel, controls, gridHelper;
         const targetQuaternion = new THREE.Quaternion();
 
-        // Sayfa Durum Değişkenleri
+        // Sayfa Durum DeÄŸiÅŸkenleri
 
         let selectedAircraft = 'v-tail';
         let throttleValue = 1000;
@@ -1932,13 +1928,13 @@
         let logPaused = false;
         let currentSearchTerm = '';
 
-        // Harita Değişkenleri
+        // Harita DeÄŸiÅŸkenleri
         let map = null;
         let planeMarker = null;
         let flightPath = null;
         let pathCoordinates = [];
 
-        // Grafik Global Değişkenleri
+        // Grafik Global DeÄŸiÅŸkenleri
         let gyroChart, accelChart;
         const maxDataPoints = 100;
 
@@ -1971,13 +1967,13 @@
             manual: { name: "MANUEL", channel: 5, min: 1000, max: 1200 },
             angle: { name: "ANGLE", channel: 5, min: 1201, max: 1400 },
             horizon: { name: "HORIZON", channel: 5, min: 1401, max: 1600 },
-            rth: { name: "EVE DÖN", channel: 5, min: 1601, max: 1800 },
+            rth: { name: "EVE DÃ–N", channel: 5, min: 1601, max: 1800 },
             launch: { name: "OTO LAUNCH", channel: 5, min: 1801, max: 2000 }
         };
         let logStats = { total: 0, commands: 0, errors: 0, success: 0, warning: 0, info: 0, receive: 0 };
         const minGap = 50;
 
-        // Global Değişkenler
+        // Global DeÄŸiÅŸkenler
         const esp32Pins = [
             -1,
             0, 1, 2, 3, 4, 5,
@@ -2004,7 +2000,7 @@
             entry.className = `log-entry log-${type}`;
             
             const typeIcons = { 'info': 'ℹ️', 'success': '✅', 'warning': '⚠️', 'error': '❌', 'command': '📤', 'receive': '📥' };
-            entry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${typeIcons[type] || '📝'} ${message}`;
+            entry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${typeIcons[type] || '📋'} ${message}`;
             
             const currentFilter = $('logLevelFilter').value;
             if (currentFilter !== 'all' && currentFilter !== type) {
@@ -2077,20 +2073,40 @@
         }
 
         function updateConnectionStatus() {
-            const isConnected = !!port;
-            $('btnConnect').classList.toggle('d-none', isConnected);
-            // $('btnConnectPrompt').classList.toggle('d-none', isConnected); // CSS ile gizlendi
-            $('btnDisconnect').classList.toggle('d-none', !isConnected);
-            // $('connectionPrompt').classList.toggle('d-none', isConnected); // CSS ile gizlendi
-            $('statusIndicator').className = `status-indicator ${isConnected ? 'status-connected' : 'status-off'}`;
-            $('connectionStatus').textContent = isConnected ? 'Bağlandı' : 'Bağlantı Yok';
+            let connected = false;
+            if (typeof window.isConnected === 'function') {
+                connected = window.isConnected();
+            }
+            if (!connected && window.port) {
+                connected = true;
+            }
+
+            $('btnConnect').classList.toggle('d-none', connected);
+            $('btnConnectPrompt').classList.toggle('d-none', connected);
+            $('btnDisconnect').classList.toggle('d-none', !connected);
+            $('statusIndicator').className = `status-indicator ${connected ? 'status-connected' : 'status-off'}`;
+            $('connectionStatus').textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
+
+            const prompt = $('connectionPrompt');
+            if (prompt) {
+                if (connected) {
+                    prompt.classList.add('d-none');
+                    prompt.style.setProperty('display', 'none', 'important');
+                } else {
+                    prompt.classList.remove('d-none');
+                    prompt.style.setProperty('display', 'flex', 'important');
+                }
+            }
 
             document.querySelectorAll('.page').forEach(page => {
-                // Bağlantı olmasa bile aktif sayfayı göster
-                page.style.display = page.classList.contains('active') ? 'block' : 'none';
+                if (connected) {
+                    page.style.display = page.classList.contains('active') ? 'block' : 'none';
+                } else {
+                    page.style.setProperty('display', 'none', 'important');
+                }
             });
 
-            if (!isConnected) {
+            if (!connected) {
                 stopThrottleUpdates();
                 if (throttleSlider) throttleSlider.disabled = true;
                 if (safetyCheck) safetyCheck.checked = false;
@@ -2212,7 +2228,7 @@
         }
 
         function savePIDConfig() {
-            log('📤 PID değerleri gönderiliyor...', 'info');
+            log('💾 PID değerleri gönderiliyor...', 'info');
             sendCommand(`PID_SAVE ${JSON.stringify(pidValues)}`);
         }
 
