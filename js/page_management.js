@@ -137,12 +137,9 @@ function savePageData(page) {
             return;
 
         case 'outputs':
-            saveCommand = 'OUTPUT_SAVE';
-            payload = {
-                aircraft_type: selectedAircraft,
-                servos: servoValues
-            };
-            break;
+            saveOutputsConfig();
+            resetSaveButton(btn, 2000);
+            return;
 
         case 'transmitter':
             saveCommand = 'TRANSMITTER_SAVE';
