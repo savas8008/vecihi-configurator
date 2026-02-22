@@ -416,8 +416,14 @@ function handleStatusResponse(command, result, data) {
             }
             break;
             
-        default:
-            log(`✅ ${command}: ${result}`, 'info');
+      default:
+    // Önce kalibrasyon modülüne devret
+    if (typeof handleCalibrationStatusResponse === 'function') {
+        if (handleCalibrationStatusResponse(command, result, data)) {
+            return; // Kalibrasyon modülü işledi
+        }
+    }
+    log(`✅ ${command}: ${result}`, 'info');
     }
 }
 
