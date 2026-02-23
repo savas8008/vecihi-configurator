@@ -142,15 +142,9 @@ function savePageData(page) {
             return;
 
         case 'transmitter':
-            saveCommand = 'TRANSMITTER_SAVE';
-            payload = {
-                protocol: $('rcProtocol').value,
-                channel_map: $('channelMap').value,
-                rssi_channel: parseInt($('rssiChannel').value),
-                failsafe_mode: $('failsafeMode').value,
-                battery_pin: parseInt($('batteryPin').value)
-            };
-            break;
+            saveTransmitterConfig();
+            resetSaveButton(btn, 2000);
+            return;
 
         case 'modes':
             saveCommand = 'MODES_SAVE';
