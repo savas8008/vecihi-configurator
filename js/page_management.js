@@ -65,6 +65,10 @@ function stopAllStreams() {
     sendCommand('stop_gyro_stream');
     sendCommand('stop_sensor_stream');
     stopThrottleUpdates();
+    const safetyEl = document.getElementById('safetyCheck');
+    if (safetyEl) safetyEl.checked = false;
+    if (typeof safetyChecked !== 'undefined') safetyChecked = false;
+    if (typeof updateSafetyWarning === 'function') updateSafetyWarning();
 }
 
 /**

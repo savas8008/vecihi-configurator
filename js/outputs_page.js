@@ -291,11 +291,10 @@ function stopThrottleUpdates() {
     if (throttleInterval) {
         clearInterval(throttleInterval);
         throttleInterval = null;
-    }
-    
-    if (typeof isConnected !== 'undefined' && isConnected) {
-        if (typeof sendCommand === 'function') {
-            sendCommand('THROTTLE 1000');
+        if (typeof isConnected !== 'undefined' && isConnected) {
+            if (typeof sendCommand === 'function') {
+                sendCommand('THROTTLE_STOP');
+            }
         }
     }
 }
