@@ -16,6 +16,11 @@ function handlePIDPageData(data) {
       pidValues.tpa_factor = parseFloat(data.tpa_factor);
     }
 
+    // max_rate_dps (°/s)
+    if (data.max_rate_roll  !== undefined) pidValues.max_rate_roll  = parseFloat(data.max_rate_roll);
+    if (data.max_rate_pitch !== undefined) pidValues.max_rate_pitch = parseFloat(data.max_rate_pitch);
+    if (data.max_rate_yaw   !== undefined) pidValues.max_rate_yaw   = parseFloat(data.max_rate_yaw);
+
     // ✅ LEVEL + TPA slider listener’larını bir kere bağla
     bindPIDExtraSlidersOnce();
 
@@ -85,6 +90,21 @@ function updatePIDUI() {
       if (tpaText)   tpaText.textContent = `${pct}%`;
     }
 
+    // --- MAX RATE DPS ---
+    const rateAxes = [
+      { key: 'max_rate_roll',  slider: 'rollMaxRateSlider',  text: 'rollMaxRateValue'  },
+      { key: 'max_rate_pitch', slider: 'pitchMaxRateSlider', text: 'pitchMaxRateValue' },
+      { key: 'max_rate_yaw',   slider: 'yawMaxRateSlider',   text: 'yawMaxRateValue'   },
+    ];
+    rateAxes.forEach(({ key, slider, text }) => {
+      if (pidValues[key] !== undefined) {
+        const s = $(slider);
+        const t = $(text);
+        if (s) s.value = pidValues[key];
+        if (t) t.textContent = Math.round(pidValues[key]);
+      }
+    });
+
   } catch (e) {
     console.error("PID UI Güncelleme Hatası: ", e);
   }
@@ -117,6 +137,24 @@ function bindPIDExtraSlidersOnce() {
       if (t) t.textContent = `${pct}%`;
     });
   }
+
+  // Max Rate sliders (°/s)
+  const rateBindings = [
+    { sliderId: 'rollMaxRateSlider',  textId: 'rollMaxRateValue',  key: 'max_rate_roll'  },
+    { sliderId: 'pitchMaxRateSlider', textId: 'pitchMaxRateValue', key: 'max_rate_pitch' },
+    { sliderId: 'yawMaxRateSlider',   textId: 'yawMaxRateValue',   key: 'max_rate_yaw'   },
+  ];
+  rateBindings.forEach(({ sliderId, textId, key }) => {
+    const el = document.getElementById(sliderId);
+    if (el) {
+      el.addEventListener('input', () => {
+        const v = parseFloat(el.value);
+        pidValues[key] = v;
+        const t = document.getElementById(textId);
+        if (t) t.textContent = Math.round(v);
+      });
+    }
+  });
 }
 
 

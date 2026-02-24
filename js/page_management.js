@@ -65,6 +65,10 @@ function stopAllStreams() {
     sendCommand('stop_gyro_stream');
     sendCommand('stop_sensor_stream');
     stopThrottleUpdates();
+    const safetyEl = document.getElementById('safetyCheck');
+    if (safetyEl) safetyEl.checked = false;
+    if (typeof safetyChecked !== 'undefined') safetyChecked = false;
+    if (typeof updateSafetyWarning === 'function') updateSafetyWarning();
 }
 
 /**
@@ -142,15 +146,9 @@ function savePageData(page) {
             return;
 
         case 'transmitter':
-            saveCommand = 'TRANSMITTER_SAVE';
-            payload = {
-                protocol: $('rcProtocol').value,
-                channel_map: $('channelMap').value,
-                rssi_channel: parseInt($('rssiChannel').value),
-                failsafe_mode: $('failsafeMode').value,
-                battery_pin: parseInt($('batteryPin').value)
-            };
-            break;
+            saveTransmitterConfig();
+            resetSaveButton(btn, 2000);
+            return;
 
         case 'modes':
             saveCommand = 'MODES_SAVE';
