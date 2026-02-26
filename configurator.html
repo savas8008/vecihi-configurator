@@ -76,7 +76,7 @@
     </style>
 
 </head>
-<body>
+<body class="panel1">
     
     <header class="dashboard-header py-3 panel2" >
       <div class="container-fluid">
@@ -114,11 +114,8 @@
                         <li class="nav-item"><a class="nav-link active" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> Kalibrasyon</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="outputs"><i class="bi bi-plug me-2"></i> Konfigürasyon</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="transmitter"><i class="bi bi-controller me-2"></i> Kumanda</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i> Uçuş Modları</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i>Uçuş Modları</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="pid"><i class="bi bi-graph-up me-2"></i> PID</a></li>
-						<li class="nav-item">
-
-</li>
 						<li class="nav-item">
     <a class="nav-link" href="#" data-page="advanced">
         <i class="bi bi-sliders me-2"></i> Tercihler
@@ -135,8 +132,8 @@
             </div>
 
             <div class="col-lg-10 col-md-9">
-                <div id="connectionPrompt" class="connection-prompt">
-                    <div class="panel text-center">
+                <div id="connectionPrompt" class="connection-prompt" id="">
+                    <div class="panel2 text-center">
                         <i class="bi bi-usb-symbol display-1 text-muted mb-4 gradient-text mb-3"></i>
                         <h2 class="gradient-text mb-3">Seri Port Bağlantısı Gerekli</h2>
                         <p class="gradient-text mb-3">Uygulamayı kullanmak için lütfen cihazınızı seri porta bağlayın.</p>
@@ -151,7 +148,7 @@
 
     <!-- SOL: 3D + HUD -->
     <div class="col-lg-6">
-      <div class="panel3 p-3">
+      <div class="panel2 p-3">
         <div class="d-flex align-items-center justify-content-between mb-2 baslik">
           <div>
             <div class="fw-semibold">Kalibrasyon Görünümü</div>
@@ -162,7 +159,7 @@
              style="width:100%; height:280px; background:#e2e8f0; border-radius:12px; position:relative; overflow:hidden; min-height:240px;">
         </div>
 
-        <div class="row justify-content-center mt-3 mb-0">
+        <div class="row justify-content-center mt-3 mb-0 panel3">
           <div class="col-12">
             <div class="panel3 euler-panel mb-0">
 
@@ -172,7 +169,7 @@
 
               <div class="hud-divider"></div>
 
-              <div class="angles-grid">
+              <div class="angles-grid ">
                 <div class="angle-box">
                   <span class="angle-label">ROLL</span>
                   <strong id="euler-roll" class="angle-val">0.0°</strong>
@@ -203,7 +200,7 @@
 
     <!-- SAĞ: Canlı Sensör Verileri -->
     <div class="col-lg-6">
-      <div class="panel">
+      <div class="panel2">
         <h2 class="panel-title"><i class="bi bi-radar"></i> Canlı Sensör Verileri</h2>
 
         <div class="row">
@@ -272,7 +269,7 @@
 
     <!-- ALT: Konum Radarı (tam genişlik) -->
     <div class="col-12">
-      <div class="panel3">
+      <div class="panel2">
         <h3 class="h5 text-light mb-3"><i class="bi bi-map"></i> Konum </h3>
         <div id="map-container" style="width: 100%; height: 350px; border-radius: 8px; border: 1px solid #444; z-index: 1;"></div>
       </div>
@@ -280,29 +277,29 @@
 
     <!-- EN ALT: MCU & Sistem (tam genişlik) -->
     <div class="col-12">
-      <div class="panel3">
+      <div class="panel2">
         <h3 class="h5 text-danger mb-3"><i class="bi bi-cpu"></i> MCU &amp; Sistem Durumu</h3>
         <div class="row g-3 text-center">
           <div class="col-md-3 col-6">
-            <div class="p-2 border border-secondary rounded">
+            <div class="p-2 border border-secondary rounded panel3">
               <small class="text-muted d-block">CORE 1 (LOOP)</small>
               <span id="sys-hz" class="fs-4 fw-bold text-white">0</span> <small class="text-muted">Hz</small>
             </div>
           </div>
           <div class="col-md-3 col-6">
-            <div class="p-2 border border-secondary rounded">
+            <div class="p-2 border border-secondary rounded panel3">
               <small class="text-muted d-block">CORE 0 (SYS)</small>
               <span id="sys-hz0" class="fs-4 fw-bold text-info">0</span> <small class="text-muted">Hz</small>
             </div>
           </div>
           <div class="col-md-3 col-6">
-            <div class="p-2 border border-secondary rounded">
+            <div class="p-2 border border-secondary rounded panel3">
               <small class="text-muted d-block">SICAKLIK</small>
               <span id="sys-temp" class="fs-4 fw-bold text-warning">--</span> <small class="text-muted">°C</small>
             </div>
           </div>
           <div class="col-md-3 col-6">
-            <div class="p-2 border border-secondary rounded">
+            <div class="p-2 border border-secondary rounded panel3">
               <small class="text-muted d-block">BOŞ RAM</small>
               <span id="sys-ram" class="fs-4 fw-bold text-info">--</span> <small class="text-muted">KB</small>
             </div>
@@ -322,7 +319,7 @@
     <div class="col-lg-6">
 
       <!-- Pozisyon (6 yüz) adımları -->
-      <div class="panel3 p-2 mb-2 baslik">
+      <div class="panel2 p-2 mb-2 baslik">
         <div class="fw-semibold">Pozisyon Kalibrasyonu (6 Yüz)</div>
         <div class="small text-muted">Her adımda uçağı konumlandırıp tıklayın</div>
 
@@ -398,7 +395,7 @@
       </div>
 
       <!-- Gyro Kalibrasyonu -->
-      <div class="panel3 p-2 mb-2 baslik">
+      <div class="panel2 p-2 mb-2 baslik">
         <div class="small text-muted">Gyro Kalibrasyonu</div>
 
         <div class="cal-steps-container mb-1">
@@ -416,7 +413,7 @@
       </div>
 
       <!-- Hard Kalibrasyon -->
-      <div class="panel3 p-2 mb-2 baslik">
+      <div class="panel2 p-2 mb-2 baslik">
         <div class="small text-muted">Hard Kalibrasyon</div>
 
         <div class="cal-steps-container mb-0">
@@ -440,7 +437,7 @@
 
     <!-- SAĞ: Mevcut kalibrasyon değerleri -->
     <div class="col-lg-6">
-      <div class="panel3 p-3">
+      <div class="panel2 p-3">
         <div class="d-flex align-items-center justify-content-between mb-2 baslik">
           <div>
             <div class="fw-semibold">Mevcut Kalibrasyon Değerleri</div>
@@ -480,7 +477,7 @@
 
 <div id="outputs" class="page">
   <!-- 1) PANEL: Uçak Tipi Seçimi -->
-  <div class="panel mb-4">
+  <div class="panel2 mb-4">
     <h2 class="panel-title"><i class="bi bi-airplane"></i> Uçak Tipi Seçimi</h2>
 
     <div class="row g-3">
@@ -523,7 +520,7 @@
   </div>
 
   <!-- 2) PANEL: Motor & Servo Çıkış Pinleri -->
-  <div class="panel mb-4">
+  <div class="panel2 mb-4">
     <h2 class="panel-title"><i class="bi bi-plug"></i> Motor & Servo Çıkış Pinleri</h2>
 
     <div class="row g-3">
@@ -762,7 +759,7 @@
   </div>
 
   <!-- 3) PANEL: AUX Portları -->
-  <div class="panel">
+  <div class="panel2">
     <h2 class="panel-title"><i class="bi bi-usb-plug"></i> AUX Portları</h2>
 
     <!-- RX / GPS / OSD -->
@@ -834,7 +831,7 @@
 </div>
 
  <div id="transmitter" class="page">
-    <div class="panel">
+    <div class="panel2">
         <h2 class="panel-title"><i class="bi bi-controller"></i> Kumanda ve Alıcı Ayarları</h2>
         
         <div class="row">
@@ -926,7 +923,7 @@
 </div>
 				
           <div id="modes" class="page">
-    <div class="panel">
+    <div class="panel2">
         <h2 class="panel-title"><i class="bi bi-gear"></i> Uçuş Modları</h2>
         <div class="row wrapper" id="modesWrapper"> 
         </div>
@@ -937,7 +934,7 @@
 </div>
 
       <div id="pid" class="page">
-    <div class="panel">
+    <div class="panel2">
         <h2 class="panel-title"><i class="bi bi-graph-up"></i> PID Ayarları</h2>
         <div class="row">
             <div class="col-md-4 panel3">
@@ -1037,13 +1034,13 @@
     </div>
    
 	<div id="advanced" class="page">
-    <div class="panel">
+    <div class="panel2">
         <h2 class="panel-title mb-4"><i class="bi bi-sliders"></i> Tercihler</h2>
 
         <div class="row g-4">
             
             <!-- ==================== 1. UÇUŞ LİMİTLERİ & AUTO LAUNCH ==================== -->
-            <div class="col-12">
+            <div class="col-12 panel3">
                 <div class="card bg-dark border-secondary">
                     <div class="card-header bg-danger bg-opacity-25 text-danger border-danger">
                         <h5 class="mb-0"><i class="bi bi-airplane-engines"></i> 1. Uçuş Limitleri & Auto Launch</h5>
@@ -1149,7 +1146,7 @@
             </div>
 
             <!-- ==================== 2. NAVİGASYON & GPS ==================== -->
-            <div class="col-12">
+            <div class="col-12 panel3">
                 <div class="card bg-dark border-secondary">
                     <div class="card-header bg-primary bg-opacity-25 text-primary border-primary">
                         <h5 class="mb-0"><i class="bi bi-geo-fill"></i> 2. Navigasyon & GPS</h5>
@@ -1213,7 +1210,7 @@
                             </div>
 
                             <!-- RTH (Eve Dönüş) -->
-                            <div class="col-md-4 border-end border-secondary">
+                            <div class="col-md-4 border-end border-secondary ">
                                 <h6 class="text-muted mb-3">RTH (Eve Dönüş)</h6>
                                 <div class="mb-2 row">
                                     <label class="col-sm-7 col-form-label col-form-label-sm">RTH İrtifası (m)</label>
@@ -1332,7 +1329,7 @@
             </div>
 
             <!-- ==================== 3. İRTİFA ==================== -->
-            <div class="col-12">
+            <div class="col-12 panel3">
                 <div class="card bg-dark border-secondary">
                     <div class="card-header bg-success bg-opacity-25 text-success border-success">
                         <h5 class="mb-0"><i class="bi bi-arrow-bar-up"></i> 3. İrtifa Tahmini</h5>
@@ -1377,7 +1374,7 @@
             </div>
 
             <!-- ==================== 4. DONANIM, SENSÖR & FİLTRELER ==================== -->
-            <div class="col-12">
+            <div class="col-12 panel3">
                 <div class="card bg-dark border-secondary">
                     <div class="card-header bg-info bg-opacity-25 text-info border-info">
                         <h5 class="mb-0"><i class="bi bi-cpu"></i> 4. Donanım, Sensör & Filtreler</h5>
@@ -1486,7 +1483,7 @@
 </script>
 		
 <div id="osd" class="page">
-    <div class="panel mb-4">
+    <div class="panel2 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
             <div>
                 <h2 class="panel-title mb-0"><i class="bi bi-aspect-ratio me-2 text-info"></i>OSD Tasarımcı</h2>
@@ -1498,11 +1495,11 @@
             </div>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-4 panel3">
             <div class="col-lg-8">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <div class="panel3 p-3 h-100 bg-dark">
+                        <div class=" p-3 h-100 bg-dark">
                             <h6 class="text-info border-bottom border-secondary pb-2 mb-3">
                                 <i class="bi bi-list-check me-2"></i>Ekran Öğeleri
                             </h6>
@@ -1743,7 +1740,7 @@
             
             <div class="col-md-4">
                 
-                <div class="panel mb-3">
+                <div class="panel3 mb-3">
                     <h3 class="h5 mb-3"><i class="bi bi-send"></i> Komut Merkezi</h3>
                     
                     <div class="mb-3">
@@ -1824,7 +1821,7 @@
                     </div>
                 </div>
 
-                <div class="panel">
+                <div class="panel3">
                     <h3 class="h5 mb-3"><i class="bi bi-filter"></i> Log Filtreleme</h3>
                     <div class="mb-3">
                         <label class="form-label">Gösterilecek Log Tipi</label>
@@ -1855,7 +1852,7 @@
 
             <div class="col-md-8">
                 
-                <div class="panel">
+                <div class="panel3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h3 class="h5 mb-0"><i class="bi bi-terminal"></i> Sistem Kayıtları (Logs)</h3>
                         <div class="d-flex align-items-center gap-2">
@@ -1881,7 +1878,7 @@
                     </div>
                 </div>
 
-                <div class="panel">
+                <div class="panel3">
                     <h3 class="h5 mb-3"><i class="bi bi-graph-up"></i> İletişim İstatistikleri</h3>
                     <div class="row text-center">
                         <div class="col-4">

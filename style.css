@@ -16,7 +16,7 @@
     --color-brand-blue-rgb: 234, 46, 46;
 
     --color-primary: #0ea5e9;           /* Sky Blue */
-    --color-primary-hover: #abccdc;     /* Darker Blue */
+    --color-primary-hover: #000000;     /* Darker Blue */
     --color-primary-glow: rgba(14, 165, 233, 0.3);
     
     --color-secondary: #94a3b8;         /* Slate 400 */
@@ -35,16 +35,17 @@
     --color-info: #0ea5e9;              /* Açık mavi - Bilgi */
     
     /* --- ARKAPLAN RENKLERİ --- */
-    --bg-body: #2e87df;                 /* Açık gri/beyaz */
-    --bg-body-gradient: linear-gradient(135deg, #8c969b 0%, #e2e8f0 100%);
+    --bg-body: #b02626;                 /* Açık gri/beyaz */
+    --bg-body-gradient: linear-gradient(135deg, #29b4d3 0%, #e2e8f0 100%);
     
-    --bg-panel: rgba(61, 198, 175, 0.504);  /* Panel arkası (glassmorphism) */
+    --bg-panel: rgba(30, 175, 154, 0.129);  /* Panel arkası (glassmorphism) */
     --bg-panel-solid: #d35f5f;             /* Solid panel */
     --bg-input: #ffffff;                   /* Input arkası */
     --bg-hover: rgba(0, 0, 0, 0.05);
     
     --bg-terminal: #0d5ee2;             /* Log/Terminal arkası (Koyu kalmalı) */
-    --bg-3d-canvas: #c99b56;            /* 3D Sahne arkası */
+    --bg-3d-canvas: #26d458;            /* 3D Sahne arkası */
+    --bg-overlay: #ffffff;              /* Bağlantı ekranı arka plan rengi (Tek renk) */
     
     /* --- KENARLIK RENKLERİ --- */
     --border-default: rgba(0, 0, 0, 0.1);
@@ -52,8 +53,8 @@
     --border-focus: var(--color-primary);
     
     /* --- METİN RENKLERİ --- */
-    --text-primary: #000000;            /* Ana metin (Tam Siyah) */
-    --text-secondary: #222222;          /* İkincil metin (Koyu Gri/Siyah) */
+    --text-primary: #170101;            /* Ana metin (Tam Siyah) */
+    --text-secondary: #000102;          /* İkincil metin (Koyu Gri/Siyah) */
     --text-muted: #444444;              /* Soluk metin */
     --text-inverse: #ffffff;            /* Ters metin (Beyaz) */
     
@@ -86,8 +87,13 @@
     --shadow-glow: 0 0 20px var(--color-primary-glow);
     
     /* --- FONTLAR --- */
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    /* Yazı Tipi 1: Ana Başlıklar */
+    --font-title: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Yazı Tipi 2: Düğmeler ve Etkileşimli Öğeler */
+    --font-button: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Yazı Tipi 3: Bilgilendirme Metinleri */
+    --font-info: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; /* Teknik veriler için */
     
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.85rem;
@@ -114,7 +120,7 @@ body {
     background-color: var(--bg-body);
     background-image: var(--bg-body-gradient);
     color: var(--text-primary);
-    font-family: var(--font-sans);
+    font-family: var(--font-info); /* Varsayılan yazı tipi bilgilendirme formatı olsun */
     font-size: var(--font-size-md);
     line-height: 1.6;
     min-height: 100vh;
@@ -140,9 +146,10 @@ body {
 
 /* Başlıklar */
 h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-title);
     margin: 0 0 var(--spacing-md);
-    font-weight: 600;
-    letter-spacing: -0.5px;
+    font-weight: 700; /* Daha kalın başlıklar */
+    letter-spacing: -0.8px;
     color: var(--text-primary);
 }
 
@@ -158,17 +165,48 @@ a:hover {
 /* ============================================
    3. LAYOUT - PANELLER
    ============================================ */
-.panel, .panel2, .panel3, .sidebar {
-    background: var(--bg-panel);
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
+.panel, .panel1, .panel2, .panel3 {
     padding: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-normal);
     color: var(--text-primary);
-    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+/* Panel 1 (Zemin): Sayfa zemini ve dış katmanlar. */
+.panel, .panel1 {
+    background: rgba(229, 218, 14, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: none; /* Zemin panellerde gölge olmasın */
+}
+
+/* Body her durumda panel1 arka planını kullansın */
+body.panel1 {
+    background-color: var(--bg-body);
+    background-image: var(--bg-body-gradient);
+}
+
+/* Panel 2 (Bloklar): Header ve Sidebar gibi yapısal bloklar. Daha belirgin. */
+.panel2 {
+    background: rgba(26, 45, 128, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-md);
+}
+
+/* Panel 3 (İç Bloklar): Kartlar, bileşenler. En belirgin olan. */
+.panel3 {
+    background: rgba(65, 8, 209, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-sm);
+}
+
+.panel3:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .panel-title {
@@ -176,7 +214,7 @@ a:hover {
     align-items: center;
     gap: var(--spacing-sm);
     font-size: var(--font-size-lg);
-    font-weight: 600;
+    font-family: var(--font-title); /* Başlık yazı tipi */
     color: var(--text-primary);
     padding-bottom: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
@@ -204,15 +242,32 @@ a:hover {
    4. HEADER & NAVİGASYON
    ============================================ */
 .dashboard-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: static;
+    z-index: 10000;
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-default);
     padding: var(--spacing-md) 0;
     margin-bottom: var(--spacing-lg);
+}
+
+/* Modallar her zaman header'ın üstünde görünmeli */
+.modal-backdrop {
+    z-index: 20000 !important;
+}
+
+.modal {
+    z-index: 20010 !important;
+}
+
+/* Header her durumda panel2 görünümünde sabit kalsın */
+.dashboard-header.panel2 {
+    background: rgba(14, 42, 168, 0.4) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-md);
 }
 
 .gradient-text {
@@ -260,13 +315,22 @@ a:hover {
 }
 
 /* Sidebar Navigasyon */
+.sidebar .nav-item {
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar .nav-item + .nav-item {
+    margin-top: var(--spacing-xs);
+}
+
 .sidebar .nav-link {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     color: var(--text-secondary);
     padding: var(--spacing-sm) var(--spacing-md);
-    margin-bottom: var(--spacing-xs);
+    margin: 0;
     border-radius: var(--radius-md);
     border: 1px solid transparent;
     font-weight: bold;
@@ -306,7 +370,7 @@ a:hover {
 
 /* Euler Panel (HUD) */
 .euler-panel {
-    background: linear-gradient(145deg, rgba(40, 45, 60, 0.9), rgba(20, 25, 35, 0.95));
+    background: rgba(224, 224, 220, 0.85); /* İsteğinize göre burayı değiştirebilirsiniz */
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
@@ -982,6 +1046,7 @@ input[type="range"]::-moz-range-thumb {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    font-family: var(--font-button); /* Düğme yazı tipi */
     gap: var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: var(--font-size-sm);
@@ -1160,7 +1225,7 @@ input[type="range"]::-moz-range-thumb {
         --spacing-xl: 24px;
     }
     
-    .panel, .panel2, .panel3 {
+    .panel, .panel1, .panel2, .panel3 {
         padding: var(--spacing-md);
     }
     
@@ -1237,17 +1302,14 @@ input[type="range"]::-moz-range-thumb {
 
 /* Bağlantı Penceresi Garantisi */
 #connectionPrompt {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
+    position: relative !important;
     width: 100% !important;
-    height: 100% !important;
+    min-height: 60vh !important;
     display: flex !important; /* Varsayılan olarak göster */
     align-items: center !important;
     justify-content: center !important;
-    z-index: 9999 !important;
-    background: rgba(0, 0, 0, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
+    z-index: 1 !important;
+    background: transparent !important;
 }
 
 /* Bağlantı kurulduğunda pencereyi kesinlikle gizle */
