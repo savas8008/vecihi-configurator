@@ -162,7 +162,6 @@ function bindPIDExtraSlidersOnce() {
             try {
                 log(`📊 PID ayarları kaydediliyor...`, 'info');
                 const jsonCommand = `PID_SAVE ${JSON.stringify(pidValues)}`;
-				alert(jsonCommand);
                 sendCommand(jsonCommand);
             } catch (error) {
                 console.error('PID ayarları kaydetme hatası:', error);
