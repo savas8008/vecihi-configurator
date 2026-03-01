@@ -35,7 +35,8 @@ const modeDefinitions = [
     { key: 'cruise', name: 'CRUISE', cat: 'assist', defaultMin: 1500, defaultMax: 1700, defaultCh: 9 },
     { key: 'althold', name: 'ALTITUDE HOLD', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 9 },
     { key: 'headhold', name: 'HEADING HOLD', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
-    { key: 'autotune', name: 'AUTO TUNE', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 }
+    { key: 'autotune', name: 'AUTO TUNE', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
+    { key: 'flaperon', name: 'FLAPERON', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 }
 ];
 
 // ============================================================================
