@@ -42,10 +42,13 @@ let advancedConfig = {
         gps_baud: 9600,
         
         // Launch
-        launch_throttle: 1700, 
-        launch_angle: 20, 
-        launch_time: 2000
-    }, 
+        launch_throttle: 1700,
+        launch_angle: 20,
+        launch_time: 2000,
+
+        // Güvenlik: Yön hatası bu eşiği aşarsa irtifa düzeltmesi devre dışı
+        heading_err_alt_thr: 45
+    },
     misc: { 
         tpa: 0.00, 
         esc_hz: 50 
@@ -197,6 +200,9 @@ function updateAdvancedUI() {
         // L1 navigasyon
         setVal("inp_nav_l1_period", n.l1_period);
         setVal("inp_nav_l1_damping", n.l1_damping);
+
+        // Yön hatası irtifa kilidi eşiği
+        setVal("inp_nav_hdg_err_alt_thr", n.heading_err_alt_thr);
     }
 
     // --- Altitude config ---
@@ -332,6 +338,9 @@ function saveAdvancedConfig() {
     // L1 navigasyon
     setIf(nav, "l1_period", int("inp_nav_l1_period"));
     setIf(nav, "l1_damping", num("inp_nav_l1_damping"));
+
+    // Yön hatası irtifa kilidi eşiği
+    setIf(nav, "heading_err_alt_thr", int("inp_nav_hdg_err_alt_thr"));
 
     if (Object.keys(nav).length) cfg.nav = nav;
 
