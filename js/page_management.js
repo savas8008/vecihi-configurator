@@ -151,9 +151,9 @@ function savePageData(page) {
             return;
 
         case 'modes':
-            saveCommand = 'MODES_SAVE';
-            payload = collectModesData();
-            break;
+            saveFlightModesConfig();
+            resetSaveButton(btn, 2000);
+            return;
 
         case 'pid':
             saveCommand = 'PID_SAVE';
