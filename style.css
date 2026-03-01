@@ -1,848 +1,948 @@
-﻿/* ============================================
-   X-FLIGHT CONFIGURATOR - THEME SYSTEM
-   ============================================
-   Flight Controller için profesyonel koyu tema
-   
-   Değiştirmek için sadece :root içindeki değişkenleri düzenleyin.
-   Tüm renkler ve boyutlar merkezi olarak yönetilir.
-   ============================================ */
+/* ============================================================
+   X-FLIGHT CONFIGURATOR — MERKEZİ TEMA SİSTEMİ
+   ============================================================
+   3 KATMANLI PANEL HİYERARŞİSİ
+   ─────────────────────────────
+   panel1  → Arka Plan (body/sayfa zemini)
+   panel2  → Adacıklar (header, sidebar, içerik kartları,
+              bağlantı penceresi — panel1 üzerinde yüzen yüzeyler)
+   panel3  → Ada İçi Bölümler (panel2 içindeki alt bölümler)
 
-/* ============================================
-   1. MERKEZI DEĞİŞKENLER (THEME TOKENS)
-   ============================================ */
+   3 GRUP YAZI STİLİ
+   ─────────────────
+   .t1 / .type-heading   → Başlık  (bölüm/panel başlıkları)
+   .t2 / .type-indicator → Gösterge (canlı veriler, sayısal değerler)
+   .t3 / .type-desc      → Açıklama (form etiketleri, yardım metinleri)
+
+   MERKEZI KONTROL
+   ───────────────
+   Tüm renkler, arka planlar ve tipografi yalnızca
+   :root içindeki değişkenler düzenlenerek değiştirilir.
+   Bileşen CSS'i bu değişkenlere referans verir, sabit
+   değer içermez.
+   ============================================================ */
+
+
+/* ============================================================
+   1. MERKEZİ DEĞİŞKENLER
+   ============================================================ */
 :root {
-    /* --- ANA RENKLER --- */
-    --color-brand-blue: #ea2e2e;        /* Özel Mavi Tonu */
-    --color-brand-blue-rgb: 234, 46, 46;
 
-    --color-primary: #0ea5e9;           /* Sky Blue */
-    --color-primary-hover: #abccdc;     /* Darker Blue */
-    --color-primary-glow: rgba(14, 165, 233, 0.3);
-    
-    --color-secondary: #94a3b8;         /* Slate 400 */
-    --color-secondary-hover: #64748b;
-    
-    /* --- DURUM RENKLERİ --- */
-    --color-success: #10b981;           /* Yeşil - Armed, OK */
-    --color-success-glow: rgba(16, 185, 129, 0.4);
-    
-    --color-warning: #f59e0b;           /* Amber - Dikkat */
-    --color-warning-glow: rgba(245, 158, 11, 0.4);
-    
-    --color-danger: #ef4444;            /* Kırmızı - Hata, Disarmed */
-    --color-danger-glow: rgba(239, 68, 68, 0.4);
-    
-    --color-info: #0ea5e9;              /* Açık mavi - Bilgi */
-    
-    /* --- ARKAPLAN RENKLERİ --- */
-    --bg-body: #2e87df;                 /* Açık gri/beyaz */
-    --bg-body-gradient: linear-gradient(135deg, #8c969b 0%, #e2e8f0 100%);
-    
-    --bg-panel: rgba(61, 198, 175, 0.504);  /* Panel arkası (glassmorphism) */
-    --bg-panel-solid: #d35f5f;             /* Solid panel */
-    --bg-input: #ffffff;                   /* Input arkası */
-    --bg-hover: rgba(0, 0, 0, 0.05);
-    
-    --bg-terminal: #0d5ee2;             /* Log/Terminal arkası (Koyu kalmalı) */
-    --bg-3d-canvas: #c99b56;            /* 3D Sahne arkası */
-    
-    /* --- KENARLIK RENKLERİ --- */
-    --border-default: rgba(0, 0, 0, 0.1);
-    --border-light: rgba(0, 0, 0, 0.05);
-    --border-focus: var(--color-primary);
-    
-    /* --- METİN RENKLERİ --- */
-    --text-primary: #000000;            /* Ana metin (Tam Siyah) */
-    --text-secondary: #222222;          /* İkincil metin (Koyu Gri/Siyah) */
-    --text-muted: #444444;              /* Soluk metin */
-    --text-inverse: #ffffff;            /* Ters metin (Beyaz) */
-    
-    /* --- HUD & DATA RENKLERİ --- */
-    --hud-green: #20d297;               /* Klasik HUD yeşili */
-    --hud-amber: #fbbf24;               /* Canlı imleç sarısı */
-    --data-x: #ff6b6b;                  /* X ekseni (kırmızı) */
-    --data-y: #51cf66;                  /* Y ekseni (yeşil) */
-    --data-z: #339af0;                  /* Z ekseni (mavi) */
-    
-    /* --- BOYUTLAR --- */
-    --radius-xs: 4px;
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --radius-xl: 20px;
+    /* ── RENK PALETİ ─────────────────────────────────────── */
+    --color-accent:        #0ea5e9;
+    --color-accent-rgb:    14, 165, 233;
+    --color-accent-hover:  #38bdf8;
+    --color-accent-glow:   rgba(14, 165, 233, 0.30);
+
+    --color-brand:         #ea2e2e;
+    --color-brand-rgb:     234, 46, 46;
+
+    --color-success:       #10b981;
+    --color-success-glow:  rgba(16, 185, 129, 0.40);
+
+    --color-warning:       #f59e0b;
+    --color-warning-glow:  rgba(245, 158, 11, 0.40);
+
+    --color-danger:        #ef4444;
+    --color-danger-glow:   rgba(239, 68, 68, 0.40);
+
+    --color-info:          #0ea5e9;
+
+    /* ── HUD & VERİ RENKLERİ ──────────────────────────────── */
+    --hud-green:  #20d297;
+    --hud-amber:  #fbbf24;
+    --data-x:     #ff6b6b;
+    --data-y:     #51cf66;
+    --data-z:     #339af0;
+
+    /* ══════════════════════════════════════════════════════
+       PANEL 1 — ARKA PLAN
+       Sayfanın en altındaki katman; header/sidebar/kartlar
+       bu zemin üzerinde yüzer.
+       ══════════════════════════════════════════════════════ */
+    --p1-bg:          linear-gradient(135deg, #0f1117 0%, #1a1f2e 100%);
+    --p1-bg-solid:    #0f1117;
+    --p1-text:        #cbd5e1;
+
+    /* ══════════════════════════════════════════════════════
+       PANEL 2 — ADACIKLAR
+       Header, sol menü barı, içerik kartları ve
+       bağlantı penceresi — panel1 üzerinde yüzen yüzeyler.
+       ══════════════════════════════════════════════════════ */
+    --p2-bg:          rgba(255, 255, 255, 0.06);
+    --p2-bg-solid:    #1e2535;
+    --p2-border:      rgba(255, 255, 255, 0.10);
+    --p2-shadow:      0 4px 24px rgba(0, 0, 0, 0.45);
+    --p2-radius:      14px;
+    --p2-blur:        14px;
+    --p2-text:        #e2e8f0;
+    --p2-padding:     24px;
+
+    /* ══════════════════════════════════════════════════════
+       PANEL 3 — ADA İÇİ BÖLÜMLER
+       Panel2 içindeki alt veri kutuları, alt kartlar,
+       kalibrasyon adımları, PID satırları…
+       ══════════════════════════════════════════════════════ */
+    --p3-bg:          rgba(0, 0, 0, 0.28);
+    --p3-bg-solid:    #141822;
+    --p3-border:      rgba(255, 255, 255, 0.07);
+    --p3-shadow:      inset 0 1px 4px rgba(0, 0, 0, 0.45);
+    --p3-radius:      10px;
+    --p3-text:        #94a3b8;
+    --p3-padding:     16px;
+
+    /* ══════════════════════════════════════════════════════
+       TİP 1 — BAŞLIK
+       Panel/bölüm başlıkları, sayfa başlıkları.
+       ══════════════════════════════════════════════════════ */
+    --t1-family:       'Inter', system-ui, -apple-system, sans-serif;
+    --t1-size:         1.05rem;
+    --t1-weight:       700;
+    --t1-color:        #f1f5f9;
+    --t1-spacing:      -0.3px;
+    --t1-line-height:  1.4;
+
+    /* ══════════════════════════════════════════════════════
+       TİP 2 — GÖSTERGE
+       Canlı sayısal değerler, sensör okumaları,
+       PWM değerleri, açı göstergeleri.
+       ══════════════════════════════════════════════════════ */
+    --t2-family:       'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    --t2-size:         1.25rem;
+    --t2-weight:       700;
+    --t2-color:        #0ea5e9;
+    --t2-glow:         0 0 8px rgba(14, 165, 233, 0.40);
+    --t2-line-height:  1.2;
+
+    /* ══════════════════════════════════════════════════════
+       TİP 3 — AÇIKLAMA
+       Form etiketleri, yardım metinleri, kategori tanımları.
+       ══════════════════════════════════════════════════════ */
+    --t3-family:       'Inter', system-ui, -apple-system, sans-serif;
+    --t3-size:         0.78rem;
+    --t3-weight:       400;
+    --t3-color:        #64748b;
+    --t3-line-height:  1.55;
+
+    /* ── BOYUTLAR ─────────────────────────────────────────── */
+    --radius-xs:   4px;
+    --radius-sm:   6px;
+    --radius-md:   10px;
+    --radius-lg:   14px;
+    --radius-xl:   20px;
     --radius-full: 50px;
-    
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
-    
-    /* --- BLUR & GÖLGE --- */
-    --blur-amount: 12px;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --shadow-glow: 0 0 20px var(--color-primary-glow);
-    
-    /* --- FONTLAR --- */
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-    
-    --font-size-xs: 0.75rem;
-    --font-size-sm: 0.85rem;
-    --font-size-md: 1rem;
-    --font-size-lg: 1.25rem;
-    --font-size-xl: 1.5rem;
-    
-    /* --- GEÇİŞLER --- */
-    --transition-fast: 0.15s ease;
+
+    --spacing-xs:  4px;
+    --spacing-sm:  8px;
+    --spacing-md:  16px;
+    --spacing-lg:  24px;
+    --spacing-xl:  32px;
+
+    /* ── GEÇİŞLER ────────────────────────────────────────── */
+    --transition-fast:   0.15s ease;
     --transition-normal: 0.25s ease;
-    --transition-slow: 0.4s ease;
+    --transition-slow:   0.40s ease;
+
+    /* ── GÖLGE ───────────────────────────────────────────── */
+    --shadow-sm:    0 2px 8px  rgba(0, 0, 0, 0.30);
+    --shadow-md:    0 4px 16px rgba(0, 0, 0, 0.40);
+    --shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.50);
+    --shadow-glow:  0 0 20px var(--color-accent-glow);
+
+    /* ── GERIYE UYUMLULUK ALIAS'LARI ─────────────────────── */
+    /* Eski bileşen kodları bu alias'lar üzerinden çalışmaya  */
+    /* devam eder; yeni kod doğrudan --p* / --t* kullanır.    */
+    --font-sans:             var(--t1-family);
+    --font-mono:             var(--t2-family);
+    --font-size-xs:          0.75rem;
+    --font-size-sm:          0.85rem;
+    --font-size-md:          1rem;
+    --font-size-lg:          1.25rem;
+    --font-size-xl:          1.5rem;
+    --text-primary:          var(--p2-text);
+    --text-secondary:        var(--p3-text);
+    --text-muted:            var(--t3-color);
+    --text-inverse:          #ffffff;
+    --bg-panel:              var(--p2-bg);
+    --bg-panel-solid:        var(--p2-bg-solid);
+    --bg-input:              rgba(255, 255, 255, 0.08);
+    --bg-hover:              rgba(255, 255, 255, 0.04);
+    --bg-terminal:           #0a0d14;
+    --bg-3d-canvas:          #1a2030;
+    --bg-body:               var(--p1-bg-solid);
+    --bg-body-gradient:      var(--p1-bg);
+    --border-default:        var(--p2-border);
+    --border-light:          var(--p3-border);
+    --border-focus:          var(--color-accent);
+    --blur-amount:           var(--p2-blur);
+    --color-primary:         var(--color-accent);
+    --color-primary-hover:   var(--color-accent-hover);
+    --color-primary-glow:    var(--color-accent-glow);
+    --color-brand-blue:      var(--color-brand);
+    --color-brand-blue-rgb:  var(--color-brand-rgb);
+    --color-secondary:       #94a3b8;
+    --color-secondary-hover: #64748b;
 }
 
-/* ============================================
-   2. RESET & GENEL YAPILANDIRMA
-   ============================================ */
-*, *::before, *::after {
-    box-sizing: border-box;
-}
+
+/* ============================================================
+   2. RESET & GENEL
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
     margin: 0;
     padding: 0;
-    background-color: var(--bg-body);
-    background-image: var(--bg-body-gradient);
-    color: var(--text-primary);
-    font-family: var(--font-sans);
-    font-size: var(--font-size-md);
+    background:  var(--p1-bg);
+    color:       var(--p1-text);
+    font-family: var(--t1-family);
+    font-size:   var(--font-size-md);
     line-height: 1.6;
-    min-height: 100vh;
-    overflow-x: hidden;
+    min-height:  100vh;
+    overflow-x:  hidden;
     -webkit-font-smoothing: antialiased;
 }
 
 /* Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: var(--radius-xs);
-}
-::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary);
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track  { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.12); border-radius: var(--radius-xs); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
 
-/* Başlıklar */
 h1, h2, h3, h4, h5, h6 {
     margin: 0 0 var(--spacing-md);
     font-weight: 600;
-    letter-spacing: -0.5px;
-    color: var(--text-primary);
+    letter-spacing: -0.4px;
+    color: var(--p2-text);
 }
 
 a {
-    color: var(--color-primary);
+    color: var(--color-accent);
     text-decoration: none;
     transition: color var(--transition-fast);
 }
-a:hover {
-    color: var(--color-primary-hover);
+a:hover { color: var(--color-accent-hover); }
+
+
+/* ============================================================
+   3. PANEL SİSTEMİ
+   ============================================================ */
+
+/* ── PANEL 1 — Arka Plan ──────────────────────────────────── */
+/* body zaten panel1; ayrıca bir .panel1 class'ı da tanımlanır */
+.panel1 {
+    background: var(--p1-bg);
+    color:      var(--p1-text);
 }
 
-/* ============================================
-   3. LAYOUT - PANELLER
-   ============================================ */
-.panel, .panel2, .panel3, .sidebar {
-    background: var(--bg-panel);
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-    box-shadow: var(--shadow-md);
-    color: var(--text-primary);
-    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+/* ── PANEL 2 — Adacıklar ─────────────────────────────────── */
+/* .panel (numarasız) panel2 ile aynı katmandır → alias       */
+.panel2,
+.panel {
+    background:          var(--p2-bg);
+    backdrop-filter:     blur(var(--p2-blur));
+    -webkit-backdrop-filter: blur(var(--p2-blur));
+    border:              1px solid var(--p2-border);
+    border-radius:       var(--p2-radius);
+    padding:             var(--p2-padding);
+    margin-bottom:       var(--spacing-lg);
+    box-shadow:          var(--p2-shadow);
+    color:               var(--p2-text);
+    transition:          box-shadow var(--transition-normal);
 }
 
+/* ── PANEL 3 — Ada İçi Bölümler ──────────────────────────── */
+.panel3 {
+    background:    var(--p3-bg);
+    border:        1px solid var(--p3-border);
+    border-radius: var(--p3-radius);
+    padding:       var(--p3-padding);
+    box-shadow:    var(--p3-shadow);
+    color:         var(--p3-text);
+}
+
+
+/* ============================================================
+   4. TİPOGRAFİ SİSTEMİ
+   ============================================================ */
+
+/* ── TİP 1 — Başlık ──────────────────────────────────────── */
+.t1,
+.type-heading,
 .panel-title {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    padding-bottom: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-default);
-}
-.panel-title i {
-    color: var(--color-primary);
+    font-family:    var(--t1-family);
+    font-size:      var(--t1-size);
+    font-weight:    var(--t1-weight);
+    color:          var(--t1-color);
+    letter-spacing: var(--t1-spacing);
+    line-height:    var(--t1-line-height);
 }
 
-/* Sayfa Görünürlük */
-.page {
-    display: none;
+/* ── TİP 2 — Gösterge ────────────────────────────────────── */
+.t2,
+.type-indicator {
+    font-family:  var(--t2-family);
+    font-size:    var(--t2-size);
+    font-weight:  var(--t2-weight);
+    color:        var(--t2-color);
+    text-shadow:  var(--t2-glow);
+    line-height:  var(--t2-line-height);
 }
+
+/* ── TİP 3 — Açıklama ────────────────────────────────────── */
+.t3,
+.type-desc {
+    font-family:  var(--t3-family);
+    font-size:    var(--t3-size);
+    font-weight:  var(--t3-weight);
+    color:        var(--t3-color);
+    line-height:  var(--t3-line-height);
+}
+
+
+/* ============================================================
+   5. LAYOUT — SAYFA GÖRÜNÜRLÜĞü & ANİMASYON
+   ============================================================ */
+.page { display: none; }
 .page.active {
     display: block;
     animation: fadeIn 0.2s ease;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ============================================
-   4. HEADER & NAVİGASYON
-   ============================================ */
+/* Panel-title (t1 uyumlu, çizgili başlık) */
+.panel-title {
+    display:         flex;
+    align-items:     center;
+    gap:             var(--spacing-sm);
+    padding-bottom:  var(--spacing-md);
+    margin-bottom:   var(--spacing-lg);
+    border-bottom:   1px solid var(--p2-border);
+}
+.panel-title i { color: var(--color-accent); }
+
+
+/* ============================================================
+   6. HEADER & NAVİGASYON
+   ============================================================ */
+
+/* dashboard-header panel2 sınıfını alıyor (HTML'de mevcut).
+   Buraya sadece layout'a özgü ek stiller ekliyoruz.          */
 .dashboard-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-default);
-    padding: var(--spacing-md) 0;
+    position:      sticky;
+    top:           0;
+    z-index:       100;
+    padding:       var(--spacing-md) 0;
     margin-bottom: var(--spacing-lg);
+    border-radius: 0;                 /* header tam genişlik  */
+    border-top:    none;
+    border-left:   none;
+    border-right:  none;
 }
 
 .gradient-text {
-    background: linear-gradient(45deg, var(--color-brand-blue), #4f46e5);
+    background:             linear-gradient(45deg, var(--color-brand), #818cf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 700;
-    letter-spacing: -1px;
+    background-clip:         text;
+    font-weight:             700;
+    letter-spacing:          -1px;
 }
 
-/* Bağlantı Durumu */
+/* Bağlantı Durumu — panel3 sınıfını alıyor (HTML'de mevcut) */
 .connection-status {
-    display: flex;
+    display:     flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid var(--border-default);
-    padding: var(--spacing-xs) var(--spacing-md);
+    gap:         var(--spacing-sm);
+    font-family: var(--t2-family);
+    font-size:   var(--font-size-sm);
     border-radius: var(--radius-full);
-    font-family: var(--font-mono);
-    font-size: var(--font-size-sm);
+    padding:     var(--spacing-xs) var(--spacing-md);
 }
 
 .status-indicator {
-    width: 10px;
-    height: 10px;
+    width:         10px;
+    height:        10px;
     border-radius: 50%;
-    box-shadow: 0 0 8px currentColor;
-    transition: all var(--transition-fast);
+    box-shadow:    0 0 8px currentColor;
+    transition:    all var(--transition-fast);
 }
-.status-off {
-    background-color: var(--color-danger);
-    color: var(--color-danger);
-}
-.status-connected {
-    background-color: var(--color-success);
-    color: var(--color-success);
-    animation: pulse-glow 2s infinite;
-}
+.status-off       { background-color: var(--color-danger);  color: var(--color-danger); }
+.status-connected { background-color: var(--color-success); color: var(--color-success); animation: pulse-glow 2s infinite; }
 
 @keyframes pulse-glow {
     0%, 100% { box-shadow: 0 0 8px currentColor; }
-    50% { box-shadow: 0 0 16px currentColor; }
+    50%       { box-shadow: 0 0 16px currentColor; }
 }
 
-/* Sidebar Navigasyon */
+/* ── Sidebar (Sol Menü Barı) ─────────────────────────────── */
+/* Sidebar sütunu HTML'de panel2 alıyor; .sidebar alt stillerini tanımlar */
+.sidebar {
+    position: sticky;
+    top: calc(var(--spacing-lg) * 3 + var(--spacing-md));
+}
+
 .sidebar .nav-link {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    color: var(--text-secondary);
-    padding: var(--spacing-sm) var(--spacing-md);
+    display:       flex;
+    align-items:   center;
+    gap:           var(--spacing-sm);
+    color:         var(--p3-text);
+    padding:       var(--spacing-sm) var(--spacing-md);
     margin-bottom: var(--spacing-xs);
     border-radius: var(--radius-md);
-    border: 1px solid transparent;
-    font-weight: bold;
-    transition: all var(--transition-fast);
+    border:        1px solid transparent;
+    font-weight:   600;
+    font-size:     var(--font-size-sm);
+    transition:    all var(--transition-fast);
 }
-
 .sidebar .nav-link:hover {
-    color: var(--text-primary);
-    background: rgba(var(--color-brand-blue-rgb), 0.1);
-    border-color: var(--border-light);
-    transform: translateX(4px);
+    color:       var(--p2-text);
+    background:  rgba(var(--color-brand-rgb), 0.08);
+    border-color: var(--p3-border);
+    transform:   translateX(4px);
 }
-
 .sidebar .nav-link.active {
-    color: var(--color-primary);
-    background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), transparent);
+    color:       var(--color-accent);
+    background:  linear-gradient(90deg, rgba(var(--color-accent-rgb), 0.14), transparent);
     border-color: transparent;
-    border-left: 3px solid var(--color-primary);
+    border-left: 3px solid var(--color-accent);
 }
-
 .sidebar .nav-link i {
-    font-size: 1.1em;
-    width: 20px;
+    font-size:  1.1em;
+    width:      20px;
     text-align: center;
 }
 
-/* ============================================
-   5. 3D CANVAS & HUD PANEL
-   ============================================ */
+
+/* ============================================================
+   7. 3D CANVAS & HUD PANELİ
+   ============================================================ */
 #3d-canvas-container {
-    background: var(--bg-3d-canvas);
-    border: 1px solid var(--border-default);
+    background:    var(--bg-3d-canvas);
+    border:        1px solid var(--p3-border);
     border-radius: var(--radius-lg);
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+    box-shadow:    inset 0 0 20px rgba(0,0,0,0.3);
+    overflow:      hidden;
 }
 
-/* Euler Panel (HUD) */
-.euler-panel {
-    background: linear-gradient(145deg, rgba(40, 45, 60, 0.9), rgba(20, 25, 35, 0.95));
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(10px);
-}
+/* euler-panel panel3 sınıfını alıyor (HTML'de mevcut) */
+.euler-panel { }   /* layout ek stilleri gerekirse buraya */
 
-.arm-section {
-    text-align: center;
-    margin-bottom: var(--spacing-md);
-}
+.arm-section { text-align: center; margin-bottom: var(--spacing-md); }
 
 .arm-status {
-    display: inline-block;
-    width: 100%;
-    padding: var(--spacing-sm) 0;
-    font-family: var(--font-sans);
-    font-size: var(--font-size-lg);
-    font-weight: 800;
+    display:        inline-block;
+    width:          100%;
+    padding:        var(--spacing-sm) 0;
+    font-family:    var(--t2-family);
+    font-size:      var(--font-size-lg);
+    font-weight:    800;
     letter-spacing: 3px;
     text-transform: uppercase;
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-normal);
+    border-radius:  var(--radius-sm);
+    transition:     all var(--transition-normal);
 }
-
 .status-disarmed {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-muted);
-    border: 1px solid var(--border-light);
+    background: rgba(255,255,255,0.04);
+    color:      var(--t3-color);
+    border:     1px solid var(--p3-border);
 }
-
 .status-armed {
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2));
-    color: #ff4d4d;
-    border: 1px solid var(--color-danger);
+    background: linear-gradient(90deg,
+        rgba(239,68,68,0.20), rgba(239,68,68,0.40), rgba(239,68,68,0.20));
+    color:      #ff4d4d;
+    border:     1px solid var(--color-danger);
     text-shadow: 0 0 10px var(--color-danger-glow);
-    animation: armed-pulse 1s infinite;
+    animation:  armed-pulse 1s infinite;
 }
 
 @keyframes armed-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.85; transform: scale(0.98); }
+    0%, 100% { opacity: 1;    transform: scale(1);    }
+    50%       { opacity: 0.85; transform: scale(0.98); }
 }
 
 .hud-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-light), transparent);
-    margin: var(--spacing-md) 0;
+    height:     1px;
+    background: linear-gradient(90deg, transparent, var(--p3-border), transparent);
+    margin:     var(--spacing-md) 0;
 }
 
 .angles-grid {
-    display: grid;
+    display:               grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-sm);
+    gap:                   var(--spacing-sm);
 }
 
+/* angle-box → panel3 materyali */
 .angle-box {
-    background: rgba(0, 0, 0, 0.25);
-    padding: var(--spacing-sm);
+    background:    var(--p3-bg);
+    padding:       var(--spacing-sm);
     border-radius: var(--radius-sm);
-    border: 1px solid var(--border-light);
-    text-align: center;
+    border:        1px solid var(--p3-border);
+    text-align:    center;
 }
 
+/* angle-label → t3 */
 .angle-label {
-    display: block;
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    color: var(--text-secondary);
+    display:        block;
+    font-family:    var(--t3-family);
+    font-size:      var(--font-size-xs);
+    font-weight:    600;
+    color:          var(--t3-color);
     letter-spacing: 1px;
-    margin-bottom: var(--spacing-xs);
+    margin-bottom:  var(--spacing-xs);
 }
 
+/* angle-val → t2 */
 .angle-val {
-    font-family: var(--font-mono);
-    font-size: var(--font-size-lg);
-    color: var(--text-primary);
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    font-family: var(--t2-family);
+    font-size:   var(--font-size-lg);
+    color:       var(--t2-color);
+    text-shadow: var(--t2-glow);
 }
 
 .mode-section {
-    display: flex;
+    display:         flex;
     justify-content: space-between;
-    align-items: center;
-    background: rgba(14, 165, 233, 0.1);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(14, 165, 233, 0.3);
-    margin-top: var(--spacing-md);
+    align-items:     center;
+    background:      rgba(var(--color-accent-rgb), 0.08);
+    padding:         var(--spacing-sm) var(--spacing-md);
+    border-radius:   var(--radius-sm);
+    border:          1px solid rgba(var(--color-accent-rgb), 0.25);
+    margin-top:      var(--spacing-md);
 }
 
+/* mode-label → t3 */
 .mode-label {
-    font-size: var(--font-size-sm);
+    font-family: var(--t3-family);
+    font-size:   var(--font-size-sm);
     font-weight: 600;
-    color: var(--text-secondary);
+    color:       var(--t3-color);
 }
 
+/* mode-val → t2 */
 .mode-val {
-    font-family: var(--font-sans);
-    font-size: var(--font-size-lg);
-    font-weight: 800;
-    color: var(--color-info);
+    font-family:    var(--t2-family);
+    font-size:      var(--font-size-lg);
+    font-weight:    800;
+    color:          var(--color-accent);
     text-transform: uppercase;
     letter-spacing: 1px;
-    text-shadow: 0 0 8px rgba(14, 165, 233, 0.6);
+    text-shadow:    0 0 8px var(--color-accent-glow);
 }
 
-/* ============================================
-   6. KALİBRASYON ADIMLARI
-   ============================================ */
+
+/* ============================================================
+   8. KALİBRASYON ADIMLARI
+   ============================================================ */
 .cal-steps-container {
-    display: grid;
+    display:               grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: var(--spacing-md);
+    gap:                   var(--spacing-md);
 }
 
+/* cal-step → panel3 sınıfını alıyor + ek davranış */
 .cal-step {
-    background: rgba(30, 41, 59, 0.5);
-    border: 2px solid var(--border-default);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md) var(--spacing-sm);
+    border:     2px solid var(--p3-border);
     text-align: center;
-    cursor: pointer;
+    cursor:     pointer;
     transition: all var(--transition-normal);
-    position: relative;
-    overflow: hidden;
+    position:   relative;
+    overflow:   hidden;
 }
-
 .cal-step:hover:not(.disabled) {
-    border-color: var(--color-primary);
-    background: rgba(59, 130, 246, 0.1);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+    border-color: var(--color-accent);
+    background:   rgba(var(--color-accent-rgb), 0.08);
+    transform:    translateY(-3px);
+    box-shadow:   var(--shadow-md);
 }
-
 .cal-step.active {
-    border-color: var(--color-primary);
-    background: rgba(59, 130, 246, 0.08);
-    box-shadow: 0 0 20px var(--color-primary-glow);
+    border-color: var(--color-accent);
+    background:   rgba(var(--color-accent-rgb), 0.08);
+    box-shadow:   0 0 20px var(--color-accent-glow);
 }
-
 .cal-step.completed {
     border-color: var(--color-success);
-    background: rgba(16, 185, 129, 0.08);
+    background:   rgba(16,185,129,0.08);
 }
+.cal-step.disabled { opacity: 0.45; cursor: not-allowed; }
 
-.cal-step.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+.cal-step-icon { font-size: 2rem; margin-bottom: var(--spacing-sm); color: var(--t3-color); transition: color var(--transition-fast); }
+.cal-step.completed .cal-step-icon { color: var(--color-success); }
+.cal-step.active    .cal-step-icon { color: var(--color-accent); }
 
-.cal-step-icon {
-    font-size: 2rem;
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-muted);
-    transition: color var(--transition-fast);
-}
-.cal-step.completed .cal-step-icon {
-    color: var(--color-success);
-}
-.cal-step.active .cal-step-icon {
-    color: var(--color-primary);
-}
-
+/* cal-step-values → t2 küçük */
 .cal-step-values {
-    font-family: var(--font-mono);
-    font-size: var(--font-size-xs);
-    background: rgba(0, 0, 0, 0.4);
-    padding: var(--spacing-xs);
+    font-family:   var(--t2-family);
+    font-size:     var(--font-size-xs);
+    background:    rgba(0,0,0,0.35);
+    padding:       var(--spacing-xs);
     border-radius: var(--radius-xs);
-    margin-top: var(--spacing-xs);
+    margin-top:    var(--spacing-xs);
+    color:         var(--t2-color);
 }
 
-.cal-step-footer {
-    margin-top: var(--spacing-sm);
-}
+.cal-step-footer { margin-top: var(--spacing-sm); }
 
+/* step-label → t3 */
 .step-label {
-    font-size: var(--font-size-xs);
-    color: var(--text-secondary);
+    font-family: var(--t3-family);
+    font-size:   var(--font-size-xs);
+    color:       var(--t3-color);
 }
 
-/* ============================================
-   7. OUTPUTS - UÇAK & SERVO
-   ============================================ */
+
+/* ============================================================
+   9. OUTPUTS — UÇAK & SERVO
+   ============================================================ */
 .aircraft-card {
-    background: var(--bg-hover);
-    border: 2px solid transparent;
+    background:    var(--p3-bg);
+    border:        2px solid transparent;
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    text-align: center;
+    padding:       var(--spacing-md);
+    cursor:        pointer;
+    transition:    all var(--transition-fast);
+    text-align:    center;
 }
-
 .aircraft-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--border-light);
+    background:   rgba(255,255,255,0.06);
+    border-color: var(--p3-border);
 }
-
 .aircraft-card.active {
-    border-color: var(--color-primary);
-    background: rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 15px var(--color-primary-glow);
+    border-color: var(--color-accent);
+    background:   rgba(var(--color-accent-rgb), 0.10);
+    box-shadow:   0 0 15px var(--color-accent-glow);
 }
 
-.aircraft-card h5 {
-    color: var(--text-primary);
-    font-weight: 700;
-    margin-bottom: var(--spacing-xs);
-}
+/* aircraft-card h5 → t1 */
+.aircraft-card h5 { font-family: var(--t1-family); color: var(--t1-color); font-weight: 700; margin-bottom: var(--spacing-xs); }
 
-.aircraft-card small {
-    color: var(--text-secondary);
-    font-size: var(--font-size-xs);
-}
+/* aircraft-card small → t3 */
+.aircraft-card small { font-family: var(--t3-family); color: var(--t3-color); font-size: var(--font-size-xs); }
 
 /* Throttle Slider (Dikey) */
 .throttle-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
     justify-content: flex-end;
-    background: rgba(0, 0, 0, 0.2);
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-lg);
-    min-height: 280px;
-}
-.throttle-container{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-end;
-  min-height:260px;
+    background:      var(--p3-bg);
+    padding:         var(--spacing-lg);
+    border-radius:   var(--radius-lg);
+    min-height:      260px;
+    border:          1px solid var(--p3-border);
 }
 
-.throttle-slider{
-    transform: rotate(180deg); 
-    transform-origin: center;
-  writing-mode: vertical-lr; direction: rtl; -webkit-appearance: none;
-  appearance: auto !important;
-  writing-mode: vertical-rl !important;
-  width: 40px !important;
-  height: 220px !important;
-  margin-top: auto !important;   /* alta iter */
-  margin-bottom: 0 !important;
+.throttle-value {
+    font-family: var(--t2-family);
+    font-size:   var(--font-size-lg);
+    color:       var(--t2-color);
+    text-shadow: var(--t2-glow);
 }
 
-/* Servo/Output Display */
+.throttle-slider {
+    transform:         rotate(180deg);
+    writing-mode:      vertical-rl   !important;
+    -webkit-appearance: none;
+    appearance:        auto          !important;
+    width:             40px          !important;
+    height:            220px         !important;
+    margin-top:        auto          !important;
+    margin-bottom:     0             !important;
+}
+
+/* output-display → panel3 uyumlu */
 .output-display {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border-default);
+    background:    var(--p3-bg);
+    border:        1px solid var(--p3-border);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    text-align: center;
+    padding:       var(--spacing-md);
+    text-align:    center;
 }
 
+/* output-title → t3 */
 .output-title {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-family:    var(--t3-family);
+    font-size:      var(--font-size-xs);
+    font-weight:    600;
+    color:          var(--t3-color);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
+/* output-value → t2 */
 .output-value {
-    font-family: var(--font-mono);
-    font-size: var(--font-size-lg);
+    font-family: var(--t2-family);
+    font-size:   var(--font-size-lg);
     font-weight: bold;
-    color: var(--color-primary);
-    margin: var(--spacing-xs) 0;
+    color:       var(--t2-color);
+    text-shadow: var(--t2-glow);
+    margin:      var(--spacing-xs) 0;
 }
 
 .servo-controls button {
-    background: var(--bg-panel);
-    border: 1px solid var(--border-default);
-    color: var(--text-primary);
+    background:    var(--p3-bg);
+    border:        1px solid var(--p3-border);
+    color:         var(--p2-text);
     border-radius: var(--radius-xs);
-    padding: 2px 8px;
-    font-size: var(--font-size-sm);
-    cursor: pointer;
-    transition: all var(--transition-fast);
+    padding:       2px 8px;
+    font-size:     var(--font-size-sm);
+    cursor:        pointer;
+    transition:    all var(--transition-fast);
 }
+.servo-controls button:hover { background: var(--color-accent); border-color: var(--color-accent); }
+.servo-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.servo-controls button:hover {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-}
 
-.servo-controls button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-/* ============================================
-   8. KUMANDA - RECEIVER BARS
-   ============================================ */
+/* ============================================================
+   10. KUMANDA — RECEIVER BARS
+   ============================================================ */
 .channel-row {
-    display: flex;
-    align-items: center;
+    display:       flex;
+    align-items:   center;
     margin-bottom: var(--spacing-sm);
-    background: var(--bg-hover);
-    padding: var(--spacing-sm) var(--spacing-md);
+    background:    var(--p3-bg);
+    padding:       var(--spacing-sm) var(--spacing-md);
     border-radius: var(--radius-sm);
+    border:        1px solid var(--p3-border);
 }
 
+/* channel-label → t3 */
 .channel-label {
-    width: 80px;
-    font-size: var(--font-size-sm);
+    width:       80px;
+    font-family: var(--t3-family);
+    font-size:   var(--font-size-sm);
     font-weight: 600;
-    color: var(--text-secondary);
+    color:       var(--t3-color);
 }
 
 .channel-track {
-    flex: 1;
-    height: 8px;
-    background: rgba(0, 0, 0, 0.4);
+    flex:          1;
+    height:        8px;
+    background:    rgba(0,0,0,0.40);
     border-radius: var(--radius-xs);
-    margin: 0 var(--spacing-md);
-    position: relative;
-    overflow: hidden;
+    margin:        0 var(--spacing-md);
+    position:      relative;
+    overflow:      hidden;
 }
 
 .channel-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-info));
-    width: 50%;
-    transition: width 0.05s linear;
+    height:        100%;
+    background:    linear-gradient(90deg, var(--color-accent), var(--color-info));
+    width:         50%;
+    transition:    width 0.05s linear;
     border-radius: var(--radius-xs);
 }
 
 .channel-center-line {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: rgba(255, 255, 255, 0.4);
-    z-index: 2;
+    position:   absolute;
+    left:       50%;
+    top:        0;
+    bottom:     0;
+    width:      1px;
+    background: rgba(255,255,255,0.30);
+    z-index:    2;
 }
 
+/* channel-value-text → t2 küçük */
 .channel-value-text {
-    width: 50px;
-    text-align: right;
-    font-family: var(--font-mono);
-    font-size: var(--font-size-sm);
-    color: var(--text-primary);
+    width:       50px;
+    text-align:  right;
+    font-family: var(--t2-family);
+    font-size:   var(--font-size-sm);
+    color:       var(--t2-color);
 }
 
-/* ============================================
-   9. UÇUŞ MODLARI
-   ============================================ */
+
+/* ============================================================
+   11. UÇUŞ MODLARI
+   ============================================================ */
 .mode-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid var(--border-default);
+    background:    var(--p3-bg);
+    border:        1px solid var(--p3-border);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    padding:       var(--spacing-md);
     margin-bottom: var(--spacing-md);
-    transition: all var(--transition-fast);
+    transition:    all var(--transition-fast);
 }
-
 .mode-card.active-mode {
     border-color: var(--color-success);
-    background: rgba(16, 185, 129, 0.08);
-    box-shadow: 0 0 15px var(--color-success-glow);
+    background:   rgba(16,185,129,0.08);
+    box-shadow:   0 0 15px var(--color-success-glow);
 }
 
 .mode-header-row {
-    display: flex;
+    display:         flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-md);
+    align-items:     center;
+    margin-bottom:   var(--spacing-md);
 }
 
+/* mode-name → t1 */
 .mode-name {
-    font-weight: 700;
-    font-size: var(--font-size-md);
-    color: var(--text-primary);
+    font-family: var(--t1-family);
+    font-weight: var(--t1-weight);
+    font-size:   var(--font-size-md);
+    color:       var(--t1-color);
 }
 
 .mode-channel-select {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    background: var(--bg-input);
-    color: var(--text-primary);
-    border: 1px solid var(--border-default);
+    padding:       var(--spacing-xs) var(--spacing-sm);
+    font-size:     var(--font-size-sm);
+    background:    var(--bg-input);
+    color:         var(--p2-text);
+    border:        1px solid var(--p2-border);
     border-radius: var(--radius-xs);
-    min-width: 120px;
+    min-width:     120px;
 }
 
 /* Range Track */
 .range-track-container {
-    position: relative;
-    width: 100%;
-    height: 36px;
-    background: rgba(0, 0, 0, 0.4);
+    position:      relative;
+    width:         100%;
+    height:        36px;
+    background:    rgba(0,0,0,0.40);
     border-radius: 18px;
-    margin: var(--spacing-lg) 0;
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--border-light);
+    margin:        var(--spacing-lg) 0;
+    box-shadow:    inset 0 2px 6px rgba(0,0,0,0.50);
+    border:        1px solid var(--p3-border);
 }
 
 .range-fill {
-    position: absolute;
-    height: 100%;
-    top: 0;
-    background: rgba(59, 130, 246, 0.4);
-    border-radius: 18px;
+    position:       absolute;
+    height:         100%;
+    top:            0;
+    background:     rgba(var(--color-accent-rgb), 0.35);
+    border-radius:  18px;
     pointer-events: none;
-    z-index: 1;
-    transition: background var(--transition-fast);
+    z-index:        1;
+    transition:     background var(--transition-fast);
 }
-
-.mode-card.active-mode .range-fill {
-    background: rgba(16, 185, 129, 0.5);
-}
+.mode-card.active-mode .range-fill { background: rgba(16,185,129,0.45); }
 
 /* Canlı İmleç */
 .live-marker {
-    position: absolute;
-    top: -6px;
-    bottom: -6px;
-    width: 4px;
-    background: var(--hud-amber);
-    box-shadow: 0 0 8px var(--hud-amber), 0 0 4px #000;
-    border-radius: 2px;
-    z-index: 10;
+    position:       absolute;
+    top:            -6px;
+    bottom:         -6px;
+    width:          4px;
+    background:     var(--hud-amber);
+    box-shadow:     0 0 8px var(--hud-amber), 0 0 4px #000;
+    border-radius:  2px;
+    z-index:        10;
     pointer-events: none;
-    transition: left 0.1s linear;
+    transition:     left 0.1s linear;
 }
-
 .live-marker::after {
-    content: attr(data-val);
-    position: absolute;
-    top: -28px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: var(--font-size-xs);
-    font-weight: bold;
-    color: var(--text-inverse);
-    background: var(--hud-amber);
-    padding: 2px 6px;
-    border-radius: var(--radius-xs);
-    white-space: nowrap;
+    content:          attr(data-val);
+    position:         absolute;
+    top:              -28px;
+    left:             50%;
+    transform:        translateX(-50%);
+    font-size:        var(--font-size-xs);
+    font-weight:      bold;
+    color:            var(--text-inverse);
+    background:       var(--hud-amber);
+    padding:          2px 6px;
+    border-radius:    var(--radius-xs);
+    white-space:      nowrap;
+    font-family:      var(--t2-family);
 }
 
 /* Input Range (Tutamaklar) */
 .input-range {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
+    position:        absolute;
+    width:           100%;
+    height:          100%;
+    top:             0;
+    left:            0;
+    pointer-events:  none;
     -webkit-appearance: none;
-    appearance: none;
-    background: transparent;
-    z-index: 5;
-    margin: 0;
+    appearance:      none;
+    background:      transparent;
+    z-index:         5;
+    margin:          0;
 }
-
 .input-range::-webkit-slider-thumb {
-    pointer-events: auto;
+    pointer-events:   auto;
     -webkit-appearance: none;
-    width: 24px;
-    height: 36px;
-    background: var(--text-primary);
-    border: 1px solid var(--text-secondary);
-    border-radius: var(--radius-xs);
-    cursor: col-resize;
-    box-shadow: var(--shadow-sm);
+    width:            24px;
+    height:           36px;
+    background:       var(--p2-text);
+    border:           1px solid var(--p3-text);
+    border-radius:    var(--radius-xs);
+    cursor:           col-resize;
+    box-shadow:       var(--shadow-sm);
 }
-
 .input-range::-moz-range-thumb {
     pointer-events: auto;
-    width: 24px;
-    height: 36px;
-    background: var(--text-primary);
-    border: none;
-    border-radius: var(--radius-xs);
-    cursor: col-resize;
+    width:          24px;
+    height:         36px;
+    background:     var(--p2-text);
+    border:         none;
+    border-radius:  var(--radius-xs);
+    cursor:         col-resize;
 }
 
+/* mode-category-title → t3 */
 .mode-category-title {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
+    font-family:    var(--t3-family);
+    color:          var(--t3-color);
+    font-size:      var(--font-size-sm);
+    font-weight:    600;
     text-transform: uppercase;
     letter-spacing: 1px;
     padding-bottom: var(--spacing-sm);
-    margin: var(--spacing-md) 0 var(--spacing-md);
-    border-bottom: 1px solid var(--border-light);
+    margin:         var(--spacing-md) 0;
+    border-bottom:  1px solid var(--p3-border);
 }
+.mode-category-title i { margin-right: var(--spacing-sm); color: var(--color-accent); }
 
-.mode-category-title i {
-    margin-right: var(--spacing-sm);
-    color: var(--color-primary);
-}
 
-/* ============================================
-   10. PID KONTROLLER
-   ============================================ */
+/* ============================================================
+   12. PID KONTROLLER
+   ============================================================ */
+/* pid-control → panel3 materyali */
 .pid-control {
-    background: var(--bg-hover);
-    padding: var(--spacing-md);
+    background:    var(--p3-bg);
+    padding:       var(--spacing-md);
     border-radius: var(--radius-md);
     margin-bottom: var(--spacing-md);
+    border:        1px solid var(--p3-border);
 }
 
+/* pid-axis → t1 */
 .pid-axis {
-    font-size: var(--font-size-md);
-    font-weight: 700;
-    color: var(--color-primary);
+    font-family:    var(--t1-family);
+    font-size:      var(--font-size-md);
+    font-weight:    var(--t1-weight);
+    color:          var(--color-accent);
     text-transform: uppercase;
-    margin-bottom: var(--spacing-md);
+    margin-bottom:  var(--spacing-md);
 }
 
-.pid-parameter {
-    margin-bottom: var(--spacing-sm);
-}
+.pid-parameter { margin-bottom: var(--spacing-sm); }
 
+/* pid-label → t3 */
 .pid-label {
-    display: flex;
+    display:         flex;
     justify-content: space-between;
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-xs);
+    font-family:     var(--t3-family);
+    font-size:       var(--font-size-sm);
+    color:           var(--t3-color);
+    margin-bottom:   var(--spacing-xs);
 }
 
-.pid-name {
-    font-weight: bold;
-}
+.pid-name { font-weight: bold; }
 
+/* pid-value → t2 küçük */
 .pid-value {
-    font-family: var(--font-mono);
-    color: var(--text-primary);
+    font-family: var(--t2-family);
+    color:       var(--t2-color);
     font-weight: bold;
 }
 
@@ -850,407 +950,335 @@ a:hover {
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
-    width: 100%;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    width:      100%;
+    height:     6px;
+    background: rgba(255,255,255,0.10);
     border-radius: 3px;
-    outline: none;
+    outline:    none;
 }
-
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+    width:      18px;
+    height:     18px;
     border-radius: 50%;
-    background: var(--color-primary);
-    cursor: pointer;
-    box-shadow: 0 0 10px var(--color-primary-glow);
-    border: 2px solid #fff;
+    background: var(--color-accent);
+    cursor:     pointer;
+    box-shadow: 0 0 10px var(--color-accent-glow);
+    border:     2px solid rgba(255,255,255,0.8);
     transition: transform var(--transition-fast);
 }
-
-input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
-}
-
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 input[type="range"]::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
+    width:         18px;
+    height:        18px;
     border-radius: 50%;
-    background: var(--color-primary);
-    cursor: pointer;
-    border: 2px solid #fff;
+    background:    var(--color-accent);
+    cursor:        pointer;
+    border:        2px solid rgba(255,255,255,0.8);
 }
 
-/* ============================================
-   11. LOG TERMİNAL
-   ============================================ */
+
+/* ============================================================
+   13. LOG TERMİNAL
+   ============================================================ */
 .log-container {
-    background: var(--bg-terminal);
-    color: #cccccc;
-    font-family: var(--font-mono);
-    font-size: var(--font-size-sm);
-    padding: var(--spacing-md);
+    background:    var(--bg-terminal);
+    color:         #cccccc;
+    font-family:   var(--t2-family);
+    font-size:     var(--font-size-sm);
+    padding:       var(--spacing-md);
     border-radius: var(--radius-md);
-    height: 400px;
-    overflow-y: auto;
-    border: 1px solid #333;
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+    height:        400px;
+    overflow-y:    auto;
+    border:        1px solid rgba(255,255,255,0.08);
+    box-shadow:    inset 0 0 30px rgba(0,0,0,0.60);
 }
 
 .log-entry {
-    padding: 2px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding:       2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
-.log-time {
-    color: #666;
-    margin-right: var(--spacing-sm);
-}
+.log-time { color: #555; margin-right: var(--spacing-sm); }
 
-/* Log Renkleri */
-.log-info { color: var(--color-info); }
+.log-info    { color: var(--color-info); }
 .log-success { color: var(--color-success); }
 .log-warning { color: var(--color-warning); }
-.log-error { color: var(--color-danger); }
+.log-error   { color: var(--color-danger); }
 .log-command { color: #a855f7; }
 .log-receive { color: #ec4899; }
-.search-match { 
-    background: rgba(245, 158, 11, 0.2); 
-    color: #fff; 
-}
+.search-match { background: rgba(245,158,11,0.20); color: #fff; }
 
+/* stat kutuları → panel3 + t2/t3 */
 .system-stat {
-    background: var(--bg-hover);
-    padding: var(--spacing-md);
+    background:    var(--p3-bg);
+    border:        1px solid var(--p3-border);
+    padding:       var(--spacing-md);
     border-radius: var(--radius-sm);
-    text-align: center;
+    text-align:    center;
 }
 
+/* stat-value → t2 */
 .stat-value {
-    font-size: var(--font-size-xl);
+    font-family: var(--t2-family);
+    font-size:   var(--font-size-xl);
     font-weight: bold;
-    color: var(--text-primary);
+    color:       var(--t2-color);
+    text-shadow: var(--t2-glow);
 }
 
+/* stat-label → t3 */
 .stat-label {
-    font-size: var(--font-size-xs);
-    color: var(--text-secondary);
+    font-family:    var(--t3-family);
+    font-size:      var(--font-size-xs);
+    color:          var(--t3-color);
     text-transform: uppercase;
 }
 
-/* ============================================
-   12. FORM ELEMANLARI
-   ============================================ */
+
+/* ============================================================
+   14. FORM ELEMANLARI
+   ============================================================ */
 .form-control,
 .form-select {
     background-color: var(--bg-input) !important;
-    border: 1px solid var(--border-default) !important;
-    color: var(--text-primary) !important;
-    border-radius: var(--radius-md) !important;
-    padding: var(--spacing-sm) var(--spacing-md);
-    transition: all var(--transition-fast);
+    border:           1px solid var(--p2-border) !important;
+    color:            var(--p2-text) !important;
+    border-radius:    var(--radius-md) !important;
+    padding:          var(--spacing-sm) var(--spacing-md);
+    transition:       all var(--transition-fast);
 }
-
 .form-control:focus,
 .form-select:focus {
-    background-color: #ffffff !important;
-    border-color: var(--color-primary) !important;
-    box-shadow: 0 0 0 3px var(--color-primary-glow) !important;
-    outline: none;
+    background-color: rgba(255,255,255,0.10) !important;
+    border-color:     var(--color-accent) !important;
+    box-shadow:       0 0 0 3px var(--color-accent-glow) !important;
+    outline:          none;
+    color:            var(--p2-text) !important;
 }
+.form-control::placeholder { color: var(--t3-color) !important; }
 
-.form-control::placeholder {
-    color: var(--text-muted) !important;
-}
-
+/* form-label → t3 */
 .form-label {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
+    font-family:   var(--t3-family);
+    color:         var(--t3-color);
+    font-size:     var(--t3-size);
+    font-weight:   500;
     margin-bottom: var(--spacing-xs);
 }
 
-.text-muted {
-    color: var(--text-secondary) !important;
-}
+.text-muted { color: var(--t3-color) !important; }
 
-/* ============================================
-   13. BUTONLAR
-   ============================================ */
+
+/* ============================================================
+   15. BUTONLAR
+   ============================================================ */
 .btn {
-    display: inline-flex;
-    align-items: center;
+    display:         inline-flex;
+    align-items:     center;
     justify-content: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: var(--radius-sm);
-    border: none;
-    cursor: pointer;
-    transition: all var(--transition-fast);
+    gap:             var(--spacing-sm);
+    padding:         var(--spacing-sm) var(--spacing-lg);
+    font-size:       var(--font-size-sm);
+    font-weight:     600;
+    text-transform:  uppercase;
+    letter-spacing:  0.5px;
+    border-radius:   var(--radius-sm);
+    border:          none;
+    cursor:          pointer;
+    transition:      all var(--transition-fast);
 }
 
 .btn-primary {
-    background: var(--color-brand-blue);
+    background: var(--color-brand);
     color: white;
-    box-shadow: 0 4px 12px var(--color-primary-glow);
+    box-shadow: 0 4px 12px var(--color-accent-glow);
 }
-.btn-primary:hover {
-    background: var(--color-primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--color-primary-glow);
-}
+.btn-primary:hover { background: #c92626; transform: translateY(-2px); box-shadow: 0 6px 20px var(--color-accent-glow); }
 
-.btn-success {
-    background: var(--color-success);
-    color: white;
-    box-shadow: 0 4px 12px var(--color-success-glow);
-}
-.btn-success:hover {
-    background: #0d9668;
-    transform: translateY(-2px);
-}
+.btn-success { background: var(--color-success); color: white; box-shadow: 0 4px 12px var(--color-success-glow); }
+.btn-success:hover { background: #0d9668; transform: translateY(-2px); }
 
-.btn-danger {
-    background: var(--color-danger);
-    color: white;
-    box-shadow: 0 4px 12px var(--color-danger-glow);
-}
-.btn-danger:hover {
-    background: #dc2626;
-    transform: translateY(-2px);
-}
+.btn-danger { background: var(--color-danger); color: white; box-shadow: 0 4px 12px var(--color-danger-glow); }
+.btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
 
-.btn-warning {
-    background: var(--color-warning);
-    color: var(--text-inverse);
-}
-.btn-warning:hover {
-    background: #d97706;
-}
+.btn-warning { background: var(--color-warning); color: #1a1a1a; }
+.btn-warning:hover { background: #d97706; }
 
 .btn-outline-secondary {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--border-default);
+    background:   transparent;
+    color:        var(--p3-text);
+    border:       1px solid var(--p2-border);
 }
 .btn-outline-secondary:hover {
-    background: var(--color-secondary);
-    color: white;
-    border-color: var(--color-secondary);
+    background:   rgba(148,163,184,0.15);
+    color:        var(--p2-text);
+    border-color: var(--p3-text);
 }
 
 /* Save Button (Fixed) */
 .save-button-container {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 1000;
+    bottom:   30px;
+    right:    30px;
+    z-index:  1000;
 }
-
 #globalSaveBtn {
-    padding: var(--spacing-md) var(--spacing-xl);
-    font-size: var(--font-size-md);
+    padding:       var(--spacing-md) var(--spacing-xl);
+    font-size:     var(--font-size-md);
     border-radius: var(--radius-full);
-    box-shadow: var(--shadow-lg);
+    box-shadow:    var(--shadow-lg);
 }
 
-/* ============================================
-   14. MODAL
-   ============================================ */
+
+/* ============================================================
+   16. MODAL
+   ============================================================ */
 .modal-content {
-    background: var(--bg-panel-solid);
-    color: var(--text-primary);
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
+    background:    var(--p2-bg-solid);
+    color:         var(--p2-text);
+    border:        1px solid var(--p2-border);
+    border-radius: var(--p2-radius);
+    backdrop-filter: blur(var(--p2-blur));
 }
-
 .modal-header,
-.modal-footer {
-    border-color: var(--border-default);
-}
+.modal-footer { border-color: var(--p2-border); }
+.btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
-.btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%);
-}
 
-/* ============================================
-   15. TOOLTIP
-   ============================================ */
+/* ============================================================
+   17. TOOLTIP
+   ============================================================ */
 .x-tooltip {
-    position: relative;
-    display: inline-flex;
+    position:    relative;
+    display:     inline-flex;
     align-items: center;
     margin-left: var(--spacing-sm);
 }
-
-.info-icon {
-    color: var(--color-primary);
-    font-size: 14px;
-    cursor: help;
-}
+.info-icon { color: var(--color-accent); font-size: 14px; cursor: help; }
 
 .x-tooltiptext {
-    visibility: hidden;
-    opacity: 0;
-    position: absolute;
-    bottom: 130%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px;
-    max-width: 90vw;
-    background: var(--bg-panel-solid);
-    color: var(--text-primary);
-    padding: var(--spacing-md);
+    visibility:    hidden;
+    opacity:       0;
+    position:      absolute;
+    bottom:        130%;
+    left:          50%;
+    transform:     translateX(-50%);
+    width:         300px;
+    max-width:     90vw;
+    background:    var(--p2-bg-solid);
+    color:         var(--p2-text);
+    padding:       var(--spacing-md);
     border-radius: var(--radius-md);
-    font-size: var(--font-size-sm);
-    line-height: 1.5;
-    z-index: 9999;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-default);
-    transition: opacity var(--transition-fast);
+    font-size:     var(--font-size-sm);
+    line-height:   1.5;
+    z-index:       9999;
+    box-shadow:    var(--shadow-lg);
+    border:        1px solid var(--p2-border);
+    transition:    opacity var(--transition-fast);
 }
+.x-tooltip:hover .x-tooltiptext { visibility: visible; opacity: 1; }
 
-.x-tooltip:hover .x-tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
 
-/* ============================================
-   16. HARİTA
-   ============================================ */
-.plane-marker-icon {
-    background: transparent;
-    border: none;
-}
-
+/* ============================================================
+   18. HARİTA
+   ============================================================ */
+.plane-marker-icon { background: transparent; border: none; }
 .plane-icon-inner {
-    width: 100%;
-    height: 100%;
-    display: flex;
+    width:       100%;
+    height:      100%;
+    display:     flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    color: var(--color-info);
+    font-size:   24px;
+    color:       var(--color-accent);
     text-shadow: 0 0 8px black;
-    transition: transform 0.1s linear;
+    transition:  transform 0.1s linear;
 }
 
-/* ============================================
-   17. RESPONSIVE
-   ============================================ */
+
+/* ============================================================
+   19. RESPONSIVE
+   ============================================================ */
 @media (max-width: 992px) {
-    .sidebar {
-        margin-bottom: var(--spacing-lg);
-    }
-    
-    .angles-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: var(--spacing-xs);
-    }
+    .sidebar { position: static; margin-bottom: var(--spacing-lg); }
+    .angles-grid { grid-template-columns: repeat(3, 1fr); gap: var(--spacing-xs); }
 }
 
 @media (max-width: 768px) {
     :root {
-        --spacing-lg: 16px;
-        --spacing-xl: 24px;
+        --spacing-lg:  16px;
+        --spacing-xl:  24px;
+        --p2-padding:  16px;
+        --p3-padding:  12px;
     }
-    
-    .panel, .panel2, .panel3 {
-        padding: var(--spacing-md);
-    }
-    
-    .dashboard-header h1 {
-        font-size: var(--font-size-md);
-    }
-    
-    .save-button-container {
-        bottom: 20px;
-        right: 20px;
-    }
-    
-    #globalSaveBtn {
-        padding: var(--spacing-sm) var(--spacing-lg);
-        font-size: var(--font-size-sm);
-    }
-    
-    .cal-steps-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    .dashboard-header h1 { font-size: var(--font-size-md); }
+    .save-button-container { bottom: 20px; right: 20px; }
+    #globalSaveBtn { padding: var(--spacing-sm) var(--spacing-lg); font-size: var(--font-size-sm); }
+    .cal-steps-container { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 576px) {
-    .cal-steps-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .angles-grid {
-        grid-template-columns: 1fr;
-    }
+    .cal-steps-container { grid-template-columns: 1fr; }
+    .angles-grid          { grid-template-columns: 1fr; }
 }
 
-/* ============================================
-   18. UTILITY CLASSES
-   ============================================ */
-.text-primary { color: var(--text-primary) !important; }
-.text-secondary { color: var(--text-secondary) !important; }
-.text-success { color: var(--color-success) !important; }
-.text-warning { color: var(--color-warning) !important; }
-.text-danger { color: var(--color-danger) !important; }
-.text-info { color: var(--color-info) !important; }
+
+/* ============================================================
+   20. YARDIMCI SINIFLAR
+   ============================================================ */
+.text-primary   { color: var(--p2-text)        !important; }
+.text-secondary { color: var(--p3-text)        !important; }
+.text-success   { color: var(--color-success)  !important; }
+.text-warning   { color: var(--color-warning)  !important; }
+.text-danger    { color: var(--color-danger)   !important; }
+.text-info      { color: var(--color-accent)   !important; }
 
 .bg-transparent { background: transparent !important; }
+.font-mono      { font-family: var(--t2-family) !important; }
+.glow-primary   { box-shadow: var(--shadow-glow) !important; }
+.glow-success   { box-shadow: 0 0 20px var(--color-success-glow) !important; }
+.glow-danger    { box-shadow: 0 0 20px var(--color-danger-glow)  !important; }
 
-.font-mono { font-family: var(--font-mono) !important; }
 
-.glow-primary { box-shadow: var(--shadow-glow) !important; }
-.glow-success { box-shadow: 0 0 20px var(--color-success-glow) !important; }
-.glow-danger { box-shadow: 0 0 20px var(--color-danger-glow) !important; }
-
-/* ============================================
-   19. LIGHT THEME OVERRIDES & UTILITIES
-   ============================================ */
-
-/* Bootstrap Dark sınıflarını Açık Tema için ezme */
-.bg-dark {
-    background-color: #ffffff !important;
-    color: var(--text-primary) !important;
-}
-.text-white {
-    color: var(--text-primary) !important;
-}
-.text-muted {
-    color: var(--text-secondary) !important;
-}
-.border-secondary {
-    border-color: var(--border-default) !important;
-}
+/* ============================================================
+   21. BOOTSTRAP OVERRIDE'LARI
+   ============================================================ */
+.bg-dark    { background-color: var(--p2-bg-solid) !important; color: var(--p2-text) !important; }
+.text-white { color: var(--p2-text) !important; }
+.border-secondary { border-color: var(--p2-border) !important; }
 .input-group-text {
-    background-color: #f1f5f9 !important;
-    color: var(--text-secondary) !important;
-    border-color: var(--border-default) !important;
+    background-color: rgba(255,255,255,0.06) !important;
+    color:            var(--p3-text) !important;
+    border-color:     var(--p2-border) !important;
+}
+.badge { font-family: var(--t2-family); }
+
+/* ── Gradient text (Bootstrap'ın üzerine) ─────────────────── */
+.gradient-text {
+    background:             linear-gradient(45deg, var(--color-brand), #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip:         text;
+    font-weight:             700;
+    letter-spacing:          -1px;
 }
 
-/* Bağlantı Penceresi Garantisi */
+
+/* ============================================================
+   22. BAĞLANTI PENCERESİ
+   ============================================================ */
 #connectionPrompt {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    display: flex !important; /* Varsayılan olarak göster */
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 9999 !important;
-    background: rgba(0, 0, 0, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
+    position:        fixed   !important;
+    top:             0       !important;
+    left:            0       !important;
+    width:           100%    !important;
+    height:          100%    !important;
+    display:         flex    !important;
+    align-items:     center  !important;
+    justify-content: center  !important;
+    z-index:         9999    !important;
+    background:      rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(8px)           !important;
 }
-
-/* Bağlantı kurulduğunda pencereyi kesinlikle gizle */
-#connectionPrompt.d-none {
-    display: none !important;
-}
+#connectionPrompt.d-none { display: none !important; }
