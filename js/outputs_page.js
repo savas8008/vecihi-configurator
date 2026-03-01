@@ -103,6 +103,14 @@ function handleOutputsPageData(data) {
     if (data.outputs) {
         updatePwmOutputs(data.outputs);
     }
+
+    // 5. Flaperon Offset
+    if (data.flaperon_offset !== undefined) {
+        const slider = document.getElementById('flaperonOffsetSlider');
+        const label  = document.getElementById('flaperonOffsetValue');
+        if (slider) slider.value = data.flaperon_offset;
+        if (label)  label.textContent = data.flaperon_offset;
+    }
 }
 
 /**
@@ -343,10 +351,15 @@ function saveOutputsConfig() {
         }
     }
 
+    // Flaperon offset
+    const flaperonSlider = _$('flaperonOffsetSlider');
+    const flaperon_offset = flaperonSlider ? parseInt(flaperonSlider.value) : 150;
+
     const outputData = {
         aircraft_type: selectedAircraft,
         pins: pinConfig,
-        servo_values: servoValues
+        servo_values: servoValues,
+        flaperon_offset: flaperon_offset
     };
 
     _log('📤 Outputs konfigürasyonu gönderiliyor...', 'info');
