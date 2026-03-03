@@ -37,10 +37,29 @@ function initWpMap() {
     // Varsayılan merkez: Türkiye
     wpMap = L.map('wp-map').setView([39.9, 32.8], 10);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // --- Katmanlar ---
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
-    }).addTo(wpMap);
+    });
+
+    const satelliteLayer = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+            attribution: 'Tiles © Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
+            maxZoom: 19
+        }
+    );
+
+    // Varsayılan: uydu
+    satelliteLayer.addTo(wpMap);
+
+    // Katman seçici (sağ üst)
+    L.control.layers(
+        { 'Uydu': satelliteLayer, 'Harita': osmLayer },
+        {},
+        { position: 'topright', collapsed: false }
+    ).addTo(wpMap);
 
     // Haritaya tıklandığında waypoint ekle
     wpMap.on('click', function(e) {
@@ -240,12 +259,32 @@ function stopWaypointMission() {
  */
 function handleWaypointPageData(data) {
     if (!data) return;
-    updateWpStatus(
-        `FC: ${data.count} WP yüklü | Aktif: ${data.active ? 'Evet' : 'Hayır'} | Geçerli: WP${data.current + 1}`,
-        data.active ? 'success' : (data.finished ? 'info' : 'secondary')
-    );
 
-    // Aktif waypoint'i haritada vurgula
+    // FC'deki WP listesini UI'a yükle (henüz yerel liste boşsa)
+    if (data.points && data.count > 0 && waypoints.length === 0) {
+        waypoints = data.points.map(p => ({
+            lat: p.lat,
+            lon: p.lon,
+            alt: p.alt !== undefined ? p.alt : 50
+        }));
+        renderWaypointList();
+        renderMapMarkers();
+
+        // Haritayı ilk WP'ye ortala
+        if (wpMap && waypoints.length > 0) {
+            wpMap.setView([waypoints[0].lat, waypoints[0].lon], 16);
+        }
+    }
+
+    const statusType = data.active ? 'success' : (data.finished ? 'info' : 'secondary');
+    const statusMsg  = data.active
+        ? `▶ Misyon aktif — WP ${data.current + 1} / ${data.count}`
+        : data.finished
+            ? `✓ Misyon tamamlandı (${data.count} WP)`
+            : `${data.count} WP yüklü — başlatılmadı`;
+    updateWpStatus(statusMsg, statusType);
+
+    // Aktif waypoint marker'ını vurgula
     if (wpMap && data.active && data.current < wpMarkers.length) {
         wpMarkers[data.current].openTooltip();
     }
