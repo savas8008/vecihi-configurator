@@ -45,8 +45,11 @@ function managePageStreams(page) {
     
     // B) Sayfa verilerini iste (50ms gecikme)
     setTimeout(() => {
-        if (page !== 'sensors') {
+        if (page !== 'sensors' && page !== 'waypoint') {
             sendCommand(page + '_page_data');
+        }
+        if (page === 'waypoint') {
+            sendCommand('GET_WAYPOINTS');
         }
     }, 50);
     
