@@ -26,7 +26,7 @@ function initWaypointPage() {
             wpMap.invalidateSize();
         }
         // FC'deki mevcut waypoint listesini al
-        if (isConnected) sendCommand('GET_WAYPOINTS');
+        if (window.isConnected && window.isConnected()) sendCommand('GET_WAYPOINTS');
     }, 150);
 }
 
@@ -210,7 +210,7 @@ function setHomeMarker(lat, lon) {
 // ==================== FC İLETİŞİMİ ====================
 
 function uploadWaypoints() {
-    if (!isConnected) { log('Önce cihaza bağlanın', 'warning'); return; }
+    if (!window.isConnected || !window.isConnected()) { log('Önce cihaza bağlanın', 'warning'); return; }
     if (waypoints.length === 0) { log('Önce waypoint ekleyin', 'warning'); return; }
 
     const payload = JSON.stringify({ waypoints });
@@ -219,14 +219,14 @@ function uploadWaypoints() {
 }
 
 function startWaypointMission() {
-    if (!isConnected) { log('Önce cihaza bağlanın', 'warning'); return; }
+    if (!window.isConnected || !window.isConnected()) { log('Önce cihaza bağlanın', 'warning'); return; }
     sendCommand('START_WAYPOINT_MISSION');
     updateWpStatus('Misyon başlatıldı...', 'success');
     log('Waypoint misyonu başlatıldı', 'info');
 }
 
 function stopWaypointMission() {
-    if (!isConnected) { log('Önce cihaza bağlanın', 'warning'); return; }
+    if (!window.isConnected || !window.isConnected()) { log('Önce cihaza bağlanın', 'warning'); return; }
     sendCommand('STOP_WAYPOINT_MISSION');
     updateWpStatus('Misyon durduruldu');
     log('Waypoint misyonu durduruldu', 'warning');
