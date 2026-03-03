@@ -10,6 +10,7 @@ let wpMarkers = [];        // Harita üzerindeki waypoint markerları
 let wpPolyline = null;     // Waypoint rotası çizgisi
 let waypoints = [];        // [{lat, lon, alt}, ...]
 let homeMarker = null;     // Home konumu markeri
+let _pendingWaypointData = null; // Harita hazır olmadan önce gelen FC verisi
 const MAX_WP = 16;
 
 // ==================== SAYFA AÇILIŞI ====================
@@ -73,6 +74,12 @@ function initWpMap() {
 
     // GPS pozisyonunu home olarak göster (sensor stream'den geliyorsa)
     trySetHomeOnMap();
+
+    // Harita hazır olmadan önce gelen FC waypoint verisi varsa şimdi uygula
+    if (_pendingWaypointData) {
+        _applyWaypointData(_pendingWaypointData);
+        _pendingWaypointData = null;
+    }
 }
 
 function trySetHomeOnMap() {
@@ -254,6 +261,23 @@ function stopWaypointMission() {
 // ==================== YANIT IŞLEME ====================
 
 /**
+ * FC'den gelen WP listesini yerel dizi ve haritaya uygular.
+ * Sadece harita hazırsa çağrılabilir.
+ */
+function _applyWaypointData(data) {
+    waypoints = data.points.map(p => ({
+        lat: p.lat,
+        lon: p.lon,
+        alt: p.alt !== undefined ? p.alt : 50
+    }));
+    renderWaypointList();
+    renderMapMarkers();
+    if (wpMap && waypoints.length > 0) {
+        wpMap.setView([waypoints[0].lat, waypoints[0].lon], 16);
+    }
+}
+
+/**
  * serial_communication.js'teki handlePageData() tarafından çağrılır.
  * Gelen waypoint sayfa verisini UI'a uygular.
  */
@@ -262,17 +286,11 @@ function handleWaypointPageData(data) {
 
     // FC'deki WP listesini UI'a yükle (henüz yerel liste boşsa)
     if (data.points && data.count > 0 && waypoints.length === 0) {
-        waypoints = data.points.map(p => ({
-            lat: p.lat,
-            lon: p.lon,
-            alt: p.alt !== undefined ? p.alt : 50
-        }));
-        renderWaypointList();
-        renderMapMarkers();
-
-        // Haritayı ilk WP'ye ortala
-        if (wpMap && waypoints.length > 0) {
-            wpMap.setView([waypoints[0].lat, waypoints[0].lon], 16);
+        if (!wpMap) {
+            // Harita henüz hazır değil — veriyi tamponla, initWpMap() uygulayacak
+            _pendingWaypointData = data;
+        } else {
+            _applyWaypointData(data);
         }
     }
 
