@@ -129,6 +129,11 @@
         <i class="bi bi-aspect-ratio me-2"></i> OSD
     </a>
 </li>
+                        <li class="nav-item">
+    <a class="nav-link" href="#" data-page="waypoint">
+        <i class="bi bi-map me-2"></i> Waypoint
+    </a>
+</li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> Loglar</a></li>
                     </ul>
                 </div>
@@ -2292,5 +2297,83 @@
         $('btnLogSearch').addEventListener('click', searchLogs);
         $('btnClearSearch').addEventListener('click', clearSearch);
     </script>
+
+<!-- ==================== WAYPOINT MİSYON SAYFASI ==================== -->
+<div id="waypoint" class="page">
+    <div class="panel panel2">
+        <h2 class="panel-title"><i class="bi bi-map"></i> Waypoint Misyon Planlayıcı</h2>
+
+        <div class="row">
+            <!-- Sol: Harita -->
+            <div class="col-lg-8 mb-3">
+                <div class="panel">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Harita</h5>
+                        <small class="text-muted">Haritaya tıklayarak waypoint ekleyin</small>
+                    </div>
+                    <div id="wp-map" style="height: 450px; border-radius: 8px; border: 1px solid #333;"></div>
+                </div>
+            </div>
+
+            <!-- Sağ: Waypoint Listesi ve Kontroller -->
+            <div class="col-lg-4 mb-3">
+                <!-- Misyon Kontrolleri -->
+                <div class="panel mb-3">
+                    <h5 class="mb-3"><i class="bi bi-controller"></i> Misyon Kontrol</h5>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" id="btnUploadWaypoints" onclick="uploadWaypoints()">
+                            <i class="bi bi-cloud-upload me-2"></i> Waypoint'leri Yükle
+                        </button>
+                        <button class="btn btn-success" id="btnStartMission" onclick="startWaypointMission()">
+                            <i class="bi bi-play-fill me-2"></i> Misyonu Başlat
+                        </button>
+                        <button class="btn btn-danger" id="btnStopMission" onclick="stopWaypointMission()">
+                            <i class="bi bi-stop-fill me-2"></i> Misyonu Durdur
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="clearAllWaypoints()">
+                            <i class="bi bi-trash me-2"></i> Tüm Waypoint'leri Temizle
+                        </button>
+                    </div>
+                    <!-- Misyon durumu -->
+                    <div class="mt-3 p-2 rounded" id="wp-mission-status" style="background:#1a1a2e; font-size:0.85em;">
+                        <span id="wp-status-text" class="text-muted">Misyon hazır değil</span>
+                    </div>
+                </div>
+
+                <!-- Waypoint Listesi -->
+                <div class="panel">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0"><i class="bi bi-list-ol"></i> Waypoint Listesi</h5>
+                        <span id="wp-count-badge" class="badge bg-secondary">0 / 16</span>
+                    </div>
+                    <div id="wp-list" style="max-height: 320px; overflow-y:auto;">
+                        <p class="text-muted text-center small mt-3">Henüz waypoint eklenmedi.<br>Haritaya tıklayın.</p>
+                    </div>
+                    <!-- Manuel ekleme -->
+                    <div class="mt-3 border-top pt-3">
+                        <small class="text-muted d-block mb-2">Manuel Ekle</small>
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text">Lat</span>
+                            <input type="number" step="0.0001" class="form-control" id="inp-wp-lat" placeholder="45.0000">
+                        </div>
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text">Lon</span>
+                            <input type="number" step="0.0001" class="form-control" id="inp-wp-lon" placeholder="28.0000">
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text">Alt (m)</span>
+                            <input type="number" step="1" class="form-control" id="inp-wp-alt" placeholder="50" value="50">
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm w-100" onclick="addWaypointManual()">
+                            <i class="bi bi-plus-circle me-1"></i> Ekle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/waypoint.js"></script>
 </body>
 </html>

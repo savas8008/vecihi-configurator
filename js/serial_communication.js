@@ -290,9 +290,12 @@ function handlePageData(pageType, pageData) {
         case 'advanced': 
             if (typeof handleAdvancedPageData === 'function') handleAdvancedPageData(pageData); 
             break;
-        case 'logs':        
+        case 'waypoints':
+            if (typeof handleWaypointData === 'function') handleWaypointData(pageData);
+            break;
+        case 'logs':
             break; // Log sayfası için özel işlem yok
-        default:            
+        default:
             log(`❌ Bilinmeyen sayfa tipi: ${pageType}`, 'error');
     }
 }
@@ -320,6 +323,8 @@ function handleStreamData(streamType, streamData) {
             if (typeof handleSensorStream === 'function') handleSensorStream(streamData);
             // sensors stream içinde quaternion verisi de var
             if (typeof handleQuaternionStream === 'function') handleQuaternionStream(streamData);
+            // Waypoint haritası için GPS konumunu güncelle
+            if (typeof onSensorStreamForWaypoint === 'function') onSensorStreamForWaypoint(streamData);
             break;
         default:           
             log(`🔄 Bilinmeyen stream tipi: ${streamType}`, 'warning');

@@ -108,6 +108,11 @@ function startPageSpecificStream(page) {
             sendCommand('start_gyro_stream');
             break;
             
+        case 'waypoint':
+            log('Bağlam: Waypoint -> Harita başlatılıyor', 'info');
+            if (typeof initWaypointPage === 'function') initWaypointPage();
+            break;
+
         default:
             // calibration, outputs, logs, advanced: stream yok
             break;
