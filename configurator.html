@@ -31,8 +31,25 @@
     <link rel="stylesheet" href="style.css"> 
     <style>
     /* OSD ve diÄŸer Ã¶zel stiller */
+    /* Kısayollar accordion dark theme uyumu */
+    #shortcutsAccordion .accordion-item {
+        border-left: none;
+        border-right: none;
+        border-top: none;
+    }
+    #shortcutsAccordion .accordion-button::after {
+        filter: invert(1) brightness(0.7);
+    }
+    #shortcutsAccordion .accordion-button:not(.collapsed) {
+        box-shadow: none;
+        color: #fff;
+    }
+    #shortcutsAccordion .accordion-button:focus {
+        box-shadow: none;
+    }
+
     #prev_horizon {
-        width: 32% !important; 
+        width: 32% !important;
         text-align: center;
     }
     @keyframes blink {
@@ -99,14 +116,6 @@
                         <button class="btn btn-danger d-none" id="btnDisconnect">
                             <i class="bi bi-usb-plug-fill"></i> Bağlantıyı Kes
                         </button>
-                        <div class="btn-group" role="group" title="Ayarları yedekle veya geri yükle">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="exportSettings()" title="Tüm ayarları JSON dosyasına aktar">
-                                <i class="bi bi-download"></i> Dışa Aktar
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" onclick="importSettings()" title="JSON dosyasından ayarları geri yükle">
-                                <i class="bi bi-upload"></i> İçe Aktar
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1773,147 +1782,200 @@
     <div class="panel panel2">
         <h2 class="panel-title"><i class="bi bi-terminal"></i> Komut Konsolu & Sistem Logları</h2>
         <div class="row">
-            
+
+            <!-- ============ SOL: KISAYOLLAR ============ -->
             <div class="col-md-4">
-                
-                <div class="panel mb-3">
-                    <h3 class="h5 mb-3"><i class="bi bi-send"></i> Komut Merkezi</h3>
-                    
-                    <div class="mb-3">
+                <div class="panel">
+                    <h3 class="h5 mb-3"><i class="bi bi-lightning-charge"></i> Kısayollar</h3>
+
+                    <div class="accordion accordion-flush" id="shortcutsAccordion">
+
+                        <!-- 1. Sistem & Konfigürasyon -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accSistem">
+                                    <i class="bi bi-gear me-2 text-danger"></i> Sistem &amp; Konfigürasyon
+                                </button>
+                            </h2>
+                            <div id="accSistem" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-danger btn-sm" onclick="sendQuickCommand('CFG_RESET')" title="Tüm ayarları fabrika çıkışına döndür">FABRİKA AYARLARI</button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="sendQuickCommand('PID RESET')" title="PID değerlerini varsayılana döndür">PID SIFIRLA</button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="sendQuickCommand('CALIB_RESET')" title="Kalibrasyon verisini sil">KALİB. SİL</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Kalibrasyon -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accKalib">
+                                    <i class="bi bi-crosshair me-2 text-warning"></i> Kalibrasyon İşlemleri
+                                </button>
+                            </h2>
+                            <div id="accKalib" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="btn-group w-100 mb-1">
+                                        <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('CAL_GYRO')" title="Jiroskop sapmasını sıfırla">JİROSKOP SIFIRLA</button>
+                                        <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('CAL_LEVEL')" title="İvmeölçer düzlemini ayarla (Trim)">TERAZİ (TRIM)</button>
+                                    </div>
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('CAL_BEGIN')" title="6 Eksenli kalibrasyonu başlat">BAŞLAT</button>
+                                        <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('CALIB_SOLVE')" title="Kalibrasyon sonucunu hesapla ve kaydet">HESAPLA &amp; KAYDET</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Canlı Veri Akışları -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accStream">
+                                    <i class="bi bi-broadcast me-2 text-success"></i> Canlı Veri Akışları
+                                </button>
+                            </h2>
+                            <div id="accStream" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="GPS, Barometre, Pusula verileri">SENSÖRLER (GPS/BARO)</span>
+                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_sensor_stream')">AÇ</button>
+                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_sensor_stream')">KAPAT</button>
+                                    </div>
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Jiroskop ve İvmeölçer ham verileri">IMU (JİRO/İVME)</span>
+                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_gyro_stream')">AÇ</button>
+                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_gyro_stream')">KAPAT</button>
+                                    </div>
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Uçak duruş açısı (Quaternion & Euler)">3D DURUŞ (QUAT/EULER)</span>
+                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_quaternion_stream')">AÇ</button>
+                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_quaternion_stream')">KAPAT</button>
+                                    </div>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Kumandadan gelen kanal sinyalleri">ALICI &amp; KANALLAR</span>
+                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_receiver_stream')">AÇ</button>
+                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_receiver_stream')">KAPAT</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Sayfa Verilerini Güncelle -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accPages">
+                                    <i class="bi bi-arrow-clockwise me-2 text-info"></i> Sayfa Verilerini Güncelle
+                                </button>
+                            </h2>
+                            <div id="accPages" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('advanced_page_data')" title="Gelişmiş ayarları oku">GELİŞMİŞ</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('pid_page_data')" title="PID ayarlarını oku">PID</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('calibration_page_data')" title="Kalibrasyon verisini oku">KALİB.</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('outputs_page_data')" title="Çıkış ayarlarını oku">ÇIKIŞLAR</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('modes_page_data')" title="Uçuş modlarını oku">MODLAR</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('transmitter_page_data')" title="Alıcı ayarlarını oku">ALICI</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Ayar Yedekleme -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accBackup">
+                                    <i class="bi bi-archive me-2 text-primary"></i> Ayar Yedekleme
+                                </button>
+                            </h2>
+                            <div id="accBackup" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="exportSettings()" title="Tüm ayarları JSON dosyasına aktar">
+                                            <i class="bi bi-download me-1"></i>Dışa Aktar
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="importSettings()" title="JSON dosyasından ayarları geri yükle">
+                                            <i class="bi bi-upload me-1"></i>İçe Aktar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /accordion -->
+                </div>
+            </div>
+
+            <!-- ============ SAĞ: LOG PANELİ ============ -->
+            <div class="col-md-8">
+
+                <div class="panel">
+
+                    <!-- ── ÜST: Arama + Filtre + Kontroller ── -->
+                    <div class="d-flex gap-2 mb-2">
+                        <div class="input-group input-group-sm flex-grow-1">
+                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="logSearch" placeholder="Loglarda arama yap...">
+                            <button class="btn btn-outline-secondary" type="button" id="btnLogSearch"><i class="bi bi-search"></i></button>
+                            <button class="btn btn-outline-secondary" type="button" id="btnClearSearch"><i class="bi bi-x"></i></button>
+                        </div>
+                        <select class="form-select form-select-sm" id="logLevelFilter" style="max-width:180px">
+                            <option value="all">Tüm Kayıtlar</option>
+                            <option value="info">Bilgi (Info)</option>
+                            <option value="success">Başarılı</option>
+                            <option value="warning">Uyarılar</option>
+                            <option value="error">Hatalar</option>
+                            <option value="command">Giden Komutlar</option>
+                            <option value="receive">Gelen Veri</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between mb-3 gap-2 flex-wrap">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary" id="logCount">0 satır</span>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="autoScroll" checked>
+                                <label class="form-check-label small" for="autoScroll">Oto. Kaydır</label>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="pauseLogs">
+                                <label class="form-check-label small" for="pauseLogs">Akışı Durdur</label>
+                            </div>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-warning" id="btnLogClear" title="Ekranda görünen logları temizle"><i class="bi bi-eraser"></i> Temizle</button>
+                            <button class="btn btn-outline-danger" id="btnLogClearAll" title="Geçmişi tamamen sil ve sıfırla"><i class="bi bi-trash"></i> Geçmişi Sil</button>
+                            <button class="btn btn-outline-success" id="btnLogExport" title="Logları dosyaya kaydet"><i class="bi bi-download"></i> Kaydet</button>
+                        </div>
+                    </div>
+
+                    <!-- ── Log başlığı ── -->
+                    <h3 class="h5 mb-2"><i class="bi bi-terminal"></i> Sistem Kayıtları (Logs)</h3>
+
+                    <!-- ── Log Ekranı ── -->
+                    <div class="log-container" id="logContainer">
+                        <div class="log-entry log-info"><span class="log-time">[Sistem]</span> 🚀 Flight Controller arayüzü hazır...</div>
+                        <div class="log-entry log-info"><span class="log-time">[Sistem]</span> 📡 Bağlantı bekleniyor...</div>
+                    </div>
+
+                    <!-- ── ALT: Manuel Komut Girişi ── -->
+                    <div class="mt-3">
                         <label class="form-label small text-muted">MANUEL KOMUT GİRİŞİ</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="commandInput" placeholder="Örn: CAL_GYRO yazıp gönderin..." onkeypress="handleCommandKeypress(event)">
                             <button class="btn btn-primary" type="button" id="btnSendCommand" title="Komutu Gönder"><i class="bi bi-send"></i></button>
                         </div>
                     </div>
-
-                    <div class="mb-2">
-                        <label class="form-label small text-muted">SİSTEM & KONFİGÜRASYON</label>
-                        <div class="d-grid gap-2">
-                      
-                            <div class="btn-group w-100">
-                                <button class="btn btn-outline-danger btn-sm" onclick="sendQuickCommand('CFG_RESET')" title="Tüm ayarları fabrika çıkışına döndür">FABRİKA AYARLARI</button>
-                                <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('PID RESET')" title="PID değerlerini varsayılana döndür">PID SIFIRLA</button>
-                                <button class="btn btn-outline-secondary btn-sm" onclick="sendQuickCommand('CALIB_RESET')" title="Kalibrasyon verisini sil">KALİB. SİL</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label small text-muted">KALİBRASYON İŞLEMLERİ</label>
-                        <div class="btn-group w-100 mb-1">
-                            <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('CAL_GYRO')" title="Jiroskop sapmasını sıfırla">JİROSKOP SIFIRLA</button>
-                            <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('CAL_LEVEL')" title="İvmeölçer düzlemini ayarla (Trim)">TERAZİ (TRIM)</button>
-                        </div>
-                        <div class="btn-group w-100">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="sendQuickCommand('CAL_BEGIN')" title="6 Eksenli kalibrasyonu başlat">BAŞLAT</button>
-                            <button class="btn btn-outline-success btn-sm" onclick="sendQuickCommand('CALIB_SOLVE')" title="Kalibrasyon sonucunu hesapla ve kaydet">HESAPLA & KAYDET</button>
-                        </div>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label small text-muted">CANLI VERİ AKIŞLARI (TELEMETRİ)</label>
-                        
-                        <div class="input-group input-group-sm mb-1">
-                            <span class="input-group-text bg-dark border-secondary text-light w-50" title="GPS, Barometre, Pusula verileri">SENSÖRLER (GPS/BARO)</span>
-                            <button class="btn btn-outline-success w-25" onclick="sendQuickCommand('start_sensor_stream')">AÇ</button>
-                            <button class="btn btn-outline-danger w-25" onclick="sendQuickCommand('stop_sensor_stream')">KAPAT</button>
-                        </div>
-
-                        <div class="input-group input-group-sm mb-1">
-                            <span class="input-group-text bg-dark border-secondary text-light w-50" title="Jiroskop ve İvmeölçer ham verileri">IMU (JİRO/İVME)</span>
-                            <button class="btn btn-outline-success w-25" onclick="sendQuickCommand('start_gyro_stream')">AÇ</button>
-                            <button class="btn btn-outline-danger w-25" onclick="sendQuickCommand('stop_gyro_stream')">KAPAT</button>
-                        </div>
-
-                        <div class="input-group input-group-sm mb-1">
-                            <span class="input-group-text bg-dark border-secondary text-light w-50" title="Uçak duruş açısı (Quaternion & Euler)">3D DURUŞ (QUAT/EULER)</span>
-                            <button class="btn btn-outline-success w-25" onclick="sendQuickCommand('start_quaternion_stream')">AÇ</button>
-                            <button class="btn btn-outline-danger w-25" onclick="sendQuickCommand('stop_quaternion_stream')">KAPAT</button>
-                        </div>
-
-                        <div class="input-group input-group-sm mb-1">
-                            <span class="input-group-text bg-dark border-secondary text-light w-50" title="Kumandadan gelen kanal sinyalleri">ALICI & KANALLAR</span>
-                            <button class="btn btn-outline-success w-25" onclick="sendQuickCommand('start_receiver_stream')">AÇ</button>
-                            <button class="btn btn-outline-danger w-25" onclick="sendQuickCommand('stop_receiver_stream')">KAPAT</button>
-                        </div>
-
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-dark border-secondary text-light w-50" title="Motor ve servolara giden sinyaller">MOTOR ÇIKIŞLARI (PWM)</span>
-                     
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">SAYFA VERİLERİNİ GÜNCELLE</label>
-                        <div class="d-flex flex-wrap gap-1">
-                            <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('advanced_page_data')" title="Gelişmiş ayarları oku">GELİŞMİŞ</button>
-                            <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('pid_page_data')" title="PID ayarlarını oku">PID</button>
-                            <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('calibration_page_data')" title="Kalibrasyon verisini oku">KALİB.</button>
-                            <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('outputs_page_data')" title="Çıkış ayarlarını oku">ÇIKIŞLAR</button>
-                            <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('modes_page_data')" title="Uçuş modlarını oku">MODLAR</button>
-                            <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="sendQuickCommand('transmitter_page_data')" title="Alıcı ayarlarını oku">ALICI</button>
-                        </div>
-                    </div>
                 </div>
 
-                <div class="panel">
-                    <h3 class="h5 mb-3"><i class="bi bi-filter"></i> Log Filtreleme</h3>
-                    <div class="mb-3">
-                        <label class="form-label">Gösterilecek Log Tipi</label>
-                        <select class="form-select" id="logLevelFilter">
-                            <option value="all">Tüm Kayıtlar</option>
-                            <option value="info">Sadece Bilgi (Info)</option>
-                            <option value="success">Sadece Başarılı İşlemler</option>
-                            <option value="warning">Sadece Uyarılar</option>
-                            <option value="error">Sadece Hatalar</option>
-                            <option value="command">Giden Komutlar</option>
-                            <option value="receive">Gelen Veri Paketleri</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Otomatik Kaydırma</label>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="autoScroll" checked>
-                            <label class="form-check-label" for="autoScroll">Yeni log gelince aşağı kaydır</label>
-                        </div>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-warning" id="btnLogClear"><i class="bi bi-eraser"></i> Ekranı Temizle</button>
-                        <button class="btn btn-danger" id="btnLogClearAll"><i class="bi bi-trash"></i> Geçmişi Sil & Sıfırla</button>
-                        <button class="btn btn-success" id="btnLogExport"><i class="bi bi-download"></i> Logları Dosyaya Kaydet</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-8">
-                
-                <div class="panel">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="h5 mb-0"><i class="bi bi-terminal"></i> Sistem Kayıtları (Logs)</h3>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary" id="logCount">0 satır</span>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="pauseLogs">
-                                <label class="form-check-label small" for="pauseLogs">Akışı Durdur</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="log-container" id="logContainer">
-                        <div class="log-entry log-info"><span class="log-time">[Sistem]</span> 🚀 Flight Controller arayüzü hazır...</div>
-                        <div class="log-entry log-info"><span class="log-time">[Sistem]</span> 📡 Bağlantı bekleniyor...</div>
-                    </div>
-                    
-                    <div class="mt-3">
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control" id="logSearch" placeholder="Loglarda arama yap...">
-                            <button class="btn btn-outline-secondary" type="button" id="btnLogSearch"><i class="bi bi-search"></i></button>
-                            <button class="btn btn-outline-secondary" type="button" id="btnClearSearch"><i class="bi bi-x"></i></button>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- ── İstatistikler ── -->
                 <div class="panel">
                     <h3 class="h5 mb-3"><i class="bi bi-graph-up"></i> İletişim İstatistikleri</h3>
                     <div class="row text-center">
@@ -1949,7 +2011,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
+
+            </div><!-- /col-md-8 -->
 
         </div>
     </div>
