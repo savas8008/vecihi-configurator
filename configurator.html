@@ -27,6 +27,7 @@
 <script src="js/main.js"></script>
 <script src="js/flight_modes.js"></script>
 <script src="js/outputs_page.js"></script>
+<script src="js/settings_backup.js"></script>
     <link rel="stylesheet" href="style.css"> 
     <style>
     /* OSD ve diÄŸer Ã¶zel stiller */
@@ -98,7 +99,14 @@
                         <button class="btn btn-danger d-none" id="btnDisconnect">
                             <i class="bi bi-usb-plug-fill"></i> Bağlantıyı Kes
                         </button>
-                     
+                        <div class="btn-group" role="group" title="Ayarları yedekle veya geri yükle">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="exportSettings()" title="Tüm ayarları JSON dosyasına aktar">
+                                <i class="bi bi-download"></i> Dışa Aktar
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="importSettings()" title="JSON dosyasından ayarları geri yükle">
+                                <i class="bi bi-upload"></i> İçe Aktar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -432,3 +432,69 @@ window.applyOSDConfig = applyOSDConfig;
 window.saveOSDConfig = saveOSDConfig;
 window.handleOSDPageData = handleOSDPageData;
 window.initOSD = initOSD;
+
+// ============================================================================
+// OSD KONFİGÜRASYON TOPLAMA (Göndermeden)
+// ============================================================================
+
+/**
+ * @brief OSD ayarlarını DOM'dan toplar, ESP32'ye göndermez.
+ * @returns {Object} OSD konfigürasyon objesi (dışa aktarma için)
+ */
+function collectOSDConfig() {
+    const cfg = { elements: {} };
+
+    const enabledEl = document.getElementById('osd_enabled');
+    if (enabledEl) cfg.enabled = enabledEl.checked;
+
+    const formatEl = document.getElementById('osd_video_format');
+    if (formatEl) cfg.video_format = formatEl.value;
+
+    const pilotEl = document.getElementById('osd_pilot_name');
+    if (pilotEl) cfg.pilot_name = pilotEl.value;
+
+    const craftEl = document.getElementById('osd_craft_name');
+    if (craftEl) cfg.craft_name = craftEl.value;
+
+    const unitRadio = document.querySelector('input[name="osd_units"]:checked');
+    if (unitRadio) cfg.units = unitRadio.value;
+
+    const lowBatEl = document.getElementById('osd_low_bat');
+    if (lowBatEl) cfg.low_battery = parseFloat(lowBatEl.value);
+
+    const maxDistEl = document.getElementById('osd_max_dist');
+    if (maxDistEl) cfg.max_distance = parseInt(maxDistEl.value);
+
+    for (const [htmlId, jsonKey] of Object.entries(osdElementMapping)) {
+        const el = document.getElementById(htmlId);
+        if (!el) continue;
+
+        let x = parseInt(el.dataset.gridX);
+        let y = parseInt(el.dataset.gridY);
+
+        if (jsonKey === 'hor') x = x + 8;
+
+        if (isNaN(x) || isNaN(y)) {
+            x = Math.round((parseFloat(el.style.left) || 0) / 100 * OSD_COLS);
+            y = Math.round((parseFloat(el.style.top) || 0) / 100 * OSD_ROWS);
+        }
+
+        x = Math.max(0, Math.min(x, OSD_COLS - 1));
+        y = Math.max(0, Math.min(y, OSD_ROWS - 1));
+
+        const toggleId = osdToggleMapping[jsonKey];
+        let isVisible = true;
+        if (toggleId) {
+            const toggleEl = document.getElementById(toggleId);
+            if (toggleEl) isVisible = toggleEl.checked;
+        } else {
+            isVisible = (el.style.display !== 'none');
+        }
+
+        cfg.elements[jsonKey] = { x, y, v: isVisible ? 1 : 0 };
+    }
+
+    return cfg;
+}
+
+window.collectOSDConfig = collectOSDConfig;
