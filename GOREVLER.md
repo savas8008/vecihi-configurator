@@ -67,7 +67,23 @@
 
 ---
 
-## 5. GPS Güvenlik — Glitch Koruma ve Spoofing Engelleme
+## 5. Navigasyon — Gaz ve Yer Hızı Integral Kontrolü
+
+**Hedef:** Nav modunda sabit yer hızı tutabilmek için gaz çıkışına integral (I) terimi ekle.
+
+**Mevcut Durum:** Nav loop gaz çıkışını büyük ihtimalle sadece P kazancıyla ya da sabit `cruise_throttle` ile hesaplıyor; sürekli rüzgar veya eğim gibi kalıcı hatalarda hedef yer hızına ulaşılamıyor.
+
+**Plan:**
+1. `navigation.cpp`'de groundspeed → throttle döngüsünü bul
+2. Hız hatası (hedef groundspeed − ölçülen groundspeed) integralini tut (`speed_error_integral`)
+3. Anti-windup sınırı ekle — integral ±throttle_max'ın belirli bir yüzdesini geçemesin
+4. Integral sıfırlama koşulları tanımla: nav modu çıkışı, throttle satürasyon, ARM değişimi
+5. Yeni PI kazançlarını (`nav_speed_i`) config struct'a ekle ve UI'dan ayarlanabilir yap
+6. Test: farklı rüzgar ve eğim koşullarında groundspeed sabitliğini logla, P-only ile karşılaştır
+
+---
+
+## 6. GPS Güvenlik — Glitch Koruma ve Spoofing Engelleme
 
 **Mevcut Durum:** `gps_min_sats` ve `gps_min_fix_type` var ama glitch / spoofing tespiti yok.
 
