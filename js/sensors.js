@@ -461,6 +461,41 @@
             updateMapPosition(data.lat, data.lon, data.heading);
         }
 
+        // --- Rüzgar Verileri ---
+        if (data.wind_speed !== undefined || data.wind_dir !== undefined) {
+            var windSpeedEl = document.getElementById('wind-speed');
+            var windDirEl = document.getElementById('wind-dir');
+            var windArrowEl = document.getElementById('wind-dir-arrow');
+            var windLabelEl = document.getElementById('wind-dir-label');
+
+            if (windSpeedEl && data.wind_speed !== undefined) {
+                var windKmh = (data.wind_speed * 3.6).toFixed(1);
+                windSpeedEl.textContent = windKmh;
+            }
+
+            if (windDirEl && data.wind_dir !== undefined) {
+                windDirEl.textContent = data.wind_dir.toFixed(0);
+            }
+
+            if (windArrowEl && data.wind_dir !== undefined) {
+                windArrowEl.style.transform = 'rotate(' + data.wind_dir + 'deg)';
+            }
+
+            if (windLabelEl && data.wind_dir !== undefined) {
+                var dir = data.wind_dir;
+                var cardinals = ['K', 'KKD', 'KD', 'DKD', 'D', 'DGD', 'GD', 'GGD', 'G', 'GGB', 'GB', 'BGB', 'B', 'BKB', 'KB', 'KKB'];
+                var idx = Math.round(dir / 22.5) % 16;
+                windLabelEl.textContent = cardinals[idx];
+            }
+
+            // OSD wind elementini de güncelle
+            var osdWindEl = document.getElementById('prev_wind');
+            if (osdWindEl && data.wind_speed !== undefined && data.wind_dir !== undefined) {
+                var osdKmh = (data.wind_speed * 3.6).toFixed(0);
+                osdWindEl.innerHTML = '<i class="bi bi-arrow-up-right" style="transform:rotate(' + data.wind_dir + 'deg);display:inline-block;"></i> ' + osdKmh + 'km/h';
+            }
+        }
+
         // --- Sistem (MCU) Verileri ---
         if (data.sys) {
             var sysHz = document.getElementById('sys-hz');
