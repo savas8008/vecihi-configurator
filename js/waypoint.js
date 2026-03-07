@@ -8,10 +8,42 @@
 let wpMap = null;          // Leaflet harita nesnesi
 let wpMarkers = [];        // Harita üzerindeki waypoint markerları
 let wpPolyline = null;     // Waypoint rotası çizgisi
-let waypoints = [];        // [{lat, lon, alt}, ...]
+let waypoints = [];        // [{lat, lon, alt, task, speed_mode, throttle, target_spd, kamikaze}, ...]
 let homeMarker = null;     // Home konumu markeri
 let _pendingWaypointData = null; // Harita hazır olmadan önce gelen FC verisi
 const MAX_WP = 16;
+
+// Görev tipleri
+const WP_TASKS = [
+    { value: 0, label: 'Cruise',      color: '#0d6efd' },
+    { value: 1, label: 'Tırmanma',    color: '#198754' },
+    { value: 2, label: 'Rüzgar Altı', color: '#0dcaf0' },
+    { value: 3, label: 'Esas Bacak',  color: '#6f42c1' },
+    { value: 4, label: 'Varış',       color: '#fd7e14' },
+    { value: 5, label: 'Kamikaze',    color: '#dc3545' },
+    { value: 6, label: 'Flare',       color: '#ffc107' },
+];
+
+// Hız modları
+const WP_SPEED_MODES = [
+    { value: 0, label: 'Gaz (PWM)',    disabled: false },
+    { value: 1, label: 'Yer Hızı (km/h)', disabled: false },
+    { value: 2, label: 'Hava Hızı',    disabled: true },
+];
+
+// Boş kamikaze config
+function defaultKamikaze() {
+    return { dive_mode: 0, dive_angle: 45, alt_offset: 0, trigger_alt: 15, mission_servo: 0 };
+}
+
+// Boş waypoint oluştur
+function newWaypoint(lat, lon, alt) {
+    return {
+        lat, lon, alt,
+        task: 0, speed_mode: 0, throttle: 0, target_spd: 0,
+        kamikaze: defaultKamikaze()
+    };
+}
 
 // ==================== SAYFA AÇILIŞI ====================
 
@@ -94,7 +126,7 @@ function trySetHomeOnMap() {
 
 function addWaypoint(lat, lon, alt) {
     alt = parseFloat(alt) || 50;
-    waypoints.push({ lat, lon, alt });
+    waypoints.push(newWaypoint(lat, lon, alt));
     renderWaypointList();
     renderMapMarkers();
     log(`WP${waypoints.length} eklendi: ${lat.toFixed(6)}, ${lon.toFixed(6)}, ${alt}m`, 'info');
@@ -153,19 +185,119 @@ function renderWaypointList() {
 
     let html = '';
     waypoints.forEach((wp, i) => {
+        const taskInfo  = WP_TASKS.find(t => t.value === (wp.task || 0)) || WP_TASKS[0];
+        const isKamikaze = (wp.task === 5);
+        const spdMode = wp.speed_mode || 0;
+
+        // Hız modu seçenekleri
+        const spdOpts = WP_SPEED_MODES.map(m =>
+            `<option value="${m.value}" ${m.disabled ? 'disabled' : ''} ${spdMode === m.value ? 'selected' : ''}>${m.label}</option>`
+        ).join('');
+
+        // Görev tipi seçenekleri
+        const taskOpts = WP_TASKS.map(t =>
+            `<option value="${t.value}" ${wp.task === t.value ? 'selected' : ''}>${t.label}</option>`
+        ).join('');
+
+        // Hız değeri alanı: Gaz (1000-2000) veya Yer Hızı (km/h)
+        let spdValueHtml = '';
+        if (spdMode === 1) {
+            // Yer hızı
+            spdValueHtml = `<input type="number" min="20" max="300" step="1" value="${wp.target_spd || ''}"
+                placeholder="km/h"
+                style="width:60px;background:transparent;border:none;border-bottom:1px solid #444;color:#ccc;font-size:0.9em;"
+                onchange="waypoints[${i}].target_spd=parseFloat(this.value)||0;">`;
+        } else {
+            // Gaz (PWM)
+            spdValueHtml = `<input type="number" min="1000" max="2000" step="10" value="${wp.throttle > 0 ? wp.throttle : ''}"
+                placeholder="varsayılan"
+                style="width:72px;background:transparent;border:none;border-bottom:1px solid #444;color:#ccc;font-size:0.9em;"
+                onchange="waypoints[${i}].throttle=parseInt(this.value)||0;">`;
+        }
+
+        // Kamikaze bölümü
+        const km = wp.kamikaze || defaultKamikaze();
+        const kamikazeHtml = isKamikaze ? `
+        <div class="mt-2 p-2 rounded" style="background:#2a1010;border:1px solid #dc3545;font-size:0.78em;">
+            <div class="text-danger fw-bold mb-1"><i class="bi bi-bullseye"></i> Kamikaze Ayarları</div>
+            <div class="row g-1">
+                <div class="col-12">
+                    <label class="text-muted">Dalış Modu</label><br>
+                    <label class="me-2">
+                        <input type="radio" name="km_mode_${i}" value="0" ${km.dive_mode === 0 ? 'checked' : ''}
+                            onchange="waypoints[${i}].kamikaze.dive_mode=0;">
+                        GPS Tabanlı
+                    </label>
+                    <label class="text-muted" title="Yakında eklenecek">
+                        <input type="radio" name="km_mode_${i}" value="1" disabled>
+                        <span style="opacity:0.4">Dalış Noktası (Pasif)</span>
+                    </label>
+                </div>
+                <div class="col-6">
+                    <label class="text-muted">Dalış Açısı (°)</label><br>
+                    <input type="number" min="5" max="90" step="1" value="${km.dive_angle}"
+                        style="width:60px;background:transparent;border:none;border-bottom:1px solid #dc3545;color:#ff9999;font-size:0.9em;"
+                        onchange="waypoints[${i}].kamikaze.dive_angle=parseFloat(this.value)||45;">
+                </div>
+                <div class="col-6">
+                    <label class="text-muted">Yükseklik Farkı (m)</label><br>
+                    <input type="number" step="1" value="${km.alt_offset}"
+                        placeholder="0"
+                        style="width:60px;background:transparent;border:none;border-bottom:1px solid #dc3545;color:#ff9999;font-size:0.9em;"
+                        onchange="waypoints[${i}].kamikaze.alt_offset=parseFloat(this.value)||0;"
+                        title="Mevcut konuma göre yükseklik farkı (negatif=aşağı)">
+                </div>
+                <div class="col-6">
+                    <label class="text-muted">Tetiklenme İrtifası (m AGL)</label><br>
+                    <input type="number" min="0" max="500" step="1" value="${km.trigger_alt}"
+                        style="width:60px;background:transparent;border:none;border-bottom:1px solid #dc3545;color:#ff9999;font-size:0.9em;"
+                        onchange="waypoints[${i}].kamikaze.trigger_alt=parseFloat(this.value)||15;"
+                        title="Bu irtifaya inince görev servosuna 2000 PWM verilir">
+                </div>
+                <div class="col-6">
+                    <label class="text-muted">Görev Servosuu</label><br>
+                    <select style="background:#1a0a0a;border:1px solid #dc3545;color:#ff9999;font-size:0.85em;border-radius:3px;padding:1px 4px;"
+                        onchange="waypoints[${i}].kamikaze.mission_servo=parseInt(this.value);">
+                        <option value="0" ${km.mission_servo===0?'selected':''}>Devre Dışı</option>
+                        <option value="1" ${km.mission_servo===1?'selected':''}>Servo 1</option>
+                        <option value="2" ${km.mission_servo===2?'selected':''}>Servo 2</option>
+                        <option value="3" ${km.mission_servo===3?'selected':''}>Servo 3</option>
+                        <option value="4" ${km.mission_servo===4?'selected':''}>Servo 4</option>
+                    </select>
+                </div>
+            </div>
+        </div>` : '';
+
         html += `
-        <div class="d-flex align-items-center mb-2 p-2 rounded" style="background:#1a1a2e; font-size:0.8em;">
-            <span class="badge bg-primary me-2">${i + 1}</span>
-            <div class="flex-grow-1">
-                <div>${wp.lat.toFixed(6)}, ${wp.lon.toFixed(6)}</div>
-                <div class="text-muted">Alt: <input type="number" step="1" value="${wp.alt}"
-                    style="width:55px; background:transparent; border:none; border-bottom:1px solid #444; color:#ccc; font-size:0.9em;"
-                    onchange="waypoints[${i}].alt=parseFloat(this.value)||50; renderMapMarkers();">m</div>
+        <div class="mb-2 p-2 rounded" style="background:#1a1a2e;font-size:0.8em;border-left:3px solid ${taskInfo.color};">
+            <div class="d-flex align-items-center">
+                <span class="badge me-2" style="background:${taskInfo.color};">${i + 1}</span>
+                <div class="flex-grow-1">
+                    <div>${wp.lat.toFixed(6)}, ${wp.lon.toFixed(6)}</div>
+                    <div class="d-flex flex-wrap gap-2 mt-1 align-items-center">
+                        <span class="text-muted">Alt:</span>
+                        <input type="number" step="1" value="${wp.alt}"
+                            style="width:55px;background:transparent;border:none;border-bottom:1px solid #444;color:#ccc;font-size:0.9em;"
+                            onchange="waypoints[${i}].alt=parseFloat(this.value)||50;renderMapMarkers();">m
+                        <span class="text-muted ms-1">Görev:</span>
+                        <select style="background:#111;border:1px solid #444;color:#ccc;font-size:0.85em;border-radius:3px;padding:1px 4px;"
+                            onchange="waypoints[${i}].task=parseInt(this.value);renderWaypointList();renderMapMarkers();">
+                            ${taskOpts}
+                        </select>
+                        <span class="text-muted ms-1">Hız:</span>
+                        <select style="background:#111;border:1px solid #444;color:#ccc;font-size:0.85em;border-radius:3px;padding:1px 4px;"
+                            onchange="waypoints[${i}].speed_mode=parseInt(this.value);renderWaypointList();">
+                            ${spdOpts}
+                        </select>
+                        ${spdValueHtml}
+                    </div>
+                </div>
+                <div class="btn-group btn-group-sm ms-1 align-self-start">
+                    ${i > 0 ? `<button class="btn btn-outline-secondary btn-sm py-0" onclick="moveWaypointUp(${i})" title="Yukarı"><i class="bi bi-arrow-up"></i></button>` : '<span style="width:30px"></span>'}
+                    <button class="btn btn-outline-danger btn-sm py-0" onclick="removeWaypoint(${i})" title="Sil"><i class="bi bi-x"></i></button>
+                </div>
             </div>
-            <div class="btn-group btn-group-sm ms-1">
-                ${i > 0 ? `<button class="btn btn-outline-secondary btn-sm py-0" onclick="moveWaypointUp(${i})" title="Yukarı"><i class="bi bi-arrow-up"></i></button>` : '<span style="width:30px"></span>'}
-                <button class="btn btn-outline-danger btn-sm py-0" onclick="removeWaypoint(${i})" title="Sil"><i class="bi bi-x"></i></button>
-            </div>
+            ${kamikazeHtml}
         </div>`;
     });
     listEl.innerHTML = html;
@@ -184,9 +316,10 @@ function renderMapMarkers() {
     const latlngs = [];
 
     waypoints.forEach((wp, i) => {
+        const taskInfo = WP_TASKS.find(t => t.value === (wp.task || 0)) || WP_TASKS[0];
         const icon = L.divIcon({
             className: '',
-            html: `<div style="background:#0d6efd;color:#fff;border-radius:50%;width:24px;height:24px;
+            html: `<div style="background:${taskInfo.color};color:#fff;border-radius:50%;width:24px;height:24px;
                               display:flex;align-items:center;justify-content:center;
                               font-size:11px;font-weight:bold;border:2px solid #fff;
                               box-shadow:0 0 4px rgba(0,0,0,0.5);">${i + 1}</div>`,
@@ -195,7 +328,7 @@ function renderMapMarkers() {
         });
 
         const marker = L.marker([wp.lat, wp.lon], { icon, draggable: true })
-            .bindTooltip(`WP${i + 1} | ${wp.alt}m`, { permanent: false })
+            .bindTooltip(`WP${i + 1} | ${wp.alt}m | ${taskInfo.label}`, { permanent: false })
             .addTo(wpMap);
 
         marker.on('dragend', function(e) {
@@ -239,7 +372,27 @@ function uploadWaypoints() {
     if (!window.isConnected || !window.isConnected()) { log('Önce cihaza bağlanın', 'warning'); return; }
     if (waypoints.length === 0) { log('Önce waypoint ekleyin', 'warning'); return; }
 
-    const payload = JSON.stringify({ waypoints });
+    // Her WP için uygun alanları hazırla; kamikaze alanları yalnızca task==5'te gönder
+    const serialized = waypoints.map(wp => {
+        const obj = {
+            lat: wp.lat, lon: wp.lon, alt: wp.alt,
+            task: wp.task || 0,
+            spd_mode: wp.speed_mode || 0,
+            thr: wp.throttle || 0,
+            target_spd: wp.target_spd || 0
+        };
+        if (wp.task === 5) {
+            const km = wp.kamikaze || defaultKamikaze();
+            obj.km_mode        = km.dive_mode   || 0;
+            obj.km_angle       = km.dive_angle   || 45;
+            obj.km_alt_offset  = km.alt_offset   || 0;
+            obj.km_trigger_alt = km.trigger_alt  || 15;
+            obj.km_servo       = km.mission_servo|| 0;
+        }
+        return obj;
+    });
+
+    const payload = JSON.stringify({ waypoints: serialized });
     sendCommand('UPLOAD_WAYPOINTS ' + payload);
     log(`${waypoints.length} waypoint yükleniyor...`, 'info');
 }
@@ -265,11 +418,26 @@ function stopWaypointMission() {
  * Sadece harita hazırsa çağrılabilir.
  */
 function _applyWaypointData(data) {
-    waypoints = data.points.map(p => ({
-        lat: p.lat,
-        lon: p.lon,
-        alt: p.alt !== undefined ? p.alt : 50
-    }));
+    waypoints = data.points.map(p => {
+        const km = defaultKamikaze();
+        if (p.task === 5) {
+            if (p.km_mode        !== undefined) km.dive_mode     = p.km_mode;
+            if (p.km_angle       !== undefined) km.dive_angle    = p.km_angle;
+            if (p.km_alt_offset  !== undefined) km.alt_offset    = p.km_alt_offset;
+            if (p.km_trigger_alt !== undefined) km.trigger_alt   = p.km_trigger_alt;
+            if (p.km_servo       !== undefined) km.mission_servo = p.km_servo;
+        }
+        return {
+            lat:        p.lat,
+            lon:        p.lon,
+            alt:        p.alt        !== undefined ? p.alt        : 50,
+            task:       p.task       !== undefined ? p.task       : 0,
+            speed_mode: p.spd_mode   !== undefined ? p.spd_mode   : 0,
+            throttle:   p.thr        !== undefined ? p.thr        : 0,
+            target_spd: p.target_spd !== undefined ? p.target_spd : 0,
+            kamikaze: km
+        };
+    });
     renderWaypointList();
     renderMapMarkers();
     if (wpMap && waypoints.length > 0) {
