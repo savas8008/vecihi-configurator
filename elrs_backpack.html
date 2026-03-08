@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELRS Backpack — Canlı Telemetri</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        :root {
+            --bg-dark: #0d0f14;
+            --bg-panel: #141720;
+            --bg-card: #1a1e2b;
+            --border: #2a3050;
+            --text-primary: #e8eaf0;
+            --text-muted: #6b7280;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-yellow: #eab308;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --accent-purple: #a855f7;
+            --accent-cyan: #06b6d4;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--accent-blue);
+            flex-shrink: 0;
+        }
+        .header-brand .logo-icon { font-size: 22px; }
+        .header-conn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+        .conn-field {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .conn-field label { color: var(--text-muted); font-size: 11px; white-space: nowrap; }
+        .conn-input {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            width: 140px;
+        }
+        .conn-input:focus { outline: none; border-color: var(--accent-blue); }
+        .port-input { width: 70px; }
+        .path-input { width: 90px; }
+        .btn-conn {
+            padding: 6px 18px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-connect { background: var(--accent-blue); color: #fff; }
+        .btn-connect:hover { background: #2563eb; }
+        .btn-disconnect { background: var(--accent-red); color: #fff; }
+        .btn-disconnect:hover { background: #dc2626; }
+
+        /* STATUS BAR */
+        .status-bar {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 6px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            flex-shrink: 0;
+            transition: background 0.3s;
+        }
+        .status-dot.connected { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+        .status-dot.connecting { background: var(--accent-yellow); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        .status-text { font-size: 11px; color: var(--text-muted); }
+        .status-text strong { color: var(--text-primary); }
+        .stat-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-pill span { color: var(--text-primary); font-weight: 600; }
+
+        /* MAIN GRID */
+        .main-grid {
+            padding: 14px;
+            display: grid;
+            grid-template-columns: 320px 1fr 260px;
+            grid-template-rows: auto auto auto;
+            gap: 12px;
+        }
+        @media (max-width: 1100px) {
+            .main-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 700px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .card-header {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+        .card-header i { font-size: 14px; color: var(--accent-blue); }
+        .card-body { padding: 14px; }
+
+        /* FLIGHT MODE */
+        .mode-badge {
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: var(--bg-panel);
+            border: 2px solid var(--accent-blue);
+            color: var(--accent-blue);
+            text-align: center;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .mode-badge.failsafe {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            animation: pulse 0.5s infinite;
+        }
+        .mode-badge.rth { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .mode-badge.angle, .mode-badge.horizon { border-color: var(--accent-green); color: var(--accent-green); }
+        .mode-badge.launch { border-color: var(--accent-yellow); color: var(--accent-yellow); }
+        .mode-badge.cruise { border-color: var(--accent-purple); color: var(--accent-purple); }
+
+        /* LINK QUALITY */
+        .link-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .metric-box {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .metric-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+        .metric-unit { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .metric-bar {
+            height: 4px;
+            background: var(--bg-dark);
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .metric-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s, background 0.3s;
+            background: var(--accent-green);
+        }
+
+        /* ARTIFICIAL HORIZON */
+        #horizonCanvas {
+            display: block;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            margin: 0 auto;
+        }
+
+        /* GPS MAP */
+        #mapContainer {
+            width: 100%;
+            height: 280px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            z-index: 1;
+        }
+
+        /* GPS INFO */
+        .gps-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .gps-item { }
+        .gps-item-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+        .gps-item-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .gps-fix-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .fix-none { background: rgba(239,68,68,0.15); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.3); }
+        .fix-2d   { background: rgba(234,179,8,0.15); color: var(--accent-yellow); border: 1px solid rgba(234,179,8,0.3); }
+        .fix-3d   { background: rgba(34,197,94,0.15); color: var(--accent-green); border: 1px solid rgba(34,197,94,0.3); }
+
+        /* RC CHANNELS */
+        .ch-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        .ch-name { width: 52px; font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+        .ch-track {
+            flex: 1;
+            height: 10px;
+            background: var(--bg-dark);
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .ch-bar {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-blue);
+            border-radius: 5px;
+            transition: width 0.1s;
+            width: 0%;
+        }
+        .ch-bar.active { background: var(--accent-cyan); }
+        .ch-center-mark {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            width: 1px;
+            background: var(--border);
+        }
+        .ch-val { width: 36px; font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; text-align: right; flex-shrink: 0; }
+
+        /* WIND COMPASS */
+        #windCanvas { display: block; margin: 0 auto; }
+        .wind-info-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        .wind-stat { text-align: center; }
+        .wind-stat-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+        .wind-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .wind-invalid { color: var(--text-muted) !important; }
+
+        /* ALTITUDE/VARIO */
+        .alt-vario-row { display: flex; gap: 12px; }
+        .alt-box { flex: 1; text-align: center; }
+        .alt-label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+        .alt-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .alt-unit { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .vario-bar-container {
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .vario-bar-fill {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            width: 0%;
+            transform-origin: left center;
+            border-radius: 4px;
+            transition: width 0.2s, background 0.2s;
+        }
+        .vario-up { background: var(--accent-green); }
+        .vario-down { background: var(--accent-red); transform: scaleX(-1); right: 50%; left: auto; }
+
+        /* FAILSAFE OVERLAY */
+        #failsafeOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(239,68,68,0.15);
+            border: 4px solid var(--accent-red);
+            pointer-events: none;
+            z-index: 9999;
+            animation: failsafe-blink 0.5s infinite;
+        }
+        @keyframes failsafe-blink {
+            0%,100%{border-color:var(--accent-red);background:rgba(239,68,68,0.15)}
+            50%{border-color:rgba(239,68,68,0.3);background:transparent}
+        }
+        #failsafeOverlay .failsafe-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--accent-red);
+            letter-spacing: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            pointer-events: none;
+            text-shadow: 0 0 20px var(--accent-red);
+        }
+
+        /* RF MODE LABELS */
+        .rf-mode-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(59,130,246,0.15);
+            color: var(--accent-blue);
+            border: 1px solid rgba(59,130,246,0.3);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* TX POWER LABELS */
+        .tx-power-label { font-size: 11px; color: var(--text-muted); }
+
+        /* Scrollable channels */
+        .channels-scroll { max-height: 220px; overflow-y: auto; padding-right: 4px; }
+        .channels-scroll::-webkit-scrollbar { width: 3px; }
+        .channels-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* Layout helpers */
+        .col-left { grid-column: 1; display: flex; flex-direction: column; gap: 12px; }
+        .col-center { grid-column: 2; display: flex; flex-direction: column; gap: 12px; }
+        .col-right { grid-column: 3; display: flex; flex-direction: column; gap: 12px; }
+
+        .leaflet-container { background: #0d0f14 !important; }
+        .leaflet-tile { filter: brightness(0.7) saturate(0.8); }
+    </style>
+</head>
+<body>
+
+<!-- FAILSAFE OVERLAY -->
+<div id="failsafeOverlay">
+    <div class="failsafe-text">!! FAILSAFE !!</div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-brand">
+        <i class="bi bi-broadcast logo-icon"></i>
+        ELRS Backpack Telemetri
+    </div>
+    <div class="header-conn">
+        <div class="conn-field">
+            <label>IP Adresi</label>
+            <input type="text" id="inputIP" class="conn-input" value="10.0.0.1" placeholder="10.0.0.1">
+        </div>
+        <div class="conn-field">
+            <label>Port</label>
+            <input type="text" id="inputPort" class="conn-input port-input" value="80" placeholder="80">
+        </div>
+        <div class="conn-field">
+            <label>Path</label>
+            <input type="text" id="inputPath" class="conn-input path-input" value="/ws" placeholder="/ws">
+        </div>
+        <button id="btnConnect" class="btn-conn btn-connect" onclick="toggleConnection()">
+            <i class="bi bi-plug-fill"></i> Bağlan
+        </button>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-text" id="statusText">Bağlantı yok</span>
+    </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+    <span class="stat-pill">Son paket: <span id="lastPacketAge">--</span></span>
+    <span class="stat-pill">Paket/s: <span id="pktRate">0</span></span>
+    <span class="stat-pill">RF Mod: <span id="rfModeLabel">--</span></span>
+    <span class="stat-pill">TX Güç: <span id="txPowerLabel">--</span></span>
+    <span class="stat-pill" id="antennaLabel">Anten: <span>A</span></span>
+</div>
+
+<!-- MAIN GRID -->
+<div class="main-grid">
+
+    <!-- SOL KOLON -->
+    <div class="col-left">
+
+        <!-- Uçuş Modu -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-airplane-fill"></i> Uçuş Modu</div>
+            <div class="card-body" style="text-align:center;">
+                <div class="mode-badge" id="flightModeBadge">--</div>
+            </div>
+        </div>
+
+        <!-- Link İstatistikleri -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-wifi"></i> Link Kalitesi</div>
+            <div class="card-body">
+                <div class="link-grid">
+                    <div class="metric-box">
+                        <div class="metric-label">UL RSSI</div>
+                        <div class="metric-value" id="rssiDbm">-</div>
+                        <div class="metric-unit">dBm</div>
+                        <div class="metric-bar"><div class="metric-bar-fill" id="rssiBar" style="width:0%"></div></div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Link LQ</div>
+                        <div class="metric-value" id="lqValue">-</div>
+                        <div class="metric-unit">%</div>
+                        <div class="metric-bar"><div class="metric-bar-fill" id="lqBar" style="width:0%"></div></div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">UL SNR</div>
+                        <div class="metric-value" id="snrValue">-</div>
+                        <div class="metric-unit">dB</div>
+                        <div class="metric-bar"><div class="metric-bar-fill" id="snrBar" style="width:0%"></div></div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">DL RSSI</div>
+                        <div class="metric-value" id="dlRssi">-</div>
+                        <div class="metric-unit">dBm</div>
+                        <div class="metric-bar"><div class="metric-bar-fill" id="dlRssiBar" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rüzgar Pusulası -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-wind"></i> Rüzgar Tahmini</div>
+            <div class="card-body">
+                <canvas id="windCanvas" width="200" height="200"></canvas>
+                <div class="wind-info-row">
+                    <div class="wind-stat">
+                        <div class="wind-stat-label">Hız</div>
+                        <div class="wind-stat-value" id="windSpeed">--</div>
+                        <div class="metric-unit">m/s</div>
+                    </div>
+                    <div class="wind-stat">
+                        <div class="wind-stat-label">Yön</div>
+                        <div class="wind-stat-value" id="windDir">--</div>
+                        <div class="metric-unit">°</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ORTA KOLON -->
+    <div class="col-center">
+
+        <!-- Yapay Ufuk + Attitude -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-crosshair2"></i> Attitude</div>
+            <div class="card-body" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+                <canvas id="horizonCanvas" width="220" height="220"></canvas>
+                <div style="flex:1;min-width:120px;">
+                    <div class="metric-box" style="margin-bottom:8px;">
+                        <div class="metric-label">Roll</div>
+                        <div class="metric-value" id="rollVal" style="font-size:22px;">0.0°</div>
+                    </div>
+                    <div class="metric-box" style="margin-bottom:8px;">
+                        <div class="metric-label">Pitch</div>
+                        <div class="metric-value" id="pitchVal" style="font-size:22px;">0.0°</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Yaw</div>
+                        <div class="metric-value" id="yawVal" style="font-size:22px;">0.0°</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPS Harita -->
+        <div class="card" style="flex:1;">
+            <div class="card-header"><i class="bi bi-geo-alt-fill"></i> GPS Harita</div>
+            <div class="card-body">
+                <div id="mapContainer"></div>
+            </div>
+        </div>
+
+        <!-- İrtifa & Vario -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart-fill"></i> İrtifa & Variometre</div>
+            <div class="card-body">
+                <div class="alt-vario-row">
+                    <div class="alt-box">
+                        <div class="alt-label">İrtifa</div>
+                        <div class="alt-value" id="altValue">0</div>
+                        <div class="alt-unit">metre</div>
+                    </div>
+                    <div class="alt-box">
+                        <div class="alt-label">Vario</div>
+                        <div class="alt-value" id="varioValue" style="color:var(--accent-green)">0.0</div>
+                        <div class="alt-unit">m/s</div>
+                        <div class="vario-bar-container">
+                            <div class="vario-bar-fill vario-up" id="varioBarUp"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SAĞ KOLON -->
+    <div class="col-right">
+
+        <!-- GPS Bilgileri -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-globe2"></i> GPS Verisi</div>
+            <div class="card-body">
+                <div id="gpsFix" class="gps-fix-badge fix-none">
+                    <i class="bi bi-circle-fill" style="font-size:7px;"></i> FIX YOK
+                </div>
+                <div class="gps-grid">
+                    <div class="gps-item">
+                        <div class="gps-item-label">Enlem</div>
+                        <div class="gps-item-value" id="gpsLat">--</div>
+                    </div>
+                    <div class="gps-item">
+                        <div class="gps-item-label">Boylam</div>
+                        <div class="gps-item-value" id="gpsLon">--</div>
+                    </div>
+                    <div class="gps-item">
+                        <div class="gps-item-label">Yer Hızı</div>
+                        <div class="gps-item-value" id="gpsSpeed">-- <span style="font-size:10px;color:var(--text-muted)">km/h</span></div>
+                    </div>
+                    <div class="gps-item">
+                        <div class="gps-item-label">Yön (COG)</div>
+                        <div class="gps-item-value" id="gpsCog">-- <span style="font-size:10px;color:var(--text-muted)">°</span></div>
+                    </div>
+                    <div class="gps-item">
+                        <div class="gps-item-label">GPS İrtifa</div>
+                        <div class="gps-item-value" id="gpsAlt">-- <span style="font-size:10px;color:var(--text-muted)">m</span></div>
+                    </div>
+                    <div class="gps-item">
+                        <div class="gps-item-label">Uydu</div>
+                        <div class="gps-item-value" id="gpsSats">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RC Kanalları -->
+        <div class="card" style="flex:1;">
+            <div class="card-header"><i class="bi bi-controller"></i> RC Kanalları</div>
+            <div class="card-body channels-scroll" id="channelsContainer">
+                <!-- JS tarafından doldurulur -->
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+// ============================================================
+//  CRSF SABITLERI
+// ============================================================
+const CRSF_SYNC       = 0xC8;
+const CRSF_GPS        = 0x02;
+const CRSF_VARIO      = 0x07;
+const CRSF_BATTERY    = 0x08;
+const CRSF_LINK_STATS = 0x14;
+const CRSF_RC_CHAN    = 0x16;
+const CRSF_ATTITUDE   = 0x1E;
+const CRSF_FLTMODE    = 0x21;
+
+const RF_MODES = ['4Hz','25Hz','50Hz','100Hz','150Hz','200Hz','250Hz','500Hz','D250Hz','D500Hz'];
+const TX_POWERS = ['10mW','25mW','50mW','100mW','250mW','500mW','1W','2W'];
+
+// ============================================================
+//  STATE
+// ============================================================
+let ws = null;
+let isConnected = false;
+let rxBuf = new Uint8Array(512);
+let rxLen = 0;
+let lastPacketTime = null;
+let pktCount = 0;
+let pktRateTimer = null;
+let pktCountLast = 0;
+let mapInstance = null;
+let mapMarker = null;
+let mapTrail = [];
+let windValid = false;
+
+const telemetry = {
+    roll: 0, pitch: 0, yaw: 0,
+    lat: null, lon: null, speed: 0, cog: 0, gpsAlt: 0, sats: 0,
+    alt: 0, vario: 0,
+    rssi1: -100, rssi2: -100, lq: 0, snr: 0,
+    antenna: 0, rfMode: 0, txPower: 0,
+    dlRssi: 0, dlLq: 0, dlSnr: 0,
+    windSpeed: 0, windDir: 0, windValid: false,
+    flightMode: '--',
+    failsafe: false,
+    channels: new Array(16).fill(1500)
+};
+
+// ============================================================
+//  CRC8 DVB-S2
+// ============================================================
+function crsf_crc8(data, start, len) {
+    let crc = 0;
+    for (let i = start; i < start + len; i++) {
+        let b = data[i];
+        for (let j = 0; j < 8; j++) {
+            let mix = (crc ^ b) & 0x80;
+            crc = (crc << 1) & 0xFF;
+            if (mix) crc ^= 0xD5;
+            b = (b << 1) & 0xFF;
+        }
+    }
+    return crc;
+}
+
+// ============================================================
+//  FRAME PARSER
+// ============================================================
+function processBytes(newBytes) {
+    // Byte'ları buffer'a ekle
+    for (let i = 0; i < newBytes.length; i++) {
+        if (rxLen < rxBuf.length) rxBuf[rxLen++] = newBytes[i];
+    }
+
+    // Frame'leri çıkar
+    while (rxLen > 2) {
+        // SYNC byte ara
+        if (rxBuf[0] !== CRSF_SYNC) {
+            let syncIdx = -1;
+            for (let i = 1; i < rxLen; i++) {
+                if (rxBuf[i] === CRSF_SYNC) { syncIdx = i; break; }
+            }
+            if (syncIdx < 0) { rxLen = 0; break; }
+            rxBuf.copyWithin(0, syncIdx, rxLen);
+            rxLen -= syncIdx;
+            continue;
+        }
+
+        const frameLen = rxBuf[1]; // LEN byte = type(1) + payload + crc(1)
+        const totalLen = frameLen + 2; // SYNC + LEN + ...
+
+        if (frameLen < 2 || frameLen > 62) { rxBuf.copyWithin(0,1,rxLen); rxLen--; continue; }
+        if (rxLen < totalLen) break; // Henüz tam frame gelmedі
+
+        // CRC kontrol: LEN byte'ından sonraki (frameLen-1) byte
+        const calcCrc = crsf_crc8(rxBuf, 2, frameLen - 1);
+        const inCrc   = rxBuf[totalLen - 1];
+
+        if (calcCrc === inCrc) {
+            const type    = rxBuf[2];
+            const payload = rxBuf.slice(3, totalLen - 1);
+            dispatchFrame(type, payload);
+            pktCount++;
+            lastPacketTime = Date.now();
+        }
+
+        rxBuf.copyWithin(0, totalLen, rxLen);
+        rxLen -= totalLen;
+    }
+}
+
+function dispatchFrame(type, p) {
+    switch (type) {
+        case CRSF_GPS:        parseGPS(p);       break;
+        case CRSF_VARIO:      parseVario(p);     break;
+        case CRSF_BATTERY:    parseBattery(p);   break;
+        case CRSF_LINK_STATS: parseLinkStats(p); break;
+        case CRSF_RC_CHAN:    parseRCChannels(p);break;
+        case CRSF_ATTITUDE:   parseAttitude(p);  break;
+        case CRSF_FLTMODE:    parseFlightMode(p);break;
+    }
+    renderAll();
+}
+
+// ============================================================
+//  CRSF FRAME PARSE FONKSİYONLARI
+// ============================================================
+function readBE32(p, i) {
+    return ((p[i] << 24) | (p[i+1] << 16) | (p[i+2] << 8) | p[i+3]) | 0;
+}
+function readBE16u(p, i) { return ((p[i] << 8) | p[i+1]) >>> 0; }
+function readBE16s(p, i) { let v = readBE16u(p,i); return v >= 0x8000 ? v - 0x10000 : v; }
+
+function parseGPS(p) {
+    if (p.length < 15) return;
+    telemetry.lat    = readBE32(p,0) / 1e7;
+    telemetry.lon    = readBE32(p,4) / 1e7;
+    telemetry.speed  = readBE16u(p,8) / 36.0;      // cm/s → km/h  (raw = km/h * 100 / ... actually CRSF stores km/h*100)
+    // ELRS: speed = km/h * 100 → divide by 100 for km/h
+    telemetry.speed  = readBE16u(p,8) / 100.0;
+    telemetry.cog    = readBE16u(p,10) / 100.0;
+    telemetry.gpsAlt = readBE16u(p,12) - 1000;
+    telemetry.sats   = p[14];
+}
+
+function parseVario(p) {
+    if (p.length < 4) return;
+    telemetry.alt   = readBE16s(p,0) - 1000;
+    telemetry.vario = readBE16s(p,2) / 10.0;
+}
+
+function parseBattery(p) {
+    // Vecihi'de: VFAS=wind_speed*10, Curr=wind_dir*10, Bat%=geçerlilik
+    if (p.length < 8) return;
+    const windSpeedRaw = readBE16s(p,0);  // 0.1 m/s cinsinden
+    const windDirRaw   = readBE16s(p,2);  // 0.1 derece cinsinden
+    const batPct       = p[7];
+    telemetry.windSpeed = windSpeedRaw / 10.0;
+    telemetry.windDir   = windDirRaw   / 10.0;
+    telemetry.windValid = (batPct === 100);
+}
+
+function parseLinkStats(p) {
+    if (p.length < 10) return;
+    telemetry.rssi1   = -(p[0]);
+    telemetry.rssi2   = -(p[1]);
+    telemetry.lq      = Math.min(p[2], 100);
+    telemetry.snr     = (p[3] << 24 >> 24);  // signed
+    telemetry.antenna = p[4];
+    telemetry.rfMode  = p[5];
+    telemetry.txPower = p[6];
+    telemetry.dlRssi  = -(p[7]);
+    telemetry.dlLq    = p[8];
+    telemetry.dlSnr   = (p[9] << 24 >> 24);
+}
+
+function parseRCChannels(p) {
+    if (p.length < 22) return;
+    const bits = [];
+    for (let i = 0; i < 22; i++) bits.push(p[i]);
+    // 16 kanalı 11-bit gruplar halinde çıkar
+    const b = (i) => {
+        const byteIdx = Math.floor(i * 11 / 8);
+        const bitIdx  = (i * 11) % 8;
+        let val = (bits[byteIdx] | (bits[byteIdx+1] << 8) | (bits[byteIdx+2] << 16)) >> bitIdx;
+        return val & 0x7FF;
+    };
+    for (let i = 0; i < 16; i++) {
+        const raw = b(i);
+        telemetry.channels[i] = Math.round(raw * (1000/1792) + 191 * (-1000/1792) + 1000);
+        telemetry.channels[i] = Math.max(1000, Math.min(2000, telemetry.channels[i]));
+    }
+}
+
+function parseAttitude(p) {
+    if (p.length < 6) return;
+    telemetry.pitch = readBE16s(p,0) / 10000.0 * (180 / Math.PI);
+    telemetry.roll  = readBE16s(p,2) / 10000.0 * (180 / Math.PI);
+    telemetry.yaw   = readBE16s(p,4) / 10000.0 * (180 / Math.PI);
+}
+
+function parseFlightMode(p) {
+    let str = '';
+    for (let i = 0; i < p.length && p[i] !== 0; i++) str += String.fromCharCode(p[i]);
+    telemetry.flightMode = str || '--';
+    telemetry.failsafe = str.includes('FAILSAFE') || str.includes('failsafe');
+}
+
+// ============================================================
+//  RENDER FONKSİYONLARI
+// ============================================================
+function renderAll() {
+    renderFlightMode();
+    renderLinkStats();
+    renderAttitude();
+    renderGPS();
+    renderVario();
+    renderWind();
+    renderChannels();
+    renderFailsafe();
+}
+
+function renderFlightMode() {
+    const el = document.getElementById('flightModeBadge');
+    const mode = telemetry.flightMode;
+    el.textContent = mode;
+    el.className = 'mode-badge';
+    const lc = mode.toLowerCase();
+    if (lc.includes('failsafe')) el.classList.add('failsafe');
+    else if (lc.includes('rth'))     el.classList.add('rth');
+    else if (lc.includes('angle'))   el.classList.add('angle');
+    else if (lc.includes('horizon')) el.classList.add('horizon');
+    else if (lc.includes('launch'))  el.classList.add('launch');
+    else if (lc.includes('cruise'))  el.classList.add('cruise');
+}
+
+function colorForPercent(pct) {
+    if (pct >= 70) return 'var(--accent-green)';
+    if (pct >= 40) return 'var(--accent-yellow)';
+    return 'var(--accent-red)';
+}
+
+function renderLinkStats() {
+    const t = telemetry;
+
+    // UL RSSI (en iyi anten, -50=iyi, -120=kötü)
+    const rssi = Math.max(t.rssi1, t.rssi2);
+    const rssiPct = Math.max(0, Math.min(100, ((rssi + 120) / 70) * 100));
+    document.getElementById('rssiDbm').textContent = rssi;
+    setBar('rssiBar', rssiPct, colorForPercent(rssiPct));
+
+    // LQ
+    document.getElementById('lqValue').textContent = t.lq;
+    setBar('lqBar', t.lq, colorForPercent(t.lq));
+
+    // SNR
+    const snrNorm = Math.max(0, Math.min(100, ((t.snr + 10) / 30) * 100));
+    document.getElementById('snrValue').textContent = t.snr;
+    setBar('snrBar', snrNorm, colorForPercent(snrNorm));
+
+    // DL RSSI
+    const dlPct = Math.max(0, Math.min(100, ((t.dlRssi + 120) / 70) * 100));
+    document.getElementById('dlRssi').textContent = t.dlRssi;
+    setBar('dlRssiBar', dlPct, colorForPercent(dlPct));
+
+    // RF Mode / TX Power / Antenna
+    document.getElementById('rfModeLabel').textContent = RF_MODES[t.rfMode] || t.rfMode;
+    document.getElementById('txPowerLabel').textContent = TX_POWERS[t.txPower] || t.txPower;
+    document.getElementById('antennaLabel').innerHTML = `Anten: <span>${t.antenna === 0 ? 'A' : 'B'}</span>`;
+}
+
+function setBar(id, pct, color) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.width = pct + '%';
+    el.style.background = color;
+}
+
+function renderAttitude() {
+    const t = telemetry;
+    document.getElementById('rollVal').textContent  = t.roll.toFixed(1) + '°';
+    document.getElementById('pitchVal').textContent = t.pitch.toFixed(1) + '°';
+    document.getElementById('yawVal').textContent   = t.yaw.toFixed(1) + '°';
+    drawHorizon(t.roll, t.pitch);
+}
+
+function renderGPS() {
+    const t = telemetry;
+    if (t.lat !== null && Math.abs(t.lat) > 0.001) {
+        document.getElementById('gpsLat').textContent = t.lat.toFixed(6);
+        document.getElementById('gpsLon').textContent = t.lon.toFixed(6);
+        updateMap(t.lat, t.lon);
+
+        // Fix badge (sats ile yaklaşık)
+        const fix = document.getElementById('gpsFix');
+        if (t.sats >= 6) {
+            fix.className = 'gps-fix-badge fix-3d';
+            fix.innerHTML = '<i class="bi bi-circle-fill" style="font-size:7px;"></i> 3D FIX';
+        } else if (t.sats >= 4) {
+            fix.className = 'gps-fix-badge fix-2d';
+            fix.innerHTML = '<i class="bi bi-circle-fill" style="font-size:7px;"></i> 2D FIX';
+        } else {
+            fix.className = 'gps-fix-badge fix-none';
+            fix.innerHTML = '<i class="bi bi-circle-fill" style="font-size:7px;"></i> FIX YOK';
+        }
+    } else {
+        document.getElementById('gpsLat').textContent = '--';
+        document.getElementById('gpsLon').textContent = '--';
+    }
+
+    document.getElementById('gpsSpeed').innerHTML = (t.speed * 3.6).toFixed(1) + ' <span style="font-size:10px;color:var(--text-muted)">km/h</span>';
+    document.getElementById('gpsCog').innerHTML   = t.cog.toFixed(1) + ' <span style="font-size:10px;color:var(--text-muted)">°</span>';
+    document.getElementById('gpsAlt').innerHTML   = t.gpsAlt + ' <span style="font-size:10px;color:var(--text-muted)">m</span>';
+    document.getElementById('gpsSats').textContent = t.sats;
+}
+
+function renderVario() {
+    const t = telemetry;
+    document.getElementById('altValue').textContent   = t.alt.toFixed(0);
+    const vEl = document.getElementById('varioValue');
+    vEl.textContent = t.vario.toFixed(1);
+    vEl.style.color = t.vario >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+
+    // Vario bar: maks ±10 m/s
+    const pct = Math.min(50, Math.abs(t.vario) / 10 * 50);
+    const barUp   = document.getElementById('varioBarUp');
+    if (t.vario >= 0) {
+        barUp.className = 'vario-bar-fill vario-up';
+        barUp.style.width = (pct * 2) + '%';
+        barUp.style.left  = '50%';
+        barUp.style.right = 'auto';
+        barUp.style.transform = 'none';
+    } else {
+        barUp.className = 'vario-bar-fill vario-down';
+        barUp.style.width = (pct * 2) + '%';
+        barUp.style.left  = 'auto';
+        barUp.style.right = '50%';
+        barUp.style.transform = 'none';
+    }
+}
+
+function renderWind() {
+    const t = telemetry;
+    drawWindCompass(t.windDir, t.windValid);
+    const invalid = !t.windValid;
+    const speedEl = document.getElementById('windSpeed');
+    const dirEl   = document.getElementById('windDir');
+    speedEl.textContent = invalid ? '--' : t.windSpeed.toFixed(1);
+    dirEl.textContent   = invalid ? '--' : t.windDir.toFixed(0);
+    speedEl.className = 'wind-stat-value' + (invalid ? ' wind-invalid' : '');
+    dirEl.className   = 'wind-stat-value' + (invalid ? ' wind-invalid' : '');
+}
+
+function renderChannels() {
+    const names = ['Roll(A)','Pitch(E)','Thr(T)','Yaw(R)',
+                   'AUX 5','AUX 6','AUX 7','AUX 8',
+                   'AUX 9','AUX10','AUX11','AUX12',
+                   'AUX13','AUX14','AUX15','AUX16'];
+    const container = document.getElementById('channelsContainer');
+    const t = telemetry;
+
+    // İlk çalışmada HTML oluştur
+    if (!container.dataset.built) {
+        container.dataset.built = '1';
+        let html = '';
+        for (let i = 0; i < 16; i++) {
+            html += `<div class="ch-row">
+                <span class="ch-name">${names[i]}</span>
+                <div class="ch-track">
+                    <div class="ch-center-mark"></div>
+                    <div class="ch-bar" id="chBar${i+1}"></div>
+                </div>
+                <span class="ch-val" id="chVal${i+1}">1500</span>
+            </div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    for (let i = 0; i < 16; i++) {
+        const val = t.channels[i];
+        const pct = ((val - 1000) / 1000) * 100;
+        const fromCenter = Math.abs(pct - 50);
+        const bar = document.getElementById('chBar' + (i+1));
+        if (bar) {
+            bar.style.width  = (fromCenter * 2) + '%';
+            bar.style.left   = (pct < 50 ? pct : 50) + '%';
+            bar.className    = 'ch-bar' + (fromCenter > 10 ? ' active' : '');
+        }
+        const valEl = document.getElementById('chVal' + (i+1));
+        if (valEl) valEl.textContent = val;
+    }
+}
+
+function renderFailsafe() {
+    const overlay = document.getElementById('failsafeOverlay');
+    overlay.style.display = telemetry.failsafe ? 'block' : 'none';
+}
+
+// ============================================================
+//  YAPAY UFUK (CANVAS)
+// ============================================================
+function drawHorizon(roll, pitch) {
+    const canvas = document.getElementById('horizonCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const cx = w/2, cy = h/2, r = w/2 - 3;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Clip dairesi
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.clip();
+
+    // Gökyüzü
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+    skyGrad.addColorStop(0, '#1a3a6b');
+    skyGrad.addColorStop(1, '#2563eb');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Yatay çizginin dikey ofseti (pitch)
+    const pitchOffset = (pitch / 45) * (h / 4);
+
+    ctx.save();
+    ctx.translate(cx, cy + pitchOffset);
+    ctx.rotate(-roll * Math.PI / 180);
+
+    // Zemin
+    const grdGrad = ctx.createLinearGradient(0, 0, 0, h);
+    grdGrad.addColorStop(0, '#7c4f1e');
+    grdGrad.addColorStop(1, '#3d2710');
+    ctx.fillStyle = grdGrad;
+    ctx.fillRect(-w, 0, w*2, h);
+
+    // Ufuk çizgisi
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-w, 0);
+    ctx.lineTo(w, 0);
+    ctx.stroke();
+
+    // Pitch çizgileri
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1;
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.textAlign = 'right';
+    for (let deg = -30; deg <= 30; deg += 10) {
+        if (deg === 0) continue;
+        const y = -(deg / 45) * (h / 4);
+        const len = (deg % 20 === 0) ? 30 : 18;
+        ctx.beginPath();
+        ctx.moveTo(-len, y);
+        ctx.lineTo(len, y);
+        ctx.stroke();
+        ctx.fillText(Math.abs(deg) + '°', -len - 4, y + 3);
+    }
+
+    ctx.restore();
+
+    // Sabit hedef merkezi
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    // Merkez daire
+    ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2); ctx.stroke();
+    // Sol kol
+    ctx.beginPath(); ctx.moveTo(cx-40, cy); ctx.lineTo(cx-10, cy); ctx.stroke();
+    // Sağ kol
+    ctx.beginPath(); ctx.moveTo(cx+10, cy); ctx.lineTo(cx+40, cy); ctx.stroke();
+
+    // Roll göstergesi (üst yay)
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.lineWidth = 1;
+    for (let a = -60; a <= 60; a += 10) {
+        if (a === 0) continue;
+        const rad = (a - 90) * Math.PI / 180;
+        const innerR = r - 14, outerR = r - 6;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(rad)*innerR, cy + Math.sin(rad)*innerR);
+        ctx.lineTo(cx + Math.cos(rad)*outerR, cy + Math.sin(rad)*outerR);
+        ctx.stroke();
+    }
+
+    // Roll ok
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-roll * Math.PI / 180);
+    ctx.strokeStyle = '#facc15';
+    ctx.fillStyle   = '#facc15';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -(r - 14));
+    ctx.lineTo(-6, -(r - 4));
+    ctx.lineTo(6,  -(r - 4));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore(); // clip
+}
+
+// ============================================================
+//  RÜZGAR PUSULASI (CANVAS)
+// ============================================================
+function drawWindCompass(dir, valid) {
+    const canvas = document.getElementById('windCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const cx = w/2, cy = h/2, r = w/2 - 16;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Dış halka
+    ctx.strokeStyle = '#2a3050';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
+
+    // Yön işaretleri
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const labels = [['K',0],['D',90],['G',180],['B',270]];
+    labels.forEach(([lbl, ang]) => {
+        const rad = (ang - 90) * Math.PI / 180;
+        ctx.fillStyle = (lbl === 'K') ? '#ef4444' : '#6b7280';
+        ctx.fillText(lbl, cx + Math.cos(rad)*(r-8), cy + Math.sin(rad)*(r-8));
+    });
+
+    // Derece işaretleri
+    for (let a = 0; a < 360; a += 30) {
+        const rad = (a - 90) * Math.PI / 180;
+        ctx.strokeStyle = '#2a3050';
+        ctx.lineWidth = 1;
+        const inner = r - 16, outer = r - 8;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(rad)*inner, cy + Math.sin(rad)*inner);
+        ctx.lineTo(cx + Math.cos(rad)*outer, cy + Math.sin(rad)*outer);
+        ctx.stroke();
+    }
+
+    // İç daire
+    ctx.strokeStyle = '#1a1e2b';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, r - 22, 0, Math.PI*2); ctx.stroke();
+
+    if (valid) {
+        // Rüzgar yönü oku (rüzgar hangi yönden geliyor)
+        const rad = (dir - 90) * Math.PI / 180;
+        const arrowLen = r - 26;
+
+        // Ok gövdesi
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rad);
+
+        // Rüzgar uçtan gelen yön (yani ok rüzgarın geldiği yönü gösterir)
+        ctx.strokeStyle = '#06b6d4';
+        ctx.fillStyle   = '#06b6d4';
+        ctx.lineWidth = 2;
+
+        // Gövde
+        ctx.beginPath();
+        ctx.moveTo(0, -arrowLen);
+        ctx.lineTo(0, arrowLen * 0.5);
+        ctx.stroke();
+
+        // Ok ucu
+        ctx.beginPath();
+        ctx.moveTo(0, -arrowLen);
+        ctx.lineTo(-8, -arrowLen + 16);
+        ctx.lineTo(8, -arrowLen + 16);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+    } else {
+        ctx.fillStyle = '#2a3050';
+        ctx.font = '11px Inter';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Tahmin yok', cx, cy);
+    }
+}
+
+// ============================================================
+//  HARİTA
+// ============================================================
+function initMap() {
+    mapInstance = L.map('mapContainer', { zoomControl: true, attributionControl: false })
+        .setView([39.0, 35.0], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(mapInstance);
+
+    // Özel icon
+    const icon = L.divIcon({
+        html: '<div style="width:14px;height:14px;background:#3b82f6;border:2px solid #fff;border-radius:50%;box-shadow:0 0 6px #3b82f6;"></div>',
+        iconSize: [14,14], iconAnchor: [7,7]
+    });
+    mapMarker = L.marker([39.0, 35.0], { icon }).addTo(mapInstance);
+}
+
+let mapCentered = false;
+function updateMap(lat, lon) {
+    if (!mapInstance) return;
+    mapMarker.setLatLng([lat, lon]);
+    mapTrail.push([lat, lon]);
+    if (mapTrail.length > 500) mapTrail.shift();
+
+    if (!mapCentered) {
+        mapInstance.setView([lat, lon], 15);
+        mapCentered = true;
+    }
+}
+
+// ============================================================
+//  WEBSOCKET BAĞLANTISI
+// ============================================================
+function toggleConnection() {
+    if (isConnected) {
+        disconnect();
+    } else {
+        connect();
+    }
+}
+
+function connect() {
+    const ip   = document.getElementById('inputIP').value.trim();
+    const port = document.getElementById('inputPort').value.trim();
+    const path = document.getElementById('inputPath').value.trim() || '/ws';
+    const url  = `ws://${ip}:${port}${path}`;
+
+    setStatus('connecting', `Bağlanıyor → ${url}`);
+
+    ws = new WebSocket(url);
+    ws.binaryType = 'arraybuffer';
+
+    ws.onopen = () => {
+        isConnected = true;
+        rxLen = 0;
+        setStatus('connected', `Bağlı → ${url}`);
+        document.getElementById('btnConnect').textContent = '🔴 Kes';
+        document.getElementById('btnConnect').className = 'btn-conn btn-disconnect';
+        startPktRateTimer();
+    };
+
+    ws.onmessage = (event) => {
+        if (event.data instanceof ArrayBuffer) {
+            processBytes(new Uint8Array(event.data));
+        } else if (typeof event.data === 'string') {
+            // JSON format desteği (fallback)
+            try {
+                const d = JSON.parse(event.data);
+                if (d.type === 'crsf' && d.data) {
+                    processBytes(new Uint8Array(d.data));
+                }
+            } catch(_) {}
+        }
+    };
+
+    ws.onerror = (e) => {
+        setStatus('disconnected', 'Bağlantı hatası');
+        isConnected = false;
+    };
+
+    ws.onclose = () => {
+        if (isConnected) setStatus('disconnected', 'Bağlantı kapandı');
+        isConnected = false;
+        document.getElementById('btnConnect').textContent = '🟢 Bağlan';
+        document.getElementById('btnConnect').className = 'btn-conn btn-connect';
+        stopPktRateTimer();
+    };
+}
+
+function disconnect() {
+    if (ws) { ws.close(); ws = null; }
+    isConnected = false;
+    setStatus('disconnected', 'Bağlantı kesildi');
+    document.getElementById('btnConnect').textContent = '🟢 Bağlan';
+    document.getElementById('btnConnect').className = 'btn-conn btn-connect';
+    stopPktRateTimer();
+}
+
+// ============================================================
+//  STATUS + PAKET RATE
+// ============================================================
+function setStatus(state, text) {
+    const dot  = document.getElementById('statusDot');
+    const txt  = document.getElementById('statusText');
+    dot.className = 'status-dot ' + (state === 'connected' ? 'connected' : state === 'connecting' ? 'connecting' : '');
+    txt.textContent = text;
+}
+
+function startPktRateTimer() {
+    pktCountLast = pktCount;
+    pktRateTimer = setInterval(() => {
+        const rate = pktCount - pktCountLast;
+        pktCountLast = pktCount;
+        document.getElementById('pktRate').textContent = rate;
+
+        // Son paket yaşı
+        if (lastPacketTime) {
+            const age = ((Date.now() - lastPacketTime) / 1000).toFixed(1);
+            document.getElementById('lastPacketAge').textContent = age + 's';
+        }
+    }, 1000);
+}
+
+function stopPktRateTimer() {
+    if (pktRateTimer) { clearInterval(pktRateTimer); pktRateTimer = null; }
+    document.getElementById('pktRate').textContent = '0';
+    document.getElementById('lastPacketAge').textContent = '--';
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    drawHorizon(0, 0);
+    drawWindCompass(0, false);
+    renderChannels(); // İlk HTML oluştur
+});
+</script>
+</body>
+</html>
