@@ -432,15 +432,15 @@
     <div class="header-conn">
         <div class="conn-field">
             <label>IP Adresi</label>
-            <input type="text" id="inputIP" class="conn-input" value="10.0.0.1" placeholder="10.0.0.1">
+            <input type="text" id="inputIP" class="conn-input" value="127.0.0.1" placeholder="127.0.0.1">
         </div>
         <div class="conn-field">
             <label>Port</label>
-            <input type="text" id="inputPort" class="conn-input port-input" value="80" placeholder="80">
+            <input type="text" id="inputPort" class="conn-input port-input" value="8765" placeholder="8765">
         </div>
         <div class="conn-field">
             <label>Path</label>
-            <input type="text" id="inputPath" class="conn-input path-input" value="/ws" placeholder="/ws">
+            <input type="text" id="inputPath" class="conn-input path-input" value="/" placeholder="/">
         </div>
         <button id="btnConnect" class="btn-conn btn-connect" onclick="toggleConnection()">
             <i class="bi bi-plug-fill"></i> Bağlan
@@ -1279,7 +1279,7 @@ function connect() {
         isConnected = true;
         rxLen = 0;
         setStatus('connected', `Bağlı → ${url}`);
-        document.getElementById('btnConnect').textContent = '🔴 Kes';
+        document.getElementById('btnConnect').innerHTML = '<i class="bi bi-x-circle-fill"></i> Kes';
         document.getElementById('btnConnect').className = 'btn-conn btn-disconnect';
         startPktRateTimer();
     };
@@ -1306,7 +1306,7 @@ function connect() {
     ws.onclose = () => {
         if (isConnected) setStatus('disconnected', 'Bağlantı kapandı');
         isConnected = false;
-        document.getElementById('btnConnect').textContent = '🟢 Bağlan';
+        document.getElementById('btnConnect').innerHTML = '<i class="bi bi-plug-fill"></i> Bağlan';
         document.getElementById('btnConnect').className = 'btn-conn btn-connect';
         stopPktRateTimer();
     };
