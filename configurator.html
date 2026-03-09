@@ -2023,6 +2023,58 @@
     <div class="panel panel2">
         <h2 class="panel-title"><i class="bi bi-map"></i> Waypoint Misyon Planlayıcı</h2>
 
+        <!-- ===== KAMİKAZE VARSAYILAN AYARLAR (SABİT BÖLÜM) ===== -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="panel" style="border-left:3px solid #dc3545;">
+                    <div class="d-flex justify-content-between align-items-center mb-2" style="cursor:pointer;" onclick="toggleWpSection('km-defaults-body')">
+                        <h6 class="mb-0" style="color:#ff7070;">
+                            <i class="bi bi-bullseye me-1"></i> Kamikaze Varsayılan Şablon
+                            <small class="ms-2" style="font-size:0.72em;font-weight:400;color:#888;">Yeni Kamikaze waypoint'leri bu değerlerle oluşturulur</small>
+                        </h6>
+                        <i class="bi bi-chevron-down" id="km-defaults-chevron" style="color:#888;font-size:0.85em;"></i>
+                    </div>
+                    <div id="km-defaults-body">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-6 col-md-2">
+                                <label class="form-label small mb-1" style="color:#ccc;">Dalış Açısı (°)</label>
+                                <input type="number" class="form-control form-control-sm" id="km_def_dive_angle" min="5" max="90" step="1" value="45" title="Kamikaze dalış açısı (5-90°)">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label small mb-1" style="color:#ccc;">Yükseklik Farkı (m)</label>
+                                <input type="number" class="form-control form-control-sm" id="km_def_alt_offset" step="1" value="0" title="Hedef WP irtifasına göre dalış başlangıç farkı (negatif=daha alçak)">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label small mb-1" style="color:#ccc;">Tetikleme İrtifası (m)</label>
+                                <input type="number" class="form-control form-control-sm" id="km_def_trigger_alt" min="0" max="500" step="1" value="15" title="Bu irtifada görev servosuna 2000 PWM verilir">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label small mb-1" style="color:#ccc;">Görev Servosu</label>
+                                <select class="form-select form-select-sm" id="km_def_mission_servo">
+                                    <option value="0">Devre Dışı</option>
+                                    <option value="1">Servo 1</option>
+                                    <option value="2">Servo 2</option>
+                                    <option value="3">Servo 3</option>
+                                    <option value="4">Servo 4</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <button class="btn btn-sm btn-outline-danger w-100" onclick="applyKamikazeDefaults()" title="Listedeki tüm Kamikaze waypoint'lerine bu değerleri uygula">
+                                    <i class="bi bi-arrow-repeat me-1"></i> Tüm KM WP'ye Uygula
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <small style="color:#888;"><i class="bi bi-info-circle me-1"></i>
+                            Bu değerler haritada oluşturulan yeni Kamikaze waypoint'lerinin başlangıç değerlerini belirler. "Tüm KM WP'ye Uygula" butonu listedeki tüm Kamikaze görevlerini günceller.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HARITA + WAYPOINT LİSTESİ ===== -->
         <div class="row">
             <!-- Sol: Harita -->
             <div class="col-lg-8 mb-3">
@@ -2091,82 +2143,128 @@
             </div>
         </div>
 
-        <!-- ===== İNİŞ ASISTAN AYARLARI ===== -->
-        <div class="row mt-3">
+        <!-- ===== WAYPOINT MİSYON GENEL AYARLARI ===== -->
+        <div class="row mt-2 mb-3">
             <div class="col-12">
-                <div class="panel" style="border-left: 3px solid #0dcaf0;">
+                <div class="panel" style="border-left:3px solid #6f42c1;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0" style="color:#b39ddb;">
+                            <i class="bi bi-sliders me-1"></i> Misyon Genel Parametreleri
+                            <small class="ms-2" style="font-size:0.72em;font-weight:400;color:#888;">Tüm waypoint görevleri için geçerli</small>
+                        </h6>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="saveAdvancedConfig()">
+                            <i class="bi bi-floppy me-1"></i> Kaydet
+                        </button>
+                    </div>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small mb-1" style="color:#ccc;">WP Yakalama Yarıçapı (m)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_wp_capture_radius" min="5" max="200" step="5" value="25" title="Uçak bir waypoint'e bu mesafede girince o noktayı tamamlandı say ve sonrakine geç (metre)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== İNİŞ ASISTAN AYARLARI ===== -->
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="panel" style="border-left:3px solid #0dcaf0;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0" style="color:#0dcaf0;">
-                            <i class="bi bi-wind"></i> İniş Asistan Ayarları
-                            <small class="text-muted ms-2" style="font-size:0.7em;font-weight:400;">( Land Assist Modu — Rüzgara Göre Otomatik Devre )</small>
+                            <i class="bi bi-wind me-1"></i> İniş Asistan Ayarları
+                            <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#888;">Land Assist — Rüzgara Göre Otomatik Devre</small>
                         </h5>
-                        <button class="btn btn-sm btn-outline-info" onclick="saveAdvancedConfig()" title="İniş parametrelerini FC'ye kaydet">
+                        <button class="btn btn-sm btn-outline-info" onclick="saveAdvancedConfig()">
                             <i class="bi bi-floppy me-1"></i> Kaydet
                         </button>
                     </div>
                     <div class="row g-3">
-                        <!-- Devre Parametreleri -->
-                        <div class="col-md-4">
-                            <div class="p-3 rounded" style="background:#0d1520;border:1px solid #1a4060;">
-                                <div class="fw-bold mb-2" style="color:#0dcaf0;font-size:0.85em;"><i class="bi bi-arrow-repeat me-1"></i>Devre Parametreleri</div>
+
+                        <!-- Devre -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
+                                <div class="fw-bold mb-2" style="color:#0dcaf0;font-size:0.8em;"><i class="bi bi-arrow-repeat me-1"></i>Devre</div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Devre İrtifası (m AGL)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_circuit_alt" min="20" max="300" step="5" value="50" title="İniş devresi irtifası — AGL metre">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Devre İrtifası (m AGL)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_circuit_alt" min="20" max="300" step="5" value="50" title="Rüzgar altı ve esas bacak irtifası — AGL metre">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Devre Mesafesi (m)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_circuit_distance" min="50" max="1000" step="10" value="200" title="İniş noktasından devre mesafesi (metre)">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Devre Mesafesi (m)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_circuit_distance" min="50" max="1000" step="10" value="200" title="İniş noktasından downwind ve base leg mesafesi (metre)">
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small text-muted mb-1">Alçalma Açısı (°)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_approach_angle" min="1.0" max="15.0" step="0.5" value="3.0" title="Son yaklaşma alçalma açısı (derece)">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Devre Yönü</label>
+                                    <select class="form-select form-select-sm" id="inp_la_loiter_dir" title="Sol devre veya sağ devre">
+                                        <option value="1">Sağ Devre</option>
+                                        <option value="-1">Sol Devre</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Son Yaklaşma -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
+                                <div class="fw-bold mb-2" style="color:#17a2b8;font-size:0.8em;"><i class="bi bi-arrow-down-right me-1"></i>Son Yaklaşma (Final)</div>
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Final Başlangıç Mesafesi (m)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_final_approach_distance" min="0" max="800" step="10" value="0" title="Final waypoint, iniş noktasından kaç metre uzakta olsun? 0 = Otomatik (devre_mesafe × 0.6)">
+                                    <small style="color:#888;font-size:0.78em;">0 = Otomatik (devre×0.6)</small>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Alçalma Açısı (°)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_approach_angle" min="1.0" max="15.0" step="0.5" value="3.0" title="Son yaklaşma alçalma açısı — pist başından final WP'ye kadar (derece)">
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Flare & Gaz -->
-                        <div class="col-md-4">
-                            <div class="p-3 rounded" style="background:#0d1520;border:1px solid #1a4060;">
-                                <div class="fw-bold mb-2" style="color:#ffc107;font-size:0.85em;"><i class="bi bi-arrow-down-circle me-1"></i>Flare & Gaz</div>
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
+                                <div class="fw-bold mb-2" style="color:#ffc107;font-size:0.8em;"><i class="bi bi-arrow-down-circle me-1"></i>Flare & Gaz</div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Flare İrtifası (m AGL)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_flare_alt" min="1.0" max="30.0" step="0.5" value="5.0" title="Flare başlangıç irtifası — AGL metre">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Flare Başlangıç İrtifası (m AGL)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_flare_alt" min="0.5" max="30.0" step="0.5" value="5.0" title="Bu irtifanın altında flare fazına girilir — pitch up ve gaz kesilir (AGL metre)">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Yaklaşma Gazı (PWM)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_approach_throttle" min="1000" max="2000" step="10" value="1200" title="Son yaklaşma fazı gaz değeri (PWM)">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Yaklaşma Gazı (PWM)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_approach_throttle" min="1000" max="2000" step="10" value="1200" title="Final yaklaşma fazındaki gaz değeri (PWM 1000-2000)">
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small text-muted mb-1">Flare Gazı (PWM)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_flare_throttle" min="1000" max="2000" step="10" value="1000" title="Flare fazı gaz değeri (PWM) — genellikle rölanti">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Flare Gazı (PWM)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_flare_throttle" min="1000" max="2000" step="10" value="1000" title="Flare fazındaki gaz değeri — genellikle rölanti (1000)">
                                 </div>
                             </div>
                         </div>
-                        <!-- Pilot İptal & Rüzgar -->
-                        <div class="col-md-4">
-                            <div class="p-3 rounded" style="background:#0d1520;border:1px solid #1a4060;">
-                                <div class="fw-bold mb-2" style="color:#fd7e14;font-size:0.85em;"><i class="bi bi-x-circle me-1"></i>Pilot İptal & Pist</div>
+
+                        <!-- Pilot İptal & Pist -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
+                                <div class="fw-bold mb-2" style="color:#fd7e14;font-size:0.8em;"><i class="bi bi-x-circle me-1"></i>Pilot İptal & Pist</div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Stick İptal Eşiği (PWM)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_stick_cancel_thr" min="50" max="500" step="10" value="100" title="Merkezden stick sapması — bu değeri aşarsa iniş iptal edilir">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Stick İptal Eşiği (PWM)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_stick_cancel_thr" min="50" max="500" step="10" value="100" title="Merkezden stick sapması bu değeri aşarsa iniş iptal edilir">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Gaz İptal Eşiği (PWM)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_thr_cancel_thr" min="1100" max="2000" step="10" value="1150" title="Bu gaz değerini aşarsa iniş iptal edilir (pilot devralır)">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Gaz İptal Eşiği (PWM)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_thr_cancel_thr" min="1100" max="2000" step="10" value="1150" title="Gaz bu değeri aşarsa iniş iptal edilir (pilot devralır)">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Min Rüzgar Hızı (m/s)</label>
+                                    <label class="form-label small mb-1" style="color:#ccc;">Min Rüzgar Hızı (m/s)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_min_wind_speed" min="0.5" max="20.0" step="0.5" value="2.0" title="Rüzgar yönünü pist başlığı olarak kullanmak için gereken minimum rüzgar hızı">
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small text-muted mb-1">Manuel Pist Başlığı (°)</label>
+                                    <label class="form-label small mb-1" style="color:#ccc;">Manuel Pist Başlığı (°)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_manual_runway_hdg" min="0" max="359" step="1" value="0" title="Rüzgar yoksa kullanılacak varsayılan pist başlığı (0-359°)">
                                 </div>
                             </div>
                         </div>
+
                     </div>
                     <div class="mt-2">
-                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i>
-                        Land Assist modu: Rüzgar yönüne göre otomatik iniş devresi oluşturur. Pilot gaz veya stick ile istediği zaman iptal edebilir.
+                        <small style="color:#666;"><i class="bi bi-info-circle me-1"></i>
+                        Land Assist: Rüzgar yönüne göre otomatik 4-noktalı devre (Downwind → Esas Bacak → Final → Flare). Pilot stick veya gaz hareketi ile iptal eder.
                         </small>
                     </div>
                 </div>
@@ -2176,72 +2274,88 @@
         <!-- ===== OTO İNİŞ (AUTO LAND) AYARLARI ===== -->
         <div class="row mt-3">
             <div class="col-12">
-                <div class="panel" style="border-left: 3px solid #dc3545;">
+                <div class="panel" style="border-left:3px solid #dc3545;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0" style="color:#dc3545;">
-                            <i class="bi bi-exclamation-triangle"></i> Oto İniş Ayarları
-                            <small class="text-muted ms-2" style="font-size:0.7em;font-weight:400;">( Auto Land Modu — Zorunlu / Acil İniş )</small>
+                            <i class="bi bi-exclamation-triangle me-1"></i> Oto İniş Ayarları
+                            <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#888;">Auto Land — Zorunlu / Acil İniş</small>
                         </h5>
-                        <button class="btn btn-sm btn-outline-danger" onclick="saveAdvancedConfig()" title="Oto iniş parametrelerini FC'ye kaydet">
+                        <button class="btn btn-sm btn-outline-danger" onclick="saveAdvancedConfig()">
                             <i class="bi bi-floppy me-1"></i> Kaydet
                         </button>
                     </div>
                     <div class="row g-3">
-                        <!-- Devre Parametreleri -->
-                        <div class="col-md-4">
-                            <div class="p-3 rounded" style="background:#1a0a0a;border:1px solid #601a1a;">
-                                <div class="fw-bold mb-2" style="color:#dc3545;font-size:0.85em;"><i class="bi bi-arrow-repeat me-1"></i>Devre Parametreleri</div>
+
+                        <!-- Devre -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#150a0a;border:1px solid #601a1a;">
+                                <div class="fw-bold mb-2" style="color:#dc3545;font-size:0.8em;"><i class="bi bi-arrow-repeat me-1"></i>Devre</div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Devre İrtifası (m AGL)</label>
+                                    <label class="form-label small mb-1" style="color:#ccc;">Devre İrtifası (m AGL)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_al_circuit_alt" min="20" max="500" step="5" value="80" title="Acil iniş devresi irtifası — AGL metre">
                                 </div>
-                                <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Devre Mesafesi (m)</label>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Devre Mesafesi (m)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_al_circuit_distance" min="50" max="1500" step="10" value="300" title="Acil iniş noktasından devre mesafesi (metre)">
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Son Yaklaşma -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#150a0a;border:1px solid #601a1a;">
+                                <div class="fw-bold mb-2" style="color:#e07070;font-size:0.8em;"><i class="bi bi-arrow-down-right me-1"></i>Son Yaklaşma (Final)</div>
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Final Başlangıç Mesafesi (m)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_al_final_approach_distance" min="0" max="1000" step="10" value="0" title="Final waypoint iniş noktasından kaç metre uzakta? 0 = Otomatik (devre×0.6)">
+                                    <small style="color:#888;font-size:0.78em;">0 = Otomatik (devre×0.6)</small>
+                                </div>
                                 <div class="mb-0">
-                                    <label class="form-label small text-muted mb-1">Alçalma Açısı (°)</label>
+                                    <label class="form-label small mb-1" style="color:#ccc;">Alçalma Açısı (°)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_al_approach_angle" min="1.0" max="20.0" step="0.5" value="4.0" title="Acil iniş alçalma açısı — genellikle normal inişten daha dik">
                                 </div>
                             </div>
                         </div>
+
                         <!-- Flare & Gaz -->
-                        <div class="col-md-4">
-                            <div class="p-3 rounded" style="background:#1a0a0a;border:1px solid #601a1a;">
-                                <div class="fw-bold mb-2" style="color:#ffc107;font-size:0.85em;"><i class="bi bi-arrow-down-circle me-1"></i>Flare & Gaz</div>
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#150a0a;border:1px solid #601a1a;">
+                                <div class="fw-bold mb-2" style="color:#ffc107;font-size:0.8em;"><i class="bi bi-arrow-down-circle me-1"></i>Flare & Gaz</div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Flare İrtifası (m AGL)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_al_flare_alt" min="1.0" max="30.0" step="0.5" value="8.0" title="Acil iniş flare başlangıç irtifası — AGL metre">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Flare Başlangıç İrtifası (m AGL)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_al_flare_alt" min="0.5" max="30.0" step="0.5" value="8.0" title="Acil iniş flare başlangıç irtifası — AGL metre">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Yaklaşma Gazı (PWM)</label>
+                                    <label class="form-label small mb-1" style="color:#ccc;">Yaklaşma Gazı (PWM)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_al_approach_throttle" min="1000" max="2000" step="10" value="1300" title="Acil iniş yaklaşma fazı gaz değeri (PWM)">
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small text-muted mb-1">Flare Gazı (PWM)</label>
+                                    <label class="form-label small mb-1" style="color:#ccc;">Flare Gazı (PWM)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_al_flare_throttle" min="1000" max="2000" step="10" value="1000" title="Acil iniş flare fazı gaz değeri (PWM)">
                                 </div>
                             </div>
                         </div>
+
                         <!-- Pilot İptal -->
-                        <div class="col-md-4">
-                            <div class="p-3 rounded" style="background:#1a0a0a;border:1px solid #601a1a;">
-                                <div class="fw-bold mb-2" style="color:#fd7e14;font-size:0.85em;"><i class="bi bi-x-circle me-1"></i>Pilot İptal Eşikleri</div>
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#150a0a;border:1px solid #601a1a;">
+                                <div class="fw-bold mb-2" style="color:#fd7e14;font-size:0.8em;"><i class="bi bi-x-circle me-1"></i>Pilot İptal Eşikleri</div>
                                 <div class="mb-2">
-                                    <label class="form-label small text-muted mb-1">Stick İptal Eşiği (PWM)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_al_stick_cancel_thr" min="50" max="500" step="10" value="100" title="Merkezden stick sapması — bu değeri aşarsa acil iniş iptal edilir">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Stick İptal Eşiği (PWM)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_al_stick_cancel_thr" min="50" max="500" step="10" value="100" title="Merkezden stick sapması bu değeri aşarsa acil iniş iptal edilir">
                                 </div>
-                                <div class="mb-0">
-                                    <label class="form-label small text-muted mb-1">Gaz İptal Eşiği (PWM)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_al_thr_cancel_thr" min="1100" max="2000" step="10" value="1150" title="Bu gaz değerini aşarsa acil iniş iptal edilir (pilot devralır)">
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Gaz İptal Eşiği (PWM)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_al_thr_cancel_thr" min="1100" max="2000" step="10" value="1150" title="Gaz bu değeri aşarsa acil iniş iptal edilir">
                                 </div>
-                                <div class="mt-3 p-2 rounded" style="background:#2a1010;border:1px solid #8b2020;">
+                                <div class="mt-2 p-2 rounded" style="background:#2a1010;border:1px solid #8b2020;">
                                     <small style="color:#ff8080;"><i class="bi bi-exclamation-circle me-1"></i>
-                                    Oto İniş modu yalnızca acil durumlarda devreye girer. Pilot gaz veya stick hareketi ile iptal edebilir.
+                                    Yalnızca acil durumlarda. Pilot stick veya gaz hareketi ile iptal edebilir.
                                     </small>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

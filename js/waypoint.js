@@ -31,8 +31,9 @@ const WP_SPEED_MODES = [
     { value: 2, label: 'Hava Hızı',    disabled: true },
 ];
 
-// Boş kamikaze config
+// Boş kamikaze config — varsa şablon input'larından, yoksa sabit varsayılanlar
 function defaultKamikaze() {
+    if (typeof getKamikazeDefaults === 'function') return getKamikazeDefaults();
     return { dive_mode: 0, dive_angle: 45, alt_offset: 0, trigger_alt: 15, mission_servo: 0 };
 }
 
