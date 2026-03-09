@@ -63,10 +63,15 @@ let advancedConfig = {
         trim_roll: 0.0,
         trim_pitch: 0.0
     },
+    // Waypoint misyon genel
+    nav_wp: {
+        wp_capture_radius: 25
+    },
     // İniş Asistanı Ayarları
     land_assist: {
         circuit_alt: 50,
         circuit_distance: 200,
+        final_approach_distance: 0,
         approach_angle: 3.0,
         flare_alt: 5.0,
         approach_throttle: 1200,
@@ -80,6 +85,7 @@ let advancedConfig = {
     auto_land: {
         circuit_alt: 80,
         circuit_distance: 300,
+        final_approach_distance: 0,
         approach_angle: 4.0,
         flare_alt: 8.0,
         approach_throttle: 1300,
@@ -126,12 +132,17 @@ function handleAdvancedPageData(data) {
         advancedConfig.calib_extra = Object.assign({}, advancedConfig.calib_extra, data.calib_extra);
     }
 
-    // 7) Landing Assist
+    // 7) Nav waypoint
+    if (data.nav_wp) {
+        advancedConfig.nav_wp = Object.assign({}, advancedConfig.nav_wp, data.nav_wp);
+    }
+
+    // 8) Landing Assist
     if (data.land_assist) {
         advancedConfig.land_assist = Object.assign({}, advancedConfig.land_assist, data.land_assist);
     }
 
-    // 8) Auto Land
+    // 9) Auto Land
     if (data.auto_land) {
         advancedConfig.auto_land = Object.assign({}, advancedConfig.auto_land, data.auto_land);
     }
@@ -255,11 +266,17 @@ function updateAdvancedUI() {
         setVal("inp_trim_pitch", advancedConfig.calib_extra.trim_pitch);
     }
 
+    // --- Nav Waypoint ---
+    if (advancedConfig.nav_wp) {
+        setVal("inp_wp_capture_radius", advancedConfig.nav_wp.wp_capture_radius);
+    }
+
     // --- Landing Assist ---
     if (advancedConfig.land_assist) {
         const la = advancedConfig.land_assist;
         setVal("inp_la_circuit_alt", la.circuit_alt);
         setVal("inp_la_circuit_distance", la.circuit_distance);
+        setVal("inp_la_final_approach_distance", la.final_approach_distance);
         setVal("inp_la_approach_angle", la.approach_angle);
         setVal("inp_la_flare_alt", la.flare_alt);
         setVal("inp_la_approach_throttle", la.approach_throttle);
@@ -275,6 +292,7 @@ function updateAdvancedUI() {
         const al = advancedConfig.auto_land;
         setVal("inp_al_circuit_alt", al.circuit_alt);
         setVal("inp_al_circuit_distance", al.circuit_distance);
+        setVal("inp_al_final_approach_distance", al.final_approach_distance);
         setVal("inp_al_approach_angle", al.approach_angle);
         setVal("inp_al_flare_alt", al.flare_alt);
         setVal("inp_al_approach_throttle", al.approach_throttle);
@@ -418,10 +436,16 @@ function saveAdvancedConfig() {
     setIf(calib, "trim_pitch", num("inp_trim_pitch"));
     if (Object.keys(calib).length) cfg.calib_extra = calib;
 
+    // -------- Nav Waypoint --------
+    const nav_wp = {};
+    setIf(nav_wp, "wp_capture_radius", int("inp_wp_capture_radius"));
+    if (Object.keys(nav_wp).length) cfg.nav_wp = nav_wp;
+
     // -------- Landing Assist --------
     const la = {};
     setIf(la, "circuit_alt", int("inp_la_circuit_alt"));
     setIf(la, "circuit_distance", int("inp_la_circuit_distance"));
+    setIf(la, "final_approach_distance", int("inp_la_final_approach_distance"));
     setIf(la, "approach_angle", num("inp_la_approach_angle"));
     setIf(la, "flare_alt", num("inp_la_flare_alt"));
     setIf(la, "approach_throttle", int("inp_la_approach_throttle"));
@@ -436,6 +460,7 @@ function saveAdvancedConfig() {
     const al = {};
     setIf(al, "circuit_alt", int("inp_al_circuit_alt"));
     setIf(al, "circuit_distance", int("inp_al_circuit_distance"));
+    setIf(al, "final_approach_distance", int("inp_al_final_approach_distance"));
     setIf(al, "approach_angle", num("inp_al_approach_angle"));
     setIf(al, "flare_alt", num("inp_al_flare_alt"));
     setIf(al, "approach_throttle", int("inp_al_approach_throttle"));
@@ -490,12 +515,58 @@ function toggleGpsSettings() {
     }
 }
 
+/**
+ * @brief Waypoint sayfasındaki katlanabilir bölümü aç/kapat
+ */
+function toggleWpSection(bodyId) {
+    const body = document.getElementById(bodyId);
+    if (!body) return;
+    const chevronId = bodyId.replace('-body', '-chevron');
+    const chevron = document.getElementById(chevronId);
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? '' : 'none';
+    if (chevron) chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+}
+
+/**
+ * @brief Kamikaze varsayılan değerlerini döndür (HTML input'larından)
+ */
+function getKamikazeDefaults() {
+    const getNum = (id, def) => { const el = document.getElementById(id); return el ? (parseFloat(el.value) || def) : def; };
+    const getInt = (id, def) => { const el = document.getElementById(id); return el ? (parseInt(el.value, 10) || def) : def; };
+    return {
+        dive_mode:     0,
+        dive_angle:    getNum('km_def_dive_angle', 45),
+        alt_offset:    getNum('km_def_alt_offset', 0),
+        trigger_alt:   getNum('km_def_trigger_alt', 15),
+        mission_servo: getInt('km_def_mission_servo', 0)
+    };
+}
+
+/**
+ * @brief Listedeki tüm Kamikaze waypoint'lere şablon değerlerini uygula
+ */
+function applyKamikazeDefaults() {
+    if (typeof waypoints === 'undefined') return;
+    const def = getKamikazeDefaults();
+    let count = 0;
+    waypoints.forEach(wp => {
+        if (wp.task === 5) { wp.kamikaze = Object.assign({}, wp.kamikaze, def); count++; }
+    });
+    if (typeof renderWaypointList === 'function') renderWaypointList();
+    if (count > 0) { if (typeof log === 'function') log(`${count} Kamikaze WP güncellendi`, 'info'); }
+    else { if (typeof log === 'function') log('Listede Kamikaze WP bulunamadı', 'warning'); }
+}
+
 // === DIŞA AKTARILAN FONKSİYONLAR ===
 window.handleAdvancedPageData = handleAdvancedPageData;
 window.updateAdvancedUI = updateAdvancedUI;
 window.saveAdvancedConfig = saveAdvancedConfig;
 window.updateAdvDisplay = updateAdvDisplay;
 window.toggleGpsSettings = toggleGpsSettings;
+window.toggleWpSection = toggleWpSection;
+window.applyKamikazeDefaults = applyKamikazeDefaults;
+window.getKamikazeDefaults = getKamikazeDefaults;
 
 // advancedConfig'i dışarıdan erişilebilir yap
 window.advancedConfig = advancedConfig;
