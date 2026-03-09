@@ -59,9 +59,33 @@ let advancedConfig = {
         gps_weight: 0.05 
     },
     // Kart Hizalama
-    calib_extra: { 
-        trim_roll: 0.0, 
-        trim_pitch: 0.0 
+    calib_extra: {
+        trim_roll: 0.0,
+        trim_pitch: 0.0
+    },
+    // İniş Asistanı Ayarları
+    land_assist: {
+        circuit_alt: 50,
+        circuit_distance: 200,
+        approach_angle: 3.0,
+        flare_alt: 5.0,
+        approach_throttle: 1200,
+        flare_throttle: 1000,
+        stick_cancel_thr: 100,
+        thr_cancel_thr: 1150,
+        min_wind_speed: 2.0,
+        manual_runway_hdg: 0.0
+    },
+    // Zorunlu/Acil Otomatik İniş Ayarları
+    auto_land: {
+        circuit_alt: 80,
+        circuit_distance: 300,
+        approach_angle: 4.0,
+        flare_alt: 8.0,
+        approach_throttle: 1300,
+        flare_throttle: 1000,
+        stick_cancel_thr: 100,
+        thr_cancel_thr: 1150
     }
 };
 
@@ -100,6 +124,16 @@ function handleAdvancedPageData(data) {
     // 6) Trim
     if (data.calib_extra) {
         advancedConfig.calib_extra = Object.assign({}, advancedConfig.calib_extra, data.calib_extra);
+    }
+
+    // 7) Landing Assist
+    if (data.land_assist) {
+        advancedConfig.land_assist = Object.assign({}, advancedConfig.land_assist, data.land_assist);
+    }
+
+    // 8) Auto Land
+    if (data.auto_land) {
+        advancedConfig.auto_land = Object.assign({}, advancedConfig.auto_land, data.auto_land);
     }
 
     updateAdvancedUI();
@@ -219,6 +253,34 @@ function updateAdvancedUI() {
     if (advancedConfig.calib_extra) {
         setVal("inp_trim_roll", advancedConfig.calib_extra.trim_roll);
         setVal("inp_trim_pitch", advancedConfig.calib_extra.trim_pitch);
+    }
+
+    // --- Landing Assist ---
+    if (advancedConfig.land_assist) {
+        const la = advancedConfig.land_assist;
+        setVal("inp_la_circuit_alt", la.circuit_alt);
+        setVal("inp_la_circuit_distance", la.circuit_distance);
+        setVal("inp_la_approach_angle", la.approach_angle);
+        setVal("inp_la_flare_alt", la.flare_alt);
+        setVal("inp_la_approach_throttle", la.approach_throttle);
+        setVal("inp_la_flare_throttle", la.flare_throttle);
+        setVal("inp_la_stick_cancel_thr", la.stick_cancel_thr);
+        setVal("inp_la_thr_cancel_thr", la.thr_cancel_thr);
+        setVal("inp_la_min_wind_speed", la.min_wind_speed);
+        setVal("inp_la_manual_runway_hdg", la.manual_runway_hdg);
+    }
+
+    // --- Auto Land ---
+    if (advancedConfig.auto_land) {
+        const al = advancedConfig.auto_land;
+        setVal("inp_al_circuit_alt", al.circuit_alt);
+        setVal("inp_al_circuit_distance", al.circuit_distance);
+        setVal("inp_al_approach_angle", al.approach_angle);
+        setVal("inp_al_flare_alt", al.flare_alt);
+        setVal("inp_al_approach_throttle", al.approach_throttle);
+        setVal("inp_al_flare_throttle", al.flare_throttle);
+        setVal("inp_al_stick_cancel_thr", al.stick_cancel_thr);
+        setVal("inp_al_thr_cancel_thr", al.thr_cancel_thr);
     }
 }
 
@@ -355,6 +417,32 @@ function saveAdvancedConfig() {
     setIf(calib, "trim_roll", num("inp_trim_roll"));
     setIf(calib, "trim_pitch", num("inp_trim_pitch"));
     if (Object.keys(calib).length) cfg.calib_extra = calib;
+
+    // -------- Landing Assist --------
+    const la = {};
+    setIf(la, "circuit_alt", int("inp_la_circuit_alt"));
+    setIf(la, "circuit_distance", int("inp_la_circuit_distance"));
+    setIf(la, "approach_angle", num("inp_la_approach_angle"));
+    setIf(la, "flare_alt", num("inp_la_flare_alt"));
+    setIf(la, "approach_throttle", int("inp_la_approach_throttle"));
+    setIf(la, "flare_throttle", int("inp_la_flare_throttle"));
+    setIf(la, "stick_cancel_thr", int("inp_la_stick_cancel_thr"));
+    setIf(la, "thr_cancel_thr", int("inp_la_thr_cancel_thr"));
+    setIf(la, "min_wind_speed", num("inp_la_min_wind_speed"));
+    setIf(la, "manual_runway_hdg", num("inp_la_manual_runway_hdg"));
+    if (Object.keys(la).length) cfg.land_assist = la;
+
+    // -------- Auto Land --------
+    const al = {};
+    setIf(al, "circuit_alt", int("inp_al_circuit_alt"));
+    setIf(al, "circuit_distance", int("inp_al_circuit_distance"));
+    setIf(al, "approach_angle", num("inp_al_approach_angle"));
+    setIf(al, "flare_alt", num("inp_al_flare_alt"));
+    setIf(al, "approach_throttle", int("inp_al_approach_throttle"));
+    setIf(al, "flare_throttle", int("inp_al_flare_throttle"));
+    setIf(al, "stick_cancel_thr", int("inp_al_stick_cancel_thr"));
+    setIf(al, "thr_cancel_thr", int("inp_al_thr_cancel_thr"));
+    if (Object.keys(al).length) cfg.auto_land = al;
 
     console.log("[ADV] SAVE payload =", cfg);
     sendCommand(`SAVE_ADVANCED_CONFIG ${JSON.stringify(cfg)}`);
