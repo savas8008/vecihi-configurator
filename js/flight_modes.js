@@ -30,8 +30,7 @@ const modeDefinitions = [
     { key: 'rth', name: 'RTH (Eve Dön)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 7 },
     { key: 'launch', name: 'AUTO LAUNCH', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 8 },
     { key: 'waypoint', name: 'WAYPOINT', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
-    { key: 'land_assist', name: 'LAND ASSIST (Rüzgar İnişi)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
-    { key: 'auto_land', name: 'AUTO LAND (Acil İniş)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
+    { key: 'land_assist', name: 'LAND ASSIST (İniş Asistanı)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
 
     // --- ASİSTANLAR (ASSIST) - Eklenebilir ---
     { key: 'cruise', name: 'CRUISE', cat: 'assist', defaultMin: 1500, defaultMax: 1700, defaultCh: 9 },
