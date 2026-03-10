@@ -15,13 +15,13 @@ const MAX_WP = 16;
 
 // Görev tipleri
 const WP_TASKS = [
-    { value: 0, label: 'Cruise',      color: '#0d6efd' },
-    { value: 1, label: 'Tırmanma',    color: '#198754' },
-    { value: 2, label: 'Rüzgar Altı', color: '#0dcaf0' },
-    { value: 3, label: 'Esas Bacak',  color: '#6f42c1' },
-    { value: 4, label: 'Varış',       color: '#fd7e14' },
-    { value: 5, label: 'Kamikaze',    color: '#dc3545' },
-    { value: 6, label: 'Flare',       color: '#ffc107' },
+    { value: 0, label: 'Cruise',       color: '#0d6efd',  group: 'nav' },
+    { value: 1, label: 'Tırmanma',     color: '#198754',  group: 'nav' },
+    { value: 5, label: 'Kamikaze',     color: '#dc3545',  group: 'nav' },
+    { value: 2, label: 'Rüzgar Altı',  color: '#0dcaf0',  group: 'land' },
+    { value: 3, label: 'Esas Bacak',   color: '#6f42c1',  group: 'land' },
+    { value: 4, label: 'Son Yaklaşma', color: '#fd7e14',  group: 'land' },
+    { value: 6, label: 'Flare',        color: '#ffc107',  group: 'land' },
 ];
 
 // Hız modları
@@ -195,10 +195,14 @@ function renderWaypointList() {
             `<option value="${m.value}" ${m.disabled ? 'disabled' : ''} ${spdMode === m.value ? 'selected' : ''}>${m.label}</option>`
         ).join('');
 
-        // Görev tipi seçenekleri
-        const taskOpts = WP_TASKS.map(t =>
+        // Görev tipi seçenekleri (gruplu)
+        const navOpts  = WP_TASKS.filter(t => t.group === 'nav').map(t =>
             `<option value="${t.value}" ${wp.task === t.value ? 'selected' : ''}>${t.label}</option>`
         ).join('');
+        const landOpts = WP_TASKS.filter(t => t.group === 'land').map(t =>
+            `<option value="${t.value}" ${wp.task === t.value ? 'selected' : ''}>${t.label}</option>`
+        ).join('');
+        const taskOpts = `${navOpts}<optgroup label="─── Otomatik İniş ───">${landOpts}</optgroup>`;
 
         // Hız değeri alanı: Gaz (1000-2000) veya Yer Hızı (km/h)
         const inputStyle = 'width:70px;background:#2a2a3e;border:1px solid #555;border-radius:4px;color:#fff;font-size:0.85em;padding:1px 4px;';

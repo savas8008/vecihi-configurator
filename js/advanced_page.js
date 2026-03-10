@@ -80,17 +80,6 @@ let advancedConfig = {
         min_wind_speed: 2.0,
         manual_runway_hdg: 0.0
     },
-    // Zorunlu/Acil Otomatik İniş Ayarları
-    auto_land: {
-        circuit_alt: 80,
-        final_approach_distance: 0,
-        circuit_width: 200,
-        flare_alt: 8.0,
-        approach_throttle: 1300,
-        flare_throttle: 1000,
-        stick_cancel_thr: 100,
-        thr_cancel_thr: 1150
-    }
 };
 
 // === VERİ İŞLEME ===
@@ -138,11 +127,6 @@ function handleAdvancedPageData(data) {
     // 8) Landing Assist
     if (data.land_assist) {
         advancedConfig.land_assist = Object.assign({}, advancedConfig.land_assist, data.land_assist);
-    }
-
-    // 9) Auto Land
-    if (data.auto_land) {
-        advancedConfig.auto_land = Object.assign({}, advancedConfig.auto_land, data.auto_land);
     }
 
     updateAdvancedUI();
@@ -284,18 +268,6 @@ function updateAdvancedUI() {
         setVal("inp_la_manual_runway_hdg", la.manual_runway_hdg);
     }
 
-    // --- Auto Land ---
-    if (advancedConfig.auto_land) {
-        const al = advancedConfig.auto_land;
-        setVal("inp_al_circuit_alt", al.circuit_alt);
-        setVal("inp_al_final_approach_distance", al.final_approach_distance);
-        setVal("inp_al_circuit_width", al.circuit_width);
-        setVal("inp_al_flare_alt", al.flare_alt);
-        setVal("inp_al_approach_throttle", al.approach_throttle);
-        setVal("inp_al_flare_throttle", al.flare_throttle);
-        setVal("inp_al_stick_cancel_thr", al.stick_cancel_thr);
-        setVal("inp_al_thr_cancel_thr", al.thr_cancel_thr);
-    }
 }
 
 // === KAYDETME ===
@@ -450,18 +422,6 @@ function saveAdvancedConfig() {
     setIf(la, "min_wind_speed", num("inp_la_min_wind_speed"));
     setIf(la, "manual_runway_hdg", num("inp_la_manual_runway_hdg"));
     if (Object.keys(la).length) cfg.land_assist = la;
-
-    // -------- Auto Land --------
-    const al = {};
-    setIf(al, "circuit_alt", int("inp_al_circuit_alt"));
-    setIf(al, "final_approach_distance", int("inp_al_final_approach_distance"));
-    setIf(al, "circuit_width", int("inp_al_circuit_width"));
-    setIf(al, "flare_alt", num("inp_al_flare_alt"));
-    setIf(al, "approach_throttle", int("inp_al_approach_throttle"));
-    setIf(al, "flare_throttle", int("inp_al_flare_throttle"));
-    setIf(al, "stick_cancel_thr", int("inp_al_stick_cancel_thr"));
-    setIf(al, "thr_cancel_thr", int("inp_al_thr_cancel_thr"));
-    if (Object.keys(al).length) cfg.auto_land = al;
 
     console.log("[ADV] SAVE payload =", cfg);
     sendCommand(`SAVE_ADVANCED_CONFIG ${JSON.stringify(cfg)}`);
