@@ -104,3 +104,7 @@
 - Tüm GPS güvenlik olaylarını log'a yaz (spoof şüphesi, glitch, fix kaybı)
 - OSD'de GPS durumunu renk kodlu göster (yeşil/sarı/kırmızı)
 - `max_distance` (geofence) aşıldığında RTH'ı otomatik tetikle (madde 1'deki eksikle bağlantılı)
+
+**** landing Son Yaklaşma (Final)
+Final Başlangıç Mesafesi (m) 3 derece eğim 1500 metre saçmalığı kalkacak default olarak 350 metre girilecek
+son yaklaşmada otomatik flaperon
