@@ -213,75 +213,17 @@ function renderWaypointList() {
                 onchange="waypoints[${i}].throttle=parseInt(this.value)||0;">`;
         }
 
-        // Kamikaze bölümü
-        const km = wp.kamikaze || defaultKamikaze();
-        const kmInputStyle = 'width:64px;background:#3a1a1a;border:1px solid #e06060;border-radius:4px;color:#fff;font-size:0.85em;padding:1px 5px;';
-        const kmSelectStyle = 'background:#3a1a1a;border:1px solid #e06060;color:#fff;font-size:0.85em;border-radius:4px;padding:2px 5px;width:100%;';
-        const kamikazeHtml = isKamikaze ? `
-        <div class="mt-2 p-2 rounded" style="background:#3d1515;border:1px solid #e05555;">
-            <div style="color:#ff7070;font-weight:600;font-size:0.8em;margin-bottom:6px;">
-                <i class="bi bi-bullseye"></i>&nbsp;Kamikaze Ayarları
-            </div>
-            <div style="font-size:0.78em;">
-                <div style="margin-bottom:6px;">
-                    <span style="color:#ddd;display:block;margin-bottom:2px;">Dalış Modu</span>
-                    <label style="color:#fff;cursor:pointer;margin-right:12px;">
-                        <input type="radio" name="km_mode_${i}" value="0" ${km.dive_mode === 0 ? 'checked' : ''}
-                            onchange="waypoints[${i}].kamikaze.dive_mode=0;">
-                        &nbsp;GPS Tabanlı
-                    </label>
-                    <label style="color:#888;cursor:not-allowed;" title="Yakında eklenecek">
-                        <input type="radio" name="km_mode_${i}" value="1" disabled>
-                        &nbsp;<span style="opacity:0.5">Dalış Noktası (Pasif)</span>
-                    </label>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                    <div>
-                        <label style="color:#ddd;display:block;margin-bottom:2px;">Dalış Açısı (°)</label>
-                        <input type="number" min="5" max="90" step="1" value="${km.dive_angle}"
-                            style="${kmInputStyle}"
-                            onchange="waypoints[${i}].kamikaze.dive_angle=parseFloat(this.value)||45;">
-                    </div>
-                    <div>
-                        <label style="color:#ddd;display:block;margin-bottom:2px;">Yükseklik Farkı (m)</label>
-                        <input type="number" step="1" value="${km.alt_offset}" placeholder="0"
-                            style="${kmInputStyle}"
-                            onchange="waypoints[${i}].kamikaze.alt_offset=parseFloat(this.value)||0;"
-                            title="Mevcut konuma göre yükseklik farkı (negatif=aşağı)">
-                    </div>
-                    <div>
-                        <label style="color:#ddd;display:block;margin-bottom:2px;">Tetikleme İrtifası (m)</label>
-                        <input type="number" min="0" max="500" step="1" value="${km.trigger_alt}"
-                            style="${kmInputStyle}"
-                            onchange="waypoints[${i}].kamikaze.trigger_alt=parseFloat(this.value)||15;"
-                            title="Bu irtifada görev servosuna 2000 PWM verilir">
-                    </div>
-                    <div>
-                        <label style="color:#ddd;display:block;margin-bottom:2px;">Görev Servosu</label>
-                        <select style="${kmSelectStyle}"
-                            onchange="waypoints[${i}].kamikaze.mission_servo=parseInt(this.value);">
-                            <option value="0" ${km.mission_servo===0?'selected':''}>Devre Dışı</option>
-                            <option value="1" ${km.mission_servo===1?'selected':''}>Servo 1</option>
-                            <option value="2" ${km.mission_servo===2?'selected':''}>Servo 2</option>
-                            <option value="3" ${km.mission_servo===3?'selected':''}>Servo 3</option>
-                            <option value="4" ${km.mission_servo===4?'selected':''}>Servo 4</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>` : '';
-
         const selectStyle = 'background:#2a2a3e;border:1px solid #555;color:#fff;font-size:0.82em;border-radius:4px;padding:2px 5px;';
         html += `
         <div class="mb-2 p-2 rounded" style="background:#1e1e30;border-left:3px solid ${taskInfo.color};">
             <div class="d-flex align-items-start gap-2">
                 <span class="badge mt-1 flex-shrink-0" style="background:${taskInfo.color};min-width:22px;text-align:center;">${i + 1}</span>
                 <div class="flex-grow-1" style="min-width:0;">
-                    <div style="color:#fff;font-size:0.82em;font-weight:500;margin-bottom:4px;">${wp.lat.toFixed(6)}, ${wp.lon.toFixed(6)}</div>
+                    <div style="color:#e0e0e0;font-size:0.82em;font-weight:500;margin-bottom:4px;">${wp.lat.toFixed(6)}, ${wp.lon.toFixed(6)}</div>
                     <div style="display:grid;grid-template-columns:auto auto 1fr;gap:4px 6px;align-items:center;font-size:0.8em;">
                         <span style="color:#aaa;">İrtifa</span>
                         <input type="number" step="1" value="${wp.alt}"
-                            style="width:55px;background:#2a2a3e;border:1px solid #555;border-radius:4px;color:#fff;font-size:0.85em;padding:1px 4px;"
+                            style="width:55px;background:#2a2a3e;border:1px solid #555;border-radius:4px;color:#e0e0e0;font-size:0.85em;padding:1px 4px;"
                             onchange="waypoints[${i}].alt=parseFloat(this.value)||50;renderMapMarkers();">
                         <span style="color:#aaa;">m</span>
 
@@ -298,13 +240,13 @@ function renderWaypointList() {
                         </select>
                         ${spdValueHtml}
                     </div>
+                    ${isKamikaze ? `<div style="font-size:0.75em;color:#ff7070;margin-top:4px;"><i class="bi bi-bullseye me-1"></i>Kamikaze — detaylar aşağıdaki kutudan</div>` : ''}
                 </div>
                 <div class="d-flex flex-column gap-1 flex-shrink-0">
                     ${i > 0 ? `<button class="btn btn-outline-secondary btn-sm py-0 px-1" style="font-size:0.75em;" onclick="moveWaypointUp(${i})" title="Yukarı"><i class="bi bi-arrow-up"></i></button>` : ''}
                     <button class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size:0.75em;" onclick="removeWaypoint(${i})" title="Sil"><i class="bi bi-x-lg"></i></button>
                 </div>
             </div>
-            ${kamikazeHtml}
         </div>`;
     });
     listEl.innerHTML = html;
@@ -379,6 +321,9 @@ function uploadWaypoints() {
     if (!window.isConnected || !window.isConnected()) { log('Önce cihaza bağlanın', 'warning'); return; }
     if (waypoints.length === 0) { log('Önce waypoint ekleyin', 'warning'); return; }
 
+    // Kamikaze ayarlarını kutucuktan al (tüm KM WP'ler aynı ayarı kullanır)
+    const kmDefaults = defaultKamikaze();
+
     // Her WP için uygun alanları hazırla; kamikaze alanları yalnızca task==5'te gönder
     const serialized = waypoints.map(wp => {
         const obj = {
@@ -389,12 +334,11 @@ function uploadWaypoints() {
             target_spd: wp.target_spd || 0
         };
         if (wp.task === 5) {
-            const km = wp.kamikaze || defaultKamikaze();
-            obj.km_mode        = km.dive_mode   || 0;
-            obj.km_angle       = km.dive_angle   || 45;
-            obj.km_alt_offset  = km.alt_offset   || 0;
-            obj.km_trigger_alt = km.trigger_alt  || 15;
-            obj.km_servo       = km.mission_servo|| 0;
+            obj.km_mode        = 0;                           // GPS Tabanlı
+            obj.km_angle       = kmDefaults.dive_angle  || 45;
+            obj.km_alt_offset  = kmDefaults.alt_offset  || 0;
+            obj.km_trigger_alt = kmDefaults.trigger_alt || 15;
+            obj.km_servo       = kmDefaults.mission_servo|| 0;
         }
         return obj;
     });

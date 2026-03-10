@@ -2023,57 +2023,6 @@
     <div class="panel panel2">
         <h2 class="panel-title"><i class="bi bi-map"></i> Waypoint Misyon Planlayıcı</h2>
 
-        <!-- ===== KAMİKAZE VARSAYILAN AYARLAR (SABİT BÖLÜM) ===== -->
-        <div class="row mb-3">
-            <div class="col-12">
-                <div class="panel" style="border-left:3px solid #dc3545;">
-                    <div class="d-flex justify-content-between align-items-center mb-2" style="cursor:pointer;" onclick="toggleWpSection('km-defaults-body')">
-                        <h6 class="mb-0" style="color:#ff7070;">
-                            <i class="bi bi-bullseye me-1"></i> Kamikaze Varsayılan Şablon
-                            <small class="ms-2" style="font-size:0.72em;font-weight:400;color:#888;">Yeni Kamikaze waypoint'leri bu değerlerle oluşturulur</small>
-                        </h6>
-                        <i class="bi bi-chevron-down" id="km-defaults-chevron" style="color:#888;font-size:0.85em;"></i>
-                    </div>
-                    <div id="km-defaults-body">
-                        <div class="row g-2 align-items-end">
-                            <div class="col-6 col-md-2">
-                                <label class="form-label small mb-1" style="color:#ccc;">Dalış Açısı (°)</label>
-                                <input type="number" class="form-control form-control-sm" id="km_def_dive_angle" min="5" max="90" step="1" value="45" title="Kamikaze dalış açısı (5-90°)">
-                            </div>
-                            <div class="col-6 col-md-2">
-                                <label class="form-label small mb-1" style="color:#ccc;">Yükseklik Farkı (m)</label>
-                                <input type="number" class="form-control form-control-sm" id="km_def_alt_offset" step="1" value="0" title="Hedef WP irtifasına göre dalış başlangıç farkı (negatif=daha alçak)">
-                            </div>
-                            <div class="col-6 col-md-2">
-                                <label class="form-label small mb-1" style="color:#ccc;">Tetikleme İrtifası (m)</label>
-                                <input type="number" class="form-control form-control-sm" id="km_def_trigger_alt" min="0" max="500" step="1" value="15" title="Bu irtifada görev servosuna 2000 PWM verilir">
-                            </div>
-                            <div class="col-6 col-md-2">
-                                <label class="form-label small mb-1" style="color:#ccc;">Görev Servosu</label>
-                                <select class="form-select form-select-sm" id="km_def_mission_servo">
-                                    <option value="0">Devre Dışı</option>
-                                    <option value="1">Servo 1</option>
-                                    <option value="2">Servo 2</option>
-                                    <option value="3">Servo 3</option>
-                                    <option value="4">Servo 4</option>
-                                </select>
-                            </div>
-                            <div class="col-6 col-md-2">
-                                <button class="btn btn-sm btn-outline-danger w-100" onclick="applyKamikazeDefaults()" title="Listedeki tüm Kamikaze waypoint'lerine bu değerleri uygula">
-                                    <i class="bi bi-arrow-repeat me-1"></i> Tüm KM WP'ye Uygula
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mt-2">
-                            <small style="color:#888;"><i class="bi bi-info-circle me-1"></i>
-                            Bu değerler haritada oluşturulan yeni Kamikaze waypoint'lerinin başlangıç değerlerini belirler. "Tüm KM WP'ye Uygula" butonu listedeki tüm Kamikaze görevlerini günceller.
-                            </small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- ===== HARITA + WAYPOINT LİSTESİ ===== -->
         <div class="row">
             <!-- Sol: Harita -->
@@ -2141,25 +2090,105 @@
                     </div>
                 </div>
             </div>
+        </div><!-- /row harita+liste -->
+
+        <!-- ===== KAMİKAZE GÖREV AYARLARI ===== -->
+        <div class="row mt-2 mb-2">
+            <div class="col-12">
+                <div class="panel" style="border-left:3px solid #dc3545;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0" style="color:#ff6b6b;">
+                            <i class="bi bi-bullseye me-1"></i> Kamikaze Görev Ayarları
+                        </h5>
+                        <button class="btn btn-sm btn-outline-danger" onclick="applyKamikazeDefaults()" title="Listedeki tüm Kamikaze WP'lere bu değerleri uygula">
+                            <i class="bi bi-arrow-repeat me-1"></i> Listedeki KM WP'lere Uygula
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <!-- Dalış -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded" style="background:#1a0808;border:1px solid #501010;">
+                                <div class="mb-1" style="color:#ff6b6b;font-weight:600;font-size:0.82em;letter-spacing:0.03em;">DALIŞ</div>
+                                <div class="mb-3">
+                                    <label class="form-label small mb-1" style="color:#e0e0e0;">Dalış Açısı (°)</label>
+                                    <input type="number" class="form-control form-control-sm" id="km_def_dive_angle" min="5" max="90" step="1" value="45"
+                                        title="Hedef üzerine dik dalış açısı. Açı belirlenince mesafe irtifaya göre otomatik hesaplanır.">
+                                    <small style="color:#888;font-size:0.78em;">5° = sığ  —  90° = dik dik</small>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#e0e0e0;">Başlama İrtifa Farkı (m)</label>
+                                    <input type="number" class="form-control form-control-sm" id="km_def_alt_offset" step="1" value="0"
+                                        title="WP irtifasına göre dalış başlangıç yükseklik farkı (m). 0 = WP irtifasından başla, negatif = daha alçaktan">
+                                    <small style="color:#888;font-size:0.78em;">0 = WP irtifasından  —  negatif = daha alçak</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tetikleme -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded" style="background:#1a0808;border:1px solid #501010;">
+                                <div class="mb-1" style="color:#ffc107;font-weight:600;font-size:0.82em;letter-spacing:0.03em;">GÖREV SİSTEMİ</div>
+                                <div class="mb-3">
+                                    <label class="form-label small mb-1" style="color:#e0e0e0;">Tetikleme İrtifası (m AGL)</label>
+                                    <input type="number" class="form-control form-control-sm" id="km_def_trigger_alt" min="0" max="500" step="1" value="15"
+                                        title="Uçak bu AGL irtifasına inince görev servosuna 2000 PWM sinyali verilir">
+                                    <small style="color:#888;font-size:0.78em;">Bu irtifada servo tam gaz konumuna geçer</small>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#e0e0e0;">Görev Servosu</label>
+                                    <select class="form-select form-select-sm" id="km_def_mission_servo">
+                                        <option value="0">Devre Dışı</option>
+                                        <option value="1">Servo 1</option>
+                                        <option value="2">Servo 2</option>
+                                        <option value="3">Servo 3</option>
+                                        <option value="4">Servo 4</option>
+                                    </select>
+                                    <small style="color:#888;font-size:0.78em;">Tetiklenecek çıkış servosu</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Kullanım -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded d-flex flex-column justify-content-between h-100" style="background:#120808;border:1px solid #3a1010;">
+                                <div>
+                                    <div class="mb-2" style="color:#aaa;font-weight:600;font-size:0.82em;letter-spacing:0.03em;">KULLANIM</div>
+                                    <ol class="mb-0 ps-3" style="color:#ccc;font-size:0.82em;line-height:1.7;">
+                                        <li>Haritaya hedef noktasını tıklayın</li>
+                                        <li>Waypoint görevini <span style="color:#dc3545;font-weight:600;">Kamikaze</span> olarak seçin</li>
+                                        <li>Sol taraftaki alanlarda dalış açısı ve servo ayarlarını yapın</li>
+                                        <li><strong style="color:#e0e0e0;">Listedeki KM WP'lere Uygula</strong> butonuna basın</li>
+                                        <li>Waypoint'leri FC'ye yükleyin</li>
+                                    </ol>
+                                </div>
+                                <div class="mt-2 p-2 rounded" style="background:#2a1010;border:1px solid #6b2020;">
+                                    <small style="color:#ff9090;"><i class="bi bi-info-circle me-1"></i>
+                                    Dalış açısı sabit tutulur; başlama mesafesi mevcut irtifaya göre otomatik hesaplanır.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ===== WAYPOINT MİSYON GENEL AYARLARI ===== -->
-        <div class="row mt-2 mb-3">
+        <div class="row mt-2 mb-2">
             <div class="col-12">
                 <div class="panel" style="border-left:3px solid #6f42c1;">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0" style="color:#b39ddb;">
+                        <h5 class="mb-0" style="color:#a78bfa;">
                             <i class="bi bi-sliders me-1"></i> Misyon Genel Parametreleri
-                            <small class="ms-2" style="font-size:0.72em;font-weight:400;color:#888;">Tüm waypoint görevleri için geçerli</small>
-                        </h6>
+                        </h5>
                         <button class="btn btn-sm btn-outline-secondary" onclick="saveAdvancedConfig()">
                             <i class="bi bi-floppy me-1"></i> Kaydet
                         </button>
                     </div>
                     <div class="row g-2 align-items-end">
                         <div class="col-6 col-md-3">
-                            <label class="form-label small mb-1" style="color:#ccc;">WP Yakalama Yarıçapı (m)</label>
-                            <input type="number" class="form-control form-control-sm" id="inp_wp_capture_radius" min="5" max="200" step="5" value="25" title="Uçak bir waypoint'e bu mesafede girince o noktayı tamamlandı say ve sonrakine geç (metre)">
+                            <label class="form-label small mb-1" style="color:#e0e0e0;">WP Yakalama Yarıçapı (m)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_wp_capture_radius" min="5" max="200" step="5" value="25"
+                                title="Uçak bir waypoint'e bu mesafede girince o noktayı tamamlandı say ve sonrakine geç (metre)">
+                            <small style="color:#888;font-size:0.78em;">Varsayılan: 25m</small>
                         </div>
                     </div>
                 </div>
@@ -2173,7 +2202,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0" style="color:#0dcaf0;">
                             <i class="bi bi-wind me-1"></i> İniş Asistan Ayarları
-                            <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#888;">Land Assist — Rüzgara Göre Otomatik Devre</small>
+                            <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#aaa;">Land Assist — Rüzgara Göre Otomatik Devre</small>
                         </h5>
                         <button class="btn btn-sm btn-outline-info" onclick="saveAdvancedConfig()">
                             <i class="bi bi-floppy me-1"></i> Kaydet
@@ -2263,7 +2292,7 @@
 
                     </div>
                     <div class="mt-2">
-                        <small style="color:#666;"><i class="bi bi-info-circle me-1"></i>
+                        <small style="color:#aaa;"><i class="bi bi-info-circle me-1"></i>
                         Land Assist: Rüzgar yönüne göre otomatik 4-noktalı devre (Downwind → Esas Bacak → Final → Flare). Pilot stick veya gaz hareketi ile iptal eder.
                         </small>
                     </div>
@@ -2278,7 +2307,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0" style="color:#dc3545;">
                             <i class="bi bi-exclamation-triangle me-1"></i> Oto İniş Ayarları
-                            <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#888;">Auto Land — Zorunlu / Acil İniş</small>
+                            <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#aaa;">Auto Land — Zorunlu / Acil İniş</small>
                         </h5>
                         <button class="btn btn-sm btn-outline-danger" onclick="saveAdvancedConfig()">
                             <i class="bi bi-floppy me-1"></i> Kaydet
