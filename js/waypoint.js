@@ -19,7 +19,7 @@ const WP_TASKS = [
     { value: 1, label: 'Tırmanma',    color: '#198754' },
     { value: 2, label: 'Rüzgar Altı', color: '#0dcaf0' },
     { value: 3, label: 'Esas Bacak',  color: '#6f42c1' },
-    { value: 4, label: 'Varış',       color: '#fd7e14' },
+    { value: 4, label: 'Son Yaklaşma', color: '#fd7e14' },
     { value: 5, label: 'Kamikaze',    color: '#dc3545' },
     { value: 6, label: 'Flare',       color: '#ffc107' },
 ];
