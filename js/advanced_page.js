@@ -70,9 +70,8 @@ let advancedConfig = {
     // İniş Asistanı Ayarları
     land_assist: {
         circuit_alt: 50,
-        circuit_distance: 200,
         final_approach_distance: 0,
-        approach_angle: 3.0,
+        circuit_width: 150,
         flare_alt: 5.0,
         approach_throttle: 1200,
         flare_throttle: 1000,
@@ -84,9 +83,8 @@ let advancedConfig = {
     // Zorunlu/Acil Otomatik İniş Ayarları
     auto_land: {
         circuit_alt: 80,
-        circuit_distance: 300,
         final_approach_distance: 0,
-        approach_angle: 4.0,
+        circuit_width: 200,
         flare_alt: 8.0,
         approach_throttle: 1300,
         flare_throttle: 1000,
@@ -275,9 +273,8 @@ function updateAdvancedUI() {
     if (advancedConfig.land_assist) {
         const la = advancedConfig.land_assist;
         setVal("inp_la_circuit_alt", la.circuit_alt);
-        setVal("inp_la_circuit_distance", la.circuit_distance);
         setVal("inp_la_final_approach_distance", la.final_approach_distance);
-        setVal("inp_la_approach_angle", la.approach_angle);
+        setVal("inp_la_circuit_width", la.circuit_width);
         setVal("inp_la_flare_alt", la.flare_alt);
         setVal("inp_la_approach_throttle", la.approach_throttle);
         setVal("inp_la_flare_throttle", la.flare_throttle);
@@ -291,9 +288,8 @@ function updateAdvancedUI() {
     if (advancedConfig.auto_land) {
         const al = advancedConfig.auto_land;
         setVal("inp_al_circuit_alt", al.circuit_alt);
-        setVal("inp_al_circuit_distance", al.circuit_distance);
         setVal("inp_al_final_approach_distance", al.final_approach_distance);
-        setVal("inp_al_approach_angle", al.approach_angle);
+        setVal("inp_al_circuit_width", al.circuit_width);
         setVal("inp_al_flare_alt", al.flare_alt);
         setVal("inp_al_approach_throttle", al.approach_throttle);
         setVal("inp_al_flare_throttle", al.flare_throttle);
@@ -444,9 +440,8 @@ function saveAdvancedConfig() {
     // -------- Landing Assist --------
     const la = {};
     setIf(la, "circuit_alt", int("inp_la_circuit_alt"));
-    setIf(la, "circuit_distance", int("inp_la_circuit_distance"));
     setIf(la, "final_approach_distance", int("inp_la_final_approach_distance"));
-    setIf(la, "approach_angle", num("inp_la_approach_angle"));
+    setIf(la, "circuit_width", int("inp_la_circuit_width"));
     setIf(la, "flare_alt", num("inp_la_flare_alt"));
     setIf(la, "approach_throttle", int("inp_la_approach_throttle"));
     setIf(la, "flare_throttle", int("inp_la_flare_throttle"));
@@ -459,9 +454,8 @@ function saveAdvancedConfig() {
     // -------- Auto Land --------
     const al = {};
     setIf(al, "circuit_alt", int("inp_al_circuit_alt"));
-    setIf(al, "circuit_distance", int("inp_al_circuit_distance"));
     setIf(al, "final_approach_distance", int("inp_al_final_approach_distance"));
-    setIf(al, "approach_angle", num("inp_al_approach_angle"));
+    setIf(al, "circuit_width", int("inp_al_circuit_width"));
     setIf(al, "flare_alt", num("inp_al_flare_alt"));
     setIf(al, "approach_throttle", int("inp_al_approach_throttle"));
     setIf(al, "flare_throttle", int("inp_al_flare_throttle"));
