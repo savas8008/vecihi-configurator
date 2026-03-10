@@ -76,6 +76,7 @@ let advancedConfig = {
         flare_alt: 5.0,
         approach_throttle: 1200,
         flare_throttle: 1000,
+        use_direct_approach: false,
         stick_cancel_thr: 100,
         thr_cancel_thr: 1150,
         min_wind_speed: 2.0,
@@ -90,6 +91,7 @@ let advancedConfig = {
         flare_alt: 8.0,
         approach_throttle: 1300,
         flare_throttle: 1000,
+        use_direct_approach: false,
         stick_cancel_thr: 100,
         thr_cancel_thr: 1150
     }
@@ -281,6 +283,8 @@ function updateAdvancedUI() {
         setVal("inp_la_flare_alt", la.flare_alt);
         setVal("inp_la_approach_throttle", la.approach_throttle);
         setVal("inp_la_flare_throttle", la.flare_throttle);
+        const laChk = document.getElementById("inp_la_use_direct_approach");
+        if (laChk) laChk.checked = !!la.use_direct_approach;
         setVal("inp_la_stick_cancel_thr", la.stick_cancel_thr);
         setVal("inp_la_thr_cancel_thr", la.thr_cancel_thr);
         setVal("inp_la_min_wind_speed", la.min_wind_speed);
@@ -297,6 +301,8 @@ function updateAdvancedUI() {
         setVal("inp_al_flare_alt", al.flare_alt);
         setVal("inp_al_approach_throttle", al.approach_throttle);
         setVal("inp_al_flare_throttle", al.flare_throttle);
+        const alChk = document.getElementById("inp_al_use_direct_approach");
+        if (alChk) alChk.checked = !!al.use_direct_approach;
         setVal("inp_al_stick_cancel_thr", al.stick_cancel_thr);
         setVal("inp_al_thr_cancel_thr", al.thr_cancel_thr);
     }
@@ -450,6 +456,7 @@ function saveAdvancedConfig() {
     setIf(la, "flare_alt", num("inp_la_flare_alt"));
     setIf(la, "approach_throttle", int("inp_la_approach_throttle"));
     setIf(la, "flare_throttle", int("inp_la_flare_throttle"));
+    { const el = document.getElementById("inp_la_use_direct_approach"); if (el) la.use_direct_approach = el.checked ? 1 : 0; }
     setIf(la, "stick_cancel_thr", int("inp_la_stick_cancel_thr"));
     setIf(la, "thr_cancel_thr", int("inp_la_thr_cancel_thr"));
     setIf(la, "min_wind_speed", num("inp_la_min_wind_speed"));
@@ -465,6 +472,7 @@ function saveAdvancedConfig() {
     setIf(al, "flare_alt", num("inp_al_flare_alt"));
     setIf(al, "approach_throttle", int("inp_al_approach_throttle"));
     setIf(al, "flare_throttle", int("inp_al_flare_throttle"));
+    { const el = document.getElementById("inp_al_use_direct_approach"); if (el) al.use_direct_approach = el.checked ? 1 : 0; }
     setIf(al, "stick_cancel_thr", int("inp_al_stick_cancel_thr"));
     setIf(al, "thr_cancel_thr", int("inp_al_thr_cancel_thr"));
     if (Object.keys(al).length) cfg.auto_land = al;

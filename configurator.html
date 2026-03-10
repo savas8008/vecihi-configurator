@@ -2222,12 +2222,19 @@
                                     <label class="form-label small mb-1" style="color:#ccc;">Devre Mesafesi (m)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_circuit_distance" min="50" max="1000" step="10" value="200" title="İniş noktasından downwind ve base leg mesafesi (metre)">
                                 </div>
-                                <div class="mb-0">
+                                <div class="mb-2">
                                     <label class="form-label small mb-1" style="color:#ccc;">Devre Yönü</label>
                                     <select class="form-select form-select-sm" id="inp_la_loiter_dir" title="Sol devre veya sağ devre">
                                         <option value="1">Sağ Devre</option>
                                         <option value="-1">Sol Devre</option>
                                     </select>
+                                </div>
+                                <div class="mb-0 p-2 rounded" style="background:#061020;border:1px solid #0d6efd44;">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="inp_la_use_direct_approach" title="Aktifse Downwind ve Esas Bacak WP atlanır — doğrudan Final+Flare">
+                                        <label class="form-check-label small" for="inp_la_use_direct_approach" style="color:#aaa;">Direkt Yaklaşım <span style="color:#888;font-size:0.85em;">(Devre Atla)</span></label>
+                                    </div>
+                                    <small style="color:#666;font-size:0.75em;">Aktif: Sadece Final + Flare</small>
                                 </div>
                             </div>
                         </div>
@@ -2293,7 +2300,7 @@
                     </div>
                     <div class="mt-2">
                         <small style="color:#aaa;"><i class="bi bi-info-circle me-1"></i>
-                        Land Assist: Rüzgar yönüne göre otomatik 4-noktalı devre (Downwind → Esas Bacak → Final → Flare). Pilot stick veya gaz hareketi ile iptal eder.
+                        Land Assist: Rüzgar yönüne göre iniş. <b>Devre modu</b>: 4-noktalı devre (Downwind → Esas Bacak → Final → Flare). <b>Direkt mod</b>: Yalnızca Final + Flare (Downwind/Base Leg atlanır). Pilot stick veya gaz hareketi ile iptal eder.
                         </small>
                     </div>
                 </div>
@@ -2323,9 +2330,16 @@
                                     <label class="form-label small mb-1" style="color:#ccc;">Devre İrtifası (m AGL)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_al_circuit_alt" min="20" max="500" step="5" value="80" title="Acil iniş devresi irtifası — AGL metre">
                                 </div>
-                                <div class="mb-0">
+                                <div class="mb-2">
                                     <label class="form-label small mb-1" style="color:#ccc;">Devre Mesafesi (m)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_al_circuit_distance" min="50" max="1500" step="10" value="300" title="Acil iniş noktasından devre mesafesi (metre)">
+                                </div>
+                                <div class="mb-0 p-2 rounded" style="background:#200808;border:1px solid #dc354544;">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="inp_al_use_direct_approach" title="Aktifse Downwind ve Esas Bacak WP atlanır — doğrudan Final+Flare">
+                                        <label class="form-check-label small" for="inp_al_use_direct_approach" style="color:#aaa;">Direkt Yaklaşım <span style="color:#888;font-size:0.85em;">(Devre Atla)</span></label>
+                                    </div>
+                                    <small style="color:#666;font-size:0.75em;">Aktif: Sadece Final + Flare</small>
                                 </div>
                             </div>
                         </div>
