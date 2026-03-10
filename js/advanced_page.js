@@ -71,6 +71,7 @@ let advancedConfig = {
     land_assist: {
         circuit_alt: 50,
         final_approach_distance: 0,
+        circuit_width: 150,
         flare_alt: 5.0,
         approach_throttle: 1200,
         flare_throttle: 1000,
@@ -83,6 +84,7 @@ let advancedConfig = {
     auto_land: {
         circuit_alt: 80,
         final_approach_distance: 0,
+        circuit_width: 200,
         flare_alt: 8.0,
         approach_throttle: 1300,
         flare_throttle: 1000,
@@ -272,6 +274,7 @@ function updateAdvancedUI() {
         const la = advancedConfig.land_assist;
         setVal("inp_la_circuit_alt", la.circuit_alt);
         setVal("inp_la_final_approach_distance", la.final_approach_distance);
+        setVal("inp_la_circuit_width", la.circuit_width);
         setVal("inp_la_flare_alt", la.flare_alt);
         setVal("inp_la_approach_throttle", la.approach_throttle);
         setVal("inp_la_flare_throttle", la.flare_throttle);
@@ -286,6 +289,7 @@ function updateAdvancedUI() {
         const al = advancedConfig.auto_land;
         setVal("inp_al_circuit_alt", al.circuit_alt);
         setVal("inp_al_final_approach_distance", al.final_approach_distance);
+        setVal("inp_al_circuit_width", al.circuit_width);
         setVal("inp_al_flare_alt", al.flare_alt);
         setVal("inp_al_approach_throttle", al.approach_throttle);
         setVal("inp_al_flare_throttle", al.flare_throttle);
@@ -437,6 +441,7 @@ function saveAdvancedConfig() {
     const la = {};
     setIf(la, "circuit_alt", int("inp_la_circuit_alt"));
     setIf(la, "final_approach_distance", int("inp_la_final_approach_distance"));
+    setIf(la, "circuit_width", int("inp_la_circuit_width"));
     setIf(la, "flare_alt", num("inp_la_flare_alt"));
     setIf(la, "approach_throttle", int("inp_la_approach_throttle"));
     setIf(la, "flare_throttle", int("inp_la_flare_throttle"));
@@ -450,6 +455,7 @@ function saveAdvancedConfig() {
     const al = {};
     setIf(al, "circuit_alt", int("inp_al_circuit_alt"));
     setIf(al, "final_approach_distance", int("inp_al_final_approach_distance"));
+    setIf(al, "circuit_width", int("inp_al_circuit_width"));
     setIf(al, "flare_alt", num("inp_al_flare_alt"));
     setIf(al, "approach_throttle", int("inp_al_approach_throttle"));
     setIf(al, "flare_throttle", int("inp_al_flare_throttle"));
