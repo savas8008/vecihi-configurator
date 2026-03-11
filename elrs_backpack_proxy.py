@@ -219,14 +219,32 @@ def udp_listener():
 
 # ── Ana giriş ────────────────────────────────────────────────────────────────
 
+def start_ws_server():
+    while True:
+        try:
+            ws_server()
+        except Exception as e:
+            print(f"[WS]  Hata, yeniden başlatılıyor: {e}")
+            time.sleep(2)
+
+
+def start_udp_listener():
+    while True:
+        try:
+            udp_listener()
+        except Exception as e:
+            print(f"[UDP] Hata, yeniden başlatılıyor: {e}")
+            time.sleep(2)
+
+
 if __name__ == "__main__":
     print("=" * 52)
     print("  ELRS Backpack → WebSocket Köprüsü")
     print("=" * 52)
     print()
 
-    t_ws  = threading.Thread(target=ws_server,   daemon=True)
-    t_udp = threading.Thread(target=udp_listener, daemon=True)
+    t_ws  = threading.Thread(target=start_ws_server,   daemon=True)
+    t_udp = threading.Thread(target=start_udp_listener, daemon=True)
 
     t_ws.start()
     time.sleep(0.2)   # WS sunucu başlasın

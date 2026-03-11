@@ -659,6 +659,9 @@ const TX_POWERS = ['10mW','25mW','50mW','100mW','250mW','500mW','1W','2W'];
 // ============================================================
 let ws = null;
 let isConnected = false;
+let reconnectTimer = null;
+let reconnectDelay = 2000;
+let userDisconnected = false;
 let rxBuf = new Uint8Array(512);
 let rxLen = 0;
 let lastPacketTime = null;
@@ -1265,9 +1268,12 @@ function toggleConnection() {
 }
 
 function connect() {
+    userDisconnected = false;
+    reconnectDelay = 2000;
+    clearTimeout(reconnectTimer);
     const ip   = document.getElementById('inputIP').value.trim();
     const port = document.getElementById('inputPort').value.trim();
-    const path = document.getElementById('inputPath').value.trim() || '/ws';
+    const path = document.getElementById('inputPath').value.trim() || '/';
     const url  = `ws://${ip}:${port}${path}`;
 
     setStatus('connecting', `Bağlanıyor → ${url}`);
@@ -1309,10 +1315,18 @@ function connect() {
         document.getElementById('btnConnect').innerHTML = '<i class="bi bi-plug-fill"></i> Bağlan';
         document.getElementById('btnConnect').className = 'btn-conn btn-connect';
         stopPktRateTimer();
+
+        if (!userDisconnected) {
+            reconnectDelay = Math.min(reconnectDelay * 1.5, 15000);
+            setStatus('connecting', `Yeniden bağlanıyor... (${Math.round(reconnectDelay/1000)}s)`);
+            reconnectTimer = setTimeout(() => connect(), reconnectDelay);
+        }
     };
 }
 
 function disconnect() {
+    userDisconnected = true;
+    clearTimeout(reconnectTimer);
     if (ws) { ws.close(); ws = null; }
     isConnected = false;
     setStatus('disconnected', 'Bağlantı kesildi');
