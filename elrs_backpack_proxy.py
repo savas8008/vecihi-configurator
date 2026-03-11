@@ -279,6 +279,20 @@ def backpack_probe():
         print(f"[PROBE] Hiçbir TCP portu açık değil")
     else:
         print(f"[PROBE] Açık portlar: {open_ports}")
+
+    # HTTP GET ile backpack'in yanıtını gör
+    for path in ["/", "/ws", "/api", "/telemetry"]:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(3)
+            s.connect((BACKPACK_IP, 80))
+            s.sendall(f"GET {path} HTTP/1.0\r\nHost: {BACKPACK_IP}\r\n\r\n".encode())
+            resp = s.recv(512).decode("utf-8", errors="replace")
+            first = resp.split("\r\n")[0]
+            print(f"[HTTP] GET {path} → {first}")
+            s.close()
+        except Exception as e:
+            print(f"[HTTP] GET {path} → HATA: {e}")
     print()
 
 
@@ -295,6 +309,8 @@ def ws_client_handshake(sock, host, path="/"):
     )
     sock.sendall(req.encode())
     resp = sock.recv(4096).decode("utf-8", errors="replace")
+    first_line = resp.split("\r\n")[0] if resp else "BOŞ YANIT"
+    print(f"[BKPK] {path} → {first_line}")
     return "101" in resp
 
 
