@@ -18,9 +18,11 @@ import hashlib
 import base64
 import time
 
-UDP_PORT = 14550
-WS_HOST  = "0.0.0.0"
-WS_PORT  = 8765
+UDP_PORT       = 14550
+UDP_SCAN_PORTS = [14550, 14551, 5760, 5761, 4000, 4001, 2399, 8765]
+BACKPACK_IP    = "10.0.0.1"
+WS_HOST        = "0.0.0.0"
+WS_PORT        = 8765
 
 MSP_ELRS_BACKPACK_CRSF_TLM = 0x11
 
@@ -237,6 +239,49 @@ def start_ws_server():
             time.sleep(2)
 
 
+def udp_scanner(port):
+    """Ek portlarda veri arar — hangi portta geldiğini tespit eder."""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(("0.0.0.0", port))
+        sock.settimeout(0.5)
+        while True:
+            try:
+                data, addr = sock.recvfrom(4096)
+                print(f"[SCAN] !!! VERİ BULUNDU port={port} from={addr} len={len(data)} hex={data[:16].hex()}")
+                broadcast(data)
+            except socket.timeout:
+                continue
+            except Exception:
+                break
+    except OSError as e:
+        print(f"[SCAN] Port {port} açılamadı: {e}")
+
+
+def backpack_probe():
+    """10.0.0.1'de hangi TCP portları açık? WebSocket var mı?"""
+    time.sleep(3)  # Ağ bağlantısını bekle
+    print(f"\n[PROBE] Backpack {BACKPACK_IP} port taraması...")
+    open_ports = []
+    for p in [80, 81, 443, 1234, 5760, 8765, 8080, 8888]:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(1)
+            result = s.connect_ex((BACKPACK_IP, p))
+            s.close()
+            if result == 0:
+                open_ports.append(p)
+                print(f"[PROBE] TCP port {p} AÇIK!")
+        except Exception:
+            pass
+    if not open_ports:
+        print(f"[PROBE] Hiçbir TCP portu açık değil — UDP bekleniyor")
+    else:
+        print(f"[PROBE] Açık portlar: {open_ports}")
+    print()
+
+
 def start_udp_listener():
     while True:
         try:
@@ -252,12 +297,19 @@ if __name__ == "__main__":
     print("=" * 52)
     print()
 
-    t_ws  = threading.Thread(target=start_ws_server,   daemon=True)
+    t_ws  = threading.Thread(target=start_ws_server,    daemon=True)
     t_udp = threading.Thread(target=start_udp_listener, daemon=True)
+    t_probe = threading.Thread(target=backpack_probe,   daemon=True)
 
     t_ws.start()
-    time.sleep(0.2)   # WS sunucu başlasın
+    time.sleep(0.2)
     t_udp.start()
+    t_probe.start()
+
+    # Ek portlarda tarama
+    for p in UDP_SCAN_PORTS:
+        if p != UDP_PORT:
+            threading.Thread(target=udp_scanner, args=(p,), daemon=True).start()
 
     print()
     print("  Adımlar:")
