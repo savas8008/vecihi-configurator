@@ -276,10 +276,84 @@ def backpack_probe():
         except Exception:
             pass
     if not open_ports:
-        print(f"[PROBE] Hiçbir TCP portu açık değil — UDP bekleniyor")
+        print(f"[PROBE] Hiçbir TCP portu açık değil")
     else:
         print(f"[PROBE] Açık portlar: {open_ports}")
     print()
+
+
+def ws_client_handshake(sock, host, path="/"):
+    """Backpack'e WebSocket client olarak bağlanır."""
+    key = base64.b64encode(b"elrsproxy12345678").decode()
+    req = (
+        f"GET {path} HTTP/1.1\r\n"
+        f"Host: {host}\r\n"
+        f"Upgrade: websocket\r\n"
+        f"Connection: Upgrade\r\n"
+        f"Sec-WebSocket-Key: {key}\r\n"
+        f"Sec-WebSocket-Version: 13\r\n\r\n"
+    )
+    sock.sendall(req.encode())
+    resp = sock.recv(4096).decode("utf-8", errors="replace")
+    return "101" in resp
+
+
+def ws_client_recv_frame(sock):
+    """Backpack'ten bir WebSocket frame okur."""
+    header = b""
+    while len(header) < 2:
+        chunk = sock.recv(2 - len(header))
+        if not chunk:
+            return None
+        header += chunk
+    plen = header[1] & 0x7F
+    if plen == 126:
+        ext = b""
+        while len(ext) < 2:
+            ext += sock.recv(2 - len(ext))
+        plen = struct.unpack("!H", ext)[0]
+    elif plen == 127:
+        ext = b""
+        while len(ext) < 8:
+            ext += sock.recv(8 - len(ext))
+        plen = struct.unpack("!Q", ext)[0]
+    payload = b""
+    while len(payload) < plen:
+        chunk = sock.recv(plen - len(payload))
+        if not chunk:
+            return None
+        payload += chunk
+    return payload
+
+
+def backpack_ws_client():
+    """Backpack WebSocket sunucusuna bağlanır, veriyi alıp yayınlar."""
+    paths = ["/", "/ws", "/telemetry"]
+    while True:
+        for path in paths:
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(5)
+                sock.connect((BACKPACK_IP, 80))
+                if not ws_client_handshake(sock, BACKPACK_IP, path):
+                    sock.close()
+                    continue
+                sock.settimeout(10)
+                print(f"[BKPK] BAĞLANDI: ws://{BACKPACK_IP}:80{path}")
+                pkt = 0
+                while True:
+                    data = ws_client_recv_frame(sock)
+                    if data is None:
+                        print(f"[BKPK] Bağlantı koptu, yeniden deneniyor...")
+                        break
+                    pkt += 1
+                    print(f"[BKPK] Frame #{pkt} len={len(data)} hex={data[:16].hex()}")
+                    crsf = extract_crsf(data)
+                    broadcast(bytes(crsf) if crsf else data)
+                sock.close()
+            except Exception:
+                pass
+        time.sleep(3)
 
 
 def start_udp_listener():
@@ -297,14 +371,16 @@ if __name__ == "__main__":
     print("=" * 52)
     print()
 
-    t_ws  = threading.Thread(target=start_ws_server,    daemon=True)
-    t_udp = threading.Thread(target=start_udp_listener, daemon=True)
-    t_probe = threading.Thread(target=backpack_probe,   daemon=True)
+    t_ws    = threading.Thread(target=start_ws_server,    daemon=True)
+    t_udp   = threading.Thread(target=start_udp_listener, daemon=True)
+    t_probe = threading.Thread(target=backpack_probe,     daemon=True)
+    t_bkpk  = threading.Thread(target=backpack_ws_client, daemon=True)
 
     t_ws.start()
     time.sleep(0.2)
     t_udp.start()
     t_probe.start()
+    t_bkpk.start()
 
     # Ek portlarda tarama
     for p in UDP_SCAN_PORTS:
