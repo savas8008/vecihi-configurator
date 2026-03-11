@@ -112,11 +112,17 @@ async function connectSerial() {
         setTimeout(() => {
             log('🔄 İlk veriler isteniyor...', 'info');
             sendCommand('calibration_page_data');
+            setTimeout(() => sendCommand('advanced_page_data'), 200);
+            setTimeout(() => sendCommand('pid_page_data'), 400);
+            setTimeout(() => sendCommand('outputs_page_data'), 600);
+            setTimeout(() => sendCommand('transmitter_page_data'), 800);
+            setTimeout(() => sendCommand('modes_page_data'), 1000);
+            setTimeout(() => sendCommand('osd_page_data'), 1200);
             setTimeout(() => {
                 if (typeof startQuaternionStream === 'function') {
                     startQuaternionStream();
                 }
-            }, 1000);
+            }, 1600);
         }, 500);
         
     } catch (error) {
