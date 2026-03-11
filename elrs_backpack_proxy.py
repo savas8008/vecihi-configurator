@@ -204,6 +204,7 @@ def udp_listener():
     sock.bind(("0.0.0.0", UDP_PORT))
     print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}")
 
+    pkt_count = 0
     while True:
         try:
             data, addr = sock.recvfrom(4096)
@@ -212,9 +213,17 @@ def udp_listener():
             time.sleep(0.1)
             continue
 
+        pkt_count += 1
+        print(f"[UDP] Paket #{pkt_count} from {addr}  len={len(data)}  hex={data[:16].hex()}")
+
         crsf = extract_crsf(data)
         if crsf:
+            print(f"[UDP] CRSF çözüldü, yayınlanıyor ({len(crsf)} byte)")
             broadcast(bytes(crsf))
+        else:
+            # CRSF formatı eşleşmedi → ham veriyi doğrudan yayınla
+            print(f"[UDP] CRSF yok, ham veri yayınlanıyor")
+            broadcast(data)
 
 
 # ── Ana giriş ────────────────────────────────────────────────────────────────
