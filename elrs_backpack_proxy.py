@@ -295,6 +295,8 @@ def ws_client_handshake(sock, host, path="/"):
     )
     sock.sendall(req.encode())
     resp = sock.recv(4096).decode("utf-8", errors="replace")
+    first_line = resp.split("\r\n")[0] if resp else "BOŞ YANIT"
+    print(f"[BKPK] {path} → {first_line}")
     return "101" in resp
 
 
