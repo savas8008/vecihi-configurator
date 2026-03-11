@@ -300,19 +300,57 @@ def backpack_probe():
     else:
         print(f"[PROBE] Açık portlar: {open_ports}")
 
-    # HTTP GET ile backpack'in yanıtını gör
-    for path in ["/", "/ws", "/api", "/telemetry"]:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(3)
-            s.connect((BACKPACK_IP, 80))
-            s.sendall(f"GET {path} HTTP/1.0\r\nHost: {BACKPACK_IP}\r\n\r\n".encode())
-            resp = s.recv(512).decode("utf-8", errors="replace")
-            first = resp.split("\r\n")[0]
-            print(f"[HTTP] GET {path} → {first}")
-            s.close()
-        except Exception as e:
-            print(f"[HTTP] GET {path} → HATA: {e}")
+    # Ana HTML sayfasını oku, WebSocket/endpoint ipuçlarını bul
+    try:
+        import re
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(5)
+        s.connect((BACKPACK_IP, 80))
+        s.sendall(f"GET / HTTP/1.0\r\nHost: {BACKPACK_IP}\r\n\r\n".encode())
+        body = b""
+        while True:
+            chunk = s.recv(2048)
+            if not chunk:
+                break
+            body += chunk
+            if len(body) > 32768:
+                break
+        s.close()
+        text = body.decode("utf-8", errors="replace")
+        ws_urls   = re.findall(r'ws[s]?://[^\s"\'<>]+', text)
+        js_files  = re.findall(r'(?:src|href)=["\']([^"\']+\.(?:js|gz))["\']', text)
+        endpoints = re.findall(r'["\']/([\w\-]+)["\']', text)
+        print(f"[HTML] WS URL    : {ws_urls or 'YOK'}")
+        print(f"[HTML] JS dosya  : {js_files or 'YOK'}")
+        print(f"[HTML] Endpoint  : {list(set(endpoints))[:15]}")
+        # İlk JS dosyasını da oku
+        for js in js_files[:2]:
+            try:
+                path = js if js.startswith("/") else "/" + js
+                s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s2.settimeout(5)
+                s2.connect((BACKPACK_IP, 80))
+                s2.sendall(f"GET {path} HTTP/1.0\r\nHost: {BACKPACK_IP}\r\n\r\n".encode())
+                jsbody = b""
+                while True:
+                    c = s2.recv(2048)
+                    if not c:
+                        break
+                    jsbody += c
+                    if len(jsbody) > 65536:
+                        break
+                s2.close()
+                jstext = jsbody.decode("utf-8", errors="replace")
+                ws2 = re.findall(r'(?:ws://|new WebSocket)[^\s"\'<>]*', jstext)
+                ep2 = re.findall(r'["\']/([\w\-]+)["\']', jstext)
+                if ws2:
+                    print(f"[JS] {js} WS refs: {ws2[:5]}")
+                if ep2:
+                    print(f"[JS] {js} paths  : {list(set(ep2))[:10]}")
+            except Exception as je:
+                print(f"[JS] {js} hata: {je}")
+    except Exception as e:
+        print(f"[HTML] Okuma hatası: {e}")
     print()
 
 
