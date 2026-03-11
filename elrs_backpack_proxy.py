@@ -18,13 +18,47 @@ import hashlib
 import base64
 import time
 
-UDP_PORT       = 14550
-UDP_SCAN_PORTS = [14550, 14551, 5760, 5761, 4000, 4001, 2399, 8765]
-BACKPACK_IP    = "10.0.0.1"
-WS_HOST        = "0.0.0.0"
-WS_PORT        = 8765
+UDP_PORT        = 14550   # Backpack'in GCS'e gönderdiği port (biz dinleriz)
+BACKPACK_LISTEN = 14555   # Backpack'in GCS'ten beklediği port (biz buraya göndeririz)
+UDP_SCAN_PORTS  = [14550, 14551, 5760, 5761, 4000, 4001, 2399, 8765]
+BACKPACK_IP     = "10.0.0.1"
+WS_HOST         = "0.0.0.0"
+WS_PORT         = 8765
 
 MSP_ELRS_BACKPACK_CRSF_TLM = 0x11
+
+
+# ── MAVLink heartbeat ────────────────────────────────────────────────────────
+
+def _crc16_mcrf4xx(data: bytes) -> int:
+    crc = 0xFFFF
+    for b in data:
+        crc ^= b
+        for _ in range(8):
+            if crc & 1:
+                crc = (crc >> 1) ^ 0x8408
+            else:
+                crc >>= 1
+    return crc
+
+
+def mavlink_heartbeat(seq: int = 0) -> bytes:
+    """MAVLink v1 HEARTBEAT paketi (GCS kimliğiyle). CRC_EXTRA=50."""
+    payload = struct.pack('<IBBBBB',
+        0,    # custom_mode
+        6,    # MAV_TYPE_GCS
+        8,    # MAV_AUTOPILOT_INVALID
+        192,  # base_mode
+        0,    # system_status
+        3,    # mavlink_version
+    )
+    plen   = len(payload)
+    seq_b  = seq & 0xFF
+    sys_id, comp_id, msg_id = 255, 190, 0
+    crc_buf = bytes([plen, seq_b, sys_id, comp_id, msg_id]) + payload + bytes([50])
+    crc = _crc16_mcrf4xx(crc_buf)
+    header = bytes([0xFE, plen, seq_b, sys_id, comp_id, msg_id])
+    return header + payload + struct.pack('<H', crc)
 
 # Bağlı WebSocket istemcileri { socket: lock }
 clients: dict = {}
@@ -208,23 +242,23 @@ def udp_listener():
     sock.settimeout(1.0)
     print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}")
 
-    # Aynı soket üzerinden ping gönder → backpack kaynak port 14550'yi görür
-    msp_ping = bytes([0x24, 0x4D, 0x3C, 0x00, 0x00, 0x00])
+    # MAVLink heartbeat gönder → backpack GCS IP'sini öğrenir ve 14550'ye veri yollar
     last_ping = 0
 
     pkt_count = 0
     ping_count = 0
     while True:
-        # Periyodik ping — aynı soket, kaynak port = 14550
+        # Periyodik MAVLink heartbeat → backpack listen port 14555'e
         now = time.time()
         if now - last_ping >= 1.0:
             try:
-                sock.sendto(msp_ping, (BACKPACK_IP, UDP_PORT))
+                hb = mavlink_heartbeat(ping_count)
+                sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))
                 ping_count += 1
                 if ping_count <= 5 or ping_count % 10 == 0:
-                    print(f"[REG] Ping #{ping_count} → {BACKPACK_IP}:{UDP_PORT} (src port=14550)")
+                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN} (MAVLink GCS)")
             except Exception as e:
-                print(f"[REG] Ping hatası: {e}")
+                print(f"[REG] Heartbeat hatası: {e}")
             last_ping = now
 
         try:
