@@ -200,36 +200,37 @@ def broadcast(raw: bytes):
                 clients.pop(c, None)
 
 
-def udp_register():
-    """Backpack'e periyodik UDP ping gönder — backpack bu IP'ye telemetri başlatır."""
-    time.sleep(2)
-    ping_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    ping_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    # MSP ping paketi: $M< 0x00 0x00 checksum
-    msp_ping = bytes([0x24, 0x4D, 0x3C, 0x00, 0x00, 0x00])
-    count = 0
-    while True:
-        try:
-            ping_sock.sendto(msp_ping, (BACKPACK_IP, UDP_PORT))
-            count += 1
-            if count <= 5 or count % 10 == 0:
-                print(f"[REG] Backpack'e UDP ping gönderildi #{count} → {BACKPACK_IP}:{UDP_PORT}")
-        except Exception as e:
-            print(f"[REG] Ping hatası: {e}")
-        time.sleep(1)
-
-
 def udp_listener():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     sock.bind(("0.0.0.0", UDP_PORT))
+    sock.settimeout(1.0)
     print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}")
 
+    # Aynı soket üzerinden ping gönder → backpack kaynak port 14550'yi görür
+    msp_ping = bytes([0x24, 0x4D, 0x3C, 0x00, 0x00, 0x00])
+    last_ping = 0
+
     pkt_count = 0
+    ping_count = 0
     while True:
+        # Periyodik ping — aynı soket, kaynak port = 14550
+        now = time.time()
+        if now - last_ping >= 1.0:
+            try:
+                sock.sendto(msp_ping, (BACKPACK_IP, UDP_PORT))
+                ping_count += 1
+                if ping_count <= 5 or ping_count % 10 == 0:
+                    print(f"[REG] Ping #{ping_count} → {BACKPACK_IP}:{UDP_PORT} (src port=14550)")
+            except Exception as e:
+                print(f"[REG] Ping hatası: {e}")
+            last_ping = now
+
         try:
             data, addr = sock.recvfrom(4096)
+        except socket.timeout:
+            continue
         except Exception as e:
             print(f"[UDP] Hata: {e}")
             time.sleep(0.1)
@@ -416,7 +417,6 @@ if __name__ == "__main__":
     t_udp.start()
     t_probe.start()
     t_bkpk.start()
-    threading.Thread(target=udp_register, daemon=True).start()
 
     # Ek portlarda tarama
     for p in UDP_SCAN_PORTS:
