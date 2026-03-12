@@ -220,6 +220,7 @@ function updateAdvancedUI() {
         // Otopilot kazançları
         setVal("inp_nav_fw_alt_p", n.fw_alt_p);
         setVal("inp_nav_fw_thr_p", n.fw_thr_p);
+        setVal("inp_nav_fw_pitch2thr", n.fw_pitch2thr);
 
         // L1 navigasyon
         setVal("inp_nav_l1_period", n.l1_period);
@@ -376,6 +377,7 @@ function saveAdvancedConfig() {
     // Otopilot kazançları
     setIf(nav, "fw_alt_p", num("inp_nav_fw_alt_p"));
     setIf(nav, "fw_thr_p", num("inp_nav_fw_thr_p"));
+    setIf(nav, "fw_pitch2thr", num("inp_nav_fw_pitch2thr"));
 
     // L1 navigasyon
     setIf(nav, "l1_period", int("inp_nav_l1_period"));
