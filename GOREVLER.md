@@ -26,16 +26,124 @@
 
 **Sorun:** Araç ARM edildiğinde OSD bağlantısı/stream kesiliyor.
 
-**Muhtemel Sebepler:**
-- ARM olunca UART modu veya önceliği değişiyor olabilir
-- OSD task'i ARM state'ine göre durdurulmuş olabilir (`osd_manager.cpp`)
-- USB serial ile OSD UART aynı kaynağı paylaşıyor olabilir
+### Betaflight Karşılaştırması (Kök Neden Analizi)
 
-**Plan:**
-1. `osd_manager.cpp`'de ARM state değişikliğine tepki veren kod var mı kontrol et
-2. `flight_modes.cpp` ARM geçişinde OSD task'ini etkileyen bir çağrı var mı bak
-3. UART kaynak çakışması varsa buffer veya öncelik ayarını düzelt
-4. ARM sonrası OSD stream'in kesilmeden devam ettiğini doğrula
+Betaflight'ın `osd.c` kaynak kodu incelendi. OSD-ARM geçişini şu şekilde yönetir:
+
+**Betaflight'ın doğru yaptığı:**
+```c
+// osd.c - osdProcessStats1()
+if (armState != ARMING_FLAG(ARMED)) {
+    if (ARMING_FLAG(ARMED)) {
+        osdStatsEnabled = false;
+        osdStatsVisible = false;
+        osdResetStats();
+        resumeRefreshAt = osdShowArmed() + currentTimeUs;  // ARM geçici ekran
+    }
+    armState = ARMING_FLAG(ARMED);
+}
+```
+
+```c
+// osdShowArmed() — ARM geçişinde ne olur:
+static timeDelta_t osdShowArmed(void) {
+    displayClearScreen(osdDisplayPort, DISPLAY_CLEAR_WAIT);  // Ekranı temizle
+    displayWrite(..., "ARMED");   // Ortaya "ARMED" yaz
+    return (REFRESH_1S / 2);     // 500ms bekle, sonra normal OSD devam eder
+}
+```
+
+```c
+// osdUpdate() — ARM sonrası resume koruması:
+if (resumeRefreshAt) {
+    if (cmp32(currentTimeUs, resumeRefreshAt) < 0) {
+        return;  // Timer dolana kadar render etme
+    }
+    // Timer doldu → resumeRefreshAt = 0 → normal OSD devam
+}
+```
+
+**Betaflight'ın kritik tasarım kararları:**
+1. OSD task ASLA suspend/delete edilmez — ARM boyunca çalışmaya devam eder
+2. ARM'da ekran temizlenip "ARMED" yazısı gösterilir, 500ms sonra normal OSD geri gelir
+3. OSD task'i `TASK_PRIORITY_LOW` olarak kalır, önceliği ARM'da değişmez
+4. State machine (`osdState`) ile rendering birden fazla scheduler döngüsüne yayılır
+5. `resumeRefreshAt` değişkeni ile render geçici olarak durdurulur, task değil
+
+### X-Flight'ta Tespit Edilen Muhtemel Hatalar
+
+**BUG-1: OSD task'inin suspend edilmesi (En Olası)**
+
+`osd_manager.cpp` veya `flight_modes.cpp` içinde büyük ihtimalle şu var:
+```cpp
+// YANLIŞ — Betaflight'ta böyle bir şey YOK
+if (is_armed) {
+    vTaskSuspend(osd_task_handle);   // BUG: task asla devam etmez
+}
+```
+
+Doğru yaklaşım:
+```cpp
+// DOĞRU — Betaflight yaklaşımı
+if (arm_state_changed && is_armed) {
+    osd_clear_screen();
+    osd_write_center("ARMED");
+    resume_at = current_time_us + 500000;  // 500ms sonra devam
+    // Task hiç durdurulmuyor
+}
+if (current_time_us < resume_at) return;  // Task çalışıyor, sadece return
+```
+
+**BUG-2: ARM geçişinde UART reset / baud değişimi**
+
+ARM olunca ESC telemetri veya başka bir amaç için OSD UART'ı yeniden yapılandırılıyorsa:
+```cpp
+// YANLIŞ
+if (is_armed) {
+    uart_init(OSD_UART, new_baud);  // OSD bağlantısını keser
+}
+```
+
+Düzeltme: ARM geçişinde OSD UART konfigürasyonu değiştirilmemeli.
+
+**BUG-3: FreeRTOS task priority çakışması**
+
+ARM'da flight control task'ının önceliği yükseltiliyorsa ve OSD task aynı çekirdeği paylaşıyorsa:
+```cpp
+// Kontrol edilecek: flight_modes.cpp içinde
+vTaskPrioritySet(flight_ctrl_task, PRIORITY_REALTIME);
+// OSD task aynı core'daysa hiç çalışamaz hale gelir
+```
+
+Düzeltme:
+- OSD task'ini ayrı bir ESP32 core'a ata (`xTaskCreatePinnedToCore`)
+- Flight control: Core 1 (PRO_CPU), OSD: Core 0 (APP_CPU)
+
+**BUG-4: Stack overflow (sessiz çökme)**
+
+ESP32'de FreeRTOS task'ı stack overflow'da sessizce çöker. ARM'da yığın kullanımı artar.
+```cpp
+// osd_manager.cpp başlatma kısmında stack boyutunu artır
+xTaskCreate(osd_task, "OSD", 4096, NULL, 2, &osd_task_handle);
+//                            ^^^^
+// 2048 ise yetersiz olabilir, 4096+ dene
+```
+
+### Düzeltme Planı (Öncelik Sırasıyla)
+
+1. **`osd_manager.cpp` kontrol:** ARM state callback'te `vTaskSuspend` veya `vTaskDelete` var mı?
+   - Varsa: sil, yerine `resume_at` timer + erken return ekle
+
+2. **`flight_modes.cpp` kontrol:** ARM transition callback'te OSD ile ilgili herhangi bir çağrı var mı?
+   - Varsa: kaldır
+
+3. **Task core affinity:** OSD task'i `xTaskCreatePinnedToCore(..., 0)` ile Core 0'a, uçuş görevlerini Core 1'e sabitle
+
+4. **Stack boyutu:** OSD task stack'i en az 4096 byte olarak ayarla
+
+5. **ARM geçiş animasyonu:** Betaflight yaklaşımıyla:
+   - ARM → ekranı temizle → "ARMED" yaz → 500ms bekle → normal OSD devam
+   - DISARM → istatistik ekranı göster (60s) → normal OSD devam
 
 ---
 
