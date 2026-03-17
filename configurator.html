@@ -49,7 +49,7 @@
     }
 
     /* Konfigürasyon sayfası alt navigasyon */
-    #configSubNav .nav-link {
+    .cfg-tab-btn {
         color: #adb5bd;
         border-radius: 6px;
         padding: 0.4rem 0.9rem;
@@ -57,12 +57,13 @@
         transition: background 0.15s, color 0.15s;
         border: none;
         background: transparent;
+        cursor: pointer;
     }
-    #configSubNav .nav-link:hover {
+    .cfg-tab-btn:hover {
         background: rgba(255,255,255,0.08);
         color: #fff;
     }
-    #configSubNav .nav-link.active {
+    .cfg-tab-btn.active {
         background: rgba(13,110,253,0.25);
         color: #6ea8fe;
         font-weight: 600;
@@ -523,24 +524,24 @@
 <div id="outputs" class="page">
 
   <!-- Alt Navigasyon Menüsü -->
-  <ul class="nav nav-pills gap-1 mb-4 p-2 rounded" id="configSubNav" style="background:rgba(255,255,255,0.04); flex-wrap:wrap;">
+  <ul class="nav gap-1 mb-4 p-2 rounded" id="configSubNav" style="background:rgba(255,255,255,0.04); flex-wrap:wrap;">
     <li class="nav-item">
-      <button class="nav-link active" data-cfg-tab="ucak-tipi">
+      <button class="cfg-tab-btn active" data-cfg-tab="ucak-tipi">
         <i class="bi bi-airplane me-1"></i> Uçak Tipi
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" data-cfg-tab="mikser">
+      <button class="cfg-tab-btn" data-cfg-tab="mikser">
         <i class="bi bi-sliders me-1"></i> Mikser
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" data-cfg-tab="motor-servo">
+      <button class="cfg-tab-btn" data-cfg-tab="motor-servo">
         <i class="bi bi-plug me-1"></i> Motor &amp; Servo / AUX
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" data-cfg-tab="sensorler">
+      <button class="cfg-tab-btn" data-cfg-tab="sensorler">
         <i class="bi bi-cpu me-1"></i> Sensörler
       </button>
     </li>
