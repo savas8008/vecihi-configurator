@@ -430,7 +430,7 @@ function saveOutputsConfig() {
  * @brief Konfigürasyon sayfası alt menü tab'larını başlatır
  */
 function initConfigSubNav() {
-    const tabButtons = document.querySelectorAll('#configSubNav [data-cfg-tab]');
+    const tabButtons = document.querySelectorAll('.cfg-tab-btn[data-cfg-tab]');
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const tabId = btn.getAttribute('data-cfg-tab');
@@ -445,7 +445,7 @@ function initConfigSubNav() {
  */
 function switchConfigTab(tabId) {
     // Tüm tab butonlarından active kaldır
-    document.querySelectorAll('#configSubNav [data-cfg-tab]').forEach(btn => {
+    document.querySelectorAll('.cfg-tab-btn[data-cfg-tab]').forEach(btn => {
         btn.classList.remove('active');
     });
     // Tüm cfg-section'ları gizle
@@ -454,7 +454,7 @@ function switchConfigTab(tabId) {
     });
 
     // Aktif tab'ı işaretle
-    const activeBtn = document.querySelector(`#configSubNav [data-cfg-tab="${tabId}"]`);
+    const activeBtn = document.querySelector(`.cfg-tab-btn[data-cfg-tab="${tabId}"]`);
     if (activeBtn) activeBtn.classList.add('active');
 
     // İlgili section'ı göster
