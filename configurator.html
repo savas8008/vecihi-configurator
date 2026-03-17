@@ -544,7 +544,46 @@
     </div>
   </div>
 
-  <!-- 2) PANEL: Motor & Servo Çıkış Pinleri -->
+  <!-- 2) PANEL: Mikser Kazançları -->
+  <div class="panel mb-4">
+    <h2 class="panel-title"><i class="bi bi-sliders"></i> Mikser Kazançları</h2>
+    <p class="text-muted small mb-3">
+      Her eksen için mikser oranını ayarlayın. <strong>100 = normal</strong>, <strong>-100 = ters</strong>, <strong>50 = %50 güç</strong>.
+      Yaw tersleniyorsa Yaw değerini negatif yapın (örn: -100).
+    </p>
+    <div class="row g-3">
+      <div class="col-6 col-lg-3">
+        <div class="panel3 p-3 text-center">
+          <div class="output-title mb-2">ROLL</div>
+          <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel3 p-3 text-center">
+          <div class="output-title mb-2">PITCH</div>
+          <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel3 p-3 text-center">
+          <div class="output-title mb-2">YAW</div>
+          <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel3 p-3 text-center">
+          <div class="output-title mb-2">THROTTLE</div>
+          <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3) PANEL: Motor & Servo Çıkış Pinleri -->
   <div class="panel mb-4">
     <h2 class="panel-title"><i class="bi bi-plug"></i> Motor & Servo Çıkış Pinleri</h2>
 
@@ -598,7 +637,7 @@
             </div>
 
             <!-- Servo 1 -->
-            <div class="col-6">
+            <div class="col-6" id="servo1Card">
               <div class="panel3">
                 <div class="output-display">
                   <div class="d-flex justify-content-between align-items-center">
@@ -643,7 +682,7 @@
             </div>
 
             <!-- Servo 2 -->
-            <div class="col-6">
+            <div class="col-6" id="servo2Card">
               <div class="panel3">
                 <div class="output-display">
                   <div class="d-flex justify-content-between align-items-center">
@@ -688,7 +727,7 @@
             </div>
 
             <!-- Servo 3 -->
-            <div class="col-6">
+            <div class="col-6" id="servo3Card">
               <div class="panel3">
                 <div class="output-display">
                   <div class="d-flex justify-content-between align-items-center">
@@ -733,7 +772,7 @@
             </div>
 
             <!-- Servo 4 -->
-            <div class="col-6">
+            <div class="col-6" id="servo4Card">
               <div class="panel3">
                 <div class="output-display">
                   <div class="d-flex justify-content-between align-items-center">
