@@ -48,26 +48,6 @@
         box-shadow: none;
     }
 
-    /* Konfigürasyon sayfası alt navigasyon */
-    #configSubNav .nav-link {
-        color: #adb5bd;
-        border-radius: 6px;
-        padding: 0.4rem 0.9rem;
-        font-size: 0.875rem;
-        transition: background 0.15s, color 0.15s;
-        border: none;
-        background: transparent;
-    }
-    #configSubNav .nav-link:hover {
-        background: rgba(255,255,255,0.08);
-        color: #fff;
-    }
-    #configSubNav .nav-link.active {
-        background: rgba(13,110,253,0.25);
-        color: #6ea8fe;
-        font-weight: 600;
-    }
-
     #prev_horizon {
         width: 32% !important;
         text-align: center;
@@ -521,477 +501,417 @@
 </div>
 
 <div id="outputs" class="page">
+  <!-- 1) PANEL: Uçak Tipi Seçimi -->
+  <div class="panel mb-4">
+    <h2 class="panel-title"><i class="bi bi-airplane"></i> Uçak Tipi Seçimi</h2>
 
-  <!-- Alt Navigasyon Menüsü -->
-  <ul class="nav nav-pills gap-1 mb-4 p-2 rounded" id="configSubNav" style="background:rgba(255,255,255,0.04); flex-wrap:wrap;">
-    <li class="nav-item">
-      <button class="nav-link active" data-cfg-tab="ucak-tipi">
-        <i class="bi bi-airplane me-1"></i> Uçak Tipi
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" data-cfg-tab="mikser">
-        <i class="bi bi-sliders me-1"></i> Mikser
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" data-cfg-tab="motor-servo">
-        <i class="bi bi-plug me-1"></i> Motor &amp; Servo / AUX
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" data-cfg-tab="sensorler">
-        <i class="bi bi-cpu me-1"></i> Sensörler
-      </button>
-    </li>
-  </ul>
+    <div class="row g-3">
+      <div class="col-6 col-lg-3">
+        <div class="panel3">
+          <div class="aircraft-card active" data-aircraft-type="v-tail">
+            <div class="mixer-title">V-TAIL</div>
+            <div class="mixer-description">V şeklinde kuyruk yapısı</div>
+          </div>
+        </div>
+      </div>
 
-  <!-- ======== TAB 1: Uçak Tipi ======== -->
-  <div id="cfg-ucak-tipi" class="cfg-section">
-    <div class="panel mb-4">
-      <h2 class="panel-title"><i class="bi bi-airplane"></i> Uçak Tipi Seçimi</h2>
-      <div class="row g-3">
-        <div class="col-6 col-lg-3">
-          <div class="panel3">
-            <div class="aircraft-card active" data-aircraft-type="v-tail">
-              <div class="mixer-title">V-TAIL</div>
-              <div class="mixer-description">V şeklinde kuyruk yapısı</div>
-            </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel3">
+          <div class="aircraft-card" data-aircraft-type="t-tail">
+            <div class="mixer-title">T-TAIL</div>
+            <div class="mixer-description">T şeklinde kuyruk yapısı</div>
           </div>
         </div>
-        <div class="col-6 col-lg-3">
-          <div class="panel3">
-            <div class="aircraft-card" data-aircraft-type="t-tail">
-              <div class="mixer-title">T-TAIL</div>
-              <div class="mixer-description">T şeklinde kuyruk yapısı</div>
-            </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="panel3">
+          <div class="aircraft-card" data-aircraft-type="no-ruder">
+            <div class="mixer-title">RUDERSIZ</div>
+            <div class="mixer-description">Ruder olmadan</div>
           </div>
         </div>
-        <div class="col-6 col-lg-3">
-          <div class="panel3">
-            <div class="aircraft-card" data-aircraft-type="no-ruder">
-              <div class="mixer-title">RUDERSIZ</div>
-              <div class="mixer-description">Ruder olmadan</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="panel3">
-            <div class="aircraft-card" data-aircraft-type="delta">
-              <div class="mixer-title">DELTA</div>
-              <div class="mixer-description">Delta kanat</div>
-            </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="panel3">
+          <div class="aircraft-card" data-aircraft-type="delta">
+            <div class="mixer-title">DELTA</div>
+            <div class="mixer-description">Delta kanat</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ======== TAB 2: Mikser ======== -->
-  <div id="cfg-mikser" class="cfg-section d-none">
-    <div class="panel mb-4">
-      <h2 class="panel-title"><i class="bi bi-sliders"></i> Mikser Kazançları</h2>
-      <p class="text-muted small mb-3">
-        Her eksen için mikser oranını ayarlayın. <strong>100 = normal</strong>, <strong>-100 = ters</strong>, <strong>50 = %50 güç</strong>.
-        Yaw tersleniyorsa Yaw değerini negatif yapın (örn: -100).
-      </p>
-      <div class="row g-3">
-        <div class="col-6 col-lg-3">
-          <div class="panel3 p-3 text-center">
-            <div class="output-title mb-2">ROLL</div>
-            <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
-            <small class="text-muted">-200 ... 200</small>
-          </div>
+  <!-- 2) PANEL: Mikser Kazançları -->
+  <div class="panel mb-4">
+    <h2 class="panel-title"><i class="bi bi-sliders"></i> Mikser Kazançları</h2>
+    <p class="text-muted small mb-3">
+      Her eksen için mikser oranını ayarlayın. <strong>100 = normal</strong>, <strong>-100 = ters</strong>, <strong>50 = %50 güç</strong>.
+      Yaw tersleniyorsa Yaw değerini negatif yapın (örn: -100).
+    </p>
+    <div class="row g-3">
+      <div class="col-6 col-lg-3">
+        <div class="panel3 p-3 text-center">
+          <div class="output-title mb-2">ROLL</div>
+          <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
         </div>
-        <div class="col-6 col-lg-3">
-          <div class="panel3 p-3 text-center">
-            <div class="output-title mb-2">PITCH</div>
-            <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
-            <small class="text-muted">-200 ... 200</small>
-          </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel3 p-3 text-center">
+          <div class="output-title mb-2">PITCH</div>
+          <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
         </div>
-        <div class="col-6 col-lg-3">
-          <div class="panel3 p-3 text-center">
-            <div class="output-title mb-2">YAW</div>
-            <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
-            <small class="text-muted">-200 ... 200</small>
-          </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel3 p-3 text-center">
+          <div class="output-title mb-2">YAW</div>
+          <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
         </div>
-        <div class="col-6 col-lg-3">
-          <div class="panel3 p-3 text-center">
-            <div class="output-title mb-2">THROTTLE</div>
-            <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
-            <small class="text-muted">-200 ... 200</small>
-          </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel3 p-3 text-center">
+          <div class="output-title mb-2">THROTTLE</div>
+          <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ======== TAB 3: Motor & Servo / AUX ======== -->
-  <div id="cfg-motor-servo" class="cfg-section d-none">
-    <!-- Motor & Servo Çıkış Pinleri -->
-    <div class="panel mb-4">
-      <h2 class="panel-title"><i class="bi bi-plug"></i> Motor &amp; Servo Çıkış Pinleri</h2>
-      <div class="row g-3">
-        <!-- Sol: Motor kontrol -->
-        <div class="col-lg-4">
-          <div class="panel3 p-3 h-100">
-            <h3 class="h5 mb-3">Motor Kontrolü</h3>
-            <div class="throttle-container">
-              <div class="throttle-value" id="throttleValue">1000</div>
-              <input type="range" class="throttle-slider" min="1000" max="2000" value="1000" id="throttleSlider" disabled>
-              <div class="d-flex justify-content-between w-100 mt-2">
-                <small>1000µs</small><small>2000µs</small>
-              </div>
-              <div class="form-check mt-3">
-                <input class="form-check-input" type="checkbox" id="safetyCheck">
-                <label class="form-check-label" for="safetyCheck">Pervaneyi çıkardım</label>
-              </div>
-              <div class="safety-warning" id="safetyWarning">⚠️ Güvenlik onayı gerekiyor</div>
-            </div>
-          </div>
-        </div>
-        <!-- Sağ: Motor/Servo pin seçimi -->
-        <div class="col-lg-8">
-          <div class="panel3 p-3 h-100">
-            <h3 class="h5 mb-3">Çıkış Konfigürasyonu</h3>
-            <div class="row g-2">
-              <!-- Motorlar -->
-              <div class="col-6">
-                <div class="panel3">
-                  <div class="output-display">
-                    <div class="output-title" id="motor1Title">MOTOR 1</div>
-                    <div class="output-value" id="output1">1000</div>
-                    <select class="form-select pin-select mt-2" id="motor1Pin"></select>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="panel3">
-                  <div class="output-display">
-                    <div class="output-title" id="motor2Title">MOTOR 2</div>
-                    <div class="output-value" id="output2">1000</div>
-                    <select class="form-select pin-select mt-2" id="motor2Pin"></select>
-                  </div>
-                </div>
-              </div>
-              <!-- Servo 1 -->
-              <div class="col-6" id="servo1Card">
-                <div class="panel3">
-                  <div class="output-display">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="output-title" id="servo1Title">SERVO 1</div>
-                      <div class="form-check form-switch m-0" title="Tersle">
-                        <input class="form-check-input" type="checkbox" id="revServo1">
-                        <label class="form-check-label small" for="revServo1">Rev</label>
-                      </div>
-                    </div>
-                    <div class="output-value" id="servo1">1500</div>
-                    <select class="form-select pin-select mt-2" id="servo1Pin"></select>
-                    <div class="servo-controls">
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Min:</span>
-                        <span class="servo-value-display" id="servo1Min">1000</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Mid:</span>
-                        <span class="servo-value-display" id="servo1Mid">1500</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Max:</span>
-                        <span class="servo-value-display" id="servo1Max">2000</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Servo 2 -->
-              <div class="col-6" id="servo2Card">
-                <div class="panel3">
-                  <div class="output-display">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="output-title" id="servo2Title">SERVO 2</div>
-                      <div class="form-check form-switch m-0" title="Tersle">
-                        <input class="form-check-input" type="checkbox" id="revServo2">
-                        <label class="form-check-label small" for="revServo2">Rev</label>
-                      </div>
-                    </div>
-                    <div class="output-value" id="servo2">1500</div>
-                    <select class="form-select pin-select mt-2" id="servo2Pin"></select>
-                    <div class="servo-controls">
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Min:</span>
-                        <span class="servo-value-display" id="servo2Min">1000</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Mid:</span>
-                        <span class="servo-value-display" id="servo2Mid">1500</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Max:</span>
-                        <span class="servo-value-display" id="servo2Max">2000</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Servo 3 -->
-              <div class="col-6" id="servo3Card">
-                <div class="panel3">
-                  <div class="output-display">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="output-title" id="servo3Title">SERVO 3</div>
-                      <div class="form-check form-switch m-0" title="Tersle">
-                        <input class="form-check-input" type="checkbox" id="revServo3">
-                        <label class="form-check-label small" for="revServo3">Rev</label>
-                      </div>
-                    </div>
-                    <div class="output-value" id="servo3">1500</div>
-                    <select class="form-select pin-select mt-2" id="servo3Pin"></select>
-                    <div class="servo-controls">
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Min:</span>
-                        <span class="servo-value-display" id="servo3Min">1000</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Mid:</span>
-                        <span class="servo-value-display" id="servo3Mid">1500</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Max:</span>
-                        <span class="servo-value-display" id="servo3Max">2000</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Servo 4 -->
-              <div class="col-6" id="servo4Card">
-                <div class="panel3">
-                  <div class="output-display">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="output-title" id="servo4Title">SERVO 4</div>
-                      <div class="form-check form-switch m-0" title="Tersle">
-                        <input class="form-check-input" type="checkbox" id="revServo4">
-                        <label class="form-check-label small" for="revServo4">Rev</label>
-                      </div>
-                    </div>
-                    <div class="output-value" id="servo4">1500</div>
-                    <select class="form-select pin-select mt-2" id="servo4Pin"></select>
-                    <div class="servo-controls">
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Min:</span>
-                        <span class="servo-value-display" id="servo4Min">1000</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Mid:</span>
-                        <span class="servo-value-display" id="servo4Mid">1500</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                      <div class="servo-value-control">
-                        <span class="servo-value-label">Max:</span>
-                        <span class="servo-value-display" id="servo4Max">2000</span>
-                        <div class="servo-arrows">
-                          <button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button>
-                          <button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div><!-- row -->
-          </div><!-- panel3 -->
-        </div>
-      </div>
-    </div>
+  <!-- 3) PANEL: Motor & Servo Çıkış Pinleri -->
+  <div class="panel mb-4">
+    <h2 class="panel-title"><i class="bi bi-plug"></i> Motor & Servo Çıkış Pinleri</h2>
 
-    <!-- AUX Portları -->
-    <div class="panel mb-4">
-      <h2 class="panel-title"><i class="bi bi-usb-plug"></i> AUX Portları</h2>
-      <!-- RX / GPS / OSD -->
-      <div class="row g-3 mb-3">
-        <div class="col-lg-4">
-          <div class="panel3 p-3 h-100">
-            <h3 class="h5 mb-3">Alıcı</h3>
-            <label class="form-label mb-1">TX</label>
-            <select class="form-select pin-select mb-2" id="rxTxPin"></select>
-            <label class="form-label mb-1">RX</label>
-            <select class="form-select pin-select" id="rxRxPin"></select>
-          </div>
-        </div>
-        <div class="col-lg-4">
-          <div class="panel3 p-3 h-100">
-            <h3 class="h5 mb-3">GPS</h3>
-            <label class="form-label mb-1">TX</label>
-            <select class="form-select pin-select mb-2" id="gpsTxPin"></select>
-            <label class="form-label mb-1">RX</label>
-            <select class="form-select pin-select" id="gpsRxPin"></select>
-          </div>
-        </div>
-        <div class="col-lg-4">
-          <div class="panel3 p-3 h-100">
-            <h3 class="h5 mb-3">OSD</h3>
-            <label class="form-label mb-1">TX</label>
-            <select class="form-select pin-select mb-2" id="osdTxPin"></select>
-            <label class="form-label mb-1">RX</label>
-            <select class="form-select pin-select" id="osdRxPin"></select>
+    <div class="row g-3">
+      <!-- Sol: Motor kontrol (istersen kaldırabilirsin) -->
+      <div class="col-lg-4">
+        <div class="panel3 p-3 h-100">
+          <h3 class="h5 mb-3">Motor Kontrolü</h3>
+
+          <div class="throttle-container">
+            <div class="throttle-value" id="throttleValue">1000</div>
+            <input type="range" class="throttle-slider" min="1000" max="2000" value="1000" id="throttleSlider" disabled>
+            <div class="d-flex justify-content-between w-100 mt-2">
+              <small>1000Î¼s</small><small>2000Î¼s</small>
+            </div>
+
+            <div class="form-check mt-3">
+              <input class="form-check-input" type="checkbox" id="safetyCheck">
+              <label class="form-check-label" for="safetyCheck">Pervaneyi çıkardım</label>
+            </div>
+            <div class="safety-warning" id="safetyWarning">⚠️ Güvenlik onayı gerekiyor</div>
           </div>
         </div>
       </div>
-      <!-- I2C + ADC -->
-      <div class="row g-3">
-        <div class="col-lg-6">
-          <div class="panel3 p-3 h-100">
-            <h3 class="h5 mb-3">I2C</h3>
-            <div class="row g-2">
-              <div class="col-6">
-                <label class="form-label mb-1">SCL</label>
-                <select class="form-select pin-select" id="i2cSclPin"></select>
-              </div>
-              <div class="col-6">
-                <label class="form-label mb-1">SDA</label>
-                <select class="form-select pin-select" id="i2cSdaPin"></select>
+
+      <!-- Sağ: Motor/Servo pin seçimi -->
+      <div class="col-lg-8">
+        <div class="panel3 p-3 h-100">
+          <h3 class="h5 mb-3">Çıkış Konfigürasyonu</h3>
+
+          <div class="row g-2">
+            <!-- Motorlar -->
+            <div class="col-6">
+              <div class="panel3">
+                <div class="output-display">
+                  <div class="output-title" id="motor1Title">MOTOR 1</div>
+                  <div class="output-value" id="output1">1000</div>
+                  <select class="form-select pin-select mt-2" id="motor1Pin"></select>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="panel3 p-3 h-100">
-            <h3 class="h5 mb-3">Voltaj Ölçümü</h3>
-            <label class="form-label mb-1">ADC Pin</label>
-            <select class="form-select pin-select" id="voltageAdcPin"></select>
-            <small class="text-muted d-block mt-2">Batarya voltajı için ADC giriş pini</small>
-          </div>
-        </div>
+
+            <div class="col-6">
+              <div class="panel3">
+                <div class="output-display">
+                  <div class="output-title" id="motor2Title">MOTOR 2</div>
+                  <div class="output-value" id="output2">1000</div>
+                  <select class="form-select pin-select mt-2" id="motor2Pin"></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Servo 1 -->
+            <div class="col-6" id="servo1Card">
+              <div class="panel3">
+                <div class="output-display">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="output-title" id="servo1Title">SERVO 1</div>
+                    <div class="form-check form-switch m-0" title="Tersle">
+                      <input class="form-check-input" type="checkbox" id="revServo1">
+                      <label class="form-check-label small" for="revServo1">Rev</label>
+                    </div>
+                  </div>
+
+                  <div class="output-value" id="servo1">1500</div>
+                  <select class="form-select pin-select mt-2" id="servo1Pin"></select>
+
+                  <div class="servo-controls">
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Min:</span>
+                      <span class="servo-value-display" id="servo1Min">1000</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Mid:</span>
+                      <span class="servo-value-display" id="servo1Mid">1500</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Max:</span>
+                      <span class="servo-value-display" id="servo1Max">2000</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Servo 2 -->
+            <div class="col-6" id="servo2Card">
+              <div class="panel3">
+                <div class="output-display">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="output-title" id="servo2Title">SERVO 2</div>
+                    <div class="form-check form-switch m-0" title="Tersle">
+                      <input class="form-check-input" type="checkbox" id="revServo2">
+                      <label class="form-check-label small" for="revServo2">Rev</label>
+                    </div>
+                  </div>
+
+                  <div class="output-value" id="servo2">1500</div>
+                  <select class="form-select pin-select mt-2" id="servo2Pin"></select>
+
+                  <div class="servo-controls">
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Min:</span>
+                      <span class="servo-value-display" id="servo2Min">1000</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Mid:</span>
+                      <span class="servo-value-display" id="servo2Mid">1500</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Max:</span>
+                      <span class="servo-value-display" id="servo2Max">2000</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Servo 3 -->
+            <div class="col-6" id="servo3Card">
+              <div class="panel3">
+                <div class="output-display">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="output-title" id="servo3Title">SERVO 3</div>
+                    <div class="form-check form-switch m-0" title="Tersle">
+                      <input class="form-check-input" type="checkbox" id="revServo3">
+                      <label class="form-check-label small" for="revServo3">Rev</label>
+                    </div>
+                  </div>
+
+                  <div class="output-value" id="servo3">1500</div>
+                  <select class="form-select pin-select mt-2" id="servo3Pin"></select>
+
+                  <div class="servo-controls">
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Min:</span>
+                      <span class="servo-value-display" id="servo3Min">1000</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Mid:</span>
+                      <span class="servo-value-display" id="servo3Mid">1500</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Max:</span>
+                      <span class="servo-value-display" id="servo3Max">2000</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Servo 4 -->
+            <div class="col-6" id="servo4Card">
+              <div class="panel3">
+                <div class="output-display">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="output-title" id="servo4Title">SERVO 4</div>
+                    <div class="form-check form-switch m-0" title="Tersle">
+                      <input class="form-check-input" type="checkbox" id="revServo4">
+                      <label class="form-check-label small" for="revServo4">Rev</label>
+                    </div>
+                  </div>
+
+                  <div class="output-value" id="servo4">1500</div>
+                  <select class="form-select pin-select mt-2" id="servo4Pin"></select>
+
+                  <div class="servo-controls">
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Min:</span>
+                      <span class="servo-value-display" id="servo4Min">1000</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Mid:</span>
+                      <span class="servo-value-display" id="servo4Mid">1500</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                    <div class="servo-value-control">
+                      <span class="servo-value-label">Max:</span>
+                      <span class="servo-value-display" id="servo4Max">2000</span>
+                      <div class="servo-arrows">
+                        <button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button>
+                        <button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- row -->
+        </div><!-- panel3 -->
       </div>
     </div>
   </div>
 
-  <!-- ======== TAB 4: Sensörler ======== -->
-  <div id="cfg-sensorler" class="cfg-section d-none">
-    <div class="panel mb-4">
-      <h2 class="panel-title"><i class="bi bi-cpu"></i> Sensör Konfigürasyonu</h2>
-      <div class="row g-4">
+  <!-- 3) PANEL: AUX Portları -->
+  <div class="panel">
+    <h2 class="panel-title"><i class="bi bi-usb-plug"></i> AUX Portları</h2>
 
-        <!-- IMU -->
-        <div class="col-lg-6">
-          <div class="card bg-dark border-secondary h-100">
-            <div class="card-header bg-info bg-opacity-25 text-info border-info">
-              <h5 class="mb-0"><i class="bi bi-gyroscope me-2"></i> IMU (Gyro / İvmeölçer)</h5>
-            </div>
-            <div class="card-body">
-              <div class="mb-3">
-                <label class="form-label small text-muted">IMU Modeli</label>
-                <select class="form-select" id="cfg_imu_model">
-                  <option value="0">MPU-6050</option>
-                  <option value="1">ICM-42688-P</option>
-                  <option value="2">BMI270</option>
-                  <option value="3">MPU-9250</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label small text-muted">Montaj Yönü (Rotasyon)</label>
-                <select class="form-select" id="cfg_imu_orient">
-                  <option value="0">Normal (0°)</option>
-                  <option value="1">CW 90°</option>
-                  <option value="2">CW 180°</option>
-                  <option value="3">CW 270°</option>
-                  <option value="4">Ters (Flip 180°)</option>
-                </select>
-                <small class="text-muted d-block mt-1">Kart gövdeye farklı açıda monte edildiyse seçin.</small>
-              </div>
-            </div>
-          </div>
+    <!-- RX / GPS / OSD -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-4">
+        <div class="panel3 p-3 h-100">
+          <h3 class="h5 mb-3">Alıcı</h3>
+          <label class="form-label mb-1">TX</label>
+          <select class="form-select pin-select mb-2" id="rxTxPin"></select>
+          <label class="form-label mb-1">RX</label>
+          <select class="form-select pin-select" id="rxRxPin"></select>
         </div>
+      </div>
 
-        <!-- Ek Sensörler -->
-        <div class="col-lg-6">
-          <div class="card bg-dark border-secondary h-100">
-            <div class="card-header bg-success bg-opacity-25 text-success border-success">
-              <h5 class="mb-0"><i class="bi bi-broadcast me-2"></i> Ek Sensörler</h5>
-            </div>
-            <div class="card-body">
-              <div class="form-check form-switch mb-3 py-1">
-                <input class="form-check-input" type="checkbox" id="cfg_has_baro" checked>
-                <label class="form-check-label" for="cfg_has_baro">
-                  <i class="bi bi-thermometer-half me-1 text-warning"></i> Barometre (BMP280 / MS5611)
-                  <small class="d-block text-muted">İrtifa ölçümü için</small>
-                </label>
-              </div>
-              <hr class="border-secondary">
-              <div class="form-check form-switch mb-3 py-1">
-                <input class="form-check-input" type="checkbox" id="cfg_has_mag">
-                <label class="form-check-label" for="cfg_has_mag">
-                  <i class="bi bi-compass me-1 text-info"></i> Pusula / Manyetometre
-                  <small class="d-block text-muted">GPS navigasyon için önerilir</small>
-                </label>
-              </div>
-              <hr class="border-secondary">
-              <div class="form-check form-switch py-1">
-                <input class="form-check-input" type="checkbox" id="cfg_has_airspeed">
-                <label class="form-check-label" for="cfg_has_airspeed">
-                  <i class="bi bi-wind me-1 text-primary"></i> Hava Hızı Sensörü (Pitot Tüpü)
-                  <small class="d-block text-muted">Stall koruması ve hız kontrolü için</small>
-                </label>
-              </div>
-            </div>
-          </div>
+      <div class="col-lg-4">
+        <div class="panel3 p-3 h-100">
+          <h3 class="h5 mb-3">GPS</h3>
+          <label class="form-label mb-1">TX</label>
+          <select class="form-select pin-select mb-2" id="gpsTxPin"></select>
+          <label class="form-label mb-1">RX</label>
+          <select class="form-select pin-select" id="gpsRxPin"></select>
         </div>
+      </div>
 
+      <div class="col-lg-4">
+        <div class="panel3 p-3 h-100">
+          <h3 class="h5 mb-3">OSD</h3>
+          <label class="form-label mb-1">TX</label>
+          <select class="form-select pin-select mb-2" id="osdTxPin"></select>
+          <label class="form-label mb-1">RX</label>
+          <select class="form-select pin-select" id="osdRxPin"></select>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Kaydet Butonu (her zaman görünür) -->
-  <button type="button" class="btn btn-warning shadow-sm" id="btnSaveOutputs">
+    <!-- I2C + ADC -->
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="panel3 p-3 h-100">
+          <h3 class="h5 mb-3">I2C</h3>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label mb-1">SCL</label>
+              <select class="form-select pin-select" id="i2cSclPin"></select>
+            </div>
+            <div class="col-6">
+              <label class="form-label mb-1">SDA</label>
+              <select class="form-select pin-select" id="i2cSdaPin"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="panel3 p-3 h-100">
+          <h3 class="h5 mb-3">Voltaj Ölçümü</h3>
+          <label class="form-label mb-1">ADC Pin</label>
+          <select class="form-select pin-select" id="voltageAdcPin"></select>
+          <small class="text-muted d-block mt-2">Batarya voltajı için ADC giriş pini</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flaperon Ayarları -->
+    <div class="row g-3 mt-1">
+      <div class="col-12">
+        <div class="panel3 p-3">
+          <h3 class="h5 mb-3"><i class="bi bi-arrows-collapse"></i> Flaperon Ayarı</h3>
+          <p class="text-muted small mb-3">Flaperon modu aktifken her iki ailerona uygulanacak simetrik droop (aşağı eğim) miktarı.</p>
+          <div class="d-flex align-items-center gap-3">
+            <label class="form-label mb-0 text-nowrap">Droop Miktarı (µs)</label>
+            <input type="range" class="form-range flex-grow-1" id="flaperonOffsetSlider" min="0" max="500" step="10" value="150" oninput="document.getElementById('flaperonOffsetValue').textContent = this.value">
+            <span class="badge bg-secondary fs-6" id="flaperonOffsetValue">150</span>
+          </div>
+          <small class="text-muted d-block mt-1">Aralık: 0–500 µs &nbsp;|&nbsp; Varsayılan: 150 µs</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-6">
+      </div>
+
+<button type="button" class="btn btn-warning shadow-sm" id="btnSaveOutputs">
     <i class="bi bi-save2 me-2"></i> Çıkışları Kaydet
-  </button>
-
+</button>
+    </div>
+  </div>
 </div>
 
  <div id="transmitter" class="page">
@@ -1642,47 +1562,9 @@
                 </div>
             </div>
 
-        </div>
+        </div> 
     </div>
-
-    <!-- ==================== 5. FLAPERON ==================== -->
-    <div class="col-12">
-        <div class="card bg-dark border-secondary">
-            <div class="card-header bg-warning bg-opacity-25 text-warning border-warning">
-                <h5 class="mb-0"><i class="bi bi-arrows-collapse"></i> 5. Flaperon Ayarı</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <p class="text-muted small mb-3">
-                            Flaperon modu aktifken her iki ailerona uygulanacak simetrik droop (aşağı eğim) miktarı.
-                            Aileron yüzeyleri flap gibi çalışarak kalkış ve iniş performansını artırır.
-                        </p>
-                        <div class="d-flex align-items-center gap-3">
-                            <label class="form-label mb-0 text-nowrap">Droop Miktarı (µs)</label>
-                            <input type="range" class="form-range flex-grow-1" id="flaperonOffsetSlider" min="0" max="500" step="10" value="150"
-                                   oninput="document.getElementById('flaperonOffsetValue').textContent = this.value">
-                            <span class="badge bg-warning text-dark fs-6" id="flaperonOffsetValue">150</span>
-                        </div>
-                        <small class="text-muted d-block mt-1">Aralık: 0–500 µs &nbsp;|&nbsp; Varsayılan: 150 µs</small>
-                    </div>
-                    <div class="col-md-4 border-start border-secondary ps-4">
-                        <h6 class="text-muted border-bottom border-secondary pb-1">Kullanım Bilgisi</h6>
-                        <ul class="small text-muted ps-3">
-                            <li>0 µs = Flaperon devre dışı</li>
-                            <li>150 µs = Hafif droop (varsayılan)</li>
-                            <li>300+ µs = Agresif droop</li>
-                        </ul>
-                        <small class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i>
-                            Flaperon modu için uçak tipinin V-Tail veya T-Tail olması gerekir.
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <button type="button" class="btn btn-warning shadow-sm mt-3" id="btnSaveAdvanced">
+    <button type="button" class="btn btn-warning shadow-sm" id="btnSaveAdvanced">
         <i class="bi bi-save2 me-2"></i> Tercihleri Kaydet
     </button>
 </div>
