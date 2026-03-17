@@ -104,7 +104,7 @@ function handleOutputsPageData(data) {
         updatePwmOutputs(data.outputs);
     }
 
-    // 5. Flaperon Offset
+    // 5. Flaperon Offset (artık Tercihler sayfasında, aynı ID ile okunur)
     if (data.flaperon_offset !== undefined) {
         const slider = document.getElementById('flaperonOffsetSlider');
         const label  = document.getElementById('flaperonOffsetValue');
@@ -119,6 +119,18 @@ function handleOutputsPageData(data) {
         setMix('mixPitch',    data.mixer.pitch_mix);
         setMix('mixYaw',      data.mixer.yaw_mix);
         setMix('mixThrottle', data.mixer.throttle_mix);
+    }
+
+    // 7. Sensör Konfigürasyonu
+    if (data.sensor_config) {
+        const sc = data.sensor_config;
+        const setChk = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.checked = !!val; };
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+        setVal('cfg_imu_model',    sc.imu_model);
+        setVal('cfg_imu_orient',   sc.imu_orient);
+        setChk('cfg_has_baro',     sc.has_baro);
+        setChk('cfg_has_mag',      sc.has_mag);
+        setChk('cfg_has_airspeed', sc.has_airspeed);
     }
 }
 
@@ -382,12 +394,24 @@ function saveOutputsConfig() {
         throttle_mix: getMixVal('mixThrottle', 100),
     };
 
+    // Sensör Konfigürasyonu
+    const getBool = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
+    const getInt  = (id) => { const el = document.getElementById(id); return el ? parseInt(el.value) : 0; };
+    const sensor_config = {
+        imu_model:    getInt('cfg_imu_model'),
+        imu_orient:   getInt('cfg_imu_orient'),
+        has_baro:     getBool('cfg_has_baro'),
+        has_mag:      getBool('cfg_has_mag'),
+        has_airspeed: getBool('cfg_has_airspeed'),
+    };
+
     const outputData = {
         aircraft_type: selectedAircraft,
         pins: pinConfig,
         servo_values: servoValues,
         flaperon_offset: flaperon_offset,
-        mixer: mixer
+        mixer: mixer,
+        sensor_config: sensor_config,
     };
 
     _log('📤 Outputs konfigürasyonu gönderiliyor...', 'info');
@@ -398,22 +422,66 @@ function saveOutputsConfig() {
         console.error("sendCommand fonksiyonu bulunamadı!");
     }
 }
- document.querySelectorAll('.aircraft-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    document.querySelectorAll('.aircraft-card').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    selectedAircraft = card.getAttribute('data-aircraft-type');
-                    updateServoNames();
-                });
-            });
-            document.querySelectorAll('.servo-arrow').forEach(arrow => {
-                arrow.addEventListener('click', () => {
-                    const servo = arrow.getAttribute('data-servo');
-                    const type = arrow.getAttribute('data-type');
-                    const direction = arrow.getAttribute('data-direction');
-                    changeServoValue(servo, type, direction);
-                });
-            });
+// ============================================================================
+// KONFİGÜRASYON SAYFASI ALT NAVİGASYON (Sub-Nav Tabs)
+// ============================================================================
+
+/**
+ * @brief Konfigürasyon sayfası alt menü tab'larını başlatır
+ */
+function initConfigSubNav() {
+    const tabButtons = document.querySelectorAll('#configSubNav [data-cfg-tab]');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-cfg-tab');
+            switchConfigTab(tabId);
+        });
+    });
+}
+
+/**
+ * @brief Belirtilen konfigürasyon tab'ına geçiş yapar
+ * @param {string} tabId - Tab kimliği (ucak-tipi, mikser, motor-servo, sensorler)
+ */
+function switchConfigTab(tabId) {
+    // Tüm tab butonlarından active kaldır
+    document.querySelectorAll('#configSubNav [data-cfg-tab]').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    // Tüm cfg-section'ları gizle
+    document.querySelectorAll('.cfg-section').forEach(section => {
+        section.classList.add('d-none');
+    });
+
+    // Aktif tab'ı işaretle
+    const activeBtn = document.querySelector(`#configSubNav [data-cfg-tab="${tabId}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // İlgili section'ı göster
+    const activeSection = document.getElementById(`cfg-${tabId}`);
+    if (activeSection) activeSection.classList.remove('d-none');
+}
+
+// Aircraft card ve servo arrow event listener'ları
+document.querySelectorAll('.aircraft-card').forEach(card => {
+    card.addEventListener('click', () => {
+        document.querySelectorAll('.aircraft-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedAircraft = card.getAttribute('data-aircraft-type');
+        updateServoNames();
+    });
+});
+document.querySelectorAll('.servo-arrow').forEach(arrow => {
+    arrow.addEventListener('click', () => {
+        const servo = arrow.getAttribute('data-servo');
+        const type = arrow.getAttribute('data-type');
+        const direction = arrow.getAttribute('data-direction');
+        changeServoValue(servo, type, direction);
+    });
+});
+
+// Sub-nav başlat
+initConfigSubNav();
 
 // ============================================================================
 // GLOBAL EXPORT
@@ -432,5 +500,7 @@ window.updateSafetyWarning = updateSafetyWarning;
 window.startThrottleUpdates = startThrottleUpdates;
 window.stopThrottleUpdates = stopThrottleUpdates;
 window.saveOutputsConfig = saveOutputsConfig;
+window.initConfigSubNav = initConfigSubNav;
+window.switchConfigTab = switchConfigTab;
 
 console.log('✅ Outputs Page Module yüklendi');
