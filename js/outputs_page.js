@@ -111,6 +111,15 @@ function handleOutputsPageData(data) {
         if (slider) slider.value = data.flaperon_offset;
         if (label)  label.textContent = data.flaperon_offset;
     }
+
+    // 6. Mikser Kazançları
+    if (data.mixer) {
+        const setMix = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+        setMix('mixRoll',     data.mixer.roll_mix);
+        setMix('mixPitch',    data.mixer.pitch_mix);
+        setMix('mixYaw',      data.mixer.yaw_mix);
+        setMix('mixThrottle', data.mixer.throttle_mix);
+    }
 }
 
 /**
@@ -150,22 +159,26 @@ function updatePwmOutputs(outputs) {
 }
 
 /**
- * @brief Seçili uçak tipine göre servo isimlerini günceller
+ * @brief Seçili uçak tipine göre servo isimlerini günceller ve kullanılmayan servoları gizler
  */
 function updateServoNames() {
     const names = {
-        'v-tail': { servo1: 'ROLL SOL', servo2: 'ROLL SAĞ', servo3: 'SAĞ KUYRUK', servo4: 'SOL KUYRUK' },
-        't-tail': { servo1: 'ROLL SOL', servo2: 'ROLL SAĞ', servo3: 'ELEVATOR', servo4: 'RUDDER' },
-        'no-ruder': { servo1: 'ROLL SOL', servo2: 'ROLL SAĞ', servo3: 'ELEVATOR', servo4: 'BOŞ' },
-        'delta': { servo1: 'ROLL SOL', servo2: 'ROLL SAĞ', servo3: 'BOŞ', servo4: 'BOŞ' }
+        'v-tail':      { servo1: 'ROLL SOL', servo2: 'ROLL SAĞ', servo3: 'SAĞ KUYRUK',  servo4: 'SOL KUYRUK' },
+        't-tail':      { servo1: 'ROLL SOL', servo2: 'ROLL SAĞ', servo3: 'ELEVATOR',     servo4: 'RUDDER'     },
+        'no-ruder':    { servo1: 'ROLL SOL', servo2: 'ROLL SAĞ', servo3: 'ELEVATOR',     servo4: null         },
+        'delta':       { servo1: 'ELEVON SOL', servo2: 'ELEVON SAĞ', servo3: null,       servo4: 'RUDDER'     },
+        'flying-wing': { servo1: 'ELEVON SOL', servo2: 'ELEVON SAĞ', servo3: null,       servo4: 'RUDDER'     },
     };
-    
+
     const servoNames = names[selectedAircraft] || names['v-tail'];
-    
-    if (_$('servo1Title')) _$('servo1Title').textContent = servoNames.servo1;
-    if (_$('servo2Title')) _$('servo2Title').textContent = servoNames.servo2;
-    if (_$('servo3Title')) _$('servo3Title').textContent = servoNames.servo3;
-    if (_$('servo4Title')) _$('servo4Title').textContent = servoNames.servo4;
+
+    for (let i = 1; i <= 4; i++) {
+        const name = servoNames[`servo${i}`];
+        const titleEl = document.getElementById(`servo${i}Title`);
+        const cardEl  = document.getElementById(`servo${i}Card`);
+        if (titleEl) titleEl.textContent = name || `SERVO ${i}`;
+        if (cardEl)  cardEl.style.display = (name === null) ? 'none' : '';
+    }
 }
 
 /**
@@ -355,11 +368,26 @@ function saveOutputsConfig() {
     const flaperonSlider = _$('flaperonOffsetSlider');
     const flaperon_offset = flaperonSlider ? parseInt(flaperonSlider.value) : 150;
 
+    // Mikser kazançları
+    const getMixVal = (id, def) => {
+        const el = document.getElementById(id);
+        if (!el) return def;
+        const v = parseInt(el.value);
+        return (isNaN(v) || v < -200 || v > 200) ? def : v;
+    };
+    const mixer = {
+        roll_mix:     getMixVal('mixRoll', 100),
+        pitch_mix:    getMixVal('mixPitch', 100),
+        yaw_mix:      getMixVal('mixYaw', 100),
+        throttle_mix: getMixVal('mixThrottle', 100),
+    };
+
     const outputData = {
         aircraft_type: selectedAircraft,
         pins: pinConfig,
         servo_values: servoValues,
-        flaperon_offset: flaperon_offset
+        flaperon_offset: flaperon_offset,
+        mixer: mixer
     };
 
     _log('📤 Outputs konfigürasyonu gönderiliyor...', 'info');
