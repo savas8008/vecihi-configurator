@@ -258,14 +258,14 @@ a:hover {
 .sidebar .nav-link {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     color: var(--text-secondary);
-    padding: 4px 6px;
-    margin-bottom: 1px;
+    padding: 8px 12px;
+    margin-bottom: 2px;
     border-radius: var(--radius-sm);
     border: 1px solid transparent;
     font-weight: 600;
-    font-size: var(--font-size-sm);
+    font-size: 0.85rem;
     transition: all var(--transition-fast);
 }
 
@@ -302,12 +302,13 @@ a:hover {
 
 /* Euler Panel (HUD) */
 .euler-panel {
-    background: linear-gradient(145deg, rgba(40, 45, 60, 0.9), rgba(20, 25, 35, 0.95));
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(10px);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
 }
 
 .arm-section {
@@ -380,7 +381,6 @@ a:hover {
     font-family: var(--font-mono);
     font-size: var(--font-size-lg);
     color: var(--text-primary);
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
 }
 
 .mode-section {
@@ -407,7 +407,6 @@ a:hover {
     color: var(--color-info);
     text-transform: uppercase;
     letter-spacing: 1px;
-    text-shadow: 0 0 8px rgba(14, 165, 233, 0.6);
 }
 
 /* ============================================
@@ -1355,9 +1354,12 @@ input[type="range"]::-moz-range-thumb {
 /* Scrollbar daha ince */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 
-/* Connection prompt kompakt */
-#connectionPrompt .panel { padding: 16px !important; max-width: 340px; }
-#connectionPrompt .display-1 { font-size: 2rem !important; }
+/* Connection prompt - geniş */
+#connectionPrompt .panel { padding: 40px 32px !important; max-width: 480px; text-align: center; }
+#connectionPrompt .display-1 { font-size: 4rem !important; margin-bottom: 16px !important; }
+#connectionPrompt h2 { font-size: 1.4rem !important; margin-bottom: 12px !important; }
+#connectionPrompt p { font-size: 0.9rem !important; margin-bottom: 20px !important; }
+#connectionPrompt .btn-lg { padding: 10px 28px !important; font-size: 0.9rem !important; }
 
 /* Save button */
 .save-button-container { bottom: 14px; right: 14px; }
