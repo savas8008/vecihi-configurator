@@ -21,7 +21,8 @@
 <script src="js/calibration.js"></script> 
 <script src="js/osd.js"></script> 
 <script src="js/pid.js"></script>
-<script src="js/advanced_page.js"></script> 
+<script src="js/advanced_page.js"></script>
+<script src="js/sensor_alignment.js"></script>
 
 <script src="js/page_management.js"></script>
 <script src="js/main.js"></script>
@@ -151,6 +152,7 @@
         <i class="bi bi-map me-2"></i> Waypoint
     </a>
 </li>
+
                         <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> Loglar</a></li>
                     </ul>
                 </div>
@@ -486,6 +488,20 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Sensör Yönelimi -->
+  <div class="panel3 p-3 mb-3">
+    <div class="t-baslik mb-1">Sensör Yönelimi (Board Alignment)</div>
+    <div class="t-aciklama mb-2">Uçuş kontrol kartının gövde içindeki montaj yönünü seçin. Değiştirildiğinde kalibrasyon sıfırlanır.</div>
+    <div class="d-flex align-items-center gap-2">
+      <select class="form-select form-select-sm" id="sensorAlignSelect" style="max-width:220px;" onchange="selectAlignOption(parseInt(this.value))">
+        <!-- JS tarafından doldurulur -->
+      </select>
+      <button class="btn btn-warning btn-sm" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
+        <i class="bi bi-save me-1"></i> Yönelimi Kaydet
+      </button>
+    </div>
   </div>
 
   <!-- Butonlar (sayfa altı) -->
@@ -1946,6 +1962,7 @@ function switchAdvTab(tabId, btn) {
     </div>
 </div>
 
+
 <!-- ==================== WAYPOINT MİSYON SAYFASI ==================== -->
 <div id="waypoint" class="page">
     <div class="panel panel2">
@@ -2231,6 +2248,23 @@ function switchAdvTab(tabId, btn) {
         </div>
     </div>
 
+    <!-- Onay Modali (Sensor Align vb. için) -->
+    <div class="modal fade theme-modal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content theme-modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Onay</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="confirmModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-danger" id="confirmModalOkBtn">Devam Et</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade theme-modal" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content theme-modal-content">
@@ -2365,6 +2399,34 @@ function switchAdvTab(tabId, btn) {
                     if (logContainer.firstChild) logContainer.removeChild(logContainer.firstChild);
                 }
             }
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            removeModalBackdrops();
+            const modalEl = $('confirmModal');
+            $('confirmModalLabel').textContent = title;
+            $('confirmModalBody').innerHTML = message;
+
+            const modalContent = modalEl.querySelector('.modal-content');
+            modalContent.style.background = "rgba(40, 50, 70, 0.85)";
+            modalContent.style.backdropFilter = "blur(10px)";
+            modalContent.style.color = "white";
+            modalContent.style.border = "1px solid var(--warning)";
+            modalEl.querySelector('.modal-header').style.borderBottom = "3px solid var(--warning)";
+
+            const okBtn = $('confirmModalOkBtn');
+            // Eski listener'ı temizle
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            newOkBtn.addEventListener('click', () => {
+                bootstrap.Modal.getInstance(modalEl)?.hide();
+                removeModalBackdrops();
+                if (typeof onConfirm === 'function') onConfirm();
+            });
+
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+            modalEl.addEventListener('hidden.bs.modal', removeModalBackdrops, { once: true });
         }
 
         function showModal(title, message, type = 'success') {

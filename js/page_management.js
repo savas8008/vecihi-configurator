@@ -45,11 +45,13 @@ function managePageStreams(page) {
     
     // B) Sayfa verilerini iste (50ms gecikme)
     setTimeout(() => {
-        if (page !== 'sensors' && page !== 'waypoint') {
-            sendCommand(page + '_page_data');
-        }
         if (page === 'waypoint') {
             sendCommand('GET_WAYPOINTS');
+        } else if (page === 'calibration') {
+            sendCommand('calibration_page_data');
+            if (typeof onSensorAlignInit === 'function') onSensorAlignInit();
+        } else if (page !== 'sensors') {
+            sendCommand(page + '_page_data');
         }
     }, 50);
     
