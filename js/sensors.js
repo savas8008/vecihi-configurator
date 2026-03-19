@@ -132,19 +132,26 @@
                 console.warn('OrbitControls yüklenmemiş, kamera kontrolü devre dışı.');
             }
 
-            // Uçak Modeli - GLTF yükle
-            airplaneModel = createAircraftModel();
+            // Pivot: quaternion bu gruba uygulanır, model içinde (0,0,0)'da ortalı durur
+            const pivot = new THREE.Group();
+            pivot.position.y = 1.0;
+            scene.add(pivot);
 
-            // Ölçekle ve ortala
-            scene.add(airplaneModel);
-            const box = new THREE.Box3().setFromObject(airplaneModel);
-            const size = box.getSize(new THREE.Vector3());
-            const maxDim = Math.max(size.x, size.y, size.z);
-            airplaneModel.scale.setScalar(3.0 / maxDim);
+            const model = createAircraftModel();
+            pivot.add(model);
 
-            const box2 = new THREE.Box3().setFromObject(airplaneModel);
+            // Ölçekle
+            const box = new THREE.Box3().setFromObject(model);
+            const maxDim = Math.max(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z);
+            model.scale.setScalar(3.0 / maxDim);
+
+            // Scale sonrası merkezi pivot'a getir
+            const box2 = new THREE.Box3().setFromObject(model);
             const center = box2.getCenter(new THREE.Vector3());
-            airplaneModel.position.set(-center.x, -box2.min.y + 0.2, -center.z);
+            model.position.sub(center);
+
+            // airplaneModel = pivot → animate3D'de quaternion pivot'a uygulanır
+            airplaneModel = pivot;
 
             if (controls) {
                 controls.target.set(0, 1, 0);
