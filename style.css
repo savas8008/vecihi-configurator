@@ -1744,3 +1744,66 @@ label.small.text-muted,
     display: block;
     animation: fadeIn 0.15s ease;
 }
+
+/* ============================================
+   SENSOR ALIGNMENT CARDS
+   ============================================ */
+.align-card {
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 16px 12px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s ease;
+    user-select: none;
+}
+
+.align-card:hover {
+    background: rgba(37,99,235,0.12);
+    border-color: rgba(96,165,250,0.4);
+    transform: translateY(-2px);
+}
+
+.align-card--selected {
+    background: rgba(37,99,235,0.15);
+    border-color: rgba(96,165,250,0.7);
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.18);
+}
+
+.align-card--active {
+    background: rgba(37,99,235,0.22);
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.25);
+}
+
+.align-card--active.align-card--selected {
+    border-color: #34d399;
+    box-shadow: 0 0 0 3px rgba(52,211,153,0.25);
+}
+
+.align-card__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.align-card__label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 2px;
+}
+
+.align-card__desc {
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+.align-card__badge {
+    margin-top: 6px;
+    font-size: 0.72rem;
+    color: #60a5fa;
+    font-weight: 600;
+}

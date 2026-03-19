@@ -299,6 +299,9 @@ function handlePageData(pageType, pageData) {
         case 'waypoints':
             if (typeof handleWaypointData === 'function') handleWaypointData(pageData);
             break;
+        case 'sensor_align':
+            if (typeof handleSensorAlignPageData === 'function') handleSensorAlignPageData(pageData);
+            break;
         case 'logs':
             break; // Log sayfası için özel işlem yok
         default:
@@ -428,7 +431,13 @@ function handleStatusResponse(command, result, data) {
             break;
             
       default:
-    // Önce kalibrasyon modülüne devret
+    // Sensör hizalama modülüne devret
+    if (typeof handleSensorAlignStatusResponse === 'function') {
+        if (handleSensorAlignStatusResponse(command, result, data)) {
+            return;
+        }
+    }
+    // Kalibrasyon modülüne devret
     if (typeof handleCalibrationStatusResponse === 'function') {
         if (handleCalibrationStatusResponse(command, result, data)) {
             return; // Kalibrasyon modülü işledi
