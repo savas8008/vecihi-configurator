@@ -261,7 +261,7 @@ a:hover {
 
 /* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
 .panel4 {
-    background: #e8eaec;
+    background: #e8eaec !important;
     color: #111111;
     --border-default: rgba(0, 0, 0, 0.13);
     /* CSS değişkenlerini panel4 kapsamında koyu metne çevir */
@@ -272,11 +272,12 @@ a:hover {
     --t-aciklama-color:     #444444;
 }
 /* panel4 içindeki !important ile ayarlanan metin renkleri */
-.panel4 .step-label         { color: #444444 !important; }
-.panel4 .cal-step-values    { color: #111111 !important; background: rgba(0,0,0,0.06) !important; }
-.panel4 .cal-step-icon      { color: #666666 !important; }
-.panel4.cal-step.active  .cal-step-icon { color: var(--color-primary) !important; }
-.panel4.cal-step.completed .cal-step-icon { color: var(--color-success) !important; }
+.panel4 .step-label                         { color: #444444 !important; }
+.panel4 .cal-step-values                    { color: #111111 !important; background: rgba(0,0,0,0.06) !important; }
+/* Çift sınıf — .cal-step-icon { !important } (satır ~1621) kuralını özgüllükle yener */
+.cal-step.panel4 .cal-step-icon             { color: #666666 !important; }
+.cal-step.panel4.active  .cal-step-icon     { color: var(--color-primary) !important; }
+.cal-step.panel4.completed .cal-step-icon   { color: var(--color-success) !important; }
 .panel4 .cal-step-done i    { color: var(--color-success); }
 .panel4 .output-title       { color: #111111; }
 .panel4 .output-value       { color: #111111; }
