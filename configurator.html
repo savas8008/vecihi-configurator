@@ -887,29 +887,10 @@
       </div>
     </div>
 
-    <!-- Flaperon Ayarları -->
-    <div class="row g-3 mt-1">
-      <div class="col-12">
-        <div class="panel3 p-3">
-          <h3 class="h5 mb-3"><i class="bi bi-arrows-collapse"></i> Flaperon Ayarı</h3>
-          <p class="text-muted small mb-3">Flaperon modu aktifken her iki ailerona uygulanacak simetrik droop (aşağı eğim) miktarı.</p>
-          <div class="d-flex align-items-center gap-3">
-            <label class="form-label mb-0 text-nowrap">Droop Miktarı (µs)</label>
-            <input type="range" class="form-range flex-grow-1" id="flaperonOffsetSlider" min="0" max="500" step="10" value="150" oninput="document.getElementById('flaperonOffsetValue').textContent = this.value">
-            <span class="badge bg-secondary fs-6" id="flaperonOffsetValue">150</span>
-          </div>
-          <small class="text-muted d-block mt-1">Aralık: 0–500 µs &nbsp;|&nbsp; Varsayılan: 150 µs</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="row g-3">
-      <div class="col-lg-6">
-      </div>
-
-<button type="button" class="btn btn-warning shadow-sm" id="btnSaveOutputs">
-    <i class="bi bi-save2 me-2"></i> Çıkışları Kaydet
-</button>
+    <div class="mt-3">
+      <button type="button" class="btn btn-warning shadow-sm" id="btnSaveOutputs">
+        <i class="bi bi-save2 me-2"></i> Kaydet
+      </button>
     </div>
   </div>
 </div>
@@ -1562,7 +1543,28 @@
                 </div>
             </div>
 
-        </div> 
+        </div>
+
+        <!-- Flaperon Ayarları -->
+        <div class="row g-4 mt-1">
+            <div class="col-12">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-header bg-warning bg-opacity-10 text-warning border-warning">
+                        <h5 class="mb-0"><i class="bi bi-arrows-collapse"></i> Flaperon Ayarı</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">Flaperon modu aktifken her iki ailerona uygulanacak simetrik droop (aşağı eğim) miktarı.</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <label class="form-label mb-0 text-nowrap">Droop Miktarı (µs)</label>
+                            <input type="range" class="form-range flex-grow-1" id="flaperonOffsetSlider" min="0" max="500" step="10" value="150" oninput="document.getElementById('flaperonOffsetValue').textContent = this.value">
+                            <span class="badge bg-secondary fs-6" id="flaperonOffsetValue">150</span>
+                        </div>
+                        <small class="text-muted d-block mt-1">Aralık: 0–500 µs &nbsp;|&nbsp; Varsayılan: 150 µs</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <button type="button" class="btn btn-warning shadow-sm" id="btnSaveAdvanced">
         <i class="bi bi-save2 me-2"></i> Tercihleri Kaydet

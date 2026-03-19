@@ -544,8 +544,6 @@ a:hover {
 }
 
 .throttle-slider{
-    transform: rotate(180deg); 
-    transform-origin: center;
   writing-mode: vertical-lr; direction: rtl; -webkit-appearance: none;
   appearance: auto !important;
   writing-mode: vertical-rl !important;
