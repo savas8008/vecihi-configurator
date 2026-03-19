@@ -155,7 +155,8 @@ function selectAlignOption(alignId) {
 function updateAlignSaveBtn() {
     const btn = document.getElementById('btnSaveAlign');
     if (!btn) return;
-    btn.disabled = !isConnected();
+    const connected = typeof window.isConnected === 'function' ? window.isConnected() : false;
+    btn.disabled = !connected;
     btn.className = 'btn btn-warning shadow-sm';
     btn.innerHTML = '<i class="bi bi-save me-1"></i> Kaydet';
 }
@@ -164,7 +165,8 @@ function updateAlignSaveBtn() {
  * Kaydet butonuna tıklandığında çağrılır.
  */
 function saveSensorAlign() {
-    if (!isConnected()) {
+    const connected = typeof window.isConnected === 'function' ? window.isConnected() : false;
+    if (!connected) {
         showModal('Bağlantı Yok', 'Kaydetmek için önce cihaza bağlanın.', 'error');
         return;
     }
@@ -228,7 +230,7 @@ function onSensorAlignPageShow() {
     }
     renderSensorAlignPage();
 
-    if (isConnected()) {
+    if (typeof window.isConnected === 'function' && window.isConnected()) {
         sendCommand('sensor_align_page_data');
     }
 }
