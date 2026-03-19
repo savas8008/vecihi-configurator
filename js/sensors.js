@@ -69,7 +69,6 @@
 
             // Sahne oluştur - global 'scene' değişkenini kullan
             scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0xbbeeff, 10, 35);
 
             // Kamera - global 'camera' değişkenini kullan
             const fov = 75;
@@ -77,27 +76,49 @@
             const near = 0.1;
             const far = 1000;
             camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-            camera.position.set(0, 3.0, 6);
+            camera.position.set(0, 2.5, 7);
 
             // Renderer - global 'renderer' değişkenini kullan
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
             renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.physicallyCorrectLights = true;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.setAnimationLoop(animate3D);
             container.appendChild(renderer.domElement);
 
-            // Işıklar
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-            scene.add(ambientLight);
+            // Gökyüzü arka planı (gradient effect)
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.FogExp2(0xc9e8f5, 0.022);
 
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
-            directionalLight.position.set(5, 10, 7.5);
-            scene.add(directionalLight);
+            // Işıklar — PBR kaliteli aydınlatma
+            const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x5c7a3e, 0.7);
+            scene.add(hemiLight);
+
+            const sunLight = new THREE.DirectionalLight(0xfff5e0, 2.0);
+            sunLight.position.set(8, 12, 6);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width  = 1024;
+            sunLight.shadow.mapSize.height = 1024;
+            sunLight.shadow.camera.near = 0.5;
+            sunLight.shadow.camera.far  = 50;
+            sunLight.shadow.camera.left   = -10;
+            sunLight.shadow.camera.right  =  10;
+            sunLight.shadow.camera.top    =  10;
+            sunLight.shadow.camera.bottom = -10;
+            scene.add(sunLight);
+
+            const fillLight = new THREE.DirectionalLight(0xadd8e6, 0.4);
+            fillLight.position.set(-5, 3, -5);
+            scene.add(fillLight);
 
             // Grid - global 'gridHelper' değişkenini kullan
-            gridHelper = new THREE.GridHelper(50, 50, 0x999999, 0xcccccc);
-            gridHelper.position.y = 0;
+            gridHelper = new THREE.GridHelper(60, 30, 0x4a7a4a, 0x6aaa6a);
+            gridHelper.position.y = -1.5;
             scene.add(gridHelper);
 
             // Orbit Controls - global 'controls' değişkenini kullan
@@ -112,8 +133,9 @@
             }
 
             // Uçak Modeli - global 'airplaneModel' değişkenini kullan
-            airplaneModel = createWW2Airplane();
-            airplaneModel.position.y = 1.0;
+            airplaneModel = createFPVAirplane();
+            airplaneModel.position.y = 0.5;
+            airplaneModel.castShadow = true;
             scene.add(airplaneModel);
 
             if (controls) {
@@ -158,87 +180,258 @@
             typeof targetQuaternion !== 'undefined' && targetQuaternion) {
             airplaneModel.quaternion.slerp(targetQuaternion, 0.1);
         }
+
+        // Pervane dönüşü
+        if (typeof airplaneModel !== 'undefined' && airplaneModel &&
+            airplaneModel.userData && airplaneModel.userData.propeller) {
+            airplaneModel.userData.propeller.rotation.z += 0.18;
+        }
+
         renderer.render(scene, camera);
     }
 
     /**
-     * @brief Basit bir 3D WW2 tarzı uçak modeli oluşturur
+     * @brief FPV sabit kanat uçak modeli — iNav tarzı gerçekçi görünüm
+     *   Mimari: X-UAV Talon / Skywalker tarzı blended-wing-body FPV uçak
+     *   - Yassılaşmış oval gövde
+     *   - Svipt ana kanatlar (sweep)
+     *   - V-kuyruk (elevon)
+     *   - Burun kamerası (FPV)
+     *   - Arkadan itmeli motor (pusher)
+     *   - PBR MeshStandardMaterial malzemeler
      * @returns {THREE.Group} Uçak modeli grubu
      */
-    function createWW2Airplane() {
-        if (typeof THREE === 'undefined') {
-            console.error('THREE.js yüklenmemiş!');
-            return null;
+    function createFPVAirplane() {
+        if (typeof THREE === 'undefined') { return null; }
+
+        const plane = new THREE.Group();
+
+        // ── Malzemeler ──────────────────────────────────────────────
+        const matBody = new THREE.MeshStandardMaterial({
+            color: 0xf0f0f0, roughness: 0.55, metalness: 0.05
+        });
+        const matOrange = new THREE.MeshStandardMaterial({
+            color: 0xff6a00, roughness: 0.45, metalness: 0.05
+        });
+        const matDark = new THREE.MeshStandardMaterial({
+            color: 0x1a1a1a, roughness: 0.8, metalness: 0.1
+        });
+        const matGlass = new THREE.MeshStandardMaterial({
+            color: 0x88ccff, roughness: 0.05, metalness: 0.0,
+            transparent: true, opacity: 0.55
+        });
+        const matMotor = new THREE.MeshStandardMaterial({
+            color: 0x222222, roughness: 0.3, metalness: 0.85
+        });
+        const matProp = new THREE.MeshStandardMaterial({
+            color: 0x111111, roughness: 0.6, metalness: 0.0
+        });
+        const matDecal = new THREE.MeshStandardMaterial({
+            color: 0xff2222, roughness: 0.5, metalness: 0.0
+        });
+
+        // ── Gövde (Body) ─────────────────────────────────────────────
+        // Ön-orta gövde: yassılaşmış silindir
+        // Üst gövde plakası (oval, yassı)
+        const fuseGeo = THREE.CapsuleGeometry ?
+            new THREE.CapsuleGeometry(0.38, 4.4, 8, 16) :
+            new THREE.CylinderGeometry(0.38, 0.38, 4.4, 16);
+        const fuse = new THREE.Mesh(fuseGeo, matBody);
+        fuse.rotation.x = Math.PI / 2;
+        fuse.scale.y = 0.55; // yassılaştır
+        fuse.position.set(0, 0.0, -0.2);
+        fuse.castShadow = true;
+        plane.add(fuse);
+
+        // Gövde alt kısmı (biraz koyu)
+        const bellyGeo = THREE.CapsuleGeometry ?
+            new THREE.CapsuleGeometry(0.35, 4.0, 6, 12) :
+            new THREE.CylinderGeometry(0.35, 0.35, 4.0, 12);
+        const belly = new THREE.Mesh(bellyGeo, matDark);
+        belly.rotation.x = Math.PI / 2;
+        belly.scale.set(0.92, 0.38, 0.96);
+        belly.position.set(0, -0.12, -0.15);
+        plane.add(belly);
+
+        // Turuncu şerit (boyunca)
+        const stripeGeo = new THREE.BoxGeometry(0.15, 0.06, 3.8);
+        const stripe = new THREE.Mesh(stripeGeo, matOrange);
+        stripe.position.set(0, 0.22, -0.1);
+        plane.add(stripe);
+
+        // ── Burun (Nose) ─────────────────────────────────────────────
+        const noseGeo = new THREE.SphereGeometry(0.38, 16, 10, 0, Math.PI*2, 0, Math.PI/1.8);
+        const noseMesh = new THREE.Mesh(noseGeo, matBody);
+        noseMesh.rotation.x = -Math.PI / 2;
+        noseMesh.scale.set(1.0, 0.55, 1.2);
+        noseMesh.position.set(0, 0, 2.75);
+        plane.add(noseMesh);
+
+        // FPV Kamera kutusu
+        const camHousingGeo = new THREE.BoxGeometry(0.28, 0.22, 0.28);
+        const camHousing = new THREE.Mesh(camHousingGeo, matDark);
+        camHousing.position.set(0, 0.05, 2.55);
+        plane.add(camHousing);
+
+        // Kamera lensi
+        const lensGeo = new THREE.CylinderGeometry(0.07, 0.08, 0.12, 12);
+        const lens = new THREE.Mesh(lensGeo, matGlass);
+        lens.rotation.x = Math.PI / 2;
+        lens.position.set(0, 0.05, 2.70);
+        plane.add(lens);
+
+        // ── Ana Kanatlar (Main Wings) ─────────────────────────────────
+        // Sol kanat
+        function makeWing(side) {
+            const wg = new THREE.Group();
+            // Kanat gövdesi: svipt (swept-back) trapezoid
+            // Kanat kökü: geniş, ucu: dar, geriye eğik
+            const shape = new THREE.Shape();
+            // Kanat profili (üstten bakış) - sol taraf için
+            shape.moveTo(0,     0);       // ön iç köşe
+            shape.lineTo(0,     1.4);     // ön dış köşe
+            shape.lineTo(-0.65, 1.45);    // dış ön sweep
+            shape.lineTo(-1.05, 1.3);     // dış arka
+            shape.lineTo(-0.9,  0);       // arka iç köşe
+            shape.lineTo(0,     0);
+
+            const extrudeSettings = {
+                steps: 1, depth: 0.065,
+                bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2
+            };
+            const wingGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            const wingMesh = new THREE.Mesh(wingGeo, matBody);
+            wingMesh.castShadow = true;
+
+            // Kanat turuncu uç şeridi
+            const tipGeo = new THREE.BoxGeometry(0.18, 0.07, 0.32);
+            const tipMesh = new THREE.Mesh(tipGeo, matOrange);
+            tipMesh.position.set(-0.85, 0.03, 1.38);
+            wg.add(tipMesh);
+
+            // Kanat kırmızı iniş lambası
+            const lightGeo = new THREE.SphereGeometry(0.045, 8, 6);
+            const lightMesh = new THREE.Mesh(lightGeo, matDecal);
+            lightMesh.position.set(-0.88, 0.04, 1.4);
+            wg.add(lightMesh);
+
+            wg.add(wingMesh);
+            wg.rotation.x = -Math.PI / 2;  // düz yap
+            if (side === 'right') {
+                wg.scale.x = -1;
+                wg.position.set(0.0, -0.04, 0.1);
+            } else {
+                wg.position.set(0.0, -0.04, 0.1);
+            }
+            return wg;
+        }
+        plane.add(makeWing('left'));
+        plane.add(makeWing('right'));
+
+        // ── V-Kuyruk (V-Tail / Ruddervator) ──────────────────────────
+        function makeVTail(angleDeg) {
+            const vt = new THREE.Group();
+            const shape = new THREE.Shape();
+            shape.moveTo(0,    0);
+            shape.lineTo(0,    0.85);
+            shape.lineTo(-0.5, 0.72);
+            shape.lineTo(-0.65, 0);
+            shape.lineTo(0,    0);
+
+            const ext = {
+                steps: 1, depth: 0.04,
+                bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.01, bevelSegments: 1
+            };
+            const geo = new THREE.ExtrudeGeometry(shape, ext);
+            const mesh = new THREE.Mesh(geo, matBody);
+            mesh.castShadow = true;
+            vt.add(mesh);
+
+            const angleRad = (angleDeg * Math.PI) / 180;
+            vt.rotation.set(-Math.PI/2, 0, angleRad);
+            vt.position.set(0, 0.05, -2.05);
+            return vt;
+        }
+        plane.add(makeVTail( 35));   // sağ
+        plane.add(makeVTail(-35));   // sol (ayna)
+
+        // ── Pusher Motor (Arkadan İtmeli) ─────────────────────────────
+        const motorMountGeo = new THREE.CylinderGeometry(0.12, 0.10, 0.38, 12);
+        const motorMount = new THREE.Mesh(motorMountGeo, matDark);
+        motorMount.rotation.x = Math.PI / 2;
+        motorMount.position.set(0, 0.06, -2.15);
+        plane.add(motorMount);
+
+        const motorGeo = new THREE.CylinderGeometry(0.14, 0.12, 0.22, 14);
+        const motor = new THREE.Mesh(motorGeo, matMotor);
+        motor.rotation.x = Math.PI / 2;
+        motor.position.set(0, 0.06, -2.38);
+        plane.add(motor);
+
+        // Motor gövdesi vurgu halkası
+        const ringGeo = new THREE.TorusGeometry(0.135, 0.018, 8, 18);
+        const ring = new THREE.Mesh(ringGeo, matOrange);
+        ring.rotation.x = Math.PI / 2;
+        ring.position.set(0, 0.06, -2.28);
+        plane.add(ring);
+
+        // ── Pervane ───────────────────────────────────────────────────
+        const propGroup = new THREE.Group();
+
+        function makeBlade() {
+            const shape = new THREE.Shape();
+            shape.moveTo(0,    0);
+            shape.quadraticCurveTo(0.05, 0.52, 0.0, 1.05);
+            shape.lineTo(-0.10, 1.0);
+            shape.quadraticCurveTo(-0.12, 0.5, -0.06, 0);
+            shape.lineTo(0, 0);
+            const ext = { steps: 1, depth: 0.012, bevelEnabled: false };
+            return new THREE.ExtrudeGeometry(shape, ext);
         }
 
-        const planeGroup = new THREE.Group();
-
-        // Malzemeler
-        const bodyMat = new THREE.MeshPhongMaterial({ color: 0xcacfd2, shininess: 30 });
-        const wingMat = new THREE.MeshPhongMaterial({ color: 0xcccccc, shininess: 20 });
-        const cockpitMat = new THREE.MeshPhongMaterial({ color: 0x92badd, transparent: true, opacity: 0.8 });
-        const propMat = new THREE.MeshPhongMaterial({ color: 0x8b4513, shininess: 10 });
-        const noseMat = new THREE.MeshPhongMaterial({ color: 0xfdd835, shininess: 50 });
-
-        // Gövde
-        const bodyGeom = new THREE.CylinderGeometry(0.5, 0.7, 4.0, 16);
-        const body = new THREE.Mesh(bodyGeom, bodyMat);
-        body.rotation.x = Math.PI / 2;
-        planeGroup.add(body);
-
-        // Kokpit
-        const cockpitGeom = new THREE.SphereGeometry(0.4, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
-        const cockpit = new THREE.Mesh(cockpitGeom, cockpitMat);
-        cockpit.position.set(0, 0.35, 0.5);
-        planeGroup.add(cockpit);
-
-        // Ana Kanat
-        const wingGeom = new THREE.BoxGeometry(4.5, 0.15, 1.5);
-        const mainWing = new THREE.Mesh(wingGeom, wingMat);
-        mainWing.position.set(0, 0, -0.5);
-        planeGroup.add(mainWing);
-
-        // Yatay Kuyruk
-        const hTailGeom = new THREE.BoxGeometry(2.5, 0.1, 0.8);
-        const hTail = new THREE.Mesh(hTailGeom, wingMat);
-        hTail.position.set(0, 0.2, 1.8);
-        planeGroup.add(hTail);
-
-        // Dikey Kuyruk
-        const vTailGeom = new THREE.BoxGeometry(0.1, 0.9, 0.8);
-        const vTail = new THREE.Mesh(vTailGeom, bodyMat);
-        vTail.position.set(0, 0.65, 1.8);
-        planeGroup.add(vTail);
-
-        // Burun
-        const noseGeom = new THREE.ConeGeometry(0.6, 0.8, 16);
-        const nose = new THREE.Mesh(noseGeom, noseMat);
-        nose.rotation.x = Math.PI / 2;
-        nose.position.z = -2.3;
-        planeGroup.add(nose);
-
-        // Pervane Kanatları
-        const bladeGeom = new THREE.BoxGeometry(0.1, 0.05, 1.5);
-        const blade1 = new THREE.Mesh(bladeGeom, propMat);
-        blade1.rotation.y = Math.PI / 2;
-        blade1.position.z = -2.7;
-        planeGroup.add(blade1);
-
-        const blade2 = new THREE.Mesh(bladeGeom, propMat);
-        blade2.rotation.y = Math.PI / 2;
-        blade2.rotation.z = Math.PI / 2;
-        blade2.position.z = -2.7;
-        planeGroup.add(blade2);
-
-        // Pervane Göbeği
-        const hubGeom = new THREE.CylinderGeometry(0.08, 0.08, 0.1, 8);
-        const hub = new THREE.Mesh(hubGeom, propMat);
+        for (let i = 0; i < 2; i++) {
+            const blade = new THREE.Mesh(makeBlade(), matProp);
+            blade.rotation.z = (i * Math.PI);
+            blade.position.set(-0.0, 0, 0);
+            propGroup.add(blade);
+        }
+        // Pervane göbeği
+        const hubGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.06, 10);
+        const hub = new THREE.Mesh(hubGeo, matMotor);
         hub.rotation.x = Math.PI / 2;
-        hub.position.z = -2.7;
-        planeGroup.add(hub);
+        propGroup.add(hub);
 
-        planeGroup.quaternion.set(0, 0, 0, 1);
-        return planeGroup;
+        propGroup.rotation.x = Math.PI / 2;
+        propGroup.position.set(0, 0.06, -2.58);
+        // Pervaneyi yavaşça döndür (animate3D içinde değil, sabit başlangıç)
+        propGroup.rotation.y = 0.3;
+        plane.add(propGroup);
+        // Pervane referansını sakla (animasyon için)
+        plane.userData.propeller = propGroup;
+
+        // ── Batarya Tümsek ────────────────────────────────────────────
+        const battGeo = new THREE.BoxGeometry(0.38, 0.18, 0.82);
+        const batt = new THREE.Mesh(battGeo, matDark);
+        batt.position.set(0, -0.24, 0.3);
+        plane.add(batt);
+
+        // ── Antena ────────────────────────────────────────────────────
+        const antGeo = new THREE.CylinderGeometry(0.012, 0.008, 0.7, 6);
+        const ant = new THREE.Mesh(antGeo, matDark);
+        ant.position.set(0.18, 0.22, -0.8);
+        ant.rotation.z = 0.25;
+        plane.add(ant);
+
+        plane.quaternion.set(0, 0, 0, 1);
+        return plane;
+    }
+
+    /**
+     * @brief Eski isim ile uyumluluk için alias
+     * @returns {THREE.Group}
+     */
+    function createWW2Airplane() {
+        return createFPVAirplane();
     }
 
     // ============================================
