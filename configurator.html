@@ -14,6 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="js/aircraft_model.js"></script>
 <script src="js/serial_communication.js"></script>
 <script src="js/logger.js"></script>
 <script src="js/sensors.js"></script>
@@ -106,16 +107,16 @@
                     </h1>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <div class="d-flex align-items-center justify-content-md-end gap-3 panel2">
-                        <div class="connection-status d-flex align-items-center panel3">
+                    <div class="d-flex align-items-center justify-content-md-end gap-3">
+                        <div class="connection-status" id="connectionStatusBox">
                             <span class="status-indicator status-off" id="statusIndicator"></span>
                             <span id="connectionStatus">Bağlantı Yok</span>
                         </div>
-                        <button class="btn btn-primary" id="btnConnect">
-                            <i class="bi bi-usb-plug"></i> Porta Bağlan
+                        <button class="btn btn-connect" id="btnConnect">
+                            <i class="bi bi-usb-plug me-1"></i> Porta Bağlan
                         </button>
-                        <button class="btn btn-danger d-none" id="btnDisconnect">
-                            <i class="bi bi-usb-plug-fill"></i> Bağlantıyı Kes
+                        <button class="btn btn-disconnect d-none" id="btnDisconnect">
+                            <i class="bi bi-usb-plug-fill me-1"></i> Bağlantıyı Kes
                         </button>
                     </div>
                 </div>
@@ -164,7 +165,7 @@
                         <i class="bi bi-usb-symbol display-1 text-muted mb-4 gradient-text mb-3"></i>
                         <h2 class="gradient-text mb-3">Seri Port Bağlantısı Gerekli</h2>
                         <p class="gradient-text mb-3">Uygulamayı kullanmak için lütfen cihazınızı seri porta bağlayın.</p>
-                        <button class="btn btn-primary btn-lg" id="btnConnectPrompt">
+                        <button class="btn btn-connect btn-lg" id="btnConnectPrompt">
                             <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
                         </button>
                     </div>
@@ -176,10 +177,8 @@
     <!-- SOL: 3D + HUD -->
     <div class="col-lg-6">
       <div class="panel3 p-3">
-        <div class="d-flex align-items-center justify-content-between mb-2 baslik">
-          <div>
-            <div class="fw-semibold">Kalibrasyon Görünümü</div>
-          </div>
+        <div class="d-flex align-items-center mb-2 baslik">
+          <div class="fw-semibold">Kalibrasyon Görünümü</div>
         </div>
 
         <div id="3d-canvas-container"
@@ -348,20 +347,20 @@
         <div class="t-baslik mb-1">Pozisyon Kalibrasyonu (6 Yüz)</div>
         <div class="t-aciklama mb-2">Her adımda uçağı konumlandırıp tıklayın</div>
 
-        <div class="cal-steps-container cal-steps-6 mb-0">
+        <div class="cal-steps-container cal-steps-6 mb-0" style="background-color:rgb(242, 244, 242) ;" >
 
-          <div class="cal-step panel3" data-target="#btn-pose-zp" data-step="1">
+          <div class="cal-step panel4"  data-target="#btn-pose-zp" data-step="1">
             <div class="cal-step-body">
               <i class="bi bi-record-circle cal-step-icon"></i>
               <div class="cal-step-values">
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="t-aciklama step-label">Düz (tekerlekler aşağıda)</span></div>
+            <div class="cal-step-footer" ><span class="t-aciklama step-label">Düz (tekerlekler aşağıda)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-zn" data-step="2">
+          <div class="cal-step panel4" data-target="#btn-pose-zn" data-step="2">
             <div class="cal-step-body">
               <i class="bi bi-record-circle-fill cal-step-icon"></i>
               <div class="cal-step-values">
@@ -372,7 +371,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-xp" data-step="3">
+          <div class="cal-step panel4" data-target="#btn-pose-xp" data-step="3">
             <div class="cal-step-body">
               <i class="bi bi-arrow-up cal-step-icon"></i>
               <div class="cal-step-values">
@@ -383,7 +382,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-xn" data-step="4">
+          <div class="cal-step panel4" data-target="#btn-pose-xn" data-step="4">
             <div class="cal-step-body">
               <i class="bi bi-arrow-down cal-step-icon"></i>
               <div class="cal-step-values">
@@ -394,7 +393,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-yp" data-step="5">
+          <div class="cal-step panel4" data-target="#btn-pose-yp" data-step="5">
             <div class="cal-step-body">
               <i class="bi bi-arrow-right cal-step-icon"></i>
               <div class="cal-step-values">
@@ -405,7 +404,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-yn" data-step="6">
+          <div class="cal-step panel4" data-target="#btn-pose-yn" data-step="6">
             <div class="cal-step-body">
               <i class="bi bi-arrow-left cal-step-icon"></i>
               <div class="cal-step-values">
@@ -423,7 +422,7 @@
     <!-- Mevcut Kalibrasyon Değerleri -->
     <div class="col-lg-4">
       <div class="panel3 p-3 h-100">
-        <div class="t-baslik mb-2">Mevcut Kalibrasyon Değerleri</div>
+        <div class="t-alt-baslik mb-2">Mevcut Kalibrasyon Değerleri</div>
         <div class="row g-2">
           <div class="col-6">
             <div class="t-alt-baslik">ACC Bias</div>
@@ -454,7 +453,7 @@
       <div class="panel3 p-2">
         <div class="t-alt-baslik mb-2">Gyro Kalibrasyonu</div>
         <div class="cal-steps-container mb-0">
-          <div class="cal-step panel3" data-target="#btn-pose-gy">
+          <div class="cal-step panel4" data-target="#btn-pose-gy">
             <div class="cal-step-body">
               <i class="bi bi-speedometer cal-step-icon"></i>
               <div class="cal-step-values" style="display:none;">
@@ -472,7 +471,7 @@
       <div class="panel3 p-2">
         <div class="t-alt-baslik mb-2">Hard Kalibrasyon (Level)</div>
         <div class="cal-steps-container mb-0">
-          <div class="cal-step panel3" data-target="#btn-pose-level">
+          <div class="cal-step panel4" data-target="#btn-pose-level">
             <div class="cal-step-body">
               <i class="bi bi-bullseye cal-step-icon"></i>
               <div class="cal-step-values" style="display:none;">
@@ -498,7 +497,7 @@
       <select class="form-select form-select-sm" id="sensorAlignSelect" style="max-width:220px;" onchange="selectAlignOption(parseInt(this.value))">
         <!-- JS tarafından doldurulur -->
       </select>
-      <button class="btn btn-warning btn-sm" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
+      <button class="btn btn-warning btn-md" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
         <i class="bi bi-save me-1"></i> Yönelimi Kaydet
       </button>
     </div>
@@ -506,10 +505,10 @@
 
   <!-- Butonlar (sayfa altı) -->
   <div class="d-flex gap-2">
-    <button type="button" class="btn btn-warning btn-sm" id="btnSaveCalibration">
+    <button type="button" class="btn btn-warning btn-md" id="btnSaveCalibration">
       <i class="bi bi-save2 me-1"></i> Kalibrasyonu Kaydet
     </button>
-    <button type="button" class="btn btn-danger btn-sm" onclick="sendQuickCommand('CALIB_RESET')">
+    <button type="button" class="btn btn-danger btn-md" onclick="sendQuickCommand('CALIB_RESET')">
       <i class="bi bi-arrow-counterclockwise me-1"></i> Kalibrasyonu Sıfırla
     </button>
   </div>
@@ -523,7 +522,7 @@
 
     <div class="row g-3">
       <div class="col-6 col-lg-3">
-        <div class="panel3">
+        <div class="panel4">
           <div class="aircraft-card active" data-aircraft-type="v-tail">
             <div class="mixer-title">V-TAIL</div>
             <div class="mixer-description">V şeklinde kuyruk yapısı</div>
@@ -532,7 +531,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel3">
+        <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="t-tail">
             <div class="mixer-title">T-TAIL</div>
             <div class="mixer-description">T şeklinde kuyruk yapısı</div>
@@ -541,7 +540,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel3">
+        <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="no-ruder">
             <div class="mixer-title">RUDERSIZ</div>
             <div class="mixer-description">Ruder olmadan</div>
@@ -550,7 +549,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel3">
+        <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="delta">
             <div class="mixer-title">DELTA</div>
             <div class="mixer-description">Delta kanat</div>
@@ -569,28 +568,28 @@
     </p>
     <div class="row g-3">
       <div class="col-6 col-lg-3">
-        <div class="panel3 p-3 text-center">
+        <div class="panel4 p-3 text-center">
           <div class="output-title mb-2">ROLL</div>
           <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
           <small class="text-muted">-200 ... 200</small>
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel3 p-3 text-center">
+        <div class="panel4 p-3 text-center">
           <div class="output-title mb-2">PITCH</div>
           <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
           <small class="text-muted">-200 ... 200</small>
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel3 p-3 text-center">
+        <div class="panel4 p-3 text-center">
           <div class="output-title mb-2">YAW</div>
           <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
           <small class="text-muted">-200 ... 200</small>
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel3 p-3 text-center">
+        <div class="panel4 p-3 text-center">
           <div class="output-title mb-2">THROTTLE</div>
           <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
           <small class="text-muted">-200 ... 200</small>
@@ -884,7 +883,7 @@
     <div class="panel">
         <h2 class="panel-title"><i class="bi bi-graph-up"></i> PID Ayarları</h2>
         <div class="row">
-            <div class="col-md-4 panel3">
+            <div class="col-md-4 panel4">
                 <div class="pid-control">
                     <div class="pid-axis">ROLL</div>
                     <div class="pid-parameter"><div class="pid-label"><span class="pid-name">P</span><span class="pid-value" id="rollPValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="2" step="0.01" value="0.08" id="rollPSlider"></div>
@@ -893,7 +892,7 @@
                     <div class="pid-parameter"><div class="pid-label"><span class="pid-name">FF</span><span class="pid-value" id="rollFFValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="1" step="0.01" value="0.0" id="rollFFSlider"></div>
                 </div>
             </div>
-            <div class="col-md-4 panel3">
+            <div class="col-md-4 panel4">
                 <div class="pid-control">
                     <div class="pid-axis">PITCH</div>
                     <div class="pid-parameter"><div class="pid-label"><span class="pid-name">P</span><span class="pid-value" id="pitchPValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="2" step="0.01" value="0.08" id="pitchPSlider"></div>
@@ -902,7 +901,7 @@
                     <div class="pid-parameter"><div class="pid-label"><span class="pid-name">FF</span><span class="pid-value" id="pitchFFValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="1" step="0.01" value="0.0" id="pitchFFSlider"></div>
                 </div>
             </div>
-            <div class="col-md-4 panel3">
+            <div class="col-md-4 panel4">
                 <div class="pid-control">
                     <div class="pid-axis">YAW</div>
                     <div class="pid-parameter"><div class="pid-label"><span class="pid-name">P</span><span class="pid-value" id="yawPValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="2" step="0.01" value="0.15" id="yawPSlider"></div>
@@ -914,7 +913,7 @@
         </div>
 
         <div class="row mt-4">
-            <div class="col-md-4 panel3">
+            <div class="col-md-4 panel4">
                 <div class="pid-control">
                     <div class="pid-axis text-info">ROLL MAX RATE</div>
                     <div class="pid-parameter">
@@ -923,7 +922,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 panel3">
+            <div class="col-md-4 panel4">
                 <div class="pid-control">
                     <div class="pid-axis text-info">PITCH MAX RATE</div>
                     <div class="pid-parameter">
@@ -932,7 +931,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 panel3">
+            <div class="col-md-4 panel4">
                 <div class="pid-control">
                     <div class="pid-axis text-info">YAW MAX RATE</div>
                     <div class="pid-parameter">
@@ -944,7 +943,7 @@
         </div>
 
       <div class="row mt-4">
-             <div class="col-md-5 panel3 ">
+             <div class="col-md-5 panel4">
                  <div class="pid-control">
                     <div class="pid-axis text-warning">ANGLE MODE (LEVEL STRENGTH)</div>
                     <div class="pid-parameter">
@@ -958,7 +957,7 @@
              
              </div>
 		
-             <div class="col-md-5 panel3" >
+             <div class="col-md-5 panel4" >
                  <div class="pid-control">
                     <div class="pid-axis text-warning">TPA FAKTÖRÜ</div>
                     <div class="pid-parameter">

@@ -45,9 +45,10 @@
        .panel3 → En iç içerik kartı
        Değiştirmek için sadece bu değişkenleri güncelleyin.
     ========================================= */
-    --bg-panel:   rgba(28, 144, 138, 0.9);    /* Dış: koyu lacivert */
+    --bg-panel:   rgba(9, 80, 76, 0.9);    /* Dış: koyu lacivert */
     --bg-panel-2: rgba(43, 94, 91, 0.9);     /* Orta: biraz açık çelik mavi */
     --bg-panel-3: rgba(13, 81, 78, 0.9);   /* İç: hafif aydınlık çelik mavi */
+    --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
 
     --bg-panel-solid: #dbe0e8;
     --bg-input: rgba(10, 20, 35, 0.85);      /* Input: koyu şeffaf */
@@ -66,7 +67,7 @@
     --text-secondary: #ffffff;          /* İkincil metin — çelik mavi-gri */
     --text-muted:     #4d708f;          /* Soluk metin */
     --text-inverse:   #0d1520;          /* Ters metin (koyu arka plana karşı) */
-    --text-value:     #fd1e1e;          /* Değer rengi (emerald yeşil) */
+    --text-value:     #03212a;          /* Değer rengi (emerald yeşil) */
 
     /* =========================================
        MERKEZİ METİN TİPOGRAFİ SİSTEMİ
@@ -243,7 +244,7 @@ a:hover {
    3. LAYOUT - PANELLER
    ============================================ */
 /* Ortak panel özellikleri */
-.panel, .panel2, .panel3, .sidebar {
+.panel, .panel2, .panel3, .panel4, .sidebar {
     backdrop-filter: blur(var(--blur-amount));
     -webkit-backdrop-filter: blur(var(--blur-amount));
     border: 1px solid var(--border-default);
@@ -256,8 +257,63 @@ a:hover {
 
 /* Hiyerarşik arka planlar */
 .panel, .sidebar { background: var(--bg-panel);   }  /* Dış: teal */
-.panel2           { background: var(--bg-panel-2); }  /* Orta: yarı beyaz */
-.panel3           { background: var(--bg-panel-3); }  /* İç: neredeyse beyaz */
+.panel2           { background: var(--bg-panel-2); }  /* Orta */
+.panel3           { background: var(--bg-panel-3); }  /* İç */
+
+/* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
+.panel4 {
+    background: #e8eaec !important;
+    color: #111111;
+    --border-default:       rgba(0, 0, 0, 0.13);
+    /* cal-step ve diğer bileşenlerin background değişkenini override et */
+    --cal-step-bg:          #e8eaec;
+    /* CSS değişkenlerini panel4 kapsamında koyu metne çevir */
+    --text-primary:         #111111;
+    --text-secondary:       #333333;
+    --t-baslik-color:       #111111;
+    --t-alt-baslik-color:   #111111;
+    --t-aciklama-color:     #444444;
+}
+/* panel4 içindeki !important ile ayarlanan metin renkleri */
+.panel4 .step-label                         { color: #444444 !important; }
+.panel4 .cal-step-values                    { color: #111111 !important; background: rgba(0,0,0,0.06) !important; }
+/* Çift sınıf — .cal-step-icon { !important } (satır ~1621) kuralını özgüllükle yener */
+.cal-step.panel4 .cal-step-icon             { color: #666666 !important; }
+.cal-step.panel4.active  .cal-step-icon     { color: var(--color-primary) !important; }
+.cal-step.panel4.completed .cal-step-icon   { color: var(--color-success) !important; }
+.panel4 .cal-step-done i    { color: var(--color-success); }
+.panel4 .output-title       { color: #111111; }
+.panel4 .output-value       { color: #111111; }
+.panel4 .mixer-title        { color: #111111; }
+.panel4 .mixer-description  { color: #444444; }
+.panel4 small               { color: #555555 !important; }
+.panel4 .form-control,
+.panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
+.panel4 .form-control:focus,
+.panel4 .form-select:focus  { background-color: #ffffff !important; border-color: var(--color-primary) !important; }
+
+/* PID kutuları — panel4 metin renkleri */
+.panel4 .pid-label          { color: #333333 !important; }
+.panel4 .pid-value          { color: #111111 !important; }
+.panel4 .pid-unit           { color: #555555 !important; }
+/* pid-axis: axis başlığı kendi renklerini (primary/info/warning) korur */
+
+/* Mod kartları — panel4 metin ve kontrol renkleri */
+.mode-card.panel4           { background: #e8eaec !important; }
+.panel4 .mode-name          { color: #111111 !important; }
+.panel4 .mode-channel-select {
+    background: #ffffff !important;
+    color: #111111 !important;
+    border: 1px solid rgba(0,0,0,0.20) !important;
+}
+.panel4 .range-track-container {
+    background: rgba(0, 0, 0, 0.10) !important;
+    border: 1px solid rgba(0,0,0,0.15) !important;
+}
+.panel4 .mode-category-title {
+    color: #111111 !important;
+    border-bottom-color: rgba(0,0,0,0.15) !important;
+}
 
 .panel-title {
     display: flex;
@@ -299,25 +355,35 @@ a:hover {
 }
 
 .gradient-text {
-    background: linear-gradient(45deg, var(--color-brand-blue), #818cf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
     font-weight: 700;
     letter-spacing: -1px;
 }
 
-/* Bağlantı Durumu */
+/* Bağlantı Durumu — header içi durum göstergesi */
 .connection-status {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid var(--border-default);
-    padding: var(--spacing-xs) var(--spacing-md);
+    background: rgba(0, 0, 0, 0.28);
+    border: 1.5px solid rgba(255, 255, 255, 0.13);
+    padding: 5px 14px;
     border-radius: var(--radius-full);
     font-family: var(--font-mono);
     font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: #dce8f5;
+    min-width: 150px;
+    justify-content: center;
+    letter-spacing: 0.3px;
+    transition: all var(--transition-normal);
+}
+/* Bağlı olduğunda çerçeve yeşil parlar */
+.connection-status.is-connected {
+    border-color: rgba(16, 185, 129, 0.5);
+    background: rgba(16, 185, 129, 0.10);
+    color: #6ee7c6;
 }
 
 .status-indicator {
@@ -512,7 +578,7 @@ a:hover {
 }
 
 .cal-step {
-    background: var(--bg-panel-3);
+    background: var(--cal-step-bg);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-md);
     padding: var(--spacing-md) var(--spacing-sm);
@@ -1149,6 +1215,52 @@ input[type="range"]::-moz-range-thumb {
     border-color: var(--color-secondary);
 }
 
+/* Orta boy buton */
+.btn-md { padding: 5px 14px !important; font-size: var(--font-size-sm) !important; }
+
+/* Header bağlantı butonları — ayırt edici, tema uyumlu */
+.btn-connect {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 18px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45), 0 2px 8px rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(16, 185, 129, 0.55);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-connect:hover {
+    background: linear-gradient(135deg, #047857, #059669);
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.65), 0 4px 14px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+.btn-disconnect {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 18px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.45), 0 2px 8px rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(239, 68, 68, 0.55);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-disconnect:hover {
+    background: linear-gradient(135deg, #b91c1c, #dc2626);
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.65), 0 4px 14px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
 /* Save Button (Fixed) */
 .save-button-container {
     position: fixed;
@@ -1554,7 +1666,7 @@ label.small.text-muted,
 /* Tab menüsü - tercihler */
 .adv-tab { background: rgba(50, 85, 125, 0.70); border-color: rgba(255,255,255,0.14); color: #c8dff0; }
 .adv-tab:hover { background: rgba(60, 100, 145, 0.80); color: #ffffff; }
-.adv-tab.active { background: rgba(14, 165, 233, 0.20); color: var(--color-primary); border-color: var(--color-primary); border-bottom-color: transparent; }
+.adv-tab.active { background: #e8eaec; color: #111111; border-color: rgba(0,0,0,0.20); border-bottom-color: transparent; }
 
 /* h5/h6 card header renkleri */
 .card-header h5, .card-header .h5 { color: var(--text-primary) !important; font-size: var(--font-size-sm) !important; margin: 0; }
@@ -1673,6 +1785,26 @@ label.small.text-muted,
 .pid-control { padding: 6px !important; margin-bottom: 4px !important; }
 .pid-axis { font-size: var(--font-size-sm) !important; margin-bottom: 4px; }
 
+/* PID slider — kalın ve siyah */
+.panel4 input[type="range"] {
+    height: 10px !important;
+    background: #222 !important;
+    border-radius: 5px !important;
+}
+.panel4 input[type="range"]::-webkit-slider-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    background: #111 !important;
+    border: 3px solid #555 !important;
+    box-shadow: none !important;
+}
+.panel4 input[type="range"]::-moz-range-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    background: #111 !important;
+    border: 3px solid #555 !important;
+}
+
 /* Scrollbar daha ince */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 
@@ -1725,9 +1857,9 @@ label.small.text-muted,
 }
 
 .adv-tab.active {
-    background: rgba(14, 165, 233, 0.20);
-    color: var(--color-primary);
-    border-color: var(--color-primary);
+    background: #e8eaec;
+    color: #111111;
+    border-color: rgba(0,0,0,0.20);
     border-bottom: 2px solid transparent;
     box-shadow: var(--shadow-sm);
 }
@@ -1807,3 +1939,14 @@ label.small.text-muted,
     color: #60a5fa;
     font-weight: 600;
 }
+
+/* ============================================
+   PANEL4 — KESİN BACKGROUND OVERRIDE (EN SON)
+   .panel4 !important tek sınıflı; sonradan gelen
+   çift sınıflı kurallar onu ezebilir. Bu blok
+   stylesheet sonunda olduğu için her durumda kazanır.
+   ============================================ */
+.cal-step.panel4                       { background: #e8eaec !important; }
+.cal-step.panel4:hover:not(.disabled)  { background: rgba(14,165,233,0.10) !important; }
+.cal-step.panel4.active                { background: rgba(14,165,233,0.12) !important; }
+.cal-step.panel4.completed             { background: rgba(16,185,129,0.12) !important; }

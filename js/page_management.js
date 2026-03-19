@@ -270,7 +270,10 @@ function updateConnectionStatus() {
 
     const statusInd = el('statusIndicator');
     if (statusInd) statusInd.className = `status-indicator ${connected ? 'status-connected' : 'status-off'}`;
-    
+
+    const connStatusBox = el('connectionStatusBox');
+    if (connStatusBox) connStatusBox.classList.toggle('is-connected', connected);
+
     const connStatus = el('connectionStatus');
     if (connStatus) connStatus.textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
 
