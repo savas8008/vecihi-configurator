@@ -1213,30 +1213,196 @@ input[type="range"]::-moz-range-thumb {
 .glow-danger { box-shadow: 0 0 20px var(--color-danger-glow) !important; }
 
 /* ============================================
-   19. LIGHT THEME OVERRIDES & UTILITIES
+   19. TEMA STANDARTIZASYONU - Bootstrap & Özel Bileşen Override
    ============================================ */
 
-/* Bootstrap Dark sınıflarını Açık Tema için ezme */
-.bg-dark {
-    background-color: #ffffff !important;
+/* --- Tüm renkler tema değişkenlerine bağlı --- */
+
+/* Bootstrap bg-dark → panel arka planı */
+.bg-dark,
+.bg-dark.card,
+.card.bg-dark {
+    background: var(--bg-panel) !important;
+    backdrop-filter: blur(var(--blur-amount)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-amount)) !important;
     color: var(--text-primary) !important;
-}
-.text-white {
-    color: var(--text-primary) !important;
-}
-.text-muted {
-    color: var(--text-secondary) !important;
-}
-.border-secondary {
     border-color: var(--border-default) !important;
 }
+
+/* bg-black → panel */
+.bg-black { background: var(--bg-panel) !important; }
+
+/* bg-secondary input-group → tema rengi */
+.input-group-text.bg-secondary,
+.bg-secondary.input-group-text {
+    background-color: rgba(0,0,0,0.07) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-default) !important;
+}
+
+/* text-white, text-light → tema metni */
+.text-white  { color: var(--text-primary)   !important; }
+.text-light  { color: var(--text-secondary) !important; }
+.text-muted  { color: var(--text-muted)     !important; }
+
+/* Renkli durum metinleri - sadece anlamlı yerlerde kalsın */
+/* text-info / text-success / text-warning / text-danger → tema renkleri */
+.text-info    { color: var(--color-info)    !important; }
+.text-success { color: var(--color-success) !important; }
+.text-warning { color: var(--color-warning) !important; }
+.text-danger  { color: var(--color-danger)  !important; }
+
+/* border-secondary → tema kenarlığı */
+.border-secondary { border-color: var(--border-default) !important; }
+
+/* Card bileşenlerini tema paneline dönüştür */
+.card {
+    background: var(--bg-panel) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: var(--radius-md) !important;
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    box-shadow: var(--shadow-sm);
+}
+
+/* Card header: renkli arka planlar kaldırılır, sadece sol kenar çizgisi kalır */
+.card-header {
+    background: rgba(0,0,0,0.04) !important;
+    border-bottom: 1px solid var(--border-default) !important;
+    padding: 6px 10px !important;
+    font-size: var(--font-size-sm) !important;
+    color: var(--text-primary) !important;
+}
+/* Sol aksan çizgileri renklere göre */
+.card-header.bg-danger,
+.card-header.bg-danger.bg-opacity-25  { border-left: 3px solid var(--color-danger)  !important; }
+.card-header.bg-primary,
+.card-header.bg-primary.bg-opacity-25 { border-left: 3px solid var(--color-primary) !important; }
+.card-header.bg-success,
+.card-header.bg-success.bg-opacity-25 { border-left: 3px solid var(--color-success) !important; }
+.card-header.bg-info,
+.card-header.bg-info.bg-opacity-25    { border-left: 3px solid var(--color-info)    !important; }
+/* Renkli arka plan sınıflarını kaldır */
+.card-header[class*="bg-danger"],
+.card-header[class*="bg-primary"],
+.card-header[class*="bg-success"],
+.card-header[class*="bg-info"] {
+    background: rgba(0,0,0,0.04) !important;
+}
+
+.card-body {
+    padding: 8px 10px !important;
+    color: var(--text-primary) !important;
+}
+
+/* Input group text - standart tema */
 .input-group-text {
-    background-color: #f1f5f9 !important;
+    background-color: rgba(0,0,0,0.06) !important;
     color: var(--text-secondary) !important;
     border-color: var(--border-default) !important;
     padding: 2px 6px !important;
     font-size: var(--font-size-sm) !important;
 }
+
+/* bg-dark form-control / form-select → tema inputu */
+.form-control.bg-dark,
+.form-select.bg-dark,
+.form-control[class*="bg-dark"],
+.form-select[class*="bg-dark"] {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-default) !important;
+}
+
+/* bg-dark bg-opacity-25 border → tema */
+[class*="bg-dark"][class*="bg-opacity"] {
+    background: rgba(0,0,0,0.05) !important;
+    border-color: var(--border-default) !important;
+}
+
+/* OSD Ekran Öğeleri paneli */
+.panel3.bg-dark {
+    background: var(--bg-panel) !important;
+    color: var(--text-primary) !important;
+}
+.osd-element-list .form-check-label { color: var(--text-primary) !important; }
+
+/* Aircraft seçim kartları */
+.aircraft-card {
+    background: rgba(0,0,0,0.04);
+    border: 2px solid var(--border-default);
+}
+.aircraft-card:hover {
+    background: rgba(0,0,0,0.07);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+}
+.aircraft-card.active {
+    background: rgba(14,165,233,0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 8px var(--color-primary-glow);
+}
+.mixer-title   { font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); }
+.mixer-description { color: var(--text-muted); font-size: var(--font-size-xs); }
+
+/* Kalibrasyon adım kutuları - panelle uyumlu */
+.cal-step {
+    background: rgba(0,0,0,0.04) !important;
+    border: 1px solid var(--border-default) !important;
+}
+.cal-step:hover:not(.disabled) {
+    border-color: var(--color-primary) !important;
+    background: rgba(14,165,233,0.07) !important;
+}
+.cal-step.active  { border-color: var(--color-primary) !important; background: rgba(14,165,233,0.08) !important; }
+.cal-step.completed { border-color: var(--color-success) !important; background: rgba(16,185,129,0.07) !important; }
+.cal-step-icon { color: var(--text-muted) !important; }
+.cal-step.active .cal-step-icon { color: var(--color-primary) !important; }
+.cal-step.completed .cal-step-icon { color: var(--color-success) !important; }
+.step-label    { color: var(--text-secondary) !important; font-size: var(--font-size-xs) !important; }
+.cal-step-values { background: rgba(0,0,0,0.08) !important; color: var(--text-primary) !important; }
+
+/* Kalibrasyon & genel buton standardizasyonu */
+.btn-warning {
+    background: var(--color-warning);
+    color: #000 !important;
+    border: none;
+}
+.btn-warning:hover { background: #d97706; color: #000 !important; transform: translateY(-1px); }
+.btn-danger  { background: var(--color-danger); color: #fff !important; border: none; }
+.btn-danger:hover  { background: #dc2626; transform: translateY(-1px); }
+.btn-primary { background: var(--color-brand-blue); color: #fff !important; border: none; }
+.btn-primary:hover { background: #c92020; transform: translateY(-1px); }
+
+/* Accordion - Loglar sayfası kısayollar */
+.accordion-item {
+    background: var(--bg-panel) !important;
+    border-color: var(--border-default) !important;
+}
+.accordion-button {
+    background: var(--bg-panel) !important;
+    color: var(--text-primary) !important;
+}
+.accordion-button:not(.collapsed) {
+    background: rgba(14,165,233,0.08) !important;
+    color: var(--color-primary) !important;
+    box-shadow: none !important;
+}
+.accordion-button::after { filter: none !important; opacity: 0.6; }
+.accordion-body { background: var(--bg-panel) !important; color: var(--text-primary) !important; }
+
+/* Kumanda sayfası Konfigürasyon başlığı */
+.text-info.h5, h3.text-info, h4.text-info { color: var(--text-primary) !important; font-size: var(--font-size-md) !important; }
+.text-success.h5, h3.text-success { color: var(--text-primary) !important; font-size: var(--font-size-md) !important; }
+
+/* Tab menüsü - tercihler */
+.adv-tab { background: rgba(0,0,0,0.04); border-color: var(--border-default); color: var(--text-secondary); }
+.adv-tab:hover { background: rgba(0,0,0,0.08); color: var(--text-primary); }
+.adv-tab.active { background: var(--bg-panel); color: var(--color-primary); border-bottom-color: var(--bg-panel); }
+
+/* h5/h6 card header renkleri */
+.card-header h5, .card-header .h5 { color: var(--text-primary) !important; font-size: var(--font-size-sm) !important; margin: 0; }
+.card-header h6, .card-header .h6 { color: var(--text-secondary) !important; font-size: var(--font-size-xs) !important; margin: 0; }
 
 /* Bağlantı Penceresi Garantisi */
 #connectionPrompt {
