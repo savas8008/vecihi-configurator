@@ -56,6 +56,37 @@
     --text-secondary: #4a5568;          /* İkincil metin - açıklamalar için gri */
     --text-muted: #718096;              /* Soluk metin - etiketler için açık gri */
     --text-inverse: #ffffff;            /* Ters metin (Beyaz) */
+    --text-value: #16a34a;              /* Değer rengi (yeşil) */
+
+    /* =========================================
+       MERKEZİ METİN TİPOGRAFİ SİSTEMİ
+       Buradaki değişkenleri düzenleyerek tüm
+       sayfadaki tipografiyi tek noktadan
+       değiştirebilirsiniz.
+    ========================================= */
+    /* t-baslik: Panel başlıkları, bölüm adları */
+    --t-baslik-size:   var(--font-size-lg);
+    --t-baslik-weight: 700;
+    --t-baslik-color:  var(--text-primary);
+    --t-baslik-style:  normal;
+
+    /* t-alt-baslik: Grup başlıkları, alan adları */
+    --t-alt-baslik-size:   var(--font-size-md);
+    --t-alt-baslik-weight: 700;
+    --t-alt-baslik-color:  var(--text-primary);
+    --t-alt-baslik-style:  normal;
+
+    /* t-aciklama: Yardım metni, talimatlar */
+    --t-aciklama-size:   var(--font-size-sm);
+    --t-aciklama-weight: 400;
+    --t-aciklama-color:  var(--text-muted);
+    --t-aciklama-style:  italic;
+
+    /* t-deger: Sensör/ölçüm değerleri */
+    --t-deger-size:   var(--font-size-sm);
+    --t-deger-weight: 400;
+    --t-deger-color:  var(--text-value);
+    --t-deger-style:  normal;
     
     /* --- HUD & DATA RENKLERİ --- */
     --hud-green: #20d297;               /* Klasik HUD yeşili */
@@ -154,6 +185,48 @@ a {
 }
 a:hover {
     color: var(--color-primary-hover);
+}
+
+/* ============================================
+   2b. TİPOGRAFİ SİSTEMİ - 4 MERKEZİ METİN SINIFI
+   Tüm sayfalarda kullanılan standart metin rolleri.
+   Değiştirmek için :root değişkenlerini düzenleyin.
+   ============================================ */
+
+/* Başlık: Panel/bölüm adları — bold, büyük punto, siyah */
+.t-baslik {
+    font-size:   var(--t-baslik-size);
+    font-weight: var(--t-baslik-weight);
+    color:       var(--t-baslik-color);
+    font-style:  var(--t-baslik-style);
+    line-height: 1.3;
+}
+
+/* Alt Başlık: Alan/grup adları — bold, normal punto, siyah */
+.t-alt-baslik {
+    font-size:   var(--t-alt-baslik-size);
+    font-weight: var(--t-alt-baslik-weight);
+    color:       var(--t-alt-baslik-color);
+    font-style:  var(--t-alt-baslik-style);
+    line-height: 1.3;
+}
+
+/* Açıklama: Yardım/talimat metinleri — italik, açık gri */
+.t-aciklama {
+    font-size:   var(--t-aciklama-size);
+    font-weight: var(--t-aciklama-weight);
+    color:       var(--t-aciklama-color);
+    font-style:  var(--t-aciklama-style);
+    line-height: 1.4;
+}
+
+/* Değer: Sensör/ölçüm verileri — yeşil, normal */
+.t-deger {
+    font-size:   var(--t-deger-size);
+    font-weight: var(--t-deger-weight);
+    color:       var(--t-deger-color);
+    font-style:  var(--t-deger-style);
+    line-height: 1.4;
 }
 
 /* ============================================
@@ -416,6 +489,11 @@ a:hover {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: var(--spacing-md);
+}
+
+/* 6 adımı her zaman tek satırda yan yana dizer */
+.cal-steps-6 {
+    grid-template-columns: repeat(6, 1fr);
 }
 
 .cal-step {
@@ -1211,6 +1289,60 @@ input[type="range"]::-moz-range-thumb {
 .glow-primary { box-shadow: var(--shadow-glow) !important; }
 .glow-success { box-shadow: 0 0 20px var(--color-success-glow) !important; }
 .glow-danger { box-shadow: 0 0 20px var(--color-danger-glow) !important; }
+
+/* ============================================
+   18b. TİPOGRAFİ — Mevcut HTML elemanlarını merkezi sisteme bağlama
+   panel-title, h5/h6 grup başlıkları, small.text-muted açıklamalar,
+   .mono değer metinleri → t- değişkenlerine yönlendirilir.
+   HTML değiştirmeden tüm sayfalar etkilenir.
+   ============================================ */
+
+/* Panel ana başlıkları (h2.panel-title) */
+.panel-title {
+    font-size:   calc(var(--t-baslik-size) * 1.1) !important;
+    font-weight: var(--t-baslik-weight) !important;
+    color:       var(--t-baslik-color)  !important;
+}
+
+/* Alt bölüm başlıkları: h3, h4, h5 içinde panel */
+.panel h3, .panel h4, .panel h5,
+.panel2 h3, .panel2 h4, .panel2 h5,
+.panel3 h3, .panel3 h4, .panel3 h5 {
+    font-size:   var(--t-alt-baslik-size)   !important;
+    font-weight: var(--t-alt-baslik-weight) !important;
+    color:       var(--t-alt-baslik-color)  !important;
+    font-style:  var(--t-alt-baslik-style)  !important;
+}
+
+/* h6 grup etiketleri (tercihler accordion alt başlıkları) */
+h6.text-muted, h6:not([class*="text-"]) {
+    font-size:   var(--t-alt-baslik-size)   !important;
+    font-weight: var(--t-alt-baslik-weight) !important;
+    color:       var(--t-alt-baslik-color)  !important;
+    font-style:  var(--t-alt-baslik-style)  !important;
+}
+
+/* Açıklama metinleri: small.text-muted, p.text-muted, form-label.small */
+small.text-muted,
+.text-muted.small,
+p.text-muted,
+.form-label.small,
+label.small.text-muted,
+.step-label {
+    font-size:   var(--t-aciklama-size)   !important;
+    font-weight: var(--t-aciklama-weight) !important;
+    color:       var(--t-aciklama-color)  !important;
+    font-style:  var(--t-aciklama-style)  !important;
+}
+
+/* Değer metinleri: .mono sınıfı ve sensör göstergeleri */
+.mono,
+.cal-val-ax, .cal-val-ay, .cal-val-az {
+    font-size:   var(--t-deger-size)   !important;
+    font-weight: var(--t-deger-weight) !important;
+    color:       var(--t-deger-color)  !important;
+    font-family: var(--font-mono)      !important;
+}
 
 /* ============================================
    19. TEMA STANDARTIZASYONU - Bootstrap & Özel Bileşen Override

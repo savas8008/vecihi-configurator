@@ -337,111 +337,140 @@
 
 <!-- ================== CALIBRATION PAGE ================== -->
 <div id="calibration" class="page">
-  <div class="row g-3">
 
-    <!-- SOL: Aksiyonlar + Adımlar + Butonlar -->
-    <div class="col-lg-6">
+  <!-- Satır 1: 6 Yüz Adımları (geniş) + Mevcut Değerler -->
+  <div class="row g-3 mb-3">
 
-      <!-- Pozisyon (6 yüz) adımları -->
-      <div class="panel3 p-2 mb-2 baslik">
-        <div class="fw-semibold">Pozisyon Kalibrasyonu (6 Yüz)</div>
-        <div class="small text-muted">Her adımda uçağı konumlandırıp tıklayın</div>
+    <div class="col-lg-8">
+      <div class="panel3 p-2">
+        <div class="t-baslik mb-1">Pozisyon Kalibrasyonu (6 Yüz)</div>
+        <div class="t-aciklama mb-2">Her adımda uçağı konumlandırıp tıklayın</div>
 
-        <div class="cal-steps-container mb-3">
+        <div class="cal-steps-container cal-steps-6 mb-0">
 
-          <div class="cal-step panel3" data-target="#btn-pose-zp" data-step="1">
+          <div class="cal-step" data-target="#btn-pose-zp" data-step="1">
             <div class="cal-step-body">
               <i class="bi bi-record-circle cal-step-icon"></i>
               <div class="cal-step-values">
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="step-label">Uçağı düz (tekerlekleri aşağıda) konumlandırın.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Düz (tekerlekler aşağıda)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-zn" data-step="2">
+          <div class="cal-step" data-target="#btn-pose-zn" data-step="2">
             <div class="cal-step-body">
               <i class="bi bi-record-circle-fill cal-step-icon"></i>
               <div class="cal-step-values">
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="step-label">Uçağı ters (tekerlekleri havada) konumlandırın.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Ters (tekerlekler havada)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-xp" data-step="3">
+          <div class="cal-step" data-target="#btn-pose-xp" data-step="3">
             <div class="cal-step-body">
               <i class="bi bi-arrow-up cal-step-icon"></i>
               <div class="cal-step-values">
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="step-label">Uçağın burnunu havaya bakacak şekilde dik koyun.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Burun yukarı (dik)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-xn" data-step="4">
+          <div class="cal-step" data-target="#btn-pose-xn" data-step="4">
             <div class="cal-step-body">
               <i class="bi bi-arrow-down cal-step-icon"></i>
               <div class="cal-step-values">
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="step-label">Uçağın burnunu yere bakacak şekilde dik koyun.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Burun aşağı (dik)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-yp" data-step="5">
+          <div class="cal-step" data-target="#btn-pose-yp" data-step="5">
             <div class="cal-step-body">
               <i class="bi bi-arrow-right cal-step-icon"></i>
               <div class="cal-step-values">
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="step-label">Uçağı sol kanadı havaya bakacak şekilde yan yatırın.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Sol kanat yukarı</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-yn" data-step="6">
+          <div class="cal-step" data-target="#btn-pose-yn" data-step="6">
             <div class="cal-step-body">
               <i class="bi bi-arrow-left cal-step-icon"></i>
               <div class="cal-step-values">
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="step-label">Uçağı sağ kanadı havaya bakacak şekilde yan yatırın.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Sağ kanat yukarı</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
         </div>
       </div>
+    </div>
 
-      <!-- Gyro Kalibrasyonu -->
-      <div class="panel3 p-2 mb-2 baslik">
-        <div class="small text-muted">Gyro Kalibrasyonu</div>
+    <!-- Mevcut Kalibrasyon Değerleri -->
+    <div class="col-lg-4">
+      <div class="panel3 p-3 h-100">
+        <div class="t-baslik mb-2">Mevcut Kalibrasyon Değerleri</div>
+        <div class="row g-2">
+          <div class="col-6">
+            <div class="t-alt-baslik">ACC Bias</div>
+            <div id="cal_acc_bias" class="t-deger mono">x: --  y: --  z: --</div>
+          </div>
+          <div class="col-6">
+            <div class="t-alt-baslik">ACC Scale</div>
+            <div id="cal_acc_scale" class="t-deger mono">x: --  y: --  z: --</div>
+          </div>
+          <div class="col-6">
+            <div class="t-alt-baslik">GYRO Bias</div>
+            <div id="cal_gyro_bias" class="t-deger mono">x: --  y: --  z: --</div>
+          </div>
+          <div class="col-6">
+            <div class="t-alt-baslik">Level Trim</div>
+            <div id="cal_level_trim" class="t-deger mono">pitch: --  roll: --</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <div class="cal-steps-container mb-1">
-          <div class="cal-step panel3" data-target="#btn-pose-gy">
+  </div>
+
+  <!-- Satır 2: Gyro + Hard Kalibrasyon yan yana -->
+  <div class="row g-3 mb-3">
+
+    <div class="col-lg-6">
+      <div class="panel3 p-2">
+        <div class="t-alt-baslik mb-2">Gyro Kalibrasyonu</div>
+        <div class="cal-steps-container mb-0">
+          <div class="cal-step" data-target="#btn-pose-gy">
             <div class="cal-step-body">
               <i class="bi bi-speedometer cal-step-icon"></i>
               <div class="cal-step-values" style="display:none;">
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="step-label">Gyro: Cihazı tamamen hareketsiz tutun ve tıklayın.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Cihazı tamamen hareketsiz tutun ve tıklayın.</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Hard Kalibrasyon -->
-      <div class="panel3 p-2 mb-2 baslik">
-        <div class="small text-muted">Hard Kalibrasyon</div>
-
+    <div class="col-lg-6">
+      <div class="panel3 p-2">
+        <div class="t-alt-baslik mb-2">Hard Kalibrasyon (Level)</div>
         <div class="cal-steps-container mb-0">
-          <div class="cal-step panel3" data-target="#btn-pose-level">
+          <div class="cal-step" data-target="#btn-pose-level">
             <div class="cal-step-body">
               <i class="bi bi-bullseye cal-step-icon"></i>
               <div class="cal-step-values" style="display:none;">
@@ -450,54 +479,25 @@
                 <span class="cal-val-az">ROLL</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="step-label">Level: Cihazı düz konuma alıp 2sn bekleyin, sonra tıklayın.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Cihazı düz konuma alıp 2sn bekleyin, sonra tıklayın.</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
         </div>
-
-      </div>
-
-    </div>
-
-    <!-- SAĞ: Mevcut kalibrasyon değerleri (daraltıldı) -->
-    <div class="col-lg-4">
-      <div class="panel3 p-3">
-        <div class="fw-semibold baslik mb-2">Mevcut Kalibrasyon Değerleri</div>
-        <div class="row g-2">
-          <div class="col-6">
-            <div class="small text-muted mb-1">ACC Bias</div>
-            <div id="cal_acc_bias" class="mono small">x: --  y: --  z: --</div>
-          </div>
-          <div class="col-6">
-            <div class="small text-muted mb-1">ACC Scale</div>
-            <div id="cal_acc_scale" class="mono small">x: --  y: --  z: --</div>
-          </div>
-          <div class="col-6">
-            <div class="small text-muted mb-1">GYRO Bias</div>
-            <div id="cal_gyro_bias" class="mono small">x: --  y: --  z: --</div>
-          </div>
-          <div class="col-6">
-            <div class="small text-muted mb-1">Level Trim</div>
-            <div id="cal_level_trim" class="mono small">pitch: --  roll: --</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Kalibrasyon Butonları Paneli -->
-    <div class="col-lg-2">
-      <div class="panel3 p-3 h-100 d-flex flex-column justify-content-center gap-2">
-        <div class="fw-semibold baslik mb-1">İşlemler</div>
-        <button type="button" class="btn btn-warning btn-sm w-100" id="btnSaveCalibration">
-          <i class="bi bi-save2 me-1"></i> Kaydet
-        </button>
-        <button type="button" class="btn btn-danger btn-sm w-100" onclick="sendQuickCommand('CALIB_RESET')">
-          <i class="bi bi-arrow-counterclockwise me-1"></i> Sıfırla
-        </button>
       </div>
     </div>
 
   </div>
+
+  <!-- Butonlar (sayfa altı) -->
+  <div class="d-flex gap-2">
+    <button type="button" class="btn btn-warning btn-sm" id="btnSaveCalibration">
+      <i class="bi bi-save2 me-1"></i> Kalibrasyonu Kaydet
+    </button>
+    <button type="button" class="btn btn-danger btn-sm" onclick="sendQuickCommand('CALIB_RESET')">
+      <i class="bi bi-arrow-counterclockwise me-1"></i> Kalibrasyonu Sıfırla
+    </button>
+  </div>
+
 </div>
 
 <div id="outputs" class="page">
