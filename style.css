@@ -310,6 +310,35 @@ a:hover {
     background: rgba(0, 0, 0, 0.10) !important;
     border: 1px solid rgba(0,0,0,0.15) !important;
 }
+/* panel4 içi range slider — koyu zeminde görünmez track'i siyah yap */
+.panel4 input[type="range"] {
+    height: 8px !important;
+    background: rgba(0,0,0,0.35) !important;
+    border-radius: 4px !important;
+}
+.panel4 input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 4px;
+}
+.panel4 input[type="range"]::-webkit-slider-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    background: #111111 !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.45) !important;
+}
+.panel4 input[type="range"]::-moz-range-track {
+    height: 8px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 4px;
+}
+.panel4 input[type="range"]::-moz-range-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    background: #111111 !important;
+    border: 3px solid #ffffff !important;
+}
 .panel4 .mode-category-title {
     color: #111111 !important;
     border-bottom-color: rgba(0,0,0,0.15) !important;
