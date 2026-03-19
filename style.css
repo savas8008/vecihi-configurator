@@ -43,7 +43,7 @@
     --bg-input: #ffffff;                   /* Input arkası */
     --bg-hover: rgba(0, 0, 0, 0.05);
     
-    --bg-terminal: #0d5ee2;             /* Log/Terminal arkası (Koyu kalmalı) */
+    --bg-terminal: #0C0C0C;             /* Log/Terminal arkası - CMD siyahı */
     --bg-3d-canvas: #c99b56;            /* 3D Sahne arkası */
     
     /* --- KENARLIK RENKLERİ --- */
@@ -204,12 +204,7 @@ a:hover {
    4. HEADER & NAVİGASYON
    ============================================ */
 .dashboard-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-default);
     padding: var(--spacing-md) 0;
     margin-bottom: var(--spacing-lg);
@@ -885,7 +880,7 @@ input[type="range"]::-moz-range-thumb {
    ============================================ */
 .log-container {
     background: var(--bg-terminal);
-    color: #cccccc;
+    color: #f0f0f0;
     font-family: var(--font-mono);
     font-size: var(--font-size-sm);
     padding: var(--spacing-md);
@@ -898,24 +893,25 @@ input[type="range"]::-moz-range-thumb {
 
 .log-entry {
     padding: 2px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #f0f0f0;
 }
 
 .log-time {
-    color: #666;
+    color: #aaaaaa;
     margin-right: var(--spacing-sm);
 }
 
-/* Log Renkleri */
-.log-info { color: var(--color-info); }
-.log-success { color: var(--color-success); }
-.log-warning { color: var(--color-warning); }
-.log-error { color: var(--color-danger); }
-.log-command { color: #a855f7; }
-.log-receive { color: #ec4899; }
-.search-match { 
-    background: rgba(245, 158, 11, 0.2); 
-    color: #fff; 
+/* Log Renkleri - CMD tarzı siyah/beyaz */
+.log-info    { color: #f0f0f0; }
+.log-success { color: #f0f0f0; }
+.log-warning { color: #f0f0f0; }
+.log-error   { color: #f0f0f0; }
+.log-command { color: #f0f0f0; }
+.log-receive { color: #f0f0f0; }
+.search-match {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
 }
 
 .system-stat {
@@ -1235,17 +1231,10 @@ input[type="range"]::-moz-range-thumb {
 
 /* Bağlantı Penceresi Garantisi */
 #connectionPrompt {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
     display: flex !important; /* Varsayılan olarak göster */
     align-items: center !important;
     justify-content: center !important;
-    z-index: 9999 !important;
-    background: rgba(0, 0, 0, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
+    padding: var(--spacing-xl) 0;
 }
 
 /* Bağlantı kurulduğunda pencereyi kesinlikle gizle */
