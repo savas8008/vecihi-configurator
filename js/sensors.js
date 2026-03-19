@@ -133,24 +133,25 @@
             }
 
             // Uçak Modeli - GLTF yükle
-            const loader = new THREE.GLTFLoader();
-            loader.load('models/scene.gltf', function(gltf) {
+            const GLTFLoaderClass = THREE.GLTFLoader || window.THREE_GLTFLoader;
+            if (!GLTFLoaderClass) {
+                console.error('GLTFLoader bulunamadı!');
+                return;
+            }
+            const loader = new GLTFLoaderClass();
+            loader.load('models/scene_embedded.gltf', function(gltf) {
                 airplaneModel = gltf.scene;
-                scene.add(airplaneModel);
 
-                // Önce sahneye ekle, sonra box hesapla
+                // Ölçekle: en uzun kenarı 3 birim yap
                 const box = new THREE.Box3().setFromObject(airplaneModel);
                 const size = box.getSize(new THREE.Vector3());
                 const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 3.0 / maxDim;
-                airplaneModel.scale.setScalar(scale);
+                airplaneModel.scale.setScalar(3.0 / maxDim);
 
-                // Scale sonrası merkezi hesapla
+                // Scale sonrası merkezi hesapla ve ortala
                 const box2 = new THREE.Box3().setFromObject(airplaneModel);
                 const center = box2.getCenter(new THREE.Vector3());
-                airplaneModel.position.x -= center.x;
-                airplaneModel.position.z -= center.z;
-                airplaneModel.position.y = -box2.min.y * 0 + 0.5;
+                airplaneModel.position.set(-center.x, -box2.min.y + 0.2, -center.z);
 
                 airplaneModel.traverse(function(child) {
                     if (child.isMesh) {
@@ -159,8 +160,10 @@
                     }
                 });
 
+                scene.add(airplaneModel);
+
                 if (controls) {
-                    controls.target.set(0, 0.5, 0);
+                    controls.target.set(0, 1, 0);
                     controls.update();
                 }
             }, undefined, function(err) {
