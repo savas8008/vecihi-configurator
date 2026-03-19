@@ -67,6 +67,8 @@ let advancedConfig = {
     nav_wp: {
         wp_capture_radius: 25
     },
+    // Flaperon
+    flaperon_offset: 150,
     // İniş Asistanı Ayarları
     land_assist: {
         circuit_alt: 50,
@@ -127,6 +129,11 @@ function handleAdvancedPageData(data) {
     // 8) Landing Assist
     if (data.land_assist) {
         advancedConfig.land_assist = Object.assign({}, advancedConfig.land_assist, data.land_assist);
+    }
+
+    // 9) Flaperon Offset
+    if (data.flaperon_offset !== undefined) {
+        advancedConfig.flaperon_offset = data.flaperon_offset;
     }
 
     updateAdvancedUI();
@@ -252,6 +259,14 @@ function updateAdvancedUI() {
     // --- Nav Waypoint ---
     if (advancedConfig.nav_wp) {
         setVal("inp_wp_capture_radius", advancedConfig.nav_wp.wp_capture_radius);
+    }
+
+    // --- Flaperon ---
+    if (advancedConfig.flaperon_offset !== undefined) {
+        const slider = document.getElementById('flaperonOffsetSlider');
+        const label  = document.getElementById('flaperonOffsetValue');
+        if (slider) slider.value = advancedConfig.flaperon_offset;
+        if (label)  label.textContent = advancedConfig.flaperon_offset;
     }
 
     // --- Landing Assist ---
@@ -410,6 +425,12 @@ function saveAdvancedConfig() {
     const nav_wp = {};
     setIf(nav_wp, "wp_capture_radius", int("inp_wp_capture_radius"));
     if (Object.keys(nav_wp).length) cfg.nav_wp = nav_wp;
+
+    // -------- Flaperon --------
+    const flaperonSlider = document.getElementById('flaperonOffsetSlider');
+    if (flaperonSlider) {
+        cfg.flaperon_offset = parseInt(flaperonSlider.value, 10);
+    }
 
     // -------- Landing Assist --------
     const la = {};

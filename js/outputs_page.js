@@ -104,15 +104,7 @@ function handleOutputsPageData(data) {
         updatePwmOutputs(data.outputs);
     }
 
-    // 5. Flaperon Offset
-    if (data.flaperon_offset !== undefined) {
-        const slider = document.getElementById('flaperonOffsetSlider');
-        const label  = document.getElementById('flaperonOffsetValue');
-        if (slider) slider.value = data.flaperon_offset;
-        if (label)  label.textContent = data.flaperon_offset;
-    }
-
-    // 6. Mikser Kazançları
+    // 5. Mikser Kazançları
     if (data.mixer) {
         const setMix = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
         setMix('mixRoll',     data.mixer.roll_mix);
@@ -364,10 +356,6 @@ function saveOutputsConfig() {
         }
     }
 
-    // Flaperon offset
-    const flaperonSlider = _$('flaperonOffsetSlider');
-    const flaperon_offset = flaperonSlider ? parseInt(flaperonSlider.value) : 150;
-
     // Mikser kazançları
     const getMixVal = (id, def) => {
         const el = document.getElementById(id);
@@ -386,7 +374,6 @@ function saveOutputsConfig() {
         aircraft_type: selectedAircraft,
         pins: pinConfig,
         servo_values: servoValues,
-        flaperon_offset: flaperon_offset,
         mixer: mixer
     };
 
