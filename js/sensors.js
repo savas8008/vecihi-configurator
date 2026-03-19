@@ -27,7 +27,6 @@
  * Ana HTML'den şu FONKSİYONLAR silinmelidir:
  * - init3DModel()
  * - animate3D()
- * - createWW2Airplane()
  * - initMap()
  * - handleQuaternionStream()
  * - handleSensorStream()
@@ -528,7 +527,6 @@
 
     window.init3DModel = init3DModel;
     window.animate3D = animate3D;
-    window.createWW2Airplane = createWW2Airplane;
     window.initMap = initMap;
     window.updateMapPosition = updateMapPosition;
     window.clearFlightPath = clearFlightPath;
@@ -544,7 +542,6 @@
     window.SensorsModule = {
         init3DModel: init3DModel,
         animate3D: animate3D,
-        createWW2Airplane: createWW2Airplane,
         initMap: initMap,
         updateMapPosition: updateMapPosition,
         clearFlightPath: clearFlightPath,
