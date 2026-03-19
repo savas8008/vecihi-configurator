@@ -287,6 +287,10 @@ a:hover {
 .panel4 .mixer-title        { color: #111111; }
 .panel4 .mixer-description  { color: #444444; }
 .panel4 small               { color: #555555 !important; }
+.panel4 .form-control,
+.panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
+.panel4 .form-control:focus,
+.panel4 .form-select:focus  { background-color: #ffffff !important; border-color: var(--color-primary) !important; }
 
 /* PID kutuları — panel4 metin renkleri */
 .panel4 .pid-label          { color: #333333 !important; }
@@ -351,10 +355,8 @@ a:hover {
 }
 
 .gradient-text {
-    background: linear-gradient(45deg, var(--color-brand-blue), #818cf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
     font-weight: 700;
     letter-spacing: -1px;
 }
@@ -1664,7 +1666,7 @@ label.small.text-muted,
 /* Tab menüsü - tercihler */
 .adv-tab { background: rgba(50, 85, 125, 0.70); border-color: rgba(255,255,255,0.14); color: #c8dff0; }
 .adv-tab:hover { background: rgba(60, 100, 145, 0.80); color: #ffffff; }
-.adv-tab.active { background: rgba(14, 165, 233, 0.20); color: var(--color-primary); border-color: var(--color-primary); border-bottom-color: transparent; }
+.adv-tab.active { background: #e8eaec; color: #111111; border-color: rgba(0,0,0,0.20); border-bottom-color: transparent; }
 
 /* h5/h6 card header renkleri */
 .card-header h5, .card-header .h5 { color: var(--text-primary) !important; font-size: var(--font-size-sm) !important; margin: 0; }
@@ -1835,9 +1837,9 @@ label.small.text-muted,
 }
 
 .adv-tab.active {
-    background: rgba(14, 165, 233, 0.20);
-    color: var(--color-primary);
-    border-color: var(--color-primary);
+    background: #e8eaec;
+    color: #111111;
+    border-color: rgba(0,0,0,0.20);
     border-bottom: 2px solid transparent;
     box-shadow: var(--shadow-sm);
 }
