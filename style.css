@@ -130,11 +130,11 @@
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'Consolas', 'Courier New', monospace;
 
-    --font-size-xs: 0.90rem;
-    --font-size-sm: 0.99rem;
-    --font-size-md: 0.99rem;
-    --font-size-lg: 1.20rem;
-    --font-size-xl: 1.30rem;
+    --font-size-xs: 0.69rem;
+    --font-size-sm: 1.0rem;
+    --font-size-md: 1.0rem;
+    --font-size-lg: 1.10rem;
+    --font-size-xl: 1.10rem;
 
     /* --- GEÇİŞLER --- */
     --transition-fast: 0.1s ease;
