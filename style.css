@@ -37,8 +37,18 @@
     /* --- ARKAPLAN RENKLERİ --- */
     --bg-body: #2e87df;                 /* Açık gri/beyaz */
     --bg-body-gradient: linear-gradient(135deg, #8c969b 0%, #e2e8f0 100%);
-    
-    --bg-panel: rgba(61, 198, 175, 0.504);  /* Panel arkası (glassmorphism) */
+
+    /* =========================================
+       PANEL HİYERARŞİSİ
+       .panel  → Sayfa bölümü dış kap (teal glassmorphism)
+       .panel2 → İç grup/kart (yarı şeffaf beyaz)
+       .panel3 → En iç içerik kartı (neredeyse beyaz)
+       Değiştirmek için sadece bu değişkenleri güncelleyin.
+    ========================================= */
+    --bg-panel:   rgba(61, 198, 175, 0.504);   /* Dış: teal glassmorphism */
+    --bg-panel-2: rgba(255, 255, 255, 0.55);   /* Orta: yarı şeffaf beyaz */
+    --bg-panel-3: rgba(255, 255, 255, 0.88);   /* İç: neredeyse beyaz */
+
     --bg-panel-solid: #d35f5f;             /* Solid panel */
     --bg-input: #ffffff;                   /* Input arkası */
     --bg-hover: rgba(0, 0, 0, 0.05);
@@ -232,8 +242,8 @@ a:hover {
 /* ============================================
    3. LAYOUT - PANELLER
    ============================================ */
+/* Ortak panel özellikleri */
 .panel, .panel2, .panel3, .sidebar {
-    background: var(--bg-panel);
     backdrop-filter: blur(var(--blur-amount));
     -webkit-backdrop-filter: blur(var(--blur-amount));
     border: 1px solid var(--border-default);
@@ -243,6 +253,11 @@ a:hover {
     box-shadow: var(--shadow-sm);
     color: var(--text-primary);
 }
+
+/* Hiyerarşik arka planlar */
+.panel, .sidebar { background: var(--bg-panel);   }  /* Dış: teal */
+.panel2           { background: var(--bg-panel-2); }  /* Orta: yarı beyaz */
+.panel3           { background: var(--bg-panel-3); }  /* İç: neredeyse beyaz */
 
 .panel-title {
     display: flex;
@@ -497,7 +512,7 @@ a:hover {
 }
 
 .cal-step {
-    background: #f0faf8;
+    background: var(--bg-panel-3);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-md);
     padding: var(--spacing-md) var(--spacing-sm);
@@ -1478,10 +1493,8 @@ label.small.text-muted,
 .mixer-description { color: var(--text-muted); font-size: var(--font-size-xs); }
 
 /* Kalibrasyon adım kutuları - panelle uyumlu */
-.cal-step {
-    background: #f0faf8 !important;
-    border: 1px solid var(--border-default) !important;
-}
+/* cal-step arka planı panel3 ile aynı — ayrı override gerekmez */
+.cal-step { border: 1px solid var(--border-default) !important; }
 .cal-step:hover:not(.disabled) {
     border-color: var(--color-primary) !important;
     background: rgba(14,165,233,0.07) !important;
