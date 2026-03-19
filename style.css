@@ -48,6 +48,7 @@
     --bg-panel:   rgba(9, 80, 76, 0.9);    /* Dış: koyu lacivert */
     --bg-panel-2: rgba(43, 94, 91, 0.9);     /* Orta: biraz açık çelik mavi */
     --bg-panel-3: rgba(13, 81, 78, 0.9);   /* İç: hafif aydınlık çelik mavi */
+    --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
 
     --bg-panel-solid: #dbe0e8;
     --bg-input: rgba(10, 20, 35, 0.85);      /* Input: koyu şeffaf */
@@ -263,7 +264,9 @@ a:hover {
 .panel4 {
     background: #e8eaec !important;
     color: #111111;
-    --border-default: rgba(0, 0, 0, 0.13);
+    --border-default:       rgba(0, 0, 0, 0.13);
+    /* cal-step ve diğer bileşenlerin background değişkenini override et */
+    --cal-step-bg:          #e8eaec;
     /* CSS değişkenlerini panel4 kapsamında koyu metne çevir */
     --text-primary:         #111111;
     --text-secondary:       #333333;
@@ -573,7 +576,7 @@ a:hover {
 }
 
 .cal-step {
-    background: var(--bg-panel-3);
+    background: var(--cal-step-bg);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-md);
     padding: var(--spacing-md) var(--spacing-sm);
