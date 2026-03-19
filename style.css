@@ -284,6 +284,29 @@ a:hover {
 .panel4 .mixer-description  { color: #444444; }
 .panel4 small               { color: #555555 !important; }
 
+/* PID kutuları — panel4 metin renkleri */
+.panel4 .pid-label          { color: #333333 !important; }
+.panel4 .pid-value          { color: #111111 !important; }
+.panel4 .pid-unit           { color: #555555 !important; }
+/* pid-axis: axis başlığı kendi renklerini (primary/info/warning) korur */
+
+/* Mod kartları — panel4 metin ve kontrol renkleri */
+.mode-card.panel4           { background: #e8eaec !important; }
+.panel4 .mode-name          { color: #111111 !important; }
+.panel4 .mode-channel-select {
+    background: #ffffff !important;
+    color: #111111 !important;
+    border: 1px solid rgba(0,0,0,0.20) !important;
+}
+.panel4 .range-track-container {
+    background: rgba(0, 0, 0, 0.10) !important;
+    border: 1px solid rgba(0,0,0,0.15) !important;
+}
+.panel4 .mode-category-title {
+    color: #111111 !important;
+    border-bottom-color: rgba(0,0,0,0.15) !important;
+}
+
 .panel-title {
     display: flex;
     align-items: center;

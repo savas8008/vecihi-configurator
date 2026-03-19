@@ -137,7 +137,7 @@ function renderModesPage() {
         const catModes = modeDefinitions.filter(m => m.cat === catKey);
         if (catModes.length === 0) return;
 
-        let html = `<div class="col-12"><div class="panel3 mb-1">`;
+        let html = `<div class="col-12"><div class="panel4 mb-1">`;
         html += `<div class="mode-category-title"><i class="bi ${catConfig.icon}"></i> ${catConfig.title}</div>`;
 
         catModes.forEach(def => {
@@ -149,7 +149,7 @@ function renderModesPage() {
             const max = savedData.max !== undefined ? savedData.max : def.defaultMax;
 
             html += `
-            <div class="mode-card" id="card-${def.key}" data-key="${def.key}">
+            <div class="mode-card panel4" id="card-${def.key}" data-key="${def.key}">
                 <div class="mode-header-row">
                     <span class="mode-name">${def.name}</span>
                     <select class="mode-channel-select" id="ch-${def.key}" onchange="updateModeUI('${def.key}')">
