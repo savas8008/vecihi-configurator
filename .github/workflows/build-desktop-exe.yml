@@ -1,0 +1,84 @@
+name: Build Desktop EXE
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_exe:
+        description: 'Exe yi branch e commit et'
+        type: boolean
+        default: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── WebView2 SDK ────────────────────────────────────────────────────────
+      - name: WebView2 SDK indir
+        shell: pwsh
+        working-directory: desktop
+        run: |
+          New-Item -ItemType Directory -Force -Path lib | Out-Null
+          $url = "https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/1.0.2792.45"
+          Invoke-WebRequest -Uri $url -OutFile "lib\webview2.nupkg"
+          Expand-Archive -Path "lib\webview2.nupkg" -DestinationPath "lib\webview2_sdk" -Force
+          Copy-Item "lib\webview2_sdk\build\native\include\WebView2.h" "lib\"
+          Copy-Item "lib\webview2_sdk\build\native\include\WebView2EnvironmentOptions.h" "lib\" -ErrorAction SilentlyContinue
+          Copy-Item "lib\webview2_sdk\build\native\include\WebView2Experimental.h" "lib\" -ErrorAction SilentlyContinue
+          Copy-Item "lib\webview2_sdk\build\native\include\WebView2ExperimentalEnvironmentOptions.h" "lib\" -ErrorAction SilentlyContinue
+          Write-Host "WebView2 SDK hazır."
+
+      # ── MinGW-w64 ───────────────────────────────────────────────────────────
+      - name: MinGW-w64 kur
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: false
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            make
+
+      # ── Build ───────────────────────────────────────────────────────────────
+      - name: CMake configure ve compile
+        shell: msys2 {0}
+        working-directory: desktop
+        run: |
+          mkdir -p build
+          cmake -S . -B build \
+            -G "MinGW Makefiles" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-O2 -DNDEBUG"
+          cmake --build build --config Release -j4
+
+      # ── Artifact olarak yükle (her zaman) ───────────────────────────────────
+      - name: Exe yi artifact olarak yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: XFlightConfigurator-exe
+          path: desktop/build/XFlightConfigurator.exe
+          retention-days: 30
+
+      # ── Branch e commit et (opsiyonel) ──────────────────────────────────────
+      - name: Exe yi proje kokune kopyala ve commit et
+        if: ${{ github.event.inputs.commit_exe == 'true' }}
+        shell: pwsh
+        run: |
+          Copy-Item "desktop\build\XFlightConfigurator.exe" "XFlightConfigurator.exe" -Force
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add XFlightConfigurator.exe
+          $status = git status --porcelain
+          if ($status) {
+            git commit -m "build: Windows exe eklendi (GitHub Actions ile derlendi)"
+            git push origin HEAD
+            Write-Host "Exe commit edildi ve push edildi."
+          } else {
+            Write-Host "Exe değişmemiş, commit atlanıyor."
+          }
