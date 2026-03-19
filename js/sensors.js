@@ -321,7 +321,7 @@
             if (data && data.q && Array.isArray(data.q) && data.q.length === 4) {
                 var w = data.q[0], x = data.q[1], y = data.q[2], z = data.q[3];
                 if (typeof targetQuaternion !== 'undefined' && targetQuaternion) {
-                    targetQuaternion.set(x, -z, -y, w);
+                    targetQuaternion.set(y, -z, -x, w);
                 }
             }
 
