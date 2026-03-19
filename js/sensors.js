@@ -75,7 +75,7 @@
             const near = 0.1;
             const far = 1000;
             camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-            camera.position.set(0, 2, 5);
+            camera.position.set(0, 3, 6);
 
             // Renderer - global 'renderer' değişkenini kullan
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -137,14 +137,12 @@
             scene.add(pivot);
 
             const model = createAircraftModel();
-            // GLTF Z-up → Y-up düzeltmesi (-90° X rotasyonu)
-            model.rotation.x = -Math.PI / 2;
             pivot.add(model);
 
-            // Ölçekle
+            // Ölçekle — rotasyon geometry'ye baked olduğu için düz hesap
             const box = new THREE.Box3().setFromObject(model);
             const maxDim = Math.max(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z);
-            model.scale.setScalar(3.0 / maxDim);
+            model.scale.setScalar(5.0 / maxDim);
 
             // Scale sonrası merkezi pivot'a getir
             const box2 = new THREE.Box3().setFromObject(model);
@@ -155,7 +153,7 @@
             airplaneModel = pivot;
 
             if (controls) {
-                controls.target.set(0, 1, 0);
+                controls.target.set(0, 1.5, 0);
                 controls.update();
             }
 
