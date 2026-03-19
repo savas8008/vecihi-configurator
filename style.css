@@ -65,40 +65,40 @@
     --data-z: #339af0;                  /* Z ekseni (mavi) */
     
     /* --- BOYUTLAR --- */
-    --radius-xs: 4px;
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --radius-xl: 20px;
+    --radius-xs: 2px;
+    --radius-sm: 3px;
+    --radius-md: 4px;
+    --radius-lg: 5px;
+    --radius-xl: 6px;
     --radius-full: 50px;
-    
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
-    
+
+    --spacing-xs: 2px;
+    --spacing-sm: 4px;
+    --spacing-md: 8px;
+    --spacing-lg: 12px;
+    --spacing-xl: 16px;
+
     /* --- BLUR & GÖLGE --- */
-    --blur-amount: 12px;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --shadow-glow: 0 0 20px var(--color-primary-glow);
-    
+    --blur-amount: 6px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 8px var(--color-primary-glow);
+
     /* --- FONTLAR --- */
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-    
-    --font-size-xs: 0.75rem;
-    --font-size-sm: 0.85rem;
-    --font-size-md: 1rem;
-    --font-size-lg: 1.25rem;
-    --font-size-xl: 1.5rem;
-    
+    --font-mono: 'Consolas', 'Courier New', monospace;
+
+    --font-size-xs: 0.68rem;
+    --font-size-sm: 0.73rem;
+    --font-size-md: 0.8rem;
+    --font-size-lg: 0.88rem;
+    --font-size-xl: 0.95rem;
+
     /* --- GEÇİŞLER --- */
-    --transition-fast: 0.15s ease;
-    --transition-normal: 0.25s ease;
-    --transition-slow: 0.4s ease;
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.15s ease;
+    --transition-slow: 0.25s ease;
 }
 
 /* ============================================
@@ -116,7 +116,7 @@ body {
     color: var(--text-primary);
     font-family: var(--font-sans);
     font-size: var(--font-size-md);
-    line-height: 1.6;
+    line-height: 1.35;
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -140,10 +140,11 @@ body {
 
 /* Başlıklar */
 h1, h2, h3, h4, h5, h6 {
-    margin: 0 0 var(--spacing-md);
+    margin: 0 0 var(--spacing-sm);
     font-weight: 600;
-    letter-spacing: -0.5px;
+    letter-spacing: 0;
     color: var(--text-primary);
+    font-size: var(--font-size-md);
 }
 
 a {
@@ -163,23 +164,22 @@ a:hover {
     backdrop-filter: blur(var(--blur-amount));
     -webkit-backdrop-filter: blur(var(--blur-amount));
     border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
     color: var(--text-primary);
-    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
 .panel-title {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-lg);
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--text-primary);
-    padding-bottom: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
     border-bottom: 1px solid var(--border-default);
 }
 .panel-title i {
@@ -206,8 +206,8 @@ a:hover {
 .dashboard-header {
     background: var(--bg-panel);
     border-bottom: 1px solid var(--border-default);
-    padding: var(--spacing-md) 0;
-    margin-bottom: var(--spacing-lg);
+    padding: 4px 0;
+    margin-bottom: 6px;
 }
 
 .gradient-text {
@@ -258,13 +258,14 @@ a:hover {
 .sidebar .nav-link {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 4px;
     color: var(--text-secondary);
-    padding: var(--spacing-sm) var(--spacing-md);
-    margin-bottom: var(--spacing-xs);
-    border-radius: var(--radius-md);
+    padding: 4px 6px;
+    margin-bottom: 1px;
+    border-radius: var(--radius-sm);
     border: 1px solid transparent;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
     transition: all var(--transition-fast);
 }
 
@@ -879,27 +880,29 @@ input[type="range"]::-moz-range-thumb {
    11. LOG TERMİNAL
    ============================================ */
 .log-container {
-    background: var(--bg-terminal);
+    background: #0C0C0C;
     color: #f0f0f0;
-    font-family: var(--font-mono);
-    font-size: var(--font-size-sm);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    height: 400px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: var(--radius-xs);
+    height: 280px;
     overflow-y: auto;
-    border: 1px solid #333;
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+    border: 1px solid #555;
 }
 
 .log-entry {
-    padding: 2px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 0;
+    line-height: 1.5;
     color: #f0f0f0;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 .log-time {
     color: #aaaaaa;
-    margin-right: var(--spacing-sm);
+    margin-right: 4px;
+    user-select: none;
 }
 
 /* Log Renkleri - CMD tarzı siyah/beyaz */
@@ -941,9 +944,13 @@ input[type="range"]::-moz-range-thumb {
     background-color: var(--bg-input) !important;
     border: 1px solid var(--border-default) !important;
     color: var(--text-primary) !important;
-    border-radius: var(--radius-md) !important;
-    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-xs) !important;
+    padding: 2px 6px;
+    font-size: var(--font-size-sm) !important;
     transition: all var(--transition-fast);
+    height: auto;
+    min-height: unset;
+    line-height: 1.4;
 }
 
 .form-control:focus,
@@ -976,16 +983,17 @@ input[type="range"]::-moz-range-thumb {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-lg);
+    gap: 3px;
+    padding: 3px 10px;
     font-size: var(--font-size-sm);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: var(--radius-sm);
+    letter-spacing: 0.3px;
+    border-radius: var(--radius-xs);
     border: none;
     cursor: pointer;
     transition: all var(--transition-fast);
+    line-height: 1.4;
 }
 
 .btn-primary {
@@ -1227,6 +1235,8 @@ input[type="range"]::-moz-range-thumb {
     background-color: #f1f5f9 !important;
     color: var(--text-secondary) !important;
     border-color: var(--border-default) !important;
+    padding: 2px 6px !important;
+    font-size: var(--font-size-sm) !important;
 }
 
 /* Bağlantı Penceresi Garantisi */
@@ -1241,3 +1251,118 @@ input[type="range"]::-moz-range-thumb {
 #connectionPrompt.d-none {
     display: none !important;
 }
+
+/* ============================================
+   20. COMPACT LAYOUT - Bootstrap Override
+   ============================================ */
+
+/* Grid gutter daraltma */
+.row { --bs-gutter-x: 0.4rem; --bs-gutter-y: 0; }
+.g-3, .gy-3, .gx-3 { --bs-gutter-x: 0.4rem !important; --bs-gutter-y: 0.4rem !important; }
+.g-4, .gy-4, .gx-4 { --bs-gutter-x: 0.4rem !important; --bs-gutter-y: 0.4rem !important; }
+
+/* Container padding daraltma */
+.container-fluid { padding-left: 8px !important; padding-right: 8px !important; }
+
+/* Bootstrap spacing sıfırlama */
+.py-3 { padding-top: 4px !important; padding-bottom: 4px !important; }
+.py-4 { padding-top: 6px !important; padding-bottom: 6px !important; }
+.px-3 { padding-left: 8px !important; padding-right: 8px !important; }
+.p-3  { padding: 8px !important; }
+.p-2  { padding: 4px !important; }
+.pt-3 { padding-top: 4px !important; }
+.pb-3 { padding-bottom: 4px !important; }
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: 2px !important; }
+.mb-2 { margin-bottom: 4px !important; }
+.mb-3 { margin-bottom: 6px !important; }
+.mb-4 { margin-bottom: 6px !important; }
+.mb-5 { margin-bottom: 8px !important; }
+.mt-2 { margin-top: 4px !important; }
+.mt-3 { margin-top: 6px !important; }
+.mt-4 { margin-top: 6px !important; }
+.me-2 { margin-right: 4px !important; }
+.me-3 { margin-right: 6px !important; }
+.ms-2 { margin-left: 4px !important; }
+.gap-3 { gap: 6px !important; }
+.gap-2 { gap: 4px !important; }
+
+/* Badge ve küçük elemanlar */
+.badge { font-size: 0.65rem; padding: 2px 5px; }
+.small, small { font-size: var(--font-size-xs) !important; }
+.h5, h5 { font-size: var(--font-size-sm) !important; margin-bottom: 4px; }
+.h4, h4 { font-size: var(--font-size-md) !important; margin-bottom: 4px; }
+.h3, h3 { font-size: var(--font-size-md) !important; margin-bottom: 4px; }
+.h2, h2 { font-size: var(--font-size-lg) !important; margin-bottom: 4px; }
+.h1, h1 { font-size: var(--font-size-lg) !important; margin-bottom: 4px; }
+.fs-1 { font-size: 1.4rem !important; }
+.fs-4 { font-size: var(--font-size-md) !important; }
+.display-1 { font-size: 2rem !important; }
+
+/* Input group */
+.input-group { height: auto; }
+.input-group-sm > .form-control,
+.input-group-sm > .input-group-text,
+.input-group-sm > .btn { padding: 1px 5px !important; font-size: var(--font-size-xs) !important; }
+
+/* Button sınıfları */
+.btn-sm { padding: 1px 6px !important; font-size: var(--font-size-xs) !important; }
+.btn-lg { padding: 4px 12px !important; font-size: var(--font-size-sm) !important; }
+
+/* Accordion */
+.accordion-button { padding: 4px 8px !important; font-size: var(--font-size-sm) !important; }
+.accordion-body  { padding: 4px 8px !important; }
+
+/* 3D canvas küçültme */
+#3d-canvas-container { height: 200px !important; min-height: 180px !important; }
+
+/* HUD panel - euler değerleri kompakt */
+.euler-panel { padding: 6px !important; }
+.arm-status { padding: 2px 0 !important; font-size: var(--font-size-sm) !important; letter-spacing: 1px; }
+.angle-box { padding: 3px !important; }
+.angle-label { font-size: 0.6rem !important; margin-bottom: 1px; }
+.angle-val { font-size: var(--font-size-sm) !important; }
+.mode-section { padding: 3px 6px !important; margin-top: 4px !important; }
+.hud-divider { margin: 4px 0 !important; }
+
+/* Kalibrasyon adımları */
+.cal-steps-container { gap: 4px !important; }
+.cal-step { padding: 6px 4px !important; }
+.cal-step-icon { font-size: 1.2rem !important; margin-bottom: 2px; }
+
+/* Outputs */
+.output-display { padding: 4px 6px !important; }
+.output-value { font-size: var(--font-size-sm) !important; margin: 1px 0 !important; }
+
+/* Mode cards */
+.mode-card { padding: 6px !important; margin-bottom: 4px !important; }
+.range-track-container { height: 24px !important; margin: 6px 0 !important; border-radius: 12px; }
+.input-range::-webkit-slider-thumb { width: 18px !important; height: 24px !important; }
+.live-marker { top: -4px !important; bottom: -4px !important; }
+.live-marker::after { top: -22px !important; font-size: 0.6rem !important; }
+
+/* Channel bars */
+.channel-row { padding: 3px 6px !important; margin-bottom: 2px !important; }
+.channel-track { height: 6px !important; margin: 0 6px !important; }
+.channel-label { width: 55px; font-size: var(--font-size-xs) !important; }
+.channel-value-text { width: 38px; font-size: var(--font-size-xs) !important; }
+
+/* PID */
+.pid-control { padding: 6px !important; margin-bottom: 4px !important; }
+.pid-axis { font-size: var(--font-size-sm) !important; margin-bottom: 4px; }
+
+/* Scrollbar daha ince */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+
+/* Connection prompt kompakt */
+#connectionPrompt .panel { padding: 16px !important; max-width: 340px; }
+#connectionPrompt .display-1 { font-size: 2rem !important; }
+
+/* Save button */
+.save-button-container { bottom: 14px; right: 14px; }
+#globalSaveBtn { padding: 4px 14px !important; font-size: var(--font-size-sm) !important; }
+
+/* Stat boxes */
+.stat-value { font-size: var(--font-size-lg) !important; }
+.stat-label { font-size: 0.6rem !important; }
