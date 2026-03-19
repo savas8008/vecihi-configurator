@@ -133,42 +133,23 @@
             }
 
             // Uçak Modeli - GLTF yükle
-            const GLTFLoaderClass = THREE.GLTFLoader || window.THREE_GLTFLoader;
-            if (!GLTFLoaderClass) {
-                console.error('GLTFLoader bulunamadı!');
-                return;
+            airplaneModel = createAircraftModel();
+
+            // Ölçekle ve ortala
+            scene.add(airplaneModel);
+            const box = new THREE.Box3().setFromObject(airplaneModel);
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            airplaneModel.scale.setScalar(3.0 / maxDim);
+
+            const box2 = new THREE.Box3().setFromObject(airplaneModel);
+            const center = box2.getCenter(new THREE.Vector3());
+            airplaneModel.position.set(-center.x, -box2.min.y + 0.2, -center.z);
+
+            if (controls) {
+                controls.target.set(0, 1, 0);
+                controls.update();
             }
-            const loader = new GLTFLoaderClass();
-            loader.load('models/scene_embedded.gltf', function(gltf) {
-                airplaneModel = gltf.scene;
-
-                // Ölçekle: en uzun kenarı 3 birim yap
-                const box = new THREE.Box3().setFromObject(airplaneModel);
-                const size = box.getSize(new THREE.Vector3());
-                const maxDim = Math.max(size.x, size.y, size.z);
-                airplaneModel.scale.setScalar(3.0 / maxDim);
-
-                // Scale sonrası merkezi hesapla ve ortala
-                const box2 = new THREE.Box3().setFromObject(airplaneModel);
-                const center = box2.getCenter(new THREE.Vector3());
-                airplaneModel.position.set(-center.x, -box2.min.y + 0.2, -center.z);
-
-                airplaneModel.traverse(function(child) {
-                    if (child.isMesh) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                    }
-                });
-
-                scene.add(airplaneModel);
-
-                if (controls) {
-                    controls.target.set(0, 1, 0);
-                    controls.update();
-                }
-            }, undefined, function(err) {
-                console.error('GLTF yüklenemedi:', err);
-            });
 
             // Resize Observer
             const onResize = () => {
