@@ -155,18 +155,13 @@ function selectAlignOption(alignId) {
 function updateAlignSaveBtn() {
     const btn = document.getElementById('btnSaveAlign');
     if (!btn) return;
-    const changed = (pendingSensorAlign !== currentSensorAlign);
     btn.disabled = !isConnected();
-    btn.classList.toggle('btn-warning', changed);
-    btn.classList.toggle('btn-primary', !changed);
-    btn.innerHTML = changed
-        ? '<i class="bi bi-exclamation-triangle me-1"></i> Kaydet (Kalibrasyon Sıfırlanacak!)'
-        : '<i class="bi bi-save me-1"></i> Kaydet';
+    btn.className = 'btn btn-warning shadow-sm';
+    btn.innerHTML = '<i class="bi bi-save me-1"></i> Kaydet';
 }
 
 /**
  * Kaydet butonuna tıklandığında çağrılır.
- * Eğer yönelim değiştiyse kullanıcıyı uyarır.
  */
 function saveSensorAlign() {
     if (!isConnected()) {
@@ -174,28 +169,11 @@ function saveSensorAlign() {
         return;
     }
 
-    if (pendingSensorAlign === currentSensorAlign) {
-        showModal('Değişiklik Yok', 'Sensör yönelimi zaten bu değerde.', 'info');
-        return;
-    }
-
     const newOpt = ALIGN_OPTIONS.find(o => o.id === pendingSensorAlign);
     const label = newOpt ? newOpt.label : `#${pendingSensorAlign}`;
-
-    // Onay modalı
-    showConfirmModal(
-        '⚠️ Kalibrasyon Sıfırlanacak!',
-        `<p>Sensör yönelimini <strong>${label}</strong> olarak değiştirmek üzeresiniz.</p>
-         <p class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>
-         <strong>Mevcut kalibrasyon verileri (ivmeölçer + jiroskop) tamamen silinecektir.</strong></p>
-         <p>Yeni yönelimle cihazı yeniden kalibre etmeniz gerekecektir.</p>
-         <p>Devam etmek istiyor musunuz?</p>`,
-        () => {
-            const payload = JSON.stringify({ align: pendingSensorAlign });
-            sendCommand(`SAVE_SENSOR_ALIGN ${payload}`);
-            log(`📐 Sensör hizalaması gönderildi: ${label}`, 'command');
-        }
-    );
+    const payload = JSON.stringify({ align: pendingSensorAlign });
+    sendCommand(`SAVE_SENSOR_ALIGN ${payload}`);
+    log(`Sensör hizalaması gönderildi: ${label}`, 'command');
 }
 
 /**
