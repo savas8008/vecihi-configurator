@@ -88,9 +88,9 @@
 
     /* t-aciklama: Yardım metni, talimatlar */
     --t-aciklama-size:   var(--font-size-sm);
-    --t-aciklama-weight: 400;
-    --t-aciklama-color:  var(--text-muted);
-    --t-aciklama-style:  italic;
+    --t-aciklama-weight: 500;
+    --t-aciklama-color:  #c8dff0;
+    --t-aciklama-style:  normal;
 
     /* t-deger: Sensör/ölçüm değerleri */
     --t-deger-size:   var(--font-size-sm);
@@ -597,18 +597,18 @@ a:hover {
 
 .aircraft-card.active {
     border-color: var(--color-primary);
-    background: rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 15px var(--color-primary-glow);
+    background: rgba(14, 165, 233, 0.30);
+    box-shadow: 0 0 18px var(--color-primary-glow);
 }
 
 .aircraft-card h5 {
-    color: var(--text-primary);
+    color: #ffffff;
     font-weight: 700;
     margin-bottom: var(--spacing-xs);
 }
 
 .aircraft-card small {
-    color: var(--text-secondary);
+    color: #b0cfe8;
     font-size: var(--font-size-xs);
 }
 
@@ -757,8 +757,8 @@ a:hover {
    9. UÇUŞ MODLARI
    ============================================ */
 .mode-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid var(--border-default);
+    background: rgba(35, 65, 100, 0.75);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
@@ -799,11 +799,11 @@ a:hover {
     position: relative;
     width: 100%;
     height: 36px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(10, 25, 50, 0.70);
     border-radius: 18px;
     margin: var(--spacing-lg) 0;
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--border-light);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255,255,255,0.10);
 }
 
 .range-fill {
@@ -888,14 +888,14 @@ a:hover {
 }
 
 .mode-category-title {
-    color: var(--text-secondary);
+    color: #ffffff;
     font-size: var(--font-size-sm);
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     padding-bottom: var(--spacing-sm);
     margin: var(--spacing-md) 0 var(--spacing-md);
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
 }
 
 .mode-category-title i {
@@ -1496,9 +1496,9 @@ label.small.text-muted,
     transform: translateY(-1px);
 }
 .aircraft-card.active {
-    background: rgba(14,165,233,0.1);
+    background: rgba(14,165,233,0.30);
     border-color: var(--color-primary);
-    box-shadow: 0 0 8px var(--color-primary-glow);
+    box-shadow: 0 0 14px var(--color-primary-glow);
 }
 .mixer-title   { font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); }
 .mixer-description { color: var(--text-muted); font-size: var(--font-size-xs); }
@@ -1552,9 +1552,9 @@ label.small.text-muted,
 .text-success.h5, h3.text-success { color: var(--text-primary) !important; font-size: var(--font-size-md) !important; }
 
 /* Tab menüsü - tercihler */
-.adv-tab { background: var(--bg-panel-3); border-color: var(--border-default); color: var(--text-secondary); }
-.adv-tab:hover { background: var(--bg-panel-2); color: var(--text-primary); }
-.adv-tab.active { background: var(--bg-panel); color: var(--color-primary); border-bottom-color: var(--bg-panel); }
+.adv-tab { background: rgba(50, 85, 125, 0.70); border-color: rgba(255,255,255,0.14); color: #c8dff0; }
+.adv-tab:hover { background: rgba(60, 100, 145, 0.80); color: #ffffff; }
+.adv-tab.active { background: rgba(14, 165, 233, 0.20); color: var(--color-primary); border-color: var(--color-primary); border-bottom-color: transparent; }
 
 /* h5/h6 card header renkleri */
 .card-header h5, .card-header .h5 { color: var(--text-primary) !important; font-size: var(--font-size-sm) !important; margin: 0; }
@@ -1703,10 +1703,10 @@ label.small.text-muted,
 }
 
 .adv-tab {
-    background: var(--bg-panel-3);
-    border: 1px solid var(--border-default);
+    background: rgba(50, 85, 125, 0.70);
+    border: 1px solid rgba(255,255,255,0.14);
     border-bottom: none;
-    color: var(--text-secondary);
+    color: #c8dff0;
     padding: 5px 14px;
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -1720,15 +1720,15 @@ label.small.text-muted,
 }
 
 .adv-tab:hover {
-    background: var(--bg-panel-2);
-    color: var(--text-primary);
+    background: rgba(60, 100, 145, 0.80);
+    color: #ffffff;
 }
 
 .adv-tab.active {
-    background: var(--bg-panel);
+    background: rgba(14, 165, 233, 0.20);
     color: var(--color-primary);
-    border-color: var(--border-default);
-    border-bottom: 2px solid var(--bg-panel);
+    border-color: var(--color-primary);
+    border-bottom: 2px solid transparent;
     box-shadow: var(--shadow-sm);
 }
 
