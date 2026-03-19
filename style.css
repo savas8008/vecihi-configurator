@@ -15,7 +15,7 @@
     --color-brand-blue: #38bdf8;        /* Sky-400 — aviation mavi */
     --color-brand-blue-rgb: 56, 189, 248;
 
-    --color-primary: #0ea5e9;           /* Sky Blue */
+    --color-primary: #000102;           /* Sky Blue */
     --color-primary-hover: #abccdc;     /* Darker Blue */
     --color-primary-glow: rgba(14, 165, 233, 0.3);
     
@@ -35,7 +35,7 @@
     --color-info: #0ea5e9;              /* Açık mavi - Bilgi */
     
     /* --- ARKAPLAN RENKLERİ --- */
-    --bg-body: #0d1520;
+    --bg-body: #c0cfe3;
     --bg-body-gradient: linear-gradient(160deg, #0a111c 0%, #0f1e30 50%, #0a1628 100%);
 
     /* =========================================
@@ -45,11 +45,11 @@
        .panel3 → En iç içerik kartı
        Değiştirmek için sadece bu değişkenleri güncelleyin.
     ========================================= */
-    --bg-panel:   rgba(20, 40, 65, 0.90);    /* Dış: koyu lacivert */
-    --bg-panel-2: rgba(30, 55, 85, 0.80);    /* Orta: biraz açık çelik mavi */
-    --bg-panel-3: rgba(40, 68, 100, 0.70);   /* İç: hafif aydınlık çelik mavi */
+    --bg-panel:   rgba(28, 144, 138, 0.9);    /* Dış: koyu lacivert */
+    --bg-panel-2: rgba(43, 94, 91, 0.9);     /* Orta: biraz açık çelik mavi */
+    --bg-panel-3: rgba(13, 81, 78, 0.9);   /* İç: hafif aydınlık çelik mavi */
 
-    --bg-panel-solid: #1a3050;
+    --bg-panel-solid: #dbe0e8;
     --bg-input: rgba(10, 20, 35, 0.85);      /* Input: koyu şeffaf */
     --bg-hover: rgba(255, 255, 255, 0.06);
     
@@ -63,10 +63,10 @@
 
     /* --- METİN RENKLERİ --- */
     --text-primary:   #dce8f5;          /* Ana metin — açık mavi-beyaz */
-    --text-secondary: #7fa8c9;          /* İkincil metin — çelik mavi-gri */
+    --text-secondary: #ffffff;          /* İkincil metin — çelik mavi-gri */
     --text-muted:     #4d708f;          /* Soluk metin */
     --text-inverse:   #0d1520;          /* Ters metin (koyu arka plana karşı) */
-    --text-value:     #34d399;          /* Değer rengi (emerald yeşil) */
+    --text-value:     #fd1e1e;          /* Değer rengi (emerald yeşil) */
 
     /* =========================================
        MERKEZİ METİN TİPOGRAFİ SİSTEMİ
