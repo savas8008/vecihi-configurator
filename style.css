@@ -45,7 +45,7 @@
        .panel3 → En iç içerik kartı
        Değiştirmek için sadece bu değişkenleri güncelleyin.
     ========================================= */
-    --bg-panel:   rgba(28, 144, 138, 0.9);    /* Dış: koyu lacivert */
+    --bg-panel:   rgba(9, 80, 76, 0.9);    /* Dış: koyu lacivert */
     --bg-panel-2: rgba(43, 94, 91, 0.9);     /* Orta: biraz açık çelik mavi */
     --bg-panel-3: rgba(13, 81, 78, 0.9);   /* İç: hafif aydınlık çelik mavi */
 
