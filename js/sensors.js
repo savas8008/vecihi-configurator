@@ -132,15 +132,44 @@
                 console.warn('OrbitControls yüklenmemiş, kamera kontrolü devre dışı.');
             }
 
-            // Uçak Modeli - global 'airplaneModel' değişkenini kullan
-            airplaneModel = createFPVAirplane();
-            airplaneModel.position.y = 0.5;
-            airplaneModel.castShadow = true;
-            scene.add(airplaneModel);
+            // Uçak Modeli - GLTF yükle
+            const loader = new THREE.GLTFLoader();
+            loader.load('models/scene.gltf', function(gltf) {
+                airplaneModel = gltf.scene;
 
-            if (controls) {
-                controls.target.copy(airplaneModel.position);
-            }
+                // Modeli ölçeklendir ve konumlandır
+                const box = new THREE.Box3().setFromObject(airplaneModel);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 3.0 / maxDim;
+                airplaneModel.scale.setScalar(scale);
+
+                // Merkeze al
+                const center = box.getCenter(new THREE.Vector3());
+                airplaneModel.position.sub(center.multiplyScalar(scale));
+                airplaneModel.position.y = 0.5;
+
+                airplaneModel.traverse(child => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                scene.add(airplaneModel);
+
+                if (controls) {
+                    controls.target.set(0, 0.5, 0);
+                    controls.update();
+                }
+            }, undefined, function(err) {
+                console.error('GLTF yüklenemedi:', err);
+                // Fallback: geometrik model
+                airplaneModel = createFPVAirplane();
+                airplaneModel.position.y = 0.5;
+                scene.add(airplaneModel);
+                if (controls) controls.target.copy(airplaneModel.position);
+            });
 
             // Resize Observer
             const onResize = () => {
