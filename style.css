@@ -1552,8 +1552,8 @@ label.small.text-muted,
 .text-success.h5, h3.text-success { color: var(--text-primary) !important; font-size: var(--font-size-md) !important; }
 
 /* Tab menüsü - tercihler */
-.adv-tab { background: rgba(0,0,0,0.04); border-color: var(--border-default); color: var(--text-secondary); }
-.adv-tab:hover { background: rgba(0,0,0,0.08); color: var(--text-primary); }
+.adv-tab { background: var(--bg-panel-3); border-color: var(--border-default); color: var(--text-secondary); }
+.adv-tab:hover { background: var(--bg-panel-2); color: var(--text-primary); }
 .adv-tab.active { background: var(--bg-panel); color: var(--color-primary); border-bottom-color: var(--bg-panel); }
 
 /* h5/h6 card header renkleri */
@@ -1703,7 +1703,7 @@ label.small.text-muted,
 }
 
 .adv-tab {
-    background: transparent;
+    background: var(--bg-panel-3);
     border: 1px solid var(--border-default);
     border-bottom: none;
     color: var(--text-secondary);
@@ -1720,7 +1720,7 @@ label.small.text-muted,
 }
 
 .adv-tab:hover {
-    background: var(--bg-hover);
+    background: var(--bg-panel-2);
     color: var(--text-primary);
 }
 
