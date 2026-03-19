@@ -497,7 +497,7 @@ a:hover {
 }
 
 .cal-step {
-    background: rgba(255, 255, 255, 0.72);
+    background: #f0faf8;
     border: 2px solid var(--border-default);
     border-radius: var(--radius-md);
     padding: var(--spacing-md) var(--spacing-sm);
@@ -1479,7 +1479,7 @@ label.small.text-muted,
 
 /* Kalibrasyon adım kutuları - panelle uyumlu */
 .cal-step {
-    background: rgba(255,255,255,0.72) !important;
+    background: #f0faf8 !important;
     border: 1px solid var(--border-default) !important;
 }
 .cal-step:hover:not(.disabled) {
