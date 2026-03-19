@@ -12,8 +12,8 @@
    ============================================ */
 :root {
     /* --- ANA RENKLER --- */
-    --color-brand-blue: #ea2e2e;        /* Özel Mavi Tonu */
-    --color-brand-blue-rgb: 234, 46, 46;
+    --color-brand-blue: #38bdf8;        /* Sky-400 — aviation mavi */
+    --color-brand-blue-rgb: 56, 189, 248;
 
     --color-primary: #0ea5e9;           /* Sky Blue */
     --color-primary-hover: #abccdc;     /* Darker Blue */
@@ -35,38 +35,38 @@
     --color-info: #0ea5e9;              /* Açık mavi - Bilgi */
     
     /* --- ARKAPLAN RENKLERİ --- */
-    --bg-body: #2e87df;                 /* Açık gri/beyaz */
-    --bg-body-gradient: linear-gradient(135deg, #8c969b 0%, #e2e8f0 100%);
+    --bg-body: #0d1520;
+    --bg-body-gradient: linear-gradient(160deg, #0a111c 0%, #0f1e30 50%, #0a1628 100%);
 
     /* =========================================
-       PANEL HİYERARŞİSİ
-       .panel  → Sayfa bölümü dış kap (teal glassmorphism)
-       .panel2 → İç grup/kart (yarı şeffaf beyaz)
-       .panel3 → En iç içerik kartı (neredeyse beyaz)
+       PANEL HİYERARŞİSİ  (koyu aviation teması)
+       .panel  → Sayfa bölümü dış kap
+       .panel2 → İç grup/kart
+       .panel3 → En iç içerik kartı
        Değiştirmek için sadece bu değişkenleri güncelleyin.
     ========================================= */
-    --bg-panel:   rgba(61, 198, 175, 0.504);   /* Dış: teal glassmorphism */
-    --bg-panel-2: rgba(255, 255, 255, 0.55);   /* Orta: yarı şeffaf beyaz */
-    --bg-panel-3: rgba(255, 255, 255, 0.88);   /* İç: neredeyse beyaz */
+    --bg-panel:   rgba(20, 40, 65, 0.90);    /* Dış: koyu lacivert */
+    --bg-panel-2: rgba(30, 55, 85, 0.80);    /* Orta: biraz açık çelik mavi */
+    --bg-panel-3: rgba(40, 68, 100, 0.70);   /* İç: hafif aydınlık çelik mavi */
 
-    --bg-panel-solid: #d35f5f;             /* Solid panel */
-    --bg-input: #ffffff;                   /* Input arkası */
-    --bg-hover: rgba(0, 0, 0, 0.05);
+    --bg-panel-solid: #1a3050;
+    --bg-input: rgba(10, 20, 35, 0.85);      /* Input: koyu şeffaf */
+    --bg-hover: rgba(255, 255, 255, 0.06);
     
-    --bg-terminal: #0C0C0C;             /* Log/Terminal arkası - CMD siyahı */
-    --bg-3d-canvas: #c99b56;            /* 3D Sahne arkası */
+    --bg-terminal: #060e18;             /* Log/Terminal arkası */
+    --bg-3d-canvas: #080f1a;            /* 3D Sahne arkası — derin koyu */
     
     /* --- KENARLIK RENKLERİ --- */
-    --border-default: rgba(0, 0, 0, 0.1);
-    --border-light: rgba(0, 0, 0, 0.05);
+    --border-default: rgba(255, 255, 255, 0.09);
+    --border-light:   rgba(255, 255, 255, 0.04);
     --border-focus: var(--color-primary);
-    
+
     /* --- METİN RENKLERİ --- */
-    --text-primary: #000000;            /* Ana metin (Tam Siyah) */
-    --text-secondary: #4a5568;          /* İkincil metin - açıklamalar için gri */
-    --text-muted: #718096;              /* Soluk metin - etiketler için açık gri */
-    --text-inverse: #ffffff;            /* Ters metin (Beyaz) */
-    --text-value: #16a34a;              /* Değer rengi (yeşil) */
+    --text-primary:   #dce8f5;          /* Ana metin — açık mavi-beyaz */
+    --text-secondary: #7fa8c9;          /* İkincil metin — çelik mavi-gri */
+    --text-muted:     #4d708f;          /* Soluk metin */
+    --text-inverse:   #0d1520;          /* Ters metin (koyu arka plana karşı) */
+    --text-value:     #34d399;          /* Değer rengi (emerald yeşil) */
 
     /* =========================================
        MERKEZİ METİN TİPOGRAFİ SİSTEMİ
@@ -120,10 +120,10 @@
     --spacing-xl: 16px;
 
     /* --- BLUR & GÖLGE --- */
-    --blur-amount: 6px;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.25);
-    --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --blur-amount: 8px;
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.65);
     --shadow-glow: 0 0 8px var(--color-primary-glow);
 
     /* --- FONTLAR --- */
@@ -299,7 +299,7 @@ a:hover {
 }
 
 .gradient-text {
-    background: linear-gradient(45deg, var(--color-brand-blue), #4f46e5);
+    background: linear-gradient(45deg, var(--color-brand-blue), #818cf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
