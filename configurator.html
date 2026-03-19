@@ -152,11 +152,7 @@
         <i class="bi bi-map me-2"></i> Waypoint
     </a>
 </li>
-                        <li class="nav-item">
-    <a class="nav-link" href="#" data-page="sensor_align">
-        <i class="bi bi-arrow-repeat me-2"></i> Sensör Hizalama
-    </a>
-</li>
+
                         <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> Loglar</a></li>
                     </ul>
                 </div>
@@ -492,6 +488,20 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Sensör Yönelimi -->
+  <div class="panel3 p-3 mb-3">
+    <div class="t-baslik mb-1">Sensör Yönelimi (Board Alignment)</div>
+    <div class="t-aciklama mb-2">Uçuş kontrol kartının gövde içindeki montaj yönünü seçin. Değiştirildiğinde kalibrasyon sıfırlanır.</div>
+    <div class="d-flex align-items-center gap-2">
+      <select class="form-select form-select-sm" id="sensorAlignSelect" style="max-width:220px;" onchange="selectAlignOption(parseInt(this.value))">
+        <!-- JS tarafından doldurulur -->
+      </select>
+      <button class="btn btn-warning btn-sm" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
+        <i class="bi bi-save me-1"></i> Yönelimi Kaydet
+      </button>
+    </div>
   </div>
 
   <!-- Butonlar (sayfa altı) -->
@@ -1952,68 +1962,6 @@ function switchAdvTab(tabId, btn) {
     </div>
 </div>
 
-<!-- ==================== SENSOR HIZALAMA SAYFASI ==================== -->
-<div id="sensor_align" class="page">
-  <div class="panel mb-4">
-    <h2 class="panel-title"><i class="bi bi-arrow-repeat"></i> Sensör Yönelimi (Board Alignment)</h2>
-    <p class="text-muted mb-3" style="font-size:0.92rem;">
-      Uçuş kontrol kartınızın gövde içinde nasıl monte edildiğini seçin.
-      <strong>Yönelim değiştirildiğinde mevcut kalibrasyon verileri sıfırlanır</strong> ve yeniden kalibrasyon gerekir.
-    </p>
-
-    <!-- Normal Montaj -->
-    <h6 class="text-uppercase text-muted mb-2" style="letter-spacing:.07em; font-size:.78rem;">
-      <i class="bi bi-arrow-up-circle me-1"></i> Normal Montaj (Z ekseni yukarı)
-    </h6>
-    <div class="row g-3 mb-4" id="alignCardsContainer">
-      <!-- JS tarafından doldurulur -->
-    </div>
-
-    <!-- Bilgi Kutusu -->
-    <div class="alert alert-warning d-flex align-items-start gap-2 py-2 px-3 mb-4" style="font-size:.85rem;">
-      <i class="bi bi-exclamation-triangle-fill mt-1" style="flex-shrink:0;"></i>
-      <div>
-        <strong>Önemli:</strong> Sensör yönelimini değiştirdiğinizde ivmeölçer ve jiroskop kalibrasyon değerleri
-        sıfırlanır. Kaydetmeden önce doğru yönelimi seçtiğinizden emin olun, ardından kalibrasyonu yeniden yapın.
-      </div>
-    </div>
-
-    <div class="d-flex gap-2">
-      <button class="btn btn-warning shadow-sm" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
-        <i class="bi bi-save me-1"></i> Kaydet
-      </button>
-    </div>
-  </div>
-
-  <!-- Açıklama -->
-  <div class="panel">
-    <h2 class="panel-title"><i class="bi bi-info-circle"></i> Yönelim Açıklaması</h2>
-    <div class="row g-3">
-      <div class="col-md-6">
-        <div class="p-3 rounded" style="background:rgba(37,99,235,.08); border:1px solid rgba(37,99,235,.2);">
-          <h6 class="mb-2"><i class="bi bi-arrow-up-circle text-primary me-1"></i> Normal Montaj</h6>
-          <ul class="mb-0" style="font-size:.86rem; padding-left:1.2rem;">
-            <li><strong>CW 0°</strong> — Kart düz, bağlantı noktası öne bakıyor</li>
-            <li><strong>CW 90°</strong> — Kart düz, saat yönünde 90° çevrilmiş</li>
-            <li><strong>CW 180°</strong> — Kart düz, bağlantı noktası arkaya bakıyor</li>
-            <li><strong>CW 270°</strong> — Kart düz, saat yönünde 270° çevrilmiş</li>
-          </ul>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="p-3 rounded" style="background:rgba(124,58,237,.08); border:1px solid rgba(124,58,237,.2);">
-          <h6 class="mb-2"><i class="bi bi-arrow-down-circle text-purple me-1" style="color:#7c3aed;"></i> Tepetaklak Montaj (Flip)</h6>
-          <ul class="mb-0" style="font-size:.86rem; padding-left:1.2rem;">
-            <li><strong>CW 0° + Flip</strong> — Kart tepetaklak, bağlantı öne</li>
-            <li><strong>CW 90° + Flip</strong> — Tepetaklak + 90° çevrilmiş</li>
-            <li><strong>CW 180° + Flip</strong> — Tepetaklak + 180° çevrilmiş</li>
-            <li><strong>CW 270° + Flip</strong> — Tepetaklak + 270° çevrilmiş</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ==================== WAYPOINT MİSYON SAYFASI ==================== -->
 <div id="waypoint" class="page">

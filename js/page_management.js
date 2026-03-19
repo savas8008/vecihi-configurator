@@ -47,8 +47,9 @@ function managePageStreams(page) {
     setTimeout(() => {
         if (page === 'waypoint') {
             sendCommand('GET_WAYPOINTS');
-        } else if (page === 'sensor_align') {
-            if (typeof onSensorAlignPageShow === 'function') onSensorAlignPageShow();
+        } else if (page === 'calibration') {
+            sendCommand('calibration_page_data');
+            if (typeof onSensorAlignInit === 'function') onSensorAlignInit();
         } else if (page !== 'sensors') {
             sendCommand(page + '_page_data');
         }
