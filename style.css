@@ -260,6 +260,15 @@ a:hover {
 .panel2           { background: var(--bg-panel-2); }  /* Orta */
 .panel3           { background: var(--bg-panel-3); }  /* İç */
 
+/* Panel 3 — koyu teal zeminde tüm metin beyaz */
+.panel3 {
+    --t-alt-baslik-color: #ffffff;
+    --t-baslik-color:     #ffffff;
+    --t-deger-color:      #ffffff;
+    --text-value:         #ffffff;
+    --text-primary:       #ffffff;
+}
+
 /* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
 .panel4 {
     background: #e8eaec !important;
