@@ -106,16 +106,16 @@
                     </h1>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <div class="d-flex align-items-center justify-content-md-end gap-3 panel2">
-                        <div class="connection-status d-flex align-items-center panel3">
+                    <div class="d-flex align-items-center justify-content-md-end gap-3">
+                        <div class="connection-status" id="connectionStatusBox">
                             <span class="status-indicator status-off" id="statusIndicator"></span>
                             <span id="connectionStatus">Bağlantı Yok</span>
                         </div>
-                        <button class="btn btn-primary" id="btnConnect">
-                            <i class="bi bi-usb-plug"></i> Porta Bağlan
+                        <button class="btn btn-connect" id="btnConnect">
+                            <i class="bi bi-usb-plug me-1"></i> Porta Bağlan
                         </button>
-                        <button class="btn btn-danger d-none" id="btnDisconnect">
-                            <i class="bi bi-usb-plug-fill"></i> Bağlantıyı Kes
+                        <button class="btn btn-disconnect d-none" id="btnDisconnect">
+                            <i class="bi bi-usb-plug-fill me-1"></i> Bağlantıyı Kes
                         </button>
                     </div>
                 </div>
@@ -164,7 +164,7 @@
                         <i class="bi bi-usb-symbol display-1 text-muted mb-4 gradient-text mb-3"></i>
                         <h2 class="gradient-text mb-3">Seri Port Bağlantısı Gerekli</h2>
                         <p class="gradient-text mb-3">Uygulamayı kullanmak için lütfen cihazınızı seri porta bağlayın.</p>
-                        <button class="btn btn-primary btn-lg" id="btnConnectPrompt">
+                        <button class="btn btn-connect btn-lg" id="btnConnectPrompt">
                             <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
                         </button>
                     </div>
@@ -350,7 +350,7 @@
 
         <div class="cal-steps-container cal-steps-6 mb-0">
 
-          <div class="cal-step panel3" data-target="#btn-pose-zp" data-step="1">
+          <div class="cal-step panel4" data-target="#btn-pose-zp" data-step="1">
             <div class="cal-step-body">
               <i class="bi bi-record-circle cal-step-icon"></i>
               <div class="cal-step-values">
@@ -361,7 +361,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-zn" data-step="2">
+          <div class="cal-step panel4" data-target="#btn-pose-zn" data-step="2">
             <div class="cal-step-body">
               <i class="bi bi-record-circle-fill cal-step-icon"></i>
               <div class="cal-step-values">
@@ -372,7 +372,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-xp" data-step="3">
+          <div class="cal-step panel4" data-target="#btn-pose-xp" data-step="3">
             <div class="cal-step-body">
               <i class="bi bi-arrow-up cal-step-icon"></i>
               <div class="cal-step-values">
@@ -383,7 +383,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-xn" data-step="4">
+          <div class="cal-step panel4" data-target="#btn-pose-xn" data-step="4">
             <div class="cal-step-body">
               <i class="bi bi-arrow-down cal-step-icon"></i>
               <div class="cal-step-values">
@@ -394,7 +394,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-yp" data-step="5">
+          <div class="cal-step panel4" data-target="#btn-pose-yp" data-step="5">
             <div class="cal-step-body">
               <i class="bi bi-arrow-right cal-step-icon"></i>
               <div class="cal-step-values">
@@ -405,7 +405,7 @@
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
-          <div class="cal-step panel3" data-target="#btn-pose-yn" data-step="6">
+          <div class="cal-step panel4" data-target="#btn-pose-yn" data-step="6">
             <div class="cal-step-body">
               <i class="bi bi-arrow-left cal-step-icon"></i>
               <div class="cal-step-values">
@@ -454,7 +454,7 @@
       <div class="panel3 p-2">
         <div class="t-alt-baslik mb-2">Gyro Kalibrasyonu</div>
         <div class="cal-steps-container mb-0">
-          <div class="cal-step panel3" data-target="#btn-pose-gy">
+          <div class="cal-step panel4" data-target="#btn-pose-gy">
             <div class="cal-step-body">
               <i class="bi bi-speedometer cal-step-icon"></i>
               <div class="cal-step-values" style="display:none;">
@@ -472,7 +472,7 @@
       <div class="panel3 p-2">
         <div class="t-alt-baslik mb-2">Hard Kalibrasyon (Level)</div>
         <div class="cal-steps-container mb-0">
-          <div class="cal-step panel3" data-target="#btn-pose-level">
+          <div class="cal-step panel4" data-target="#btn-pose-level">
             <div class="cal-step-body">
               <i class="bi bi-bullseye cal-step-icon"></i>
               <div class="cal-step-values" style="display:none;">
@@ -498,7 +498,7 @@
       <select class="form-select form-select-sm" id="sensorAlignSelect" style="max-width:220px;" onchange="selectAlignOption(parseInt(this.value))">
         <!-- JS tarafından doldurulur -->
       </select>
-      <button class="btn btn-warning btn-sm" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
+      <button class="btn btn-warning btn-md" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
         <i class="bi bi-save me-1"></i> Yönelimi Kaydet
       </button>
     </div>
@@ -506,10 +506,10 @@
 
   <!-- Butonlar (sayfa altı) -->
   <div class="d-flex gap-2">
-    <button type="button" class="btn btn-warning btn-sm" id="btnSaveCalibration">
+    <button type="button" class="btn btn-warning btn-md" id="btnSaveCalibration">
       <i class="bi bi-save2 me-1"></i> Kalibrasyonu Kaydet
     </button>
-    <button type="button" class="btn btn-danger btn-sm" onclick="sendQuickCommand('CALIB_RESET')">
+    <button type="button" class="btn btn-danger btn-md" onclick="sendQuickCommand('CALIB_RESET')">
       <i class="bi bi-arrow-counterclockwise me-1"></i> Kalibrasyonu Sıfırla
     </button>
   </div>
@@ -523,7 +523,7 @@
 
     <div class="row g-3">
       <div class="col-6 col-lg-3">
-        <div class="panel3">
+        <div class="panel4">
           <div class="aircraft-card active" data-aircraft-type="v-tail">
             <div class="mixer-title">V-TAIL</div>
             <div class="mixer-description">V şeklinde kuyruk yapısı</div>
@@ -532,7 +532,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel3">
+        <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="t-tail">
             <div class="mixer-title">T-TAIL</div>
             <div class="mixer-description">T şeklinde kuyruk yapısı</div>
@@ -541,7 +541,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel3">
+        <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="no-ruder">
             <div class="mixer-title">RUDERSIZ</div>
             <div class="mixer-description">Ruder olmadan</div>
@@ -550,7 +550,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel3">
+        <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="delta">
             <div class="mixer-title">DELTA</div>
             <div class="mixer-description">Delta kanat</div>
@@ -569,28 +569,28 @@
     </p>
     <div class="row g-3">
       <div class="col-6 col-lg-3">
-        <div class="panel3 p-3 text-center">
+        <div class="panel4 p-3 text-center">
           <div class="output-title mb-2">ROLL</div>
           <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
           <small class="text-muted">-200 ... 200</small>
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel3 p-3 text-center">
+        <div class="panel4 p-3 text-center">
           <div class="output-title mb-2">PITCH</div>
           <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
           <small class="text-muted">-200 ... 200</small>
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel3 p-3 text-center">
+        <div class="panel4 p-3 text-center">
           <div class="output-title mb-2">YAW</div>
           <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
           <small class="text-muted">-200 ... 200</small>
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel3 p-3 text-center">
+        <div class="panel4 p-3 text-center">
           <div class="output-title mb-2">THROTTLE</div>
           <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
           <small class="text-muted">-200 ... 200</small>

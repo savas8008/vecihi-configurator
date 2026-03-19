@@ -243,7 +243,7 @@ a:hover {
    3. LAYOUT - PANELLER
    ============================================ */
 /* Ortak panel özellikleri */
-.panel, .panel2, .panel3, .sidebar {
+.panel, .panel2, .panel3, .panel4, .sidebar {
     backdrop-filter: blur(var(--blur-amount));
     -webkit-backdrop-filter: blur(var(--blur-amount));
     border: 1px solid var(--border-default);
@@ -256,8 +256,33 @@ a:hover {
 
 /* Hiyerarşik arka planlar */
 .panel, .sidebar { background: var(--bg-panel);   }  /* Dış: teal */
-.panel2           { background: var(--bg-panel-2); }  /* Orta: yarı beyaz */
-.panel3           { background: var(--bg-panel-3); }  /* İç: neredeyse beyaz */
+.panel2           { background: var(--bg-panel-2); }  /* Orta */
+.panel3           { background: var(--bg-panel-3); }  /* İç */
+
+/* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
+.panel4 {
+    background: #e8eaec;
+    color: #111111;
+    --border-default: rgba(0, 0, 0, 0.13);
+    /* CSS değişkenlerini panel4 kapsamında koyu metne çevir */
+    --text-primary:         #111111;
+    --text-secondary:       #333333;
+    --t-baslik-color:       #111111;
+    --t-alt-baslik-color:   #111111;
+    --t-aciklama-color:     #444444;
+}
+/* panel4 içindeki !important ile ayarlanan metin renkleri */
+.panel4 .step-label         { color: #444444 !important; }
+.panel4 .cal-step-values    { color: #111111 !important; background: rgba(0,0,0,0.06) !important; }
+.panel4 .cal-step-icon      { color: #666666 !important; }
+.panel4.cal-step.active  .cal-step-icon { color: var(--color-primary) !important; }
+.panel4.cal-step.completed .cal-step-icon { color: var(--color-success) !important; }
+.panel4 .cal-step-done i    { color: var(--color-success); }
+.panel4 .output-title       { color: #111111; }
+.panel4 .output-value       { color: #111111; }
+.panel4 .mixer-title        { color: #111111; }
+.panel4 .mixer-description  { color: #444444; }
+.panel4 small               { color: #555555 !important; }
 
 .panel-title {
     display: flex;
@@ -307,17 +332,29 @@ a:hover {
     letter-spacing: -1px;
 }
 
-/* Bağlantı Durumu */
+/* Bağlantı Durumu — header içi durum göstergesi */
 .connection-status {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid var(--border-default);
-    padding: var(--spacing-xs) var(--spacing-md);
+    background: rgba(0, 0, 0, 0.28);
+    border: 1.5px solid rgba(255, 255, 255, 0.13);
+    padding: 5px 14px;
     border-radius: var(--radius-full);
     font-family: var(--font-mono);
     font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: #dce8f5;
+    min-width: 150px;
+    justify-content: center;
+    letter-spacing: 0.3px;
+    transition: all var(--transition-normal);
+}
+/* Bağlı olduğunda çerçeve yeşil parlar */
+.connection-status.is-connected {
+    border-color: rgba(16, 185, 129, 0.5);
+    background: rgba(16, 185, 129, 0.10);
+    color: #6ee7c6;
 }
 
 .status-indicator {
@@ -1147,6 +1184,52 @@ input[type="range"]::-moz-range-thumb {
     background: var(--color-secondary);
     color: white;
     border-color: var(--color-secondary);
+}
+
+/* Orta boy buton */
+.btn-md { padding: 5px 14px !important; font-size: var(--font-size-sm) !important; }
+
+/* Header bağlantı butonları — ayırt edici, tema uyumlu */
+.btn-connect {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 18px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45), 0 2px 8px rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(16, 185, 129, 0.55);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-connect:hover {
+    background: linear-gradient(135deg, #047857, #059669);
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.65), 0 4px 14px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+.btn-disconnect {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 18px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.45), 0 2px 8px rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(239, 68, 68, 0.55);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-disconnect:hover {
+    background: linear-gradient(135deg, #b91c1c, #dc2626);
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.65), 0 4px 14px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+    color: #ffffff;
 }
 
 /* Save Button (Fixed) */
