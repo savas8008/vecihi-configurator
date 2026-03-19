@@ -137,7 +137,7 @@ function renderModesPage() {
         const catModes = modeDefinitions.filter(m => m.cat === catKey);
         if (catModes.length === 0) return;
 
-        let html = `<div class="col-md-6"><div class="panel3 mb-4">`;
+        let html = `<div class="col-12"><div class="panel3 mb-1">`;
         html += `<div class="mode-category-title"><i class="bi ${catConfig.icon}"></i> ${catConfig.title}</div>`;
 
         catModes.forEach(def => {

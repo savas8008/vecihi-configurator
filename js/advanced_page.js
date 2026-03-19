@@ -265,7 +265,10 @@ function updateAdvancedUI() {
     if (advancedConfig.flaperon_offset !== undefined) {
         const slider = document.getElementById('flaperonOffsetSlider');
         const label  = document.getElementById('flaperonOffsetValue');
-        if (slider) slider.value = advancedConfig.flaperon_offset;
+        if (slider) {
+            slider.value = advancedConfig.flaperon_offset;
+            updateFlaperonSliderColor(slider);
+        }
         if (label)  label.textContent = advancedConfig.flaperon_offset;
     }
 
@@ -484,6 +487,12 @@ function updateAdvDisplay(key) {
 /**
  * @brief GPS ayarları bölümünü göster/gizle
  */
+function updateFlaperonSliderColor(slider) {
+    const pct = ((slider.value - slider.min) / (slider.max - slider.min) * 100).toFixed(1);
+    slider.style.background = `linear-gradient(to right, #0ea5e9 ${pct}%, rgba(0,0,0,0.15) ${pct}%)`;
+}
+window.updateFlaperonSliderColor = updateFlaperonSliderColor;
+
 function toggleGpsSettings() {
     const isChecked = document.getElementById('inp_has_gps')?.checked;
     const settingsDiv = document.getElementById('gps_hardware_settings');
