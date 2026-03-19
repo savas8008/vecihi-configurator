@@ -1785,6 +1785,26 @@ label.small.text-muted,
 .pid-control { padding: 6px !important; margin-bottom: 4px !important; }
 .pid-axis { font-size: var(--font-size-sm) !important; margin-bottom: 4px; }
 
+/* PID slider — kalın ve siyah */
+.panel4 input[type="range"] {
+    height: 10px !important;
+    background: #222 !important;
+    border-radius: 5px !important;
+}
+.panel4 input[type="range"]::-webkit-slider-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    background: #111 !important;
+    border: 3px solid #555 !important;
+    box-shadow: none !important;
+}
+.panel4 input[type="range"]::-moz-range-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    background: #111 !important;
+    border: 3px solid #555 !important;
+}
+
 /* Scrollbar daha ince */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 

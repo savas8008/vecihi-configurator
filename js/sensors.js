@@ -75,7 +75,7 @@
             const near = 0.1;
             const far = 1000;
             camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-            camera.position.set(0, 2.5, 7);
+            camera.position.set(0, 2, 5);
 
             // Renderer - global 'renderer' değişkenini kullan
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -137,6 +137,8 @@
             scene.add(pivot);
 
             const model = createAircraftModel();
+            // GLTF Z-up → Y-up düzeltmesi (-90° X rotasyonu)
+            model.rotation.x = -Math.PI / 2;
             pivot.add(model);
 
             // Ölçekle
