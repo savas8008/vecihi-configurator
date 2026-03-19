@@ -459,32 +459,24 @@
 
     </div>
 
-    <!-- SAĞ: Mevcut kalibrasyon değerleri -->
-    <div class="col-lg-6">
+    <!-- SAĞ: Mevcut kalibrasyon değerleri (daraltıldı) -->
+    <div class="col-lg-4">
       <div class="panel3 p-3">
-        <div class="d-flex align-items-center justify-content-between mb-2 baslik">
-          <div>
-            <div class="fw-semibold">Mevcut Kalibrasyon Değerleri</div>
-          </div>
-        </div>
-
+        <div class="fw-semibold baslik mb-2">Mevcut Kalibrasyon Değerleri</div>
         <div class="row g-2">
-          <div class="col-12">
+          <div class="col-6">
             <div class="small text-muted mb-1">ACC Bias</div>
             <div id="cal_acc_bias" class="mono small">x: --  y: --  z: --</div>
           </div>
-
-          <div class="col-12">
+          <div class="col-6">
             <div class="small text-muted mb-1">ACC Scale</div>
             <div id="cal_acc_scale" class="mono small">x: --  y: --  z: --</div>
           </div>
-
-          <div class="col-12">
+          <div class="col-6">
             <div class="small text-muted mb-1">GYRO Bias</div>
             <div id="cal_gyro_bias" class="mono small">x: --  y: --  z: --</div>
           </div>
-
-          <div class="col-12">
+          <div class="col-6">
             <div class="small text-muted mb-1">Level Trim</div>
             <div id="cal_level_trim" class="mono small">pitch: --  roll: --</div>
           </div>
@@ -492,11 +484,20 @@
       </div>
     </div>
 
-		   <button type="button" class="btn btn-danger shadow-sm" onclick="sendQuickCommand('CALIB_RESET')" id="">KALİBRASYON SIFIRLAMA</button>
-<button type="button" class="btn btn-warning shadow-sm" id="btnSaveCalibration">
-    <i class="bi bi-save2 me-2"></i> Kalibrasyonu Kaydet
-</button>
-</div>
+    <!-- Kalibrasyon Butonları Paneli -->
+    <div class="col-lg-2">
+      <div class="panel3 p-3 h-100 d-flex flex-column justify-content-center gap-2">
+        <div class="fw-semibold baslik mb-1">İşlemler</div>
+        <button type="button" class="btn btn-warning btn-sm w-100" id="btnSaveCalibration">
+          <i class="bi bi-save2 me-1"></i> Kaydet
+        </button>
+        <button type="button" class="btn btn-danger btn-sm w-100" onclick="sendQuickCommand('CALIB_RESET')">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Sıfırla
+        </button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <div id="outputs" class="page">

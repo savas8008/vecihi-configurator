@@ -53,8 +53,8 @@
     
     /* --- METİN RENKLERİ --- */
     --text-primary: #000000;            /* Ana metin (Tam Siyah) */
-    --text-secondary: #222222;          /* İkincil metin (Koyu Gri/Siyah) */
-    --text-muted: #444444;              /* Soluk metin */
+    --text-secondary: #4a5568;          /* İkincil metin - açıklamalar için gri */
+    --text-muted: #718096;              /* Soluk metin - etiketler için açık gri */
     --text-inverse: #ffffff;            /* Ters metin (Beyaz) */
     
     /* --- HUD & DATA RENKLERİ --- */
@@ -89,11 +89,11 @@
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'Consolas', 'Courier New', monospace;
 
-    --font-size-xs: 0.68rem;
-    --font-size-sm: 0.73rem;
-    --font-size-md: 0.8rem;
-    --font-size-lg: 0.88rem;
-    --font-size-xl: 0.95rem;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.82rem;
+    --font-size-md: 0.88rem;
+    --font-size-lg: 0.96rem;
+    --font-size-xl: 1.04rem;
 
     /* --- GEÇİŞLER --- */
     --transition-fast: 0.1s ease;
@@ -419,7 +419,7 @@ a:hover {
 }
 
 .cal-step {
-    background: rgba(30, 41, 59, 0.5);
+    background: rgba(255, 255, 255, 0.72);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-md);
     padding: var(--spacing-md) var(--spacing-sm);
@@ -1347,7 +1347,7 @@ input[type="range"]::-moz-range-thumb {
 
 /* Kalibrasyon adım kutuları - panelle uyumlu */
 .cal-step {
-    background: rgba(0,0,0,0.04) !important;
+    background: rgba(255,255,255,0.72) !important;
     border: 1px solid var(--border-default) !important;
 }
 .cal-step:hover:not(.disabled) {
