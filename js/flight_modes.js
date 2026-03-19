@@ -22,6 +22,7 @@ const modeDefinitions = [
 
     // --- UÇUŞ MODLARI (FLIGHT MODES) - Genelde 3'lü Switch ---
     { key: 'manual', name: 'MANUAL (Passthrough)', cat: 'flight', defaultMin: 900, defaultMax: 1300, defaultCh: 6 },
+    { key: 'pitch_stab', name: 'PITCH STAB (Sadece Pitch Stabilize)', cat: 'flight', defaultMin: 900, defaultMax: 900, defaultCh: 16 }, // Default kapalı
     { key: 'angle', name: 'ANGLE (Stabilize)', cat: 'flight', defaultMin: 1301, defaultMax: 1700, defaultCh: 6 },
     { key: 'horizon', name: 'HORIZON', cat: 'flight', defaultMin: 1701, defaultMax: 2100, defaultCh: 6 },
     { key: 'acro', name: 'ACRO (Rate)', cat: 'flight', defaultMin: 900, defaultMax: 900, defaultCh: 16 }, // Default kapalı
