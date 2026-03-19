@@ -965,12 +965,29 @@
    
 	<div id="advanced" class="page">
     <div class="panel">
-        <h2 class="panel-title mb-4"><i class="bi bi-sliders"></i> Tercihler</h2>
+        <h2 class="panel-title"><i class="bi bi-sliders"></i> Tercihler</h2>
 
-        <div class="row g-4">
-            
+        <!-- Tab Menü -->
+        <div class="adv-tabs" id="advTabBar">
+            <button class="adv-tab active" data-tab="adv-tab-1" onclick="switchAdvTab('adv-tab-1',this)">
+                <i class="bi bi-airplane-engines"></i> Uçuş Limitleri
+            </button>
+            <button class="adv-tab" data-tab="adv-tab-2" onclick="switchAdvTab('adv-tab-2',this)">
+                <i class="bi bi-geo-fill"></i> Navigasyon & GPS
+            </button>
+            <button class="adv-tab" data-tab="adv-tab-3" onclick="switchAdvTab('adv-tab-3',this)">
+                <i class="bi bi-arrow-bar-up"></i> İrtifa
+            </button>
+            <button class="adv-tab" data-tab="adv-tab-4" onclick="switchAdvTab('adv-tab-4',this)">
+                <i class="bi bi-cpu"></i> Donanım & Filtreler
+            </button>
+        </div>
+
+        <!-- Tab İçerikleri -->
+        <div class="adv-tab-content">
+
             <!-- ==================== 1. UÇUŞ LİMİTLERİ & AUTO LAUNCH ==================== -->
-            <div class="col-md-6">
+            <div id="adv-tab-1" class="adv-tab-pane active">
                 <div class="card bg-dark border-secondary">
                     <div class="card-header bg-danger bg-opacity-25 text-danger border-danger">
                         <h5 class="mb-0"><i class="bi bi-airplane-engines"></i> 1. Uçuş Limitleri & Auto Launch</h5>
@@ -1088,7 +1105,7 @@
             </div>
 
             <!-- ==================== 2. NAVİGASYON & GPS ==================== -->
-            <div class="col-md-6">
+            <div id="adv-tab-2" class="adv-tab-pane">
                 <div class="card bg-dark border-secondary">
                     <div class="card-header bg-primary bg-opacity-25 text-primary border-primary">
                         <h5 class="mb-0"><i class="bi bi-geo-fill"></i> 2. Navigasyon & GPS</h5>
@@ -1278,7 +1295,7 @@
             </div>
 
             <!-- ==================== 3. İRTİFA ==================== -->
-            <div class="col-md-6">
+            <div id="adv-tab-3" class="adv-tab-pane">
                 <div class="card bg-dark border-secondary">
                     <div class="card-header bg-success bg-opacity-25 text-success border-success">
                         <h5 class="mb-0"><i class="bi bi-arrow-bar-up"></i> 3. İrtifa Tahmini</h5>
@@ -1323,7 +1340,7 @@
             </div>
 
             <!-- ==================== 4. DONANIM, SENSÖR & FİLTRELER ==================== -->
-            <div class="col-md-6">
+            <div id="adv-tab-4" class="adv-tab-pane">
                 <div class="card bg-dark border-secondary">
                     <div class="card-header bg-info bg-opacity-25 text-info border-info">
                         <h5 class="mb-0"><i class="bi bi-cpu"></i> 4. Donanım, Sensör & Filtreler</h5>
@@ -1420,18 +1437,23 @@
                 </div>
             </div>
 
-        </div>
+        </div><!-- /adv-tab-content -->
 
     </div>
-    <button type="button" class="btn btn-warning shadow-sm" id="btnSaveAdvanced">
+    <button type="button" class="btn btn-warning shadow-sm mt-2" id="btnSaveAdvanced">
         <i class="bi bi-save2 me-2"></i> Tercihleri Kaydet
     </button>
 </div>
-		
-		<script>
-	
+
+<script>
+function switchAdvTab(tabId, btn) {
+    document.querySelectorAll('.adv-tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.adv-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
 </script>
-		
+
 <div id="osd" class="page">
     <div class="panel mb-4">
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">

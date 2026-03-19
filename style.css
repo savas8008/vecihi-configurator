@@ -1368,3 +1368,57 @@ input[type="range"]::-moz-range-thumb {
 /* Stat boxes */
 .stat-value { font-size: var(--font-size-lg) !important; }
 .stat-label { font-size: 0.6rem !important; }
+
+/* ============================================
+   21. TERCİHLER SAYFA TAB MENÜSÜ
+   ============================================ */
+.adv-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    border-bottom: 2px solid var(--border-default);
+    margin-bottom: 10px;
+}
+
+.adv-tab {
+    background: transparent;
+    border: 1px solid var(--border-default);
+    border-bottom: none;
+    color: var(--text-secondary);
+    padding: 5px 14px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: -2px;
+}
+
+.adv-tab:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.adv-tab.active {
+    background: var(--bg-panel);
+    color: var(--color-primary);
+    border-color: var(--border-default);
+    border-bottom: 2px solid var(--bg-panel);
+    box-shadow: var(--shadow-sm);
+}
+
+.adv-tab-content {
+    min-height: 200px;
+}
+
+.adv-tab-pane {
+    display: none;
+}
+
+.adv-tab-pane.active {
+    display: block;
+    animation: fadeIn 0.15s ease;
+}
