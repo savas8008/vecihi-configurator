@@ -81,7 +81,7 @@
     --t-baslik-style:  normal;
 
     /* t-alt-baslik: Grup başlıkları, alan adları */
-    --t-alt-baslik-size:   var(--font-size-md);
+    --t-alt-baslik-size:   var(--font-size-xl);
     --t-alt-baslik-weight: 700;
     --t-alt-baslik-color:  var(--text-primary);
     --t-alt-baslik-style:  normal;
@@ -130,11 +130,11 @@
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'Consolas', 'Courier New', monospace;
 
-    --font-size-xs: 0.75rem;
-    --font-size-sm: 0.82rem;
-    --font-size-md: 0.88rem;
-    --font-size-lg: 0.96rem;
-    --font-size-xl: 1.04rem;
+    --font-size-xs: 0.90rem;
+    --font-size-sm: 0.99rem;
+    --font-size-md: 0.99rem;
+    --font-size-lg: 1.20rem;
+    --font-size-xl: 1.30rem;
 
     /* --- GEÇİŞLER --- */
     --transition-fast: 0.1s ease;
