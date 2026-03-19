@@ -67,7 +67,7 @@
     --text-secondary: #ffffff;          /* İkincil metin — çelik mavi-gri */
     --text-muted:     #4d708f;          /* Soluk metin */
     --text-inverse:   #0d1520;          /* Ters metin (koyu arka plana karşı) */
-    --text-value:     #01040b;          /* Değer rengi (emerald yeşil) */
+    --text-value:     #03212a;          /* Değer rengi (emerald yeşil) */
 
     /* =========================================
        MERKEZİ METİN TİPOGRAFİ SİSTEMİ
@@ -260,15 +260,6 @@ a:hover {
 .panel2           { background: var(--bg-panel-2); }  /* Orta */
 .panel3           { background: var(--bg-panel-3); }  /* İç */
 
-/* Panel 3 — koyu teal zeminde tüm metin beyaz */
-.panel3 {
-    --t-alt-baslik-color: #ffffff;
-    --t-baslik-color:     #ffffff;
-    --t-deger-color:      #ffffff;
-    --text-value:         #ffffff;
-    --text-primary:       #ffffff;
-}
-
 /* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
 .panel4 {
     background: #e8eaec !important;
@@ -318,35 +309,6 @@ a:hover {
 .panel4 .range-track-container {
     background: rgba(0, 0, 0, 0.10) !important;
     border: 1px solid rgba(0,0,0,0.15) !important;
-}
-/* panel4 içi range slider — koyu zeminde görünmez track'i siyah yap */
-.panel4 input[type="range"] {
-    height: 8px !important;
-    background: rgba(0,0,0,0.35) !important;
-    border-radius: 4px !important;
-}
-.panel4 input[type="range"]::-webkit-slider-runnable-track {
-    height: 8px;
-    background: rgba(0,0,0,0.35);
-    border-radius: 4px;
-}
-.panel4 input[type="range"]::-webkit-slider-thumb {
-    width: 20px !important;
-    height: 20px !important;
-    background: #111111 !important;
-    border: 3px solid #ffffff !important;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.45) !important;
-}
-.panel4 input[type="range"]::-moz-range-track {
-    height: 8px;
-    background: rgba(0,0,0,0.35);
-    border-radius: 4px;
-}
-.panel4 input[type="range"]::-moz-range-thumb {
-    width: 20px !important;
-    height: 20px !important;
-    background: #111111 !important;
-    border: 3px solid #ffffff !important;
 }
 .panel4 .mode-category-title {
     color: #111111 !important;
