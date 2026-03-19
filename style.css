@@ -650,12 +650,23 @@ a:hover {
     text-align: center;
 }
 
+/* Kart başlığı — mixer-title ile aynı hiyerarşi */
 .output-title {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--text-primary);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Port alt etiketi (TX / RX / SCL / SDA vb.) */
+.port-label {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 2px;
 }
 
 .output-value {
