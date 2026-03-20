@@ -12,6 +12,8 @@ let isConnected = false;
 let jsonBuffer = '';
 const textEncoder = new TextEncoder();
 let userInitiatedDisconnect = false; // Kullanıcı kendi bağlantıyı kestiyse true
+let pendingReconnect = false;        // Restart sonrası otomatik yeniden bağlanma bekleniyor
+let pendingReconnectTimer = null;    // Timeout: restart gelmezse bayrağı temizle
 
 // === TEMEL KOMUT FONKSİYONLARI ===
 
@@ -196,10 +198,130 @@ function handleDisconnect() {
     updateConnectionStatus();
     log('🔌 Bağlantı kesildi', 'warning');
 
-    // Beklenmedik bağlantı kesilmesi → cihaz muhtemelen yeniden başlatıldı
+    // Beklenmedik bağlantı kesilmesi → restart mi yoksa beklenmedik kopma mı?
     if (wasUnexpected) {
-        showFlightModeWarning();
+        if (pendingReconnect) {
+            pendingReconnect = false;
+            clearTimeout(pendingReconnectTimer);
+            attemptAutoReconnect();
+        } else {
+            showFlightModeWarning();
+        }
     }
+}
+
+/**
+ * @brief Restart bekleniyor bayrağını ayarlar; 6s içinde disconnect gelmezse iptal eder
+ */
+function setPendingReconnect() {
+    pendingReconnect = true;
+    clearTimeout(pendingReconnectTimer);
+    pendingReconnectTimer = setTimeout(() => {
+        pendingReconnect = false; // Restart gelmedi (örn. protokol değişmedi)
+    }, 6000);
+}
+
+/**
+ * @brief Restart sonrası otomatik yeniden bağlanma dener (max 4 deneme, exponential backoff)
+ */
+async function attemptAutoReconnect() {
+    showReconnectOverlay('Cihaz yeniden başlatılıyor...');
+
+    // ESP32 boot süresi için bekle
+    await new Promise(r => setTimeout(r, 2500));
+
+    const MAX_TRIES = 4;
+    for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
+        updateReconnectStatus(`Bağlanılıyor... (${attempt}/${MAX_TRIES})`);
+        try {
+            const ports = await navigator.serial.getPorts();
+            if (ports.length === 0) {
+                hideReconnectOverlay();
+                showFlightModeWarning();
+                return;
+            }
+
+            port = ports[0];
+            await port.open({ baudRate: 115200 });
+
+            const textDecoder = new TextDecoderStream();
+            port.readable.pipeTo(textDecoder.writable);
+            reader = textDecoder.readable.getReader();
+            writer = port.writable.getWriter();
+
+            isConnected = true;
+            hideReconnectOverlay();
+            log('✅ Otomatik yeniden bağlandı', 'success');
+
+            if (typeof activateSensorsPage === 'function') activateSensorsPage();
+            updateConnectionStatus();
+
+            readLoop().catch(error => {
+                log(`❌ Okuma döngüsü hatası: ${error.message}`, 'error');
+                handleDisconnect();
+            });
+
+            // Sayfa verilerini yenile
+            setTimeout(() => {
+                log('🔄 Veriler yenileniyor...', 'info');
+                sendCommand('calibration_page_data');
+                setTimeout(() => sendCommand('advanced_page_data'), 200);
+                setTimeout(() => sendCommand('pid_page_data'), 400);
+                setTimeout(() => sendCommand('outputs_page_data'), 600);
+                setTimeout(() => sendCommand('transmitter_page_data'), 800);
+                setTimeout(() => sendCommand('modes_page_data'), 1000);
+                setTimeout(() => sendCommand('osd_page_data'), 1200);
+                setTimeout(() => {
+                    if (typeof startQuaternionStream === 'function') startQuaternionStream();
+                }, 1600);
+            }, 400);
+            return;
+
+        } catch (err) {
+            log(`⚠️ Yeniden bağlanma denemesi ${attempt} başarısız: ${err.message}`, 'warning');
+            if (attempt < MAX_TRIES) {
+                await new Promise(r => setTimeout(r, 1000 * attempt));
+            }
+        }
+    }
+
+    hideReconnectOverlay();
+    showFlightModeWarning();
+}
+
+/**
+ * @brief Yeniden bağlanma overlay'ini gösterir
+ */
+function showReconnectOverlay(title) {
+    let overlay = document.getElementById('reconnectOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'reconnectOverlay';
+        overlay.innerHTML = `
+            <div class="reconnect-box">
+                <div class="spinner-border reconnect-spinner" role="status"></div>
+                <h5 id="reconnectTitle">Yeniden Bağlanılıyor</h5>
+                <p id="reconnectStatus">Lütfen bekleyin...</p>
+                <div class="reconnect-steps">
+                    Cihaz kaydedilen ayarları uyguluyor ve yeniden başlatılıyor.<br>
+                    Bu işlem birkaç saniye sürebilir.
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+    }
+    document.getElementById('reconnectTitle').textContent = title;
+    document.getElementById('reconnectStatus').textContent = 'Lütfen bekleyin...';
+    overlay.style.display = 'flex';
+}
+
+function updateReconnectStatus(msg) {
+    const el = document.getElementById('reconnectStatus');
+    if (el) el.textContent = msg;
+}
+
+function hideReconnectOverlay() {
+    const overlay = document.getElementById('reconnectOverlay');
+    if (overlay) overlay.style.display = 'none';
 }
 
 /**
@@ -406,6 +528,8 @@ function handleStatusResponse(command, result, data) {
             if (result === 'completed') {
                 log('✅ Kumanda ayarları kaydedildi.', 'success');
                 showModal('Başarılı', 'Kumanda ayarları başarıyla kaydedildi.', 'success');
+                // Protokol değişmişse firmware restart atıyor, hazır ol
+                setPendingReconnect();
             } else {
                 log(`❌ Kumanda kayıt hatası: ${result}`, 'error');
                 showModal('Hata', `Kayıt sırasında hata oluştu: ${result}`, 'error');
@@ -434,10 +558,28 @@ function handleStatusResponse(command, result, data) {
             
         case 'OUTPUT_SAVE':
             if (result === 'completed') {
-                log('✅ Çıkış ayarları kaydedildi.', 'success');
-                showModal('Başarılı', 'Çıkış ayarları başarıyla kaydedildi.', 'success');
+                log('✅ Çıkış ayarları kaydedildi, cihaz yeniden başlatılıyor...', 'success');
+                // Pin değişimi → her zaman restart → otomatik yeniden bağlan
+                setPendingReconnect();
             } else {
                 log(`❌ Çıkış kayıt hatası: ${result}`, 'error');
+                showModal('Hata', `Kayıt sırasında hata oluştu: ${result}`, 'error');
+            }
+            break;
+
+        case 'CFG_RESET':
+            if (result === 'completed') {
+                log('✅ Fabrika ayarlarına sıfırlandı, cihaz yeniden başlatılıyor...', 'success');
+                setPendingReconnect();
+            }
+            break;
+
+        case 'SAVE_SENSOR_ALIGN':
+            if (result === 'completed') {
+                log('✅ Sensör hizalaması kaydedildi, cihaz yeniden başlatılıyor...', 'success');
+                setPendingReconnect();
+            } else {
+                log(`❌ Sensör hizalama hatası: ${result}`, 'error');
                 showModal('Hata', `Kayıt sırasında hata oluştu: ${result}`, 'error');
             }
             break;
