@@ -135,27 +135,32 @@
             const pivot = new THREE.Group();
             pivot.position.y = 1.0;
             scene.add(pivot);
-
-            const model = createAircraftModel();
-            pivot.add(model);
-
-            // Ölçekle — rotasyon geometry'ye baked olduğu için düz hesap
-            const box = new THREE.Box3().setFromObject(model);
-            const maxDim = Math.max(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z);
-            model.scale.setScalar(5.0 / maxDim);
-
-            // Scale sonrası merkezi pivot'a getir
-            const box2 = new THREE.Box3().setFromObject(model);
-            const center = box2.getCenter(new THREE.Vector3());
-            model.position.sub(center);
-
-            // airplaneModel = pivot → animate3D'de quaternion pivot'a uygulanır
             airplaneModel = pivot;
 
             if (controls) {
                 controls.target.set(0, 1.5, 0);
                 controls.update();
             }
+
+            // GLB modeli yükle
+            const loader = new THREE.GLTFLoader();
+            loader.load('models/Old Toy Plane.glb', function(gltf) {
+                const model = gltf.scene;
+
+                // Ölçekle
+                const box = new THREE.Box3().setFromObject(model);
+                const maxDim = Math.max(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z);
+                model.scale.setScalar(5.0 / maxDim);
+
+                // Merkezi pivot'a getir
+                const box2 = new THREE.Box3().setFromObject(model);
+                const center = box2.getCenter(new THREE.Vector3());
+                model.position.sub(center);
+
+                pivot.add(model);
+            }, undefined, function(err) {
+                console.error('GLB yüklenemedi:', err);
+            });
 
             // Resize Observer
             const onResize = () => {
