@@ -12,10 +12,17 @@ echo   ELRS Firewall Kurali Ekleniyor...
 echo ============================================
 echo.
 
-:: UDP 14550 portunu ac
+:: UDP 14550 portunu ac (backpack telemetri portu)
 netsh advfirewall firewall delete rule name="ELRS UDP 14550" >nul 2>&1
 netsh advfirewall firewall add rule name="ELRS UDP 14550" dir=in action=allow protocol=UDP localport=14550
-echo [OK] UDP port 14550 acildi
+netsh advfirewall firewall set rule name="ELRS UDP 14550" new profile=any >nul 2>&1
+echo [OK] UDP port 14550 acildi (backpack telemetri)
+
+:: UDP 14551 portunu ac (QGC/Mission Planner icin)
+netsh advfirewall firewall delete rule name="ELRS UDP 14551" >nul 2>&1
+netsh advfirewall firewall add rule name="ELRS UDP 14551" dir=in action=allow protocol=UDP localport=14551
+netsh advfirewall firewall set rule name="ELRS UDP 14551" new profile=any >nul 2>&1
+echo [OK] UDP port 14551 acildi (QGC/Mission Planner)
 
 :: Python icin kural ekle (tum python surumlerini tara)
 for /f "tokens=*" %%i in ('where python 2^>nul') do (

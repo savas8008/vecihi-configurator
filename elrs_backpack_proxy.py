@@ -24,6 +24,8 @@ UDP_SCAN_PORTS  = [14550, 14551, 5760, 5761, 4000, 4001, 2399, 8765]
 BACKPACK_IP     = "10.0.0.1"
 WS_HOST         = "0.0.0.0"
 WS_PORT         = 8765
+QGC_HOST        = "127.0.0.1"   # QGC/Mission Planner makinesi (aynı PC ise 127.0.0.1)
+QGC_PORT        = 14551          # QGC dinleme portu (14550 proxy tarafından kullanılıyor)
 
 MSP_ELRS_BACKPACK_CRSF_TLM = 0x11
 
@@ -242,11 +244,15 @@ def udp_listener():
     sock.settimeout(1.0)
     print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}")
 
-    # MAVLink heartbeat gönder → backpack GCS IP'sini öğrenir ve 14550'ye veri yollar
-    last_ping = 0
+    # QGC/Mission Planner'a yönlendirme soketi (bağlanmadan, OS ephemeral port atar)
+    fwd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    print(f"[FWD] QGC forward    : {QGC_HOST}:{QGC_PORT}")
+    print(f"[FWD] QGC ayarı      : Connections → UDP → Listen Port {QGC_PORT}")
 
+    last_ping = 0
     pkt_count = 0
     ping_count = 0
+
     while True:
         # Periyodik MAVLink heartbeat → backpack listen port 14555'e
         now = time.time()
@@ -255,8 +261,14 @@ def udp_listener():
                 hb = mavlink_heartbeat(ping_count)
                 sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))
                 ping_count += 1
+                if ping_count == 1:
+                    try:
+                        local_addr = sock.getsockname()
+                        print(f"[REG] Heartbeat kaynak: {local_addr} → backpack bu IP'yi kaydedecek")
+                    except Exception:
+                        pass
                 if ping_count <= 5 or ping_count % 10 == 0:
-                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN} (MAVLink GCS)")
+                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN}  pkt_alindi={pkt_count}")
             except Exception as e:
                 print(f"[REG] Heartbeat hatası: {e}")
             last_ping = now
@@ -275,11 +287,20 @@ def udp_listener():
 
         crsf = extract_crsf(data)
         if crsf:
-            print(f"[UDP] CRSF çözüldü, yayınlanıyor ({len(crsf)} byte)")
-            broadcast(bytes(crsf))
+            out = bytes(crsf)
+            print(f"[UDP] CRSF çözüldü ({len(out)} byte) → WS + QGC:{QGC_PORT}")
+            broadcast(out)
+            try:
+                fwd_sock.sendto(out, (QGC_HOST, QGC_PORT))
+            except Exception as e:
+                print(f"[FWD] Hata: {e}")
         else:
-            print(f"[UDP] CRSF yok, ham veri yayınlanıyor")
+            print(f"[UDP] MAVLink ham ({len(data)} byte) → WS + QGC:{QGC_PORT}")
             broadcast(data)
+            try:
+                fwd_sock.sendto(data, (QGC_HOST, QGC_PORT))
+            except Exception as e:
+                print(f"[FWD] Hata: {e}")
 
 
 # ── Ana giriş ────────────────────────────────────────────────────────────────
@@ -498,8 +519,10 @@ if __name__ == "__main__":
     print()
     print("  Adımlar:")
     print("  1. ELRS LUA → Backpack → Telemetry = WiFi")
-    print("  2. Bu bilgisayarı backpack WiFi'ına bağlayın")
+    print("  2. Bu bilgisayarı backpack WiFi'ına bağlayın (10.0.0.x)")
     print("  3. elrs_backpack.html → IP:127.0.0.1 Port:8765 → Bağlan")
+    print(f"  4. QGC: Comm Links → Add → UDP → Listen Port:{QGC_PORT} → Connect")
+    print(f"     Mission Planner: UDP → Port:{QGC_PORT} → Connect")
     print()
     print("  Durdurmak için: Ctrl+C")
     print("=" * 52)
