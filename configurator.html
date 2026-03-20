@@ -798,16 +798,63 @@
 
                     <div class="mb-4">
                         <label class="form-label text-muted small">KANAL SIRALAMASI (CHANNEL MAP)</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-dark border-secondary text-white"><i class="bi bi-list-ol"></i></span>
-                            <select class="form-select" id="channelMapSelect">
-                                <option value="AETR">AETR (FrSky, Futaba, Radiomaster)</option>
-                                <option value="TAER">TAER (Spektrum, JR)</option>
-                                <option value="RETA">RETA (Bazı özel sistemler)</option>
-                                <option value="TEAR">TEAR</option>
-                            </select>
+                        <div class="p-3 border border-secondary rounded bg-dark bg-opacity-25">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Roll (Aileron)</label>
+                                    <select class="form-select form-select-sm" id="chRoll">
+                                        <option value="1">CH 1</option>
+                                        <option value="2">CH 2</option>
+                                        <option value="3">CH 3</option>
+                                        <option value="4">CH 4</option>
+                                        <option value="5">CH 5</option>
+                                        <option value="6">CH 6</option>
+                                        <option value="7">CH 7</option>
+                                        <option value="8">CH 8</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Pitch (Elevator)</label>
+                                    <select class="form-select form-select-sm" id="chPitch">
+                                        <option value="1">CH 1</option>
+                                        <option value="2">CH 2</option>
+                                        <option value="3">CH 3</option>
+                                        <option value="4">CH 4</option>
+                                        <option value="5">CH 5</option>
+                                        <option value="6">CH 6</option>
+                                        <option value="7">CH 7</option>
+                                        <option value="8">CH 8</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Throttle (Gaz)</label>
+                                    <select class="form-select form-select-sm" id="chThrottle">
+                                        <option value="1">CH 1</option>
+                                        <option value="2">CH 2</option>
+                                        <option value="3">CH 3</option>
+                                        <option value="4">CH 4</option>
+                                        <option value="5">CH 5</option>
+                                        <option value="6">CH 6</option>
+                                        <option value="7">CH 7</option>
+                                        <option value="8">CH 8</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Yaw (Rudder)</label>
+                                    <select class="form-select form-select-sm" id="chYaw">
+                                        <option value="1">CH 1</option>
+                                        <option value="2">CH 2</option>
+                                        <option value="3">CH 3</option>
+                                        <option value="4">CH 4</option>
+                                        <option value="5">CH 5</option>
+                                        <option value="6">CH 6</option>
+                                        <option value="7">CH 7</option>
+                                        <option value="8">CH 8</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <small class="text-muted" style="font-size: 0.75rem;">A: Aileron, E: Elevator, T: Throttle, R: Rudder</small>
+                        <small class="text-muted" style="font-size: 0.75rem;">Her eksene istediğiniz fiziksel alıcı kanalını atayın</small>
                     </div>
 
                     <div class="mb-3">
@@ -1031,6 +1078,11 @@
                             <!-- Otomatik Kalkış -->
                             <div class="col-md-4 border-end border-secondary">
                                 <h6 class="text-muted border-bottom border-secondary pb-1">Otomatik Kalkış (Auto Launch)</h6>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="inp_auto_launch_on_arm" checked>
+                                    <label class="form-check-label small" for="inp_auto_launch_on_arm">Her arm sonrasında otomatik kalkış moduna geç</label>
+                                </div>
+                                <hr>
                                 <div class="mb-2 row">
                                     <label class="col-sm-8 col-form-label col-form-label-sm">
                                         Fırlatma Eşiği (G)
