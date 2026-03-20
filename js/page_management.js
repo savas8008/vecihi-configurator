@@ -283,7 +283,11 @@ function updateConnectionStatus() {
             nav.style.opacity = '1';
             nav.style.pointerEvents = 'auto';
             nav.style.cursor = 'pointer';
+            if (nav.getAttribute('data-page') === currentPage) {
+                nav.classList.add('active');
+            }
         } else {
+            nav.classList.remove('active');
             nav.style.opacity = '0.5';
             nav.style.pointerEvents = 'none';
             nav.style.cursor = 'not-allowed';
