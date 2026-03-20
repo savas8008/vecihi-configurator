@@ -74,10 +74,10 @@ function createAircraftModel() {
     // ── Ana kanatlar ──────────────────────────────────────────────────
     function makeWing(side) {
         const shape = new THREE.Shape();
-        shape.moveTo(0,           -0.15);   // kök arka
-        shape.lineTo(side * 2.8,  -0.38);   // uç arka
-        shape.lineTo(side * 2.8,   0.22);   // uç ön
-        shape.lineTo(0,            0.65);   // kök ön
+        shape.moveTo(0,            -0.15);   // kök arka
+        shape.lineTo(side * 2.62,  -0.37);   // uç arka (yuvarlak başlangıcı)
+        shape.quadraticCurveTo(side * 2.96, -0.08, side * 2.62, 0.20);  // yuvarlak kanat ucu
+        shape.lineTo(0,             0.65);   // kök ön
         shape.closePath();
         const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.09, bevelEnabled: false });
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
@@ -91,10 +91,10 @@ function createAircraftModel() {
     // ── Yatay stabilizatörler ──────────────────────────────────────────
     function makeStab(side) {
         const shape = new THREE.Shape();
-        shape.moveTo(0,          -0.05);
-        shape.lineTo(side * 1.0, -0.18);
-        shape.lineTo(side * 1.0,  0.12);
-        shape.lineTo(0,           0.32);
+        shape.moveTo(0,           -0.05);
+        shape.lineTo(side * 0.88, -0.17);   // uç arka (yuvarlak başlangıcı)
+        shape.quadraticCurveTo(side * 1.10, -0.03, side * 0.88, 0.11);  // yuvarlak uç
+        shape.lineTo(0,            0.32);
         shape.closePath();
         const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.05, bevelEnabled: false });
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
