@@ -10,6 +10,9 @@ let currentPage = 'calibration';
 // Veri beklenen sayfalar (ESP'den page_data gelmeden kaydet engellenir)
 const DATA_PAGES = new Set(['calibration', 'outputs', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint']);
 
+// Loading timeout handle'ları (sayfa başına)
+const loadingTimeouts = {};
+
 // === SAYFA DEĞİŞTİRME ===
 
 /**
@@ -42,10 +45,10 @@ function changePage(targetPage) {
  */
 function managePageStreams(page) {
     log(`Yönlendiriliyor: ${page}...`, 'info');
-    
+
     // A) Tüm stream'leri durdur
     stopAllStreams();
-    
+
     // B) Sayfa verilerini iste (50ms gecikme)
     if (DATA_PAGES.has(page)) showPageLoading(page);
     setTimeout(() => {
@@ -53,16 +56,20 @@ function managePageStreams(page) {
             sendCommand('GET_WAYPOINTS');
         } else if (page === 'calibration') {
             sendCommand('calibration_page_data');
-            if (typeof onSensorAlignInit === 'function') onSensorAlignInit();
+            // sensor_align ayrı gecikmeyle gönder — firmware single current_command'ı
+            // aynı anda iki komut gelirse üzerine yazar, 300ms yeterli süre bırakır
+            setTimeout(() => {
+                if (typeof onSensorAlignInit === 'function') onSensorAlignInit();
+            }, 300);
         } else if (page !== 'sensors') {
             sendCommand(page + '_page_data');
         }
     }, 50);
-    
-    // C) Sayfaya özel stream başlat (100ms gecikme)
+
+    // C) Sayfaya özel stream başlat — kalibrasyonun page_data yanıtından SONRA (600ms)
     setTimeout(() => {
         startPageSpecificStream(page);
-    }, 100);
+    }, 600);
 }
 
 /**
@@ -156,6 +163,18 @@ function showPageLoading(pageKey) {
     // Kaydet butonunu da devre dışı bırak
     const saveBtn = document.getElementById('btnSave' + pageKey.charAt(0).toUpperCase() + pageKey.slice(1));
     if (saveBtn) saveBtn.disabled = true;
+
+    // Güvenlik: 8 saniye içinde veri gelmezse overlay'i temizle
+    clearTimeout(loadingTimeouts[pageKey]);
+    loadingTimeouts[pageKey] = setTimeout(() => {
+        const stale = document.getElementById('loadingOverlay-' + pageKey);
+        if (stale) {
+            stale.remove();
+            if (typeof log === 'function') {
+                log(`⚠️ ${pageKey} sayfası veri zaman aşımı — Yeniden bağlanmayı deneyin`, 'warning');
+            }
+        }
+    }, 8000);
 }
 
 /**
@@ -163,6 +182,7 @@ function showPageLoading(pageKey) {
  * @param {string} pageKey - Sayfa ID (örn. 'outputs', 'pid')
  */
 function hidePageLoading(pageKey) {
+    clearTimeout(loadingTimeouts[pageKey]);
     const overlay = document.getElementById('loadingOverlay-' + pageKey);
     if (overlay) overlay.remove();
 

@@ -14,6 +14,7 @@ const textEncoder = new TextEncoder();
 let userInitiatedDisconnect = false; // Kullanıcı kendi bağlantıyı kestiyse true
 let pendingReconnect = false;        // Restart sonrası otomatik yeniden bağlanma bekleniyor
 let pendingReconnectTimer = null;    // Timeout: restart gelmezse bayrağı temizle
+let postConnectDataTimer = null;     // Bağlantı sonrası veri gelmezse uçuş modu uyarısı
 
 // === TEMEL KOMUT FONKSİYONLARI ===
 
@@ -98,13 +99,22 @@ async function connectSerial() {
         
         isConnected = true;
         log('✅ Seri porta bağlandı', 'success');
-        
+
+        // 10s içinde veri gelmezse cihaz uçuş modunda → uyar
+        clearTimeout(postConnectDataTimer);
+        postConnectDataTimer = setTimeout(() => {
+            if (isConnected) {
+                log('⚠️ Cihazdan 10 saniye veri gelmedi — uçuş modunda olabilir', 'warning');
+                handleDisconnect();
+            }
+        }, 10000);
+
         // UI güncelle ve sensör sayfasını aktifle
         if (typeof activateSensorsPage === 'function') {
             activateSensorsPage();
         }
         updateConnectionStatus();
-        
+
         // Okuma döngüsünü başlat
         readLoop().catch(error => {
             log(`❌ Okuma döngüsü hatası: ${error.message}`, 'error');
@@ -162,6 +172,10 @@ async function readLoop() {
             log(`❌ Okuma hatası: ${error.message}`, 'error');
             handleDisconnect();
         }
+    }
+    // done=true ile reader beklenmedik kapandıysa (uçuş moduna geçiş vb.)
+    if (isConnected) {
+        handleDisconnect();
     }
 }
 
@@ -252,6 +266,15 @@ async function attemptAutoReconnect() {
             isConnected = true;
             hideReconnectOverlay();
             log('✅ Otomatik yeniden bağlandı', 'success');
+
+            // Yeniden bağlantıdan sonra da veri timeout'u başlat
+            clearTimeout(postConnectDataTimer);
+            postConnectDataTimer = setTimeout(() => {
+                if (isConnected) {
+                    log('⚠️ Yeniden bağlantıda veri gelmedi — uçuş modunda olabilir', 'warning');
+                    handleDisconnect();
+                }
+            }, 10000);
 
             if (typeof activateSensorsPage === 'function') activateSensorsPage();
             updateConnectionStatus();
@@ -355,6 +378,8 @@ function showFlightModeWarning() {
  * @param {string} data - Gelen ham veri
  */
 function processIncomingData(data) {
+    // İlk veri geldi → post-connect timeout iptal
+    clearTimeout(postConnectDataTimer);
     jsonBuffer += data;
     const lines = jsonBuffer.split('\n');
     jsonBuffer = lines.pop() || '';
