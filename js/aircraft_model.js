@@ -69,17 +69,24 @@ function createAircraftModel() {
     group.add(makeStab(-1));
 
     // ── Dikey stabilizatör (kuyruk fini) ──────────────────────────────
+    // Shape XY düzleminde: X = chord yönü, Y = yükseklik
+    // makeRotationY(-PI/2) sonrası: eski X → yeni -Z (chord Z boyunca uzar),
+    // eski Z extrusion → yeni X (ince kalınlık X'te)
     const finShape = new THREE.Shape();
-    finShape.moveTo( 0.00,  0.00);
-    finShape.lineTo(-0.35,  0.70);
-    finShape.lineTo(-0.08,  0.78);
-    finShape.lineTo( 0.26,  0.12);
+    //              (chord_x,  height_y)
+    finShape.moveTo( 0.55,  0.00);   // arka alt kenar (trailing-root)
+    finShape.lineTo( 0.40,  0.95);   // arka üst kenar (trailing-tip) — hafif sweep
+    finShape.lineTo( 0.05,  1.10);   // tepe
+    finShape.lineTo(-0.30,  0.55);   // ön üst kenar (leading-tip)
+    finShape.lineTo(-0.22,  0.00);   // ön alt kenar (leading-root)
     finShape.closePath();
-    const fin = new THREE.Mesh(
-        new THREE.ExtrudeGeometry(finShape, { depth: 0.05, bevelEnabled: false }),
-        yellow
-    );
-    fin.position.set(-0.025, 0.20, -1.90);
+    const finGeo = new THREE.ExtrudeGeometry(finShape, { depth: 0.07, bevelEnabled: false });
+    // Döndür: chord X→ -Z, extrusion Z→ X
+    finGeo.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI / 2));
+    const fin = new THREE.Mesh(finGeo, yellow);
+    // Şekil X merkezi ≈ (0.55-0.22)/2 = 0.165 → world Z offset = -0.165
+    // Extrusion X: 0..0.07 → fin center X = -0.035
+    fin.position.set(-0.035, 0.20, -1.735);
     group.add(fin);
 
     // ── Pervane göbeği ─────────────────────────────────────────────────
