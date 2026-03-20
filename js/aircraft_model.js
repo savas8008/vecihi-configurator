@@ -13,6 +13,36 @@ function createAircraftModel() {
         transparent: true, opacity: 0.50
     });
 
+    // ── Gövde yazı texture'ı ──────────────────────────────────────────
+    // LatheGeometry UV: U (0→1) = çevre, V (0→1) = kuyruktan buruna
+    // U=0.00: +X sağ taraf,  U=0.25: -Y alt,  U=0.50: -X sol taraf,  U=0.75: +Y üst
+    // Sağ (U=0.25) ve sol (U=0.75) taraflara yazı
+    const fuseCanvas  = document.createElement('canvas');
+    fuseCanvas.width  = 1024;
+    fuseCanvas.height = 512;
+    const fc = fuseCanvas.getContext('2d');
+
+    fc.fillStyle = '#FFD700';
+    fc.fillRect(0, 0, 1024, 512);
+
+    fc.font         = 'bold 96px Arial, sans-serif';
+    fc.textAlign    = 'center';
+    fc.textBaseline = 'middle';
+    fc.fillStyle    = '#1a1a1a';
+
+    // Sağ taraf (U merkezi = 0.25 → canvas x = 256)  V = 0.50 → canvas y = 256
+    fc.fillText('VECİHİ', 256, 256);
+
+    // Sol taraf (U merkezi = 0.75 → canvas x = 768) — görüntüleyiciden okunsun diye ayna
+    fc.save();
+    fc.translate(768, 256);
+    fc.scale(-1, 1);
+    fc.fillText('VECİHİ', 0, 0);
+    fc.restore();
+
+    const fuseTex = new THREE.CanvasTexture(fuseCanvas);
+    const fuseMat = new THREE.MeshStandardMaterial({ map: fuseTex, roughness: 0.40, metalness: 0.18 });
+
     // ── Kavisli gövde — LatheGeometry ─────────────────────────────────
     // Profil: (yarıçap, y) — yüksek y = burun tarafı
     // makeRotationX(PI/2) sonrası y → +Z
@@ -32,7 +62,7 @@ function createAircraftModel() {
     ];
     const fuseGeo = new THREE.LatheGeometry(profilePts, 24);
     fuseGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-    group.add(new THREE.Mesh(fuseGeo, yellow));
+    group.add(new THREE.Mesh(fuseGeo, fuseMat));
 
     // ── Ana kanatlar ──────────────────────────────────────────────────
     function makeWing(side) {
