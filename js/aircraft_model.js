@@ -25,18 +25,25 @@ function createAircraftModel() {
     fc.fillStyle = '#FFD700';
     fc.fillRect(0, 0, 1024, 512);
 
-    fc.font         = 'bold 96px Arial, sans-serif';
+    // Yazı gövde boyunca (pervane→kuyruk) uzansın:
+    // Canvas Y = V ekseni (flipY=true → Y=0 burun, Y=512 kuyruk)
+    // rotate(-PI/2): yerel X → canvas -Y → gövde boyunca (burun→kuyruk) ✓
+    fc.font         = 'bold 72px Arial, sans-serif';   // %25 küçük (96→72)
     fc.textAlign    = 'center';
     fc.textBaseline = 'middle';
     fc.fillStyle    = '#1a1a1a';
 
-    // Sağ taraf (U merkezi = 0.25 → canvas x = 256)  V = 0.50 → canvas y = 256
-    fc.fillText('VECİHİ', 256, 256);
+    // Sağ taraf (canvas x = 256)
+    fc.save();
+    fc.translate(256, 256);
+    fc.rotate(-Math.PI / 2);
+    fc.fillText('VECİHİ', 0, 0);
+    fc.restore();
 
-    // Sol taraf (U merkezi = 0.75 → canvas x = 768) — görüntüleyiciden okunsun diye ayna
+    // Sol taraf (canvas x = 768) — ters yön, sol yandan okunabilir
     fc.save();
     fc.translate(768, 256);
-    fc.scale(-1, 1);
+    fc.rotate(Math.PI / 2);
     fc.fillText('VECİHİ', 0, 0);
     fc.restore();
 
@@ -137,10 +144,23 @@ function createAircraftModel() {
     group.add(propGroup);
     group.userData.propeller = propGroup;
 
-    // ── Cockpit camı ──────────────────────────────────────────────────
-    const cockpitGeo = new THREE.SphereGeometry(0.17, 14, 9, 0, Math.PI * 2, 0, Math.PI * 0.52);
+    // ── Cockpit kanopisi — teardrop, pervane'den kuyruğa uzanır ───────
+    // LatheGeometry profili (yarıçap, y): makeRotationX(PI/2) sonrası y→Z
+    // Burun ucu Z ≈ +1.0, kuyruk sonu Z ≈ -0.50 (position.z = 0.25 ile)
+    const canopyPts = [
+        new THREE.Vector2(0.00,  0.75),  // burun ucu
+        new THREE.Vector2(0.09,  0.58),
+        new THREE.Vector2(0.16,  0.28),
+        new THREE.Vector2(0.17,  0.00),  // en geniş nokta
+        new THREE.Vector2(0.15, -0.28),
+        new THREE.Vector2(0.11, -0.52),
+        new THREE.Vector2(0.05, -0.70),
+        new THREE.Vector2(0.00, -0.75),  // kuyruk sonu
+    ];
+    const cockpitGeo = new THREE.LatheGeometry(canopyPts, 20);
+    cockpitGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
     const cockpit = new THREE.Mesh(cockpitGeo, cockpitMat);
-    cockpit.position.set(0, 0.22, 0.80);
+    cockpit.position.set(0, 0.26, 0.25);
     group.add(cockpit);
 
     return group;
