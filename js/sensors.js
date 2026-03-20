@@ -75,7 +75,7 @@
             const near = 0.1;
             const far = 1000;
             camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-            camera.position.set(0, 4, -8);  // arkadan/üstten bak
+            camera.position.set(6, 9, -12);  // arkadan/üstten bak
 
             // Renderer - global 'renderer' değişkenini kullan
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
