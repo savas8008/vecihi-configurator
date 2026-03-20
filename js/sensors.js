@@ -138,7 +138,7 @@
             const size = new THREE.Vector3();
             box.getSize(size);
             const maxDim = Math.max(size.x, size.y, size.z);
-            model.scale.setScalar(5.0 / maxDim);
+            model.scale.setScalar(8.0 / maxDim);
 
             // Merkezi pivot'a getir
             model.updateMatrixWorld(true);

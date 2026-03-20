@@ -35,12 +35,12 @@ function createAircraftModel() {
     // Ana kanatlar
     function makeWing(side) {
         const shape = new THREE.Shape();
-        shape.moveTo(0,           0);
-        shape.lineTo(side * 2.2, -0.22);
-        shape.lineTo(side * 2.2, -0.05);
-        shape.lineTo(0,           0.38);
+        shape.moveTo(0,           -0.15);   // kök arka kenar
+        shape.lineTo(side * 2.8,  -0.38);   // uç arka kenar
+        shape.lineTo(side * 2.8,   0.22);   // uç ön kenar
+        shape.lineTo(0,            0.65);   // kök ön kenar
         shape.closePath();
-        const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.055, bevelEnabled: false });
+        const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.09, bevelEnabled: false });
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
         const mesh = new THREE.Mesh(geo, yellow);
         mesh.position.set(0, -0.03, -0.05);
@@ -52,12 +52,12 @@ function createAircraftModel() {
     // Yatay stabilizatörler
     function makeStab(side) {
         const shape = new THREE.Shape();
-        shape.moveTo(0,           0);
-        shape.lineTo(side * 0.75, -0.1);
-        shape.lineTo(side * 0.75,  0.02);
-        shape.lineTo(0,            0.18);
+        shape.moveTo(0,           -0.05);
+        shape.lineTo(side * 1.0,  -0.18);
+        shape.lineTo(side * 1.0,   0.12);
+        shape.lineTo(0,            0.32);
         shape.closePath();
-        const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.04, bevelEnabled: false });
+        const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.05, bevelEnabled: false });
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
         const mesh = new THREE.Mesh(geo, yellow);
         mesh.position.set(0, 0.04, -1.55);
