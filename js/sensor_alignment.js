@@ -42,13 +42,11 @@ function selectAlignOption(alignId) {
 function updateAlignSaveBtn() {
     const btn = document.getElementById('btnSaveAlign');
     if (!btn) return;
-    const connected = typeof window.isConnected === 'function' ? window.isConnected() : false;
-    btn.disabled = !connected;
+    btn.disabled = !isConnected;
 }
 
 function saveSensorAlign() {
-    const connected = typeof window.isConnected === 'function' ? window.isConnected() : false;
-    if (!connected) {
+    if (!isConnected) {
         showModal('Bağlantı Yok', 'Kaydetmek için önce cihaza bağlanın.', 'error');
         return;
     }
@@ -92,7 +90,7 @@ function onSensorAlignInit() {
         pendingSensorAlign = currentSensorAlign;
     }
     renderAlignSelect();
-    if (typeof window.isConnected === 'function' && window.isConnected()) {
+    if (isConnected) {
         sendCommand('sensor_align_page_data');
     }
 }

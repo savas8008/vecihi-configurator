@@ -290,7 +290,7 @@ a:hover {
 .panel4 .form-control,
 .panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
 .panel4 .form-control:focus,
-.panel4 .form-select:focus  { background-color: #ffffff !important; border-color: var(--color-primary) !important; }
+.panel4 .form-select:focus  { background-color: var(--bg-input) !important; color: var(--text-primary) !important; border-color: var(--color-primary) !important; }
 
 /* PID kutuları — panel4 metin renkleri */
 .panel4 .pid-label          { color: #333333 !important; }
@@ -336,7 +336,91 @@ a:hover {
 }
 .page.active {
     display: block;
+    position: relative;
     animation: fadeIn 0.2s ease;
+}
+
+/* === SAYFA YÜKLENİYOR OVERLAY === */
+.page-loading-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    min-height: 200px;
+    background: rgba(12, 17, 30, 0.82);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    border-radius: 8px;
+    pointer-events: all;
+}
+.page-loading-content {
+    text-align: center;
+    color: #c8d6f0;
+    padding: 32px;
+}
+.page-loading-content .spinner-border {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 3px;
+    color: var(--primary, #4e8cff);
+}
+.page-loading-content p {
+    margin-top: 14px;
+    margin-bottom: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.page-loading-content small {
+    color: #7a90b8;
+    font-size: 0.8rem;
+}
+
+/* === OTOMATİK YENİDEN BAĞLANMA OVERLAY === */
+#reconnectOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 24, 0.92);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+#reconnectOverlay .reconnect-box {
+    background: rgba(20, 28, 50, 0.95);
+    border: 1px solid rgba(78, 140, 255, 0.35);
+    border-radius: 12px;
+    padding: 40px 48px;
+    text-align: center;
+    color: #c8d6f0;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+#reconnectOverlay .reconnect-spinner {
+    width: 3rem;
+    height: 3rem;
+    border-width: 3px;
+    color: #4e8cff;
+}
+#reconnectOverlay h5 {
+    margin: 16px 0 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #e0eaff;
+}
+#reconnectOverlay #reconnectStatus {
+    font-size: 0.875rem;
+    color: #7a90b8;
+    min-height: 1.4em;
+}
+#reconnectOverlay .reconnect-steps {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #5a70a0;
+    line-height: 1.6;
+    text-align: left;
 }
 
 @keyframes fadeIn {
@@ -1123,7 +1207,8 @@ input[type="range"]::-moz-range-thumb {
 
 .form-control:focus,
 .form-select:focus {
-    background-color: #ffffff !important;
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
     border-color: var(--color-primary) !important;
     box-shadow: 0 0 0 3px var(--color-primary-glow) !important;
     outline: none;
@@ -1131,6 +1216,16 @@ input[type="range"]::-moz-range-thumb {
 
 .form-control::placeholder {
     color: var(--text-muted) !important;
+}
+
+/* Tarayıcı autofill beyaz arkaplan inject ediyor → kapat */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:focus,
+.form-select:-webkit-autofill,
+.form-select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    caret-color: var(--text-primary);
 }
 
 .form-label {

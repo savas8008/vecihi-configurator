@@ -7,6 +7,12 @@
 // === SAYFA DURUMU ===
 let currentPage = 'calibration';
 
+// Veri beklenen sayfalar (ESP'den page_data gelmeden kaydet engellenir)
+const DATA_PAGES = new Set(['calibration', 'outputs', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint']);
+
+// Loading timeout handle'ları (sayfa başına)
+const loadingTimeouts = {};
+
 // === SAYFA DEĞİŞTİRME ===
 
 /**
@@ -39,26 +45,31 @@ function changePage(targetPage) {
  */
 function managePageStreams(page) {
     log(`Yönlendiriliyor: ${page}...`, 'info');
-    
+
     // A) Tüm stream'leri durdur
     stopAllStreams();
-    
+
     // B) Sayfa verilerini iste (50ms gecikme)
+    if (DATA_PAGES.has(page)) showPageLoading(page);
     setTimeout(() => {
         if (page === 'waypoint') {
             sendCommand('GET_WAYPOINTS');
         } else if (page === 'calibration') {
             sendCommand('calibration_page_data');
-            if (typeof onSensorAlignInit === 'function') onSensorAlignInit();
+            // sensor_align ayrı gecikmeyle gönder — firmware single current_command'ı
+            // aynı anda iki komut gelirse üzerine yazar, 300ms yeterli süre bırakır
+            setTimeout(() => {
+                if (typeof onSensorAlignInit === 'function') onSensorAlignInit();
+            }, 300);
         } else if (page !== 'sensors') {
             sendCommand(page + '_page_data');
         }
     }, 50);
-    
-    // C) Sayfaya özel stream başlat (100ms gecikme)
+
+    // C) Sayfaya özel stream başlat — kalibrasyonun page_data yanıtından SONRA (600ms)
     setTimeout(() => {
         startPageSpecificStream(page);
-    }, 100);
+    }, 600);
 }
 
 /**
@@ -124,6 +135,61 @@ function startPageSpecificStream(page) {
     }
 }
 
+// === SAYFA YÜKLENİYOR OVERLAY ===
+
+/**
+ * @brief Sayfa üzerinde "Veriler yükleniyor..." overlay'i gösterir ve kaydet butonunu devre dışı bırakır
+ * @param {string} pageKey - Sayfa ID (örn. 'outputs', 'pid')
+ */
+function showPageLoading(pageKey) {
+    const pageEl = document.getElementById(pageKey);
+    if (!pageEl) return;
+
+    // Mevcut overlay varsa kaldır
+    const existing = pageEl.querySelector('.page-loading-overlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'page-loading-overlay';
+    overlay.id = 'loadingOverlay-' + pageKey;
+    overlay.innerHTML = `
+        <div class="page-loading-content">
+            <div class="spinner-border" role="status"></div>
+            <p>Veriler yükleniyor...</p>
+            <small>Cihazdan veri bekleniyor</small>
+        </div>`;
+    pageEl.appendChild(overlay);
+
+    // Kaydet butonunu da devre dışı bırak
+    const saveBtn = document.getElementById('btnSave' + pageKey.charAt(0).toUpperCase() + pageKey.slice(1));
+    if (saveBtn) saveBtn.disabled = true;
+
+    // Güvenlik: 8 saniye içinde veri gelmezse overlay'i temizle
+    clearTimeout(loadingTimeouts[pageKey]);
+    loadingTimeouts[pageKey] = setTimeout(() => {
+        const stale = document.getElementById('loadingOverlay-' + pageKey);
+        if (stale) {
+            stale.remove();
+            if (typeof log === 'function') {
+                log(`⚠️ ${pageKey} sayfası veri zaman aşımı — Yeniden bağlanmayı deneyin`, 'warning');
+            }
+        }
+    }, 8000);
+}
+
+/**
+ * @brief Sayfa overlay'ini kaldırır ve kaydet butonunu aktif eder
+ * @param {string} pageKey - Sayfa ID (örn. 'outputs', 'pid')
+ */
+function hidePageLoading(pageKey) {
+    clearTimeout(loadingTimeouts[pageKey]);
+    const overlay = document.getElementById('loadingOverlay-' + pageKey);
+    if (overlay) overlay.remove();
+
+    const saveBtn = document.getElementById('btnSave' + pageKey.charAt(0).toUpperCase() + pageKey.slice(1));
+    if (saveBtn) saveBtn.disabled = false;
+}
+
 // === SAYFA VERİSİ KAYDETME ===
 
 /**
@@ -133,6 +199,12 @@ function startPageSpecificStream(page) {
 function savePageData(page) {
     if (!isConnected) {
         showModal('Uyarı', 'Lütfen önce cihaza bağlanın.', 'warning');
+        return;
+    }
+
+    // Veri henüz yüklenmediyse kaydetmeyi engelle
+    if (document.getElementById('loadingOverlay-' + page)) {
+        showModal('Uyarı', 'Cihazdan veriler henüz yüklenmedi. Lütfen bekleyin.', 'warning');
         return;
     }
 
@@ -347,3 +419,5 @@ window.changePage = changePage;
 window.savePageData = savePageData;
 window.updateConnectionStatus = updateConnectionStatus;
 window.stopAllStreams = stopAllStreams;
+window.showPageLoading = showPageLoading;
+window.hidePageLoading = hidePageLoading;
