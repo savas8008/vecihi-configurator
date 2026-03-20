@@ -45,39 +45,18 @@ function updateTransmitterUI() {
         else if (transmitterConfig.protocol === 1 || transmitterConfig.protocol === 'elrs') protocolEl.value = 'elrs';
     }
 
-    // 2. Kanal Haritasını Tespit Et (DÜZELTİLEN KISIM)
+    // 2. Kanal Atamalarını Doğrudan Seçicilere Yaz
     const ch = transmitterConfig.channels || { roll:1, pitch:2, throttle:3, yaw:4 };
-    let detectedMap = "AETR"; // Varsayılan
 
-    // Mantıksal kontroller: Hangi kanal 1. sırada?
-    
-    // AETR: Roll=1, Pitch=2, Throttle=3, Yaw=4
-    if (ch.roll===1 && ch.pitch===2 && ch.throttle===3 && ch.yaw===4) {
-        detectedMap = "AETR";
-    }
-    // TAER: Throttle=1, Roll=2, Pitch=3, Yaw=4
-    else if (ch.throttle===1 && ch.roll===2 && ch.pitch===3 && ch.yaw===4) {
-        detectedMap = "TAER";
-    }
-    // RETA: Yaw=1, Pitch=2, Throttle=3, Roll=4 (LOGLARINIZDAKİ VERİ BU)
-    else if (ch.yaw===1 && ch.pitch===2 && ch.throttle===3 && ch.roll===4) {
-        detectedMap = "RETA";
-    }
-    // TEAR: Throttle=1, Pitch=2, Roll=3, Yaw=4
-    else if (ch.throttle===1 && ch.pitch===2 && ch.roll===3 && ch.yaw===4) {
-        detectedMap = "TEAR";
-    }
-    
-    // Eğer özel bir sıralama varsa ve yukarıdakilere uymuyorsa, konsola yaz (Debug için)
-    else {
-        console.log("Bilinmeyen Kanal Sıralaması:", ch);
-    }
+    const chRollEl = document.getElementById('chRoll');
+    const chPitchEl = document.getElementById('chPitch');
+    const chThrottleEl = document.getElementById('chThrottle');
+    const chYawEl = document.getElementById('chYaw');
 
-    // Dropdown menüsünü güncelle
-    const mapEl = document.getElementById('channelMapSelect');
-    if (mapEl) {
-        mapEl.value = detectedMap;
-    }
+    if (chRollEl) chRollEl.value = ch.roll || 1;
+    if (chPitchEl) chPitchEl.value = ch.pitch || 2;
+    if (chThrottleEl) chThrottleEl.value = ch.throttle || 3;
+    if (chYawEl) chYawEl.value = ch.yaw || 4;
 
     // 3. Reverse Durumlarını Ayarla
     const rev = transmitterConfig.reverse || {};
@@ -92,18 +71,13 @@ function saveTransmitterConfig() {
     // 1. Protokolü al
     const protocol = document.getElementById('protocolSelect').value;
 
-    // 2. Kanal Haritasını (Map) Belirle
-    const selectedMap = document.getElementById('channelMapSelect').value;
-    let channels = {};
-
-    // Seçilen haritaya göre kanalları ata
-    switch (selectedMap) {
-        case 'AETR': channels = { roll:1, pitch:2, throttle:3, yaw:4 }; break;
-        case 'TAER': channels = { throttle:1, roll:2, pitch:3, yaw:4 }; break;
-        case 'RETA': channels = { yaw:1, pitch:2, throttle:3, roll:4 }; break;
-        case 'TEAR': channels = { throttle:1, pitch:2, roll:3, yaw:4 }; break;
-        default:     channels = { roll:1, pitch:2, throttle:3, yaw:4 }; break;
-    }
+    // 2. Kanal Atamalarını Manuel Seçicilerden Oku
+    const channels = {
+        roll:     parseInt(document.getElementById('chRoll').value)     || 1,
+        pitch:    parseInt(document.getElementById('chPitch').value)    || 2,
+        throttle: parseInt(document.getElementById('chThrottle').value) || 3,
+        yaw:      parseInt(document.getElementById('chYaw').value)      || 4
+    };
 
     // 3. Reverse (Tersleme) Ayarlarını Topla
     const reverse = {
