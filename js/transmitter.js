@@ -43,6 +43,7 @@ function updateTransmitterUI() {
     if (protocolEl && transmitterConfig.protocol !== undefined) {
         if (transmitterConfig.protocol === 0 || transmitterConfig.protocol === 'sbus') protocolEl.value = 'sbus';
         else if (transmitterConfig.protocol === 1 || transmitterConfig.protocol === 'elrs') protocolEl.value = 'elrs';
+        else if (transmitterConfig.protocol === 2 || transmitterConfig.protocol === 'mavlink') protocolEl.value = 'mavlink';
     }
 
     // 2. Kanal Atamalarını Doğrudan Seçicilere Yaz
