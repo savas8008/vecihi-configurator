@@ -290,7 +290,7 @@ a:hover {
 .panel4 .form-control,
 .panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
 .panel4 .form-control:focus,
-.panel4 .form-select:focus  { background-color: #ffffff !important; border-color: var(--color-primary) !important; }
+.panel4 .form-select:focus  { background-color: var(--bg-input) !important; color: var(--text-primary) !important; border-color: var(--color-primary) !important; }
 
 /* PID kutuları — panel4 metin renkleri */
 .panel4 .pid-label          { color: #333333 !important; }
@@ -1207,7 +1207,8 @@ input[type="range"]::-moz-range-thumb {
 
 .form-control:focus,
 .form-select:focus {
-    background-color: #ffffff !important;
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
     border-color: var(--color-primary) !important;
     box-shadow: 0 0 0 3px var(--color-primary-glow) !important;
     outline: none;
@@ -1215,6 +1216,16 @@ input[type="range"]::-moz-range-thumb {
 
 .form-control::placeholder {
     color: var(--text-muted) !important;
+}
+
+/* Tarayıcı autofill beyaz arkaplan inject ediyor → kapat */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:focus,
+.form-select:-webkit-autofill,
+.form-select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    caret-color: var(--text-primary);
 }
 
 .form-label {
