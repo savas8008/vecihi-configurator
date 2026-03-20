@@ -143,14 +143,19 @@
             }
 
             // GLB modeli yükle
-            const loader = new THREE.GLTFLoader();
-            loader.load('models/Old Toy Plane.glb', function(gltf) {
+            const GLTFLoaderClass = THREE.GLTFLoader || window.GLTFLoader;
+            const loader = new GLTFLoaderClass();
+            loader.load('models/old_toy_plane.glb', function(gltf) {
                 const model = gltf.scene;
 
                 // Ölçekle
                 const box = new THREE.Box3().setFromObject(model);
-                const maxDim = Math.max(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z);
-                model.scale.setScalar(5.0 / maxDim);
+                const size = new THREE.Vector3();
+                box.getSize(size);
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 5.0 / maxDim;
+                model.scale.setScalar(scale);
+                model.updateMatrixWorld(true);
 
                 // Merkezi pivot'a getir
                 const box2 = new THREE.Box3().setFromObject(model);
