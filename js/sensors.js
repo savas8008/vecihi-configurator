@@ -135,37 +135,29 @@
             const pivot = new THREE.Group();
             pivot.position.y = 1.0;
             scene.add(pivot);
+
+            const model = createAircraftModel();
+            pivot.add(model);
+
+            // Ölçekle
+            const box = new THREE.Box3().setFromObject(model);
+            const size = new THREE.Vector3();
+            box.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            model.scale.setScalar(5.0 / maxDim);
+
+            // Merkezi pivot'a getir
+            model.updateMatrixWorld(true);
+            const box2 = new THREE.Box3().setFromObject(model);
+            const center = box2.getCenter(new THREE.Vector3());
+            model.position.sub(center);
+
             airplaneModel = pivot;
 
             if (controls) {
                 controls.target.set(0, 1.5, 0);
                 controls.update();
             }
-
-            // GLB modeli yükle
-            const GLTFLoaderClass = THREE.GLTFLoader || window.GLTFLoader;
-            const loader = new GLTFLoaderClass();
-            loader.load('models/old_toy_plane.glb', function(gltf) {
-                const model = gltf.scene;
-
-                // Ölçekle
-                const box = new THREE.Box3().setFromObject(model);
-                const size = new THREE.Vector3();
-                box.getSize(size);
-                const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 5.0 / maxDim;
-                model.scale.setScalar(scale);
-                model.updateMatrixWorld(true);
-
-                // Merkezi pivot'a getir
-                const box2 = new THREE.Box3().setFromObject(model);
-                const center = box2.getCenter(new THREE.Vector3());
-                model.position.sub(center);
-
-                pivot.add(model);
-            }, undefined, function(err) {
-                console.error('GLB yüklenemedi:', err);
-            });
 
             // Resize Observer
             const onResize = () => {
