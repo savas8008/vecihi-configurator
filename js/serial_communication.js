@@ -11,6 +11,7 @@ let writer = null;
 let isConnected = false;
 let jsonBuffer = '';
 const textEncoder = new TextEncoder();
+let userInitiatedDisconnect = false; // Kullanıcı kendi bağlantıyı kestiyse true
 
 // === TEMEL KOMUT FONKSİYONLARI ===
 
@@ -166,6 +167,7 @@ async function readLoop() {
  * @brief Bağlantıyı keser (UI ve port)
  */
 function disconnectSerial() {
+    userInitiatedDisconnect = true;
     log('🔌 Bağlantı kesiliyor...', 'warning');
     handleDisconnect();
 }
@@ -174,23 +176,54 @@ function disconnectSerial() {
  * @brief Bağlantı kesildiğinde portları ve UI'ı temizler
  */
 function handleDisconnect() {
+    const wasUnexpected = isConnected && !userInitiatedDisconnect;
     isConnected = false;
-    
-    if (reader) { 
-        reader.cancel().catch(() => {}); 
-        reader = null; 
+    userInitiatedDisconnect = false;
+
+    if (reader) {
+        reader.cancel().catch(() => {});
+        reader = null;
     }
-    if (writer) { 
-        writer.close().catch(() => {}); 
-        writer = null; 
+    if (writer) {
+        writer.close().catch(() => {});
+        writer = null;
     }
-    if (port) { 
-        port.close().catch(() => {}); 
-        port = null; 
+    if (port) {
+        port.close().catch(() => {});
+        port = null;
     }
-    
+
     updateConnectionStatus();
     log('🔌 Bağlantı kesildi', 'warning');
+
+    // Beklenmedik bağlantı kesilmesi → cihaz muhtemelen yeniden başlatıldı
+    if (wasUnexpected) {
+        showFlightModeWarning();
+    }
+}
+
+/**
+ * @brief Cihaz beklenmedik kapandığında (restart/uçuş modu) uyarı gösterir
+ */
+function showFlightModeWarning() {
+    if (typeof showModal !== 'function') return;
+    showModal(
+        '⚠️ Bağlantı Kesildi',
+        `<div style="line-height:1.7">
+            <p><strong>Cihaz bağlantısı beklenmedik şekilde kesildi.</strong></p>
+            <p>Ayar kaydettiyseniz cihaz yeniden başlamış ve <strong>uçuş moduna</strong> geçmiş olabilir.
+               Uçuş modunda konfiguratör kullanılamaz.</p>
+            <hr style="border-color:#ffffff30">
+            <p class="mb-1"><strong>Yeniden bağlanmak için:</strong></p>
+            <ol class="text-start mb-0" style="padding-left:1.2em">
+                <li>USB fişini çıkarın</li>
+                <li>Varsa batarya fişini de çıkarın ve geri takın</li>
+                <li>USB'yi tekrar takın</li>
+                <li><strong>10 saniye içinde</strong> "Porta Bağlan" butonuna tıklayın</li>
+            </ol>
+        </div>`,
+        'warning'
+    );
 }
 
 // === VERİ İŞLEME FONKSİYONLARI ===
@@ -273,7 +306,12 @@ function handleStandardJsonData(data) {
  */
 function handlePageData(pageType, pageData) {
     log(`📊 ${pageType} sayfası verileri alındı`, 'success');
-    
+
+    // Overlay'i kaldır (veri geldi, artık kaydet butonu aktif)
+    // 'waypoints' (ESP tipi) → 'waypoint' (sayfa ID) uyumsuzluğunu çöz
+    const pageId = pageType === 'waypoints' ? 'waypoint' : pageType;
+    if (typeof hidePageLoading === 'function') hidePageLoading(pageId);
+
     switch (pageType) {
         case 'calibration': 
             if (typeof handleCalibrationPageData === 'function') handleCalibrationPageData(pageData); 

@@ -7,6 +7,9 @@
 // === SAYFA DURUMU ===
 let currentPage = 'calibration';
 
+// Veri beklenen sayfalar (ESP'den page_data gelmeden kaydet engellenir)
+const DATA_PAGES = new Set(['calibration', 'outputs', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint']);
+
 // === SAYFA DEĞİŞTİRME ===
 
 /**
@@ -44,6 +47,7 @@ function managePageStreams(page) {
     stopAllStreams();
     
     // B) Sayfa verilerini iste (50ms gecikme)
+    if (DATA_PAGES.has(page)) showPageLoading(page);
     setTimeout(() => {
         if (page === 'waypoint') {
             sendCommand('GET_WAYPOINTS');
@@ -124,6 +128,48 @@ function startPageSpecificStream(page) {
     }
 }
 
+// === SAYFA YÜKLENİYOR OVERLAY ===
+
+/**
+ * @brief Sayfa üzerinde "Veriler yükleniyor..." overlay'i gösterir ve kaydet butonunu devre dışı bırakır
+ * @param {string} pageKey - Sayfa ID (örn. 'outputs', 'pid')
+ */
+function showPageLoading(pageKey) {
+    const pageEl = document.getElementById(pageKey);
+    if (!pageEl) return;
+
+    // Mevcut overlay varsa kaldır
+    const existing = pageEl.querySelector('.page-loading-overlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'page-loading-overlay';
+    overlay.id = 'loadingOverlay-' + pageKey;
+    overlay.innerHTML = `
+        <div class="page-loading-content">
+            <div class="spinner-border" role="status"></div>
+            <p>Veriler yükleniyor...</p>
+            <small>Cihazdan veri bekleniyor</small>
+        </div>`;
+    pageEl.appendChild(overlay);
+
+    // Kaydet butonunu da devre dışı bırak
+    const saveBtn = document.getElementById('btnSave' + pageKey.charAt(0).toUpperCase() + pageKey.slice(1));
+    if (saveBtn) saveBtn.disabled = true;
+}
+
+/**
+ * @brief Sayfa overlay'ini kaldırır ve kaydet butonunu aktif eder
+ * @param {string} pageKey - Sayfa ID (örn. 'outputs', 'pid')
+ */
+function hidePageLoading(pageKey) {
+    const overlay = document.getElementById('loadingOverlay-' + pageKey);
+    if (overlay) overlay.remove();
+
+    const saveBtn = document.getElementById('btnSave' + pageKey.charAt(0).toUpperCase() + pageKey.slice(1));
+    if (saveBtn) saveBtn.disabled = false;
+}
+
 // === SAYFA VERİSİ KAYDETME ===
 
 /**
@@ -133,6 +179,12 @@ function startPageSpecificStream(page) {
 function savePageData(page) {
     if (!isConnected) {
         showModal('Uyarı', 'Lütfen önce cihaza bağlanın.', 'warning');
+        return;
+    }
+
+    // Veri henüz yüklenmediyse kaydetmeyi engelle
+    if (document.getElementById('loadingOverlay-' + page)) {
+        showModal('Uyarı', 'Cihazdan veriler henüz yüklenmedi. Lütfen bekleyin.', 'warning');
         return;
     }
 
@@ -347,3 +399,5 @@ window.changePage = changePage;
 window.savePageData = savePageData;
 window.updateConnectionStatus = updateConnectionStatus;
 window.stopAllStreams = stopAllStreams;
+window.showPageLoading = showPageLoading;
+window.hidePageLoading = hidePageLoading;
