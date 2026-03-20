@@ -447,10 +447,9 @@ a:hover {
    5. 3D CANVAS & HUD PANEL
    ============================================ */
 #3d-canvas-container {
-    background: var(--bg-3d-canvas);
+    background: transparent;
     border: 1px solid var(--border-default);
     border-radius: var(--radius-lg);
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
     overflow: hidden;
 }
 
