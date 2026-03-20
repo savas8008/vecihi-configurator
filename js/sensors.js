@@ -75,7 +75,7 @@
             const near = 0.1;
             const far = 1000;
             camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-            camera.position.set(0, 3, 6);
+            camera.position.set(0, 4, -8);  // arkadan/üstten bak
 
             // Renderer - global 'renderer' değişkenini kullan
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -323,7 +323,7 @@
             if (data && data.q && Array.isArray(data.q) && data.q.length === 4) {
                 var w = data.q[0], x = data.q[1], y = data.q[2], z = data.q[3];
                 if (typeof targetQuaternion !== 'undefined' && targetQuaternion) {
-                    targetQuaternion.set(y, -z, x, w);
+                    targetQuaternion.set(-y, -z, x, w);
                 }
             }
 
