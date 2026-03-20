@@ -78,7 +78,7 @@
             camera.position.set(0, 4, -8);  // arkadan/üstten bak
 
             // Renderer - global 'renderer' değişkenini kullan
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.physicallyCorrectLights = true;
@@ -90,9 +90,7 @@
             renderer.setAnimationLoop(animate3D);
             container.appendChild(renderer.domElement);
 
-            // Gökyüzü arka planı (gradient effect)
-            scene.background = new THREE.Color(0x87CEEB);
-            scene.fog = new THREE.FogExp2(0xc9e8f5, 0.022);
+            scene.background = null;
 
             // Işıklar — PBR kaliteli aydınlatma
             const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x5c7a3e, 0.7);
@@ -115,10 +113,6 @@
             fillLight.position.set(-5, 3, -5);
             scene.add(fillLight);
 
-            // Grid - global 'gridHelper' değişkenini kullan
-            gridHelper = new THREE.GridHelper(60, 30, 0x4a7a4a, 0x6aaa6a);
-            gridHelper.position.y = -1.5;
-            scene.add(gridHelper);
 
             // Orbit Controls - global 'controls' değişkenini kullan
             if (typeof THREE.OrbitControls !== 'undefined') {
