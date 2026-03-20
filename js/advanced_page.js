@@ -42,10 +42,11 @@ let advancedConfig = {
         gps_baud: 9600,
         
         // Launch
-        launch_throttle: 1700, 
-        launch_angle: 20, 
-        launch_time: 2000
-    }, 
+        launch_throttle: 1700,
+        launch_angle: 20,
+        launch_time: 2000,
+        auto_launch_on_arm: true
+    },
     misc: { 
         tpa: 0.00, 
         esc_hz: 50 
@@ -183,6 +184,7 @@ function updateAdvancedUI() {
         setVal("inp_ang_lim_pitch", n.ang_lim_pitch);
 
         // Auto launch
+        setChk("inp_auto_launch_on_arm", n.auto_launch_on_arm);
         setVal("inp_launch_acc_threshold", n.launch_acc_threshold);
         setVal("inp_launch_throttle", n.launch_throttle);
         setVal("inp_launch_time", n.launch_time);
@@ -352,6 +354,7 @@ function saveAdvancedConfig() {
     setIf(nav, "ang_lim_pitch", int("inp_ang_lim_pitch"));
 
     // Auto launch
+    setIf(nav, "auto_launch_on_arm", bool("inp_auto_launch_on_arm"));
     setIf(nav, "launch_acc_threshold", num("inp_launch_acc_threshold"));
     setIf(nav, "launch_throttle", int("inp_launch_throttle"));
     setIf(nav, "launch_time", int("inp_launch_time"));
