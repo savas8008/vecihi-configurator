@@ -271,16 +271,11 @@ def udp_listener():
     except Exception:
         pass  # Linux/macOS'ta bu opsiyon yok, normal
 
-    # Heartbeat gönderme soketi: lokal IP'ye bağlı (doğru arayüzden gönderim garantisi)
+    # Heartbeat gönderme soketi: geçici port — çakışma olmasın
     hb_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     hb_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    try:
-        hb_sock.bind((local_ip if is_10x else "0.0.0.0", UDP_PORT))
-        print(f"[REG] Heartbeat soketi: {hb_sock.getsockname()} (kaynak port={UDP_PORT})")
-    except OSError:
-        # Aynı port bind edilemiyorsa geçici port kullan
-        hb_sock.bind((local_ip if is_10x else "0.0.0.0", 0))
-        print(f"[REG] Heartbeat soketi: {hb_sock.getsockname()} (geçici port)")
+    hb_sock.bind((local_ip if is_10x else "0.0.0.0", 0))
+    print(f"[REG] Heartbeat soketi: {hb_sock.getsockname()} (geçici port)")
 
     print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}  (unicast+broadcast)")
     print(f"[REG] Lokal IP       : {local_ip}  ({'10.0.0.x ağında ✓' if is_10x else '⚠ 10.0.0.x değil!'})")
@@ -296,15 +291,16 @@ def udp_listener():
     ping_count = 0
 
     while True:
-        # Periyodik MAVLink heartbeat → sadece 14555 (backpack listen port)
+        # Periyodik MAVLink heartbeat → 14555 VE 14550 (farklı firmware versiyonları için)
         now = time.time()
         if now - last_ping >= 1.0:
             try:
                 hb = mavlink_heartbeat(ping_count)
-                hb_sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))
+                hb_sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))  # 14555
+                hb_sock.sendto(hb, (BACKPACK_IP, UDP_PORT))          # 14550
                 ping_count += 1
                 if ping_count <= 5 or ping_count % 10 == 0:
-                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN}  pkt_alindi={pkt_count}")
+                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN}+{UDP_PORT}  pkt_alindi={pkt_count}")
             except Exception as e:
                 print(f"[REG] Heartbeat hatası: {e}")
             last_ping = now
