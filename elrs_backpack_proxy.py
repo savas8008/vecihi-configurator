@@ -252,29 +252,23 @@ def broadcast(raw: bytes):
 
 
 def udp_listener():
+    # GCS lokal IP tespiti — backpack'e giden doğru arayüzü bul
+    local_ip = get_local_ip_for(BACKPACK_IP)
+    is_10x   = local_ip.startswith("10.0.")
+    bind_ip  = local_ip if is_10x else "0.0.0.0"
+
+    # Ana soket: heartbeat GÖNDERMEsi + telemetri ALMA — AYNI soketten (kaynak port = 14550)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    sock.bind(("0.0.0.0", UDP_PORT))
+    sock.bind((bind_ip, UDP_PORT))
     sock.settimeout(1.0)
-    print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}")
 
-    # GCS lokal IP tespiti (routing-aware: backpack'e giden arayüzü bul)
-    local_ip = get_local_ip_for(BACKPACK_IP)
-    print(f"[REG] Lokal IP       : {local_ip}  ({'10.0.0.x ağında' if local_ip.startswith('10.0.') else '⚠ 10.0.0.x değil, yanlış arayüz olabilir!'})")
-    print(f"[REG] Backpack bu IP'yi GCS olarak kaydedecek: {local_ip}")
+    print(f"[UDP] Dinleniyor     : {bind_ip}:{UDP_PORT}")
+    print(f"[REG] Lokal IP       : {local_ip}  ({'10.0.0.x ağında ✓' if is_10x else '⚠ 10.0.0.x değil!'})")
+    print(f"[REG] Heartbeat      : {local_ip}:{UDP_PORT} → {BACKPACK_IP}:{BACKPACK_LISTEN}")
 
-    # Heartbeat için ayrı soket — lokal IP'ye bağlı, backpack doğru kaynak görür
-    hb_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    hb_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    try:
-        hb_sock.bind((local_ip, 0))  # lokal 10.0.0.x IP'ye bağla, port=rastgele
-        print(f"[REG] Heartbeat soketi: {hb_sock.getsockname()}")
-    except Exception as e:
-        print(f"[REG] Heartbeat soketi bind hatası ({e}), 0.0.0.0 kullanılıyor")
-        hb_sock.bind(("0.0.0.0", 0))
-
-    # QGC/Mission Planner'a yönlendirme soketi (bağlanmadan, OS ephemeral port atar)
+    # QGC/Mission Planner'a yönlendirme soketi
     fwd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print(f"[FWD] QGC forward    : {QGC_HOST}:{QGC_PORT}")
     print(f"[FWD] QGC ayarı      : Connections → UDP → Listen Port {QGC_PORT}")
@@ -284,15 +278,16 @@ def udp_listener():
     ping_count = 0
 
     while True:
-        # Periyodik MAVLink heartbeat → backpack listen port 14555'e
+        # Periyodik MAVLink heartbeat — hem 14555 hem 14550'ye gönder (hangisi doğruysa)
         now = time.time()
         if now - last_ping >= 1.0:
             try:
                 hb = mavlink_heartbeat(ping_count)
-                hb_sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))
+                sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))   # 14555
+                sock.sendto(hb, (BACKPACK_IP, UDP_PORT))          # 14550 (fallback)
                 ping_count += 1
                 if ping_count <= 5 or ping_count % 10 == 0:
-                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN}  pkt_alindi={pkt_count}")
+                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN}+{UDP_PORT}  pkt_alindi={pkt_count}")
             except Exception as e:
                 print(f"[REG] Heartbeat hatası: {e}")
             last_ping = now
