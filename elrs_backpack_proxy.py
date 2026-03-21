@@ -17,6 +17,7 @@ import struct
 import hashlib
 import base64
 import time
+import re
 
 UDP_PORT        = 14550   # Backpack'in GCS'e gönderdiği port (biz dinleriz)
 BACKPACK_LISTEN = 14555   # Backpack'in GCS'ten beklediği port (biz buraya göndeririz)
@@ -28,6 +29,20 @@ QGC_HOST        = "127.0.0.1"   # QGC/Mission Planner makinesi (aynı PC ise 127
 QGC_PORT        = 14551          # QGC dinleme portu (14550 proxy tarafından kullanılıyor)
 
 MSP_ELRS_BACKPACK_CRSF_TLM = 0x11
+
+
+# ── Lokal IP tespiti ─────────────────────────────────────────────────────────
+
+def get_local_ip_for(dest_ip: str) -> str:
+    """dest_ip'ye gidecek pakette kullanılacak lokal IP'yi döner (routing-aware)."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((dest_ip, 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "?"
 
 
 # ── MAVLink heartbeat ────────────────────────────────────────────────────────
@@ -237,14 +252,36 @@ def broadcast(raw: bytes):
 
 
 def udp_listener():
+    # GCS lokal IP tespiti — backpack'e giden doğru arayüzü bul
+    local_ip = get_local_ip_for(BACKPACK_IP)
+    is_10x   = local_ip.startswith("10.0.")
+    bind_ip  = local_ip if is_10x else "0.0.0.0"
+
+    # Alma soketi: 0.0.0.0'a bağla — hem unicast hem BROADCAST alır
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     sock.bind(("0.0.0.0", UDP_PORT))
     sock.settimeout(1.0)
-    print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}")
+    # Windows: ICMP Port Unreachable → WinError 10054 engelini kapat
+    try:
+        SIO_UDP_CONNRESET = -1744830452
+        sock.ioctl(SIO_UDP_CONNRESET, False)
+        print(f"[UDP] SIO_UDP_CONNRESET devre dışı (Windows ICMP hatası önlendi)")
+    except Exception:
+        pass  # Linux/macOS'ta bu opsiyon yok, normal
 
-    # QGC/Mission Planner'a yönlendirme soketi (bağlanmadan, OS ephemeral port atar)
+    # Heartbeat gönderme soketi: geçici port — çakışma olmasın
+    hb_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    hb_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    hb_sock.bind((local_ip if is_10x else "0.0.0.0", 0))
+    print(f"[REG] Heartbeat soketi: {hb_sock.getsockname()} (geçici port)")
+
+    print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}  (unicast+broadcast)")
+    print(f"[REG] Lokal IP       : {local_ip}  ({'10.0.0.x ağında ✓' if is_10x else '⚠ 10.0.0.x değil!'})")
+    print(f"[REG] Heartbeat      : {hb_sock.getsockname()} → {BACKPACK_IP}:{BACKPACK_LISTEN}")
+
+    # QGC/Mission Planner'a yönlendirme soketi
     fwd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print(f"[FWD] QGC forward    : {QGC_HOST}:{QGC_PORT}")
     print(f"[FWD] QGC ayarı      : Connections → UDP → Listen Port {QGC_PORT}")
@@ -254,21 +291,16 @@ def udp_listener():
     ping_count = 0
 
     while True:
-        # Periyodik MAVLink heartbeat → backpack listen port 14555'e
+        # Periyodik MAVLink heartbeat → 14555 VE 14550 (farklı firmware versiyonları için)
         now = time.time()
         if now - last_ping >= 1.0:
             try:
                 hb = mavlink_heartbeat(ping_count)
-                sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))
+                hb_sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))  # 14555
+                hb_sock.sendto(hb, (BACKPACK_IP, UDP_PORT))          # 14550
                 ping_count += 1
-                if ping_count == 1:
-                    try:
-                        local_addr = sock.getsockname()
-                        print(f"[REG] Heartbeat kaynak: {local_addr} → backpack bu IP'yi kaydedecek")
-                    except Exception:
-                        pass
                 if ping_count <= 5 or ping_count % 10 == 0:
-                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN}  pkt_alindi={pkt_count}")
+                    print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN}+{UDP_PORT}  pkt_alindi={pkt_count}")
             except Exception as e:
                 print(f"[REG] Heartbeat hatası: {e}")
             last_ping = now
@@ -277,7 +309,9 @@ def udp_listener():
             data, addr = sock.recvfrom(4096)
         except socket.timeout:
             continue
-        except Exception as e:
+        except OSError as e:
+            if getattr(e, 'winerror', None) == 10054:
+                continue  # ICMP Port Unreachable — yoksay, devam et
             print(f"[UDP] Hata: {e}")
             time.sleep(0.1)
             continue
