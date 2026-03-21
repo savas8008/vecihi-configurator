@@ -17,6 +17,7 @@ import struct
 import hashlib
 import base64
 import time
+import re
 
 UDP_PORT        = 14550   # Backpack'in GCS'e gönderdiği port (biz dinleriz)
 BACKPACK_LISTEN = 14555   # Backpack'in GCS'ten beklediği port (biz buraya göndeririz)
@@ -28,6 +29,20 @@ QGC_HOST        = "127.0.0.1"   # QGC/Mission Planner makinesi (aynı PC ise 127
 QGC_PORT        = 14551          # QGC dinleme portu (14550 proxy tarafından kullanılıyor)
 
 MSP_ELRS_BACKPACK_CRSF_TLM = 0x11
+
+
+# ── Lokal IP tespiti ─────────────────────────────────────────────────────────
+
+def get_local_ip_for(dest_ip: str) -> str:
+    """dest_ip'ye gidecek pakette kullanılacak lokal IP'yi döner (routing-aware)."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((dest_ip, 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "?"
 
 
 # ── MAVLink heartbeat ────────────────────────────────────────────────────────
@@ -244,6 +259,21 @@ def udp_listener():
     sock.settimeout(1.0)
     print(f"[UDP] Dinleniyor     : 0.0.0.0:{UDP_PORT}")
 
+    # GCS lokal IP tespiti (routing-aware: backpack'e giden arayüzü bul)
+    local_ip = get_local_ip_for(BACKPACK_IP)
+    print(f"[REG] Lokal IP       : {local_ip}  ({'10.0.0.x ağında' if local_ip.startswith('10.0.') else '⚠ 10.0.0.x değil, yanlış arayüz olabilir!'})")
+    print(f"[REG] Backpack bu IP'yi GCS olarak kaydedecek: {local_ip}")
+
+    # Heartbeat için ayrı soket — lokal IP'ye bağlı, backpack doğru kaynak görür
+    hb_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    hb_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        hb_sock.bind((local_ip, 0))  # lokal 10.0.0.x IP'ye bağla, port=rastgele
+        print(f"[REG] Heartbeat soketi: {hb_sock.getsockname()}")
+    except Exception as e:
+        print(f"[REG] Heartbeat soketi bind hatası ({e}), 0.0.0.0 kullanılıyor")
+        hb_sock.bind(("0.0.0.0", 0))
+
     # QGC/Mission Planner'a yönlendirme soketi (bağlanmadan, OS ephemeral port atar)
     fwd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print(f"[FWD] QGC forward    : {QGC_HOST}:{QGC_PORT}")
@@ -259,14 +289,8 @@ def udp_listener():
         if now - last_ping >= 1.0:
             try:
                 hb = mavlink_heartbeat(ping_count)
-                sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))
+                hb_sock.sendto(hb, (BACKPACK_IP, BACKPACK_LISTEN))
                 ping_count += 1
-                if ping_count == 1:
-                    try:
-                        local_addr = sock.getsockname()
-                        print(f"[REG] Heartbeat kaynak: {local_addr} → backpack bu IP'yi kaydedecek")
-                    except Exception:
-                        pass
                 if ping_count <= 5 or ping_count % 10 == 0:
                     print(f"[REG] Heartbeat #{ping_count} → {BACKPACK_IP}:{BACKPACK_LISTEN}  pkt_alindi={pkt_count}")
             except Exception as e:

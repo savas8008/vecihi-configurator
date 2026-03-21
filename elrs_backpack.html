@@ -654,6 +654,13 @@ const CRSF_FLTMODE    = 0x21;
 const RF_MODES = ['4Hz','25Hz','50Hz','100Hz','150Hz','200Hz','250Hz','500Hz','D250Hz','D500Hz'];
 const TX_POWERS = ['10mW','25mW','50mW','100mW','250mW','500mW','1W','2W'];
 
+// ── MAVLink Sabitleri ────────────────────────────────────────────────────────
+const MAV_START_V1       = 0xFE;
+const MAV_START_V2       = 0xFD;
+const MAV_MSG_ATTITUDE   = 30;
+const MAV_MSG_GLOBAL_POS = 33;
+const MAV_CRC_EXTRA      = { 30: 39, 33: 104 };
+
 // ============================================================
 //  STATE
 // ============================================================
@@ -672,6 +679,10 @@ let mapInstance = null;
 let mapMarker = null;
 let mapTrail = [];
 let windValid = false;
+
+// MAVLink parser state
+let mavBuf = new Uint8Array(280);
+let mavIdx = 0, mavIsV2 = false, mavPayloadLen = 0, mavMsgId = 0;
 
 const telemetry = {
     roll: 0, pitch: 0, yaw: 0,
@@ -704,11 +715,94 @@ function crsf_crc8(data, start, len) {
 }
 
 // ============================================================
+//  MAVLink CRC-16/X25
+// ============================================================
+function mavCrc16(buf, offset, len, crcExtra) {
+    let crc = 0xFFFF;
+    for (let i = offset; i < offset + len; i++) {
+        let tmp = buf[i] ^ (crc & 0xFF);
+        tmp ^= (tmp << 4) & 0xFF;
+        crc = ((crc >> 8) ^ (tmp << 8) ^ (tmp << 3) ^ (tmp >> 4)) & 0xFFFF;
+    }
+    let tmp = crcExtra ^ (crc & 0xFF);
+    tmp ^= (tmp << 4) & 0xFF;
+    crc = ((crc >> 8) ^ (tmp << 8) ^ (tmp << 3) ^ (tmp >> 4)) & 0xFFFF;
+    return crc;
+}
+
+function readLEFloat(p, o) {
+    const ab = new ArrayBuffer(4);
+    new Uint8Array(ab).set([p[o], p[o+1], p[o+2], p[o+3]]);
+    return new DataView(ab).getFloat32(0, true);
+}
+function readLE32s(p, o) { return (p[o] | (p[o+1]<<8) | (p[o+2]<<16) | (p[o+3]<<24)) | 0; }
+function readLE16s(p, o) { return ((p[o] | (p[o+1]<<8)) << 16) >> 16; }
+
+// ── MAVLink frame parser (CRSF ile paralel çalışır) ─────────────────────────
+function tryParseMavlink(b) {
+    if (mavIdx === 0) {
+        if (b === MAV_START_V1)      mavIsV2 = false;
+        else if (b === MAV_START_V2) mavIsV2 = true;
+        else return;
+    }
+    if (mavIdx === 1) { mavPayloadLen = b; }
+    if (!mavIsV2 && mavIdx === 5) mavMsgId = b;
+    if ( mavIsV2 && mavIdx === 7) mavMsgId = b;
+    if (mavIdx < mavBuf.length) mavBuf[mavIdx] = b;
+    mavIdx++;
+
+    const headerLen = mavIsV2 ? 10 : 6;
+    const expected  = headerLen + mavPayloadLen + 2;
+    if (mavIdx < expected) return;
+
+    const extra = MAV_CRC_EXTRA[mavMsgId];
+    if (extra === undefined) { mavIdx = 0; return; }
+
+    const calcCrc = mavCrc16(mavBuf, 1, (headerLen - 1) + mavPayloadLen, extra);
+    const inCrc   = mavBuf[headerLen + mavPayloadLen] | (mavBuf[headerLen + mavPayloadLen + 1] << 8);
+
+    if (calcCrc === inCrc) {
+        const p = mavBuf.slice(headerLen, headerLen + mavPayloadLen);
+        if (mavMsgId === MAV_MSG_ATTITUDE)   parseMavAttitude(p);
+        else if (mavMsgId === MAV_MSG_GLOBAL_POS) parseMavGlobalPos(p);
+        pktCount++;
+        lastPacketTime = Date.now();
+        renderAll();
+    }
+    mavIdx = 0;
+}
+
+function parseMavAttitude(p) {
+    // [0-3]=time_boot_ms, [4-7]=roll(rad), [8-11]=pitch(rad), [12-15]=yaw(rad)
+    if (p.length < 16) return;
+    telemetry.roll  = readLEFloat(p, 4)  * (180 / Math.PI);
+    telemetry.pitch = readLEFloat(p, 8)  * (180 / Math.PI);
+    telemetry.yaw   = readLEFloat(p, 12) * (180 / Math.PI);
+}
+
+function parseMavGlobalPos(p) {
+    // [0-3]=time_boot_ms, [4-7]=lat(1e7°), [8-11]=lon(1e7°),
+    // [12-15]=alt(mm MSL), [16-19]=relative_alt(mm),
+    // [20-21]=vx(cm/s), [22-23]=vy(cm/s), [24-25]=vz(cm/s), [26-27]=hdg(cdeg)
+    if (p.length < 28) return;
+    telemetry.lat    = readLE32s(p, 4)  / 1e7;
+    telemetry.lon    = readLE32s(p, 8)  / 1e7;
+    const altM       = readLE32s(p, 12) / 1000.0;
+    telemetry.alt    = altM;
+    telemetry.gpsAlt = altM;
+    const vx = readLE16s(p, 20), vy = readLE16s(p, 22), vz = readLE16s(p, 24);
+    telemetry.speed = Math.sqrt(vx * vx + vy * vy) / 100.0;  // cm/s → m/s
+    telemetry.vario = -vz / 100.0;                             // cm/s → m/s (vz aşağı pozitif → ters çevir)
+    telemetry.cog   = (p[26] | (p[27] << 8)) / 100.0;        // cdeg → derece
+}
+
+// ============================================================
 //  FRAME PARSER
 // ============================================================
 function processBytes(newBytes) {
-    // Byte'ları buffer'a ekle
+    // Byte'ları buffer'a ekle; aynı zamanda MAVLink parser'a ilet
     for (let i = 0; i < newBytes.length; i++) {
+        tryParseMavlink(newBytes[i]);               // MAVLink (0xFE/0xFD) paralel parser
         if (rxLen < rxBuf.length) rxBuf[rxLen++] = newBytes[i];
     }
 
