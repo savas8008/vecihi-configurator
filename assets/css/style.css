@@ -1,0 +1,2046 @@
+﻿/* ============================================
+   VECİHİ CONFIGURATOR - THEME SYSTEM
+   ============================================
+   Flight Controller için profesyonel koyu tema
+   
+   Değiştirmek için sadece :root içindeki değişkenleri düzenleyin.
+   Tüm renkler ve boyutlar merkezi olarak yönetilir.
+   ============================================ */
+
+/* ============================================
+   1. MERKEZI DEĞİŞKENLER (THEME TOKENS)
+   ============================================ */
+:root {
+    /* --- ANA RENKLER --- */
+    --color-brand-blue: #38bdf8;        /* Sky-400 — aviation mavi */
+    --color-brand-blue-rgb: 56, 189, 248;
+
+    --color-primary: #000102;           /* Sky Blue */
+    --color-primary-hover: #abccdc;     /* Darker Blue */
+    --color-primary-glow: rgba(14, 165, 233, 0.3);
+    
+    --color-secondary: #94a3b8;         /* Slate 400 */
+    --color-secondary-hover: #64748b;
+    
+    /* --- DURUM RENKLERİ --- */
+    --color-success: #10b981;           /* Yeşil - Armed, OK */
+    --color-success-glow: rgba(16, 185, 129, 0.4);
+    
+    --color-warning: #f59e0b;           /* Amber - Dikkat */
+    --color-warning-glow: rgba(245, 158, 11, 0.4);
+    
+    --color-danger: #ef4444;            /* Kırmızı - Hata, Disarmed */
+    --color-danger-glow: rgba(239, 68, 68, 0.4);
+    
+    --color-info: #0ea5e9;              /* Açık mavi - Bilgi */
+    
+    /* --- ARKAPLAN RENKLERİ --- */
+    --bg-body: #c0cfe3;
+    --bg-body-gradient: linear-gradient(160deg, #0a111c 0%, #0f1e30 50%, #0a1628 100%);
+
+    /* =========================================
+       PANEL HİYERARŞİSİ  (koyu aviation teması)
+       .panel  → Sayfa bölümü dış kap
+       .panel2 → İç grup/kart
+       .panel3 → En iç içerik kartı
+       Değiştirmek için sadece bu değişkenleri güncelleyin.
+    ========================================= */
+    --bg-panel:   rgba(9, 80, 76, 0.9);    /* Dış: koyu lacivert */
+    --bg-panel-2: rgba(43, 94, 91, 0.9);     /* Orta: biraz açık çelik mavi */
+    --bg-panel-3: rgba(13, 81, 78, 0.9);   /* İç: hafif aydınlık çelik mavi */
+    --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
+
+    --bg-panel-solid: #dbe0e8;
+    --bg-input: rgba(10, 20, 35, 0.85);      /* Input: koyu şeffaf */
+    --bg-hover: rgba(255, 255, 255, 0.06);
+    
+    --bg-terminal: #060e18;             /* Log/Terminal arkası */
+    --bg-3d-canvas: #080f1a;            /* 3D Sahne arkası — derin koyu */
+    
+    /* --- KENARLIK RENKLERİ --- */
+    --border-default: rgba(255, 255, 255, 0.09);
+    --border-light:   rgba(255, 255, 255, 0.04);
+    --border-focus: var(--color-primary);
+
+    /* --- METİN RENKLERİ --- */
+    --text-primary:   #dce8f5;          /* Ana metin — açık mavi-beyaz */
+    --text-secondary: #ffffff;          /* İkincil metin — çelik mavi-gri */
+    --text-muted:     #4d708f;          /* Soluk metin */
+    --text-inverse:   #0d1520;          /* Ters metin (koyu arka plana karşı) */
+    --text-value:     #03212a;          /* Değer rengi (emerald yeşil) */
+
+    /* =========================================
+       MERKEZİ METİN TİPOGRAFİ SİSTEMİ
+       Buradaki değişkenleri düzenleyerek tüm
+       sayfadaki tipografiyi tek noktadan
+       değiştirebilirsiniz.
+    ========================================= */
+    /* t-baslik: Panel başlıkları, bölüm adları */
+    --t-baslik-size:   var(--font-size-lg);
+    --t-baslik-weight: 700;
+    --t-baslik-color:  var(--text-primary);
+    --t-baslik-style:  normal;
+
+    /* t-alt-baslik: Grup başlıkları, alan adları */
+    --t-alt-baslik-size:   var(--font-size-xl);
+    --t-alt-baslik-weight: 700;
+    --t-alt-baslik-color:  var(--text-primary);
+    --t-alt-baslik-style:  normal;
+
+    /* t-aciklama: Yardım metni, talimatlar */
+    --t-aciklama-size:   var(--font-size-sm);
+    --t-aciklama-weight: 500;
+    --t-aciklama-color:  #c8dff0;
+    --t-aciklama-style:  normal;
+
+    /* t-deger: Sensör/ölçüm değerleri */
+    --t-deger-size:   var(--font-size-sm);
+    --t-deger-weight: 400;
+    --t-deger-color:  var(--text-value);
+    --t-deger-style:  normal;
+    
+    /* --- HUD & DATA RENKLERİ --- */
+    --hud-green: #20d297;               /* Klasik HUD yeşili */
+    --hud-amber: #fbbf24;               /* Canlı imleç sarısı */
+    --data-x: #ff6b6b;                  /* X ekseni (kırmızı) */
+    --data-y: #51cf66;                  /* Y ekseni (yeşil) */
+    --data-z: #339af0;                  /* Z ekseni (mavi) */
+    
+    /* --- BOYUTLAR --- */
+    --radius-xs: 2px;
+    --radius-sm: 3px;
+    --radius-md: 4px;
+    --radius-lg: 5px;
+    --radius-xl: 6px;
+    --radius-full: 50px;
+
+    --spacing-xs: 2px;
+    --spacing-sm: 4px;
+    --spacing-md: 8px;
+    --spacing-lg: 12px;
+    --spacing-xl: 16px;
+
+    /* --- BLUR & GÖLGE --- */
+    --blur-amount: 8px;
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.65);
+    --shadow-glow: 0 0 8px var(--color-primary-glow);
+
+    /* --- FONTLAR --- */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'Consolas', 'Courier New', monospace;
+
+    --font-size-xs: 0.69rem;
+    --font-size-sm: 1.0rem;
+    --font-size-md: 1.0rem;
+    --font-size-lg: 1.10rem;
+    --font-size-xl: 1.10rem;
+
+    /* --- GEÇİŞLER --- */
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.15s ease;
+    --transition-slow: 0.25s ease;
+}
+
+/* ============================================
+   2. RESET & GENEL YAPILANDIRMA
+   ============================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-body);
+    background-image: var(--bg-body-gradient);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-md);
+    line-height: 1.35;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: var(--radius-xs);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+}
+
+/* Başlıklar */
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 var(--spacing-sm);
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+a:hover {
+    color: var(--color-primary-hover);
+}
+
+/* ============================================
+   2b. TİPOGRAFİ SİSTEMİ - 4 MERKEZİ METİN SINIFI
+   Tüm sayfalarda kullanılan standart metin rolleri.
+   Değiştirmek için :root değişkenlerini düzenleyin.
+   ============================================ */
+
+/* Başlık: Panel/bölüm adları — bold, büyük punto, siyah */
+.t-baslik {
+    font-size:   var(--t-baslik-size);
+    font-weight: var(--t-baslik-weight);
+    color:       var(--t-baslik-color);
+    font-style:  var(--t-baslik-style);
+    line-height: 1.3;
+}
+
+/* Alt Başlık: Alan/grup adları — bold, normal punto, siyah */
+.t-alt-baslik {
+    font-size:   var(--t-alt-baslik-size);
+    font-weight: var(--t-alt-baslik-weight);
+    color:       var(--t-alt-baslik-color);
+    font-style:  var(--t-alt-baslik-style);
+    line-height: 1.3;
+}
+
+/* Açıklama: Yardım/talimat metinleri — italik, açık gri */
+.t-aciklama {
+    font-size:   var(--t-aciklama-size);
+    font-weight: var(--t-aciklama-weight);
+    color:       var(--t-aciklama-color);
+    font-style:  var(--t-aciklama-style);
+    line-height: 1.4;
+}
+
+/* Değer: Sensör/ölçüm verileri — yeşil, normal */
+.t-deger {
+    font-size:   var(--t-deger-size);
+    font-weight: var(--t-deger-weight);
+    color:       var(--t-deger-color);
+    font-style:  var(--t-deger-style);
+    line-height: 1.4;
+}
+
+/* ============================================
+   3. LAYOUT - PANELLER
+   ============================================ */
+/* Ortak panel özellikleri */
+.panel, .panel2, .panel3, .panel4, .sidebar {
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-primary);
+}
+
+/* Hiyerarşik arka planlar */
+.panel, .sidebar { background: var(--bg-panel);   }  /* Dış: teal */
+.panel2           { background: var(--bg-panel-2); }  /* Orta */
+.panel3           { background: var(--bg-panel-3); }  /* İç */
+
+/* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
+.panel4 {
+    background: #e8eaec !important;
+    color: #111111;
+    --border-default:       rgba(0, 0, 0, 0.13);
+    /* cal-step ve diğer bileşenlerin background değişkenini override et */
+    --cal-step-bg:          #e8eaec;
+    /* CSS değişkenlerini panel4 kapsamında koyu metne çevir */
+    --text-primary:         #111111;
+    --text-secondary:       #333333;
+    --t-baslik-color:       #111111;
+    --t-alt-baslik-color:   #111111;
+    --t-aciklama-color:     #444444;
+}
+/* panel4 içindeki !important ile ayarlanan metin renkleri */
+.panel4 .step-label                         { color: #444444 !important; }
+.panel4 .cal-step-values                    { color: #111111 !important; background: rgba(0,0,0,0.06) !important; }
+/* Çift sınıf — .cal-step-icon { !important } (satır ~1621) kuralını özgüllükle yener */
+.cal-step.panel4 .cal-step-icon             { color: #666666 !important; }
+.cal-step.panel4.active  .cal-step-icon     { color: var(--color-primary) !important; }
+.cal-step.panel4.completed .cal-step-icon   { color: var(--color-success) !important; }
+.panel4 .cal-step-done i    { color: var(--color-success); }
+.panel4 .output-title       { color: #111111; }
+.panel4 .output-value       { color: #111111; }
+.panel4 .mixer-title        { color: #111111; }
+.panel4 .mixer-description  { color: #444444; }
+.panel4 small               { color: #555555 !important; }
+.panel4 .form-control,
+.panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
+.panel4 .form-control:focus,
+.panel4 .form-select:focus  { background-color: var(--bg-input) !important; color: var(--text-primary) !important; border-color: var(--color-primary) !important; }
+
+/* PID kutuları — panel4 metin renkleri */
+.panel4 .pid-label          { color: #333333 !important; }
+.panel4 .pid-value          { color: #111111 !important; }
+.panel4 .pid-unit           { color: #555555 !important; }
+/* pid-axis: axis başlığı kendi renklerini (primary/info/warning) korur */
+
+/* Mod kartları — panel4 metin ve kontrol renkleri */
+.mode-card.panel4           { background: #e8eaec !important; }
+.panel4 .mode-name          { color: #111111 !important; }
+.panel4 .mode-channel-select {
+    background: #ffffff !important;
+    color: #111111 !important;
+    border: 1px solid rgba(0,0,0,0.20) !important;
+}
+.panel4 .range-track-container {
+    background: rgba(0, 0, 0, 0.10) !important;
+    border: 1px solid rgba(0,0,0,0.15) !important;
+}
+.panel4 .mode-category-title {
+    color: #111111 !important;
+    border-bottom-color: rgba(0,0,0,0.15) !important;
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    padding-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-default);
+}
+.panel-title i {
+    color: var(--color-primary);
+}
+
+/* Sayfa Görünürlük */
+.page {
+    display: none;
+}
+.page.active {
+    display: block;
+    position: relative;
+    animation: fadeIn 0.2s ease;
+}
+
+/* === SAYFA YÜKLENİYOR OVERLAY === */
+.page-loading-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    min-height: 200px;
+    background: rgba(12, 17, 30, 0.82);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    border-radius: 8px;
+    pointer-events: all;
+}
+.page-loading-content {
+    text-align: center;
+    color: #c8d6f0;
+    padding: 32px;
+}
+.page-loading-content .spinner-border {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 3px;
+    color: var(--primary, #4e8cff);
+}
+.page-loading-content p {
+    margin-top: 14px;
+    margin-bottom: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.page-loading-content small {
+    color: #7a90b8;
+    font-size: 0.8rem;
+}
+
+/* === OTOMATİK YENİDEN BAĞLANMA OVERLAY === */
+#reconnectOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 24, 0.92);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+#reconnectOverlay .reconnect-box {
+    background: rgba(20, 28, 50, 0.95);
+    border: 1px solid rgba(78, 140, 255, 0.35);
+    border-radius: 12px;
+    padding: 40px 48px;
+    text-align: center;
+    color: #c8d6f0;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+#reconnectOverlay .reconnect-spinner {
+    width: 3rem;
+    height: 3rem;
+    border-width: 3px;
+    color: #4e8cff;
+}
+#reconnectOverlay h5 {
+    margin: 16px 0 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #e0eaff;
+}
+#reconnectOverlay #reconnectStatus {
+    font-size: 0.875rem;
+    color: #7a90b8;
+    min-height: 1.4em;
+}
+#reconnectOverlay .reconnect-steps {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #5a70a0;
+    line-height: 1.6;
+    text-align: left;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   4. HEADER & NAVİGASYON
+   ============================================ */
+.dashboard-header {
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-default);
+    padding: 4px 0;
+    margin-bottom: 6px;
+}
+
+.gradient-text {
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+/* Bağlantı Durumu — header içi durum göstergesi */
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: rgba(0, 0, 0, 0.28);
+    border: 1.5px solid rgba(255, 255, 255, 0.13);
+    padding: 5px 14px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: #dce8f5;
+    min-width: 150px;
+    justify-content: center;
+    letter-spacing: 0.3px;
+    transition: all var(--transition-normal);
+}
+/* Bağlı olduğunda çerçeve yeşil parlar */
+.connection-status.is-connected {
+    border-color: rgba(16, 185, 129, 0.5);
+    background: rgba(16, 185, 129, 0.10);
+    color: #6ee7c6;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+    transition: all var(--transition-fast);
+}
+.status-off {
+    background-color: var(--color-danger);
+    color: var(--color-danger);
+}
+.status-connected {
+    background-color: var(--color-success);
+    color: var(--color-success);
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 8px currentColor; }
+    50% { box-shadow: 0 0 16px currentColor; }
+}
+
+/* Sidebar Navigasyon */
+.sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    margin-bottom: 2px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all var(--transition-fast);
+}
+
+.sidebar .nav-link:hover {
+    color: var(--text-primary);
+    background: rgba(var(--color-brand-blue-rgb), 0.1);
+    border-color: var(--border-light);
+    transform: translateX(4px);
+}
+
+.sidebar .nav-link.active {
+    color: var(--color-primary);
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), transparent);
+    border-color: transparent;
+    border-left: 3px solid var(--color-primary);
+}
+
+.sidebar .nav-link i {
+    font-size: 1.1em;
+    width: 20px;
+    text-align: center;
+}
+
+/* ============================================
+   5. 3D CANVAS & HUD PANEL
+   ============================================ */
+#3d-canvas-container {
+    background: transparent;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+/* Euler Panel (HUD) */
+.euler-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+}
+
+.arm-section {
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.arm-status {
+    display: inline-block;
+    width: 100%;
+    padding: var(--spacing-sm) 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-lg);
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-normal);
+}
+
+.status-disarmed {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border: 1px solid var(--border-light);
+}
+
+.status-armed {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2));
+    color: #ff4d4d;
+    border: 1px solid var(--color-danger);
+    text-shadow: 0 0 10px var(--color-danger-glow);
+    animation: armed-pulse 1s infinite;
+}
+
+@keyframes armed-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(0.98); }
+}
+
+.hud-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+    margin: var(--spacing-md) 0;
+}
+
+.angles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.angle-box {
+    background: rgba(0, 0, 0, 0.25);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.angle-label {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    margin-bottom: var(--spacing-xs);
+}
+
+.angle-val {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+}
+
+.mode-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(14, 165, 233, 0.1);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    margin-top: var(--spacing-md);
+}
+
+.mode-label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.mode-val {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-lg);
+    font-weight: 800;
+    color: var(--color-info);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ============================================
+   6. KALİBRASYON ADIMLARI
+   ============================================ */
+.cal-steps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--spacing-md);
+}
+
+/* 6 adımı her zaman tek satırda yan yana dizer */
+.cal-steps-6 {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.cal-step {
+    background: var(--cal-step-bg);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-sm);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.cal-step:hover:not(.disabled) {
+    border-color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.cal-step.active {
+    border-color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.08);
+    box-shadow: 0 0 20px var(--color-primary-glow);
+}
+
+.cal-step.completed {
+    border-color: var(--color-success);
+    background: rgba(16, 185, 129, 0.08);
+}
+
+.cal-step.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.cal-step-icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-muted);
+    transition: color var(--transition-fast);
+}
+.cal-step.completed .cal-step-icon {
+    color: var(--color-success);
+}
+.cal-step.active .cal-step-icon {
+    color: var(--color-primary);
+}
+
+.cal-step-values {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    background: rgba(0, 0, 0, 0.4);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-xs);
+    margin-top: var(--spacing-xs);
+}
+
+.cal-step-footer {
+    margin-top: var(--spacing-sm);
+}
+
+.step-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   7. OUTPUTS - UÇAK & SERVO
+   ============================================ */
+.aircraft-card {
+    background: var(--bg-hover);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: center;
+}
+
+.aircraft-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--border-light);
+}
+
+.aircraft-card.active {
+    border-color: var(--color-primary);
+    background: rgba(14, 165, 233, 0.30);
+    box-shadow: 0 0 18px var(--color-primary-glow);
+}
+
+.aircraft-card h5 {
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+}
+
+.aircraft-card small {
+    color: #b0cfe8;
+    font-size: var(--font-size-xs);
+}
+
+/* Throttle Slider (Dikey) */
+.throttle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    background: rgba(0, 0, 0, 0.2);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    min-height: 280px;
+}
+.throttle-container{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  min-height:260px;
+}
+
+.throttle-slider{
+  writing-mode: vertical-lr; direction: rtl; -webkit-appearance: none;
+  appearance: auto !important;
+  writing-mode: vertical-rl !important;
+  width: 40px !important;
+  height: 220px !important;
+  margin-top: auto !important;   /* alta iter */
+  margin-bottom: 0 !important;
+}
+
+/* Servo/Output Display */
+.output-display {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+/* Kart başlığı — mixer-title ile aynı hiyerarşi */
+.output-title {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Port alt etiketi (TX / RX / SCL / SDA vb.) */
+.port-label {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.output-value {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+    color: var(--color-primary);
+    margin: var(--spacing-xs) 0;
+}
+
+.servo-controls button {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    border-radius: var(--radius-xs);
+    padding: 2px 8px;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.servo-controls button:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.servo-controls button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ============================================
+   8. KUMANDA - RECEIVER BARS
+   ============================================ */
+.channel-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    background: var(--bg-hover);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+}
+
+.channel-label {
+    width: 80px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.channel-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: var(--radius-xs);
+    margin: 0 var(--spacing-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.channel-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-info));
+    width: 50%;
+    transition: width 0.05s linear;
+    border-radius: var(--radius-xs);
+}
+
+.channel-center-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.4);
+    z-index: 2;
+}
+
+.channel-value-text {
+    width: 50px;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+/* ============================================
+   9. UÇUŞ MODLARI
+   ============================================ */
+.mode-card {
+    background: rgba(35, 65, 100, 0.75);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    transition: all var(--transition-fast);
+}
+
+.mode-card.active-mode {
+    border-color: var(--color-success);
+    background: rgba(16, 185, 129, 0.08);
+    box-shadow: 0 0 15px var(--color-success-glow);
+}
+
+.mode-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.mode-name {
+    font-weight: 700;
+    font-size: var(--font-size-md);
+    color: var(--text-primary);
+}
+
+.mode-channel-select {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    min-width: 120px;
+}
+
+/* Range Track */
+.range-track-container {
+    position: relative;
+    width: 100%;
+    height: 36px;
+    background: rgba(10, 25, 50, 0.70);
+    border-radius: 18px;
+    margin: var(--spacing-lg) 0;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+.range-fill {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 18px;
+    pointer-events: none;
+    z-index: 1;
+    transition: background var(--transition-fast);
+}
+
+.mode-card.active-mode .range-fill {
+    background: rgba(16, 185, 129, 0.5);
+}
+
+/* Canlı İmleç */
+.live-marker {
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    width: 4px;
+    background: var(--hud-amber);
+    box-shadow: 0 0 8px var(--hud-amber), 0 0 4px #000;
+    border-radius: 2px;
+    z-index: 10;
+    pointer-events: none;
+    transition: left 0.1s linear;
+}
+
+.live-marker::after {
+    content: attr(data-val);
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: var(--font-size-xs);
+    font-weight: bold;
+    color: var(--text-inverse);
+    background: var(--hud-amber);
+    padding: 2px 6px;
+    border-radius: var(--radius-xs);
+    white-space: nowrap;
+}
+
+/* Input Range (Tutamaklar) */
+.input-range {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    z-index: 5;
+    margin: 0;
+}
+
+.input-range::-webkit-slider-thumb {
+    pointer-events: auto;
+    -webkit-appearance: none;
+    width: 24px;
+    height: 36px;
+    background: var(--text-primary);
+    border: 1px solid var(--text-secondary);
+    border-radius: var(--radius-xs);
+    cursor: col-resize;
+    box-shadow: var(--shadow-sm);
+}
+
+.input-range::-moz-range-thumb {
+    pointer-events: auto;
+    width: 24px;
+    height: 36px;
+    background: var(--text-primary);
+    border: none;
+    border-radius: var(--radius-xs);
+    cursor: col-resize;
+}
+
+.mode-category-title {
+    color: #ffffff;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: var(--spacing-sm);
+    margin: var(--spacing-md) 0 var(--spacing-md);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.mode-category-title i {
+    margin-right: var(--spacing-sm);
+    color: var(--color-primary);
+}
+
+/* ============================================
+   10. PID KONTROLLER
+   ============================================ */
+.pid-control {
+    background: var(--bg-hover);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.pid-axis {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-md);
+}
+
+.pid-parameter {
+    margin-bottom: var(--spacing-sm);
+}
+
+.pid-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.pid-name {
+    font-weight: bold;
+}
+
+.pid-value {
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+/* Range Slider (Genel) */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--color-primary-glow);
+    border: 2px solid #fff;
+    transition: transform var(--transition-fast);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 2px solid #fff;
+}
+
+/* ============================================
+   11. LOG TERMİNAL
+   ============================================ */
+.log-container {
+    background: #0C0C0C;
+    color: #f0f0f0;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: var(--radius-xs);
+    height: 280px;
+    overflow-y: auto;
+    border: 1px solid #555;
+}
+
+.log-entry {
+    padding: 0;
+    line-height: 1.5;
+    color: #f0f0f0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.log-time {
+    color: #aaaaaa;
+    margin-right: 4px;
+    user-select: none;
+}
+
+/* Log Renkleri - CMD tarzı siyah/beyaz */
+.log-info    { color: #f0f0f0; }
+.log-success { color: #f0f0f0; }
+.log-warning { color: #f0f0f0; }
+.log-error   { color: #f0f0f0; }
+.log-command { color: #f0f0f0; }
+.log-receive { color: #f0f0f0; }
+.search-match {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.system-stat {
+    background: var(--bg-hover);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.stat-value {
+    font-size: var(--font-size-xl);
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+/* ============================================
+   12. FORM ELEMANLARI
+   ============================================ */
+.form-control,
+.form-select {
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--border-default) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-xs) !important;
+    padding: 2px 6px;
+    font-size: var(--font-size-sm) !important;
+    transition: all var(--transition-fast);
+    height: auto;
+    min-height: unset;
+    line-height: 1.4;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px var(--color-primary-glow) !important;
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Tarayıcı autofill beyaz arkaplan inject ediyor → kapat */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:focus,
+.form-select:-webkit-autofill,
+.form-select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    caret-color: var(--text-primary);
+}
+
+.form-label {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+}
+
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   13. BUTONLAR
+   ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 3px 10px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-radius: var(--radius-xs);
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    line-height: 1.4;
+}
+
+.btn-primary {
+    background: var(--color-brand-blue);
+    color: white;
+    box-shadow: 0 4px 12px var(--color-primary-glow);
+}
+.btn-primary:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--color-primary-glow);
+}
+
+.btn-success {
+    background: var(--color-success);
+    color: white;
+    box-shadow: 0 4px 12px var(--color-success-glow);
+}
+.btn-success:hover {
+    background: #0d9668;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: var(--color-danger);
+    color: white;
+    box-shadow: 0 4px 12px var(--color-danger-glow);
+}
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+.btn-warning {
+    background: var(--color-warning);
+    color: var(--text-inverse);
+}
+.btn-warning:hover {
+    background: #d97706;
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+}
+.btn-outline-secondary:hover {
+    background: var(--color-secondary);
+    color: white;
+    border-color: var(--color-secondary);
+}
+
+/* Orta boy buton */
+.btn-md { padding: 5px 14px !important; font-size: var(--font-size-sm) !important; }
+
+/* Header bağlantı butonları — ayırt edici, tema uyumlu */
+.btn-connect {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 18px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45), 0 2px 8px rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(16, 185, 129, 0.55);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-connect:hover {
+    background: linear-gradient(135deg, #047857, #059669);
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.65), 0 4px 14px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+.btn-disconnect {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 18px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.45), 0 2px 8px rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(239, 68, 68, 0.55);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-disconnect:hover {
+    background: linear-gradient(135deg, #b91c1c, #dc2626);
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.65), 0 4px 14px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+/* Save Button (Fixed) */
+.save-button-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+#globalSaveBtn {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: var(--font-size-md);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   14. MODAL
+   ============================================ */
+.modal-content {
+    background: var(--bg-panel-solid);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--border-default);
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* ============================================
+   15. TOOLTIP
+   ============================================ */
+.x-tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: var(--spacing-sm);
+}
+
+.info-icon {
+    color: var(--color-primary);
+    font-size: 14px;
+    cursor: help;
+}
+
+.x-tooltiptext {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    max-width: 90vw;
+    background: var(--bg-panel-solid);
+    color: var(--text-primary);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    z-index: 9999;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-default);
+    transition: opacity var(--transition-fast);
+}
+
+.x-tooltip:hover .x-tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ============================================
+   16. HARİTA
+   ============================================ */
+.plane-marker-icon {
+    background: transparent;
+    border: none;
+}
+
+.plane-icon-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--color-info);
+    text-shadow: 0 0 8px black;
+    transition: transform 0.1s linear;
+}
+
+/* ============================================
+   17. RESPONSIVE
+   ============================================ */
+@media (max-width: 992px) {
+    .sidebar {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .angles-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --spacing-lg: 16px;
+        --spacing-xl: 24px;
+    }
+    
+    .panel, .panel2, .panel3 {
+        padding: var(--spacing-md);
+    }
+    
+    .dashboard-header h1 {
+        font-size: var(--font-size-md);
+    }
+    
+    .save-button-container {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    #globalSaveBtn {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        font-size: var(--font-size-sm);
+    }
+    
+    .cal-steps-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .cal-steps-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .angles-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   18. UTILITY CLASSES
+   ============================================ */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-success { color: var(--color-success) !important; }
+.text-warning { color: var(--color-warning) !important; }
+.text-danger { color: var(--color-danger) !important; }
+.text-info { color: var(--color-info) !important; }
+
+.bg-transparent { background: transparent !important; }
+
+.font-mono { font-family: var(--font-mono) !important; }
+
+.glow-primary { box-shadow: var(--shadow-glow) !important; }
+.glow-success { box-shadow: 0 0 20px var(--color-success-glow) !important; }
+.glow-danger { box-shadow: 0 0 20px var(--color-danger-glow) !important; }
+
+/* ============================================
+   18b. TİPOGRAFİ — Mevcut HTML elemanlarını merkezi sisteme bağlama
+   panel-title, h5/h6 grup başlıkları, small.text-muted açıklamalar,
+   .mono değer metinleri → t- değişkenlerine yönlendirilir.
+   HTML değiştirmeden tüm sayfalar etkilenir.
+   ============================================ */
+
+/* Panel ana başlıkları (h2.panel-title) */
+.panel-title {
+    font-size:   calc(var(--t-baslik-size) * 1.1) !important;
+    font-weight: var(--t-baslik-weight) !important;
+    color:       var(--t-baslik-color)  !important;
+}
+
+/* Alt bölüm başlıkları: h3, h4, h5 içinde panel */
+.panel h3, .panel h4, .panel h5,
+.panel2 h3, .panel2 h4, .panel2 h5,
+.panel3 h3, .panel3 h4, .panel3 h5 {
+    font-size:   var(--t-alt-baslik-size)   !important;
+    font-weight: var(--t-alt-baslik-weight) !important;
+    color:       var(--t-alt-baslik-color)  !important;
+    font-style:  var(--t-alt-baslik-style)  !important;
+}
+
+/* h6 grup etiketleri (tercihler accordion alt başlıkları) */
+h6.text-muted, h6:not([class*="text-"]) {
+    font-size:   var(--t-alt-baslik-size)   !important;
+    font-weight: var(--t-alt-baslik-weight) !important;
+    color:       var(--t-alt-baslik-color)  !important;
+    font-style:  var(--t-alt-baslik-style)  !important;
+}
+
+/* Açıklama metinleri: small.text-muted, p.text-muted, form-label.small */
+small.text-muted,
+.text-muted.small,
+p.text-muted,
+.form-label.small,
+label.small.text-muted,
+.step-label {
+    font-size:   var(--t-aciklama-size)   !important;
+    font-weight: var(--t-aciklama-weight) !important;
+    color:       var(--t-aciklama-color)  !important;
+    font-style:  var(--t-aciklama-style)  !important;
+}
+
+/* Değer metinleri: .mono sınıfı ve sensör göstergeleri */
+.mono,
+.cal-val-ax, .cal-val-ay, .cal-val-az {
+    font-size:   var(--t-deger-size)   !important;
+    font-weight: var(--t-deger-weight) !important;
+    color:       var(--t-deger-color)  !important;
+    font-family: var(--font-mono)      !important;
+}
+
+/* ============================================
+   19. TEMA STANDARTIZASYONU - Bootstrap & Özel Bileşen Override
+   ============================================ */
+
+/* --- Tüm renkler tema değişkenlerine bağlı --- */
+
+/* Bootstrap bg-dark → panel arka planı */
+.bg-dark,
+.bg-dark.card,
+.card.bg-dark {
+    background: var(--bg-panel) !important;
+    backdrop-filter: blur(var(--blur-amount)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-amount)) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-default) !important;
+}
+
+/* bg-black → panel */
+.bg-black { background: var(--bg-panel) !important; }
+
+/* bg-secondary input-group → tema rengi */
+.input-group-text.bg-secondary,
+.bg-secondary.input-group-text {
+    background-color: rgba(0,0,0,0.07) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-default) !important;
+}
+
+/* text-white, text-light → tema metni */
+.text-white  { color: var(--text-primary)   !important; }
+.text-light  { color: var(--text-secondary) !important; }
+.text-muted  { color: var(--text-muted)     !important; }
+
+/* Renkli durum metinleri - sadece anlamlı yerlerde kalsın */
+/* text-info / text-success / text-warning / text-danger → tema renkleri */
+.text-info    { color: var(--color-info)    !important; }
+.text-success { color: var(--color-success) !important; }
+.text-warning { color: var(--color-warning) !important; }
+.text-danger  { color: var(--color-danger)  !important; }
+
+/* border-secondary → tema kenarlığı */
+.border-secondary { border-color: var(--border-default) !important; }
+
+/* Card bileşenlerini tema paneline dönüştür */
+.card {
+    background: var(--bg-panel) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: var(--radius-md) !important;
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    box-shadow: var(--shadow-sm);
+}
+
+/* Card header: renkli arka planlar kaldırılır, sadece sol kenar çizgisi kalır */
+.card-header {
+    background: rgba(0,0,0,0.04) !important;
+    border-bottom: 1px solid var(--border-default) !important;
+    padding: 6px 10px !important;
+    font-size: var(--font-size-sm) !important;
+    color: var(--text-primary) !important;
+}
+/* Sol aksan çizgileri renklere göre */
+.card-header.bg-danger,
+.card-header.bg-danger.bg-opacity-25  { border-left: 3px solid var(--color-danger)  !important; }
+.card-header.bg-primary,
+.card-header.bg-primary.bg-opacity-25 { border-left: 3px solid var(--color-primary) !important; }
+.card-header.bg-success,
+.card-header.bg-success.bg-opacity-25 { border-left: 3px solid var(--color-success) !important; }
+.card-header.bg-info,
+.card-header.bg-info.bg-opacity-25    { border-left: 3px solid var(--color-info)    !important; }
+/* Renkli arka plan sınıflarını kaldır */
+.card-header[class*="bg-danger"],
+.card-header[class*="bg-primary"],
+.card-header[class*="bg-success"],
+.card-header[class*="bg-info"] {
+    background: rgba(0,0,0,0.04) !important;
+}
+
+.card-body {
+    padding: 8px 10px !important;
+    color: var(--text-primary) !important;
+}
+
+/* Input group text - standart tema */
+.input-group-text {
+    background-color: rgba(0,0,0,0.06) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-default) !important;
+    padding: 2px 6px !important;
+    font-size: var(--font-size-sm) !important;
+}
+
+/* bg-dark form-control / form-select → tema inputu */
+.form-control.bg-dark,
+.form-select.bg-dark,
+.form-control[class*="bg-dark"],
+.form-select[class*="bg-dark"] {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-default) !important;
+}
+
+/* bg-dark bg-opacity-25 border → tema */
+[class*="bg-dark"][class*="bg-opacity"] {
+    background: rgba(0,0,0,0.05) !important;
+    border-color: var(--border-default) !important;
+}
+
+/* OSD Ekran Öğeleri paneli */
+.panel3.bg-dark {
+    background: var(--bg-panel) !important;
+    color: var(--text-primary) !important;
+}
+.osd-element-list .form-check-label { color: var(--text-primary) !important; }
+
+/* Aircraft seçim kartları */
+.aircraft-card {
+    background: rgba(0,0,0,0.04);
+    border: 2px solid var(--border-default);
+}
+.aircraft-card:hover {
+    background: rgba(0,0,0,0.07);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+}
+.aircraft-card.active {
+    background: rgba(14,165,233,0.30);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 14px var(--color-primary-glow);
+}
+.mixer-title   { font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); }
+.mixer-description { color: var(--text-muted); font-size: var(--font-size-xs); }
+
+/* Kalibrasyon adım kutuları - panelle uyumlu */
+/* cal-step arka planı panel3 ile aynı — ayrı override gerekmez */
+.cal-step { border: 1px solid var(--border-default) !important; }
+.cal-step:hover:not(.disabled) {
+    border-color: var(--color-primary) !important;
+    background: rgba(14,165,233,0.07) !important;
+}
+.cal-step.active  { border-color: var(--color-primary) !important; background: rgba(14,165,233,0.08) !important; }
+.cal-step.completed { border-color: var(--color-success) !important; background: rgba(16,185,129,0.07) !important; }
+.cal-step-icon { color: var(--text-muted) !important; }
+.cal-step.active .cal-step-icon { color: var(--color-primary) !important; }
+.cal-step.completed .cal-step-icon { color: var(--color-success) !important; }
+.step-label    { color: var(--text-secondary) !important; font-size: var(--font-size-xs) !important; }
+.cal-step-values { background: rgba(0,0,0,0.08) !important; color: var(--text-primary) !important; }
+
+/* Kalibrasyon & genel buton standardizasyonu */
+.btn-warning {
+    background: var(--color-warning);
+    color: #000 !important;
+    border: none;
+}
+.btn-warning:hover { background: #d97706; color: #000 !important; transform: translateY(-1px); }
+.btn-danger  { background: var(--color-danger); color: #fff !important; border: none; }
+.btn-danger:hover  { background: #dc2626; transform: translateY(-1px); }
+.btn-primary { background: var(--color-brand-blue); color: #fff !important; border: none; }
+.btn-primary:hover { background: #c92020; transform: translateY(-1px); }
+
+/* Accordion - Loglar sayfası kısayollar */
+.accordion-item {
+    background: var(--bg-panel) !important;
+    border-color: var(--border-default) !important;
+}
+.accordion-button {
+    background: var(--bg-panel) !important;
+    color: var(--text-primary) !important;
+}
+.accordion-button:not(.collapsed) {
+    background: rgba(14,165,233,0.08) !important;
+    color: var(--color-primary) !important;
+    box-shadow: none !important;
+}
+.accordion-button::after { filter: none !important; opacity: 0.6; }
+.accordion-body { background: var(--bg-panel) !important; color: var(--text-primary) !important; }
+
+/* Kumanda sayfası Konfigürasyon başlığı */
+.text-info.h5, h3.text-info, h4.text-info { color: var(--text-primary) !important; font-size: var(--font-size-md) !important; }
+.text-success.h5, h3.text-success { color: var(--text-primary) !important; font-size: var(--font-size-md) !important; }
+
+/* Tab menüsü - tercihler */
+.adv-tab { background: rgba(50, 85, 125, 0.70); border-color: rgba(255,255,255,0.14); color: #c8dff0; }
+.adv-tab:hover { background: rgba(60, 100, 145, 0.80); color: #ffffff; }
+.adv-tab.active { background: #e8eaec; color: #111111; border-color: rgba(0,0,0,0.20); border-bottom-color: transparent; }
+
+/* h5/h6 card header renkleri */
+.card-header h5, .card-header .h5 { color: var(--text-primary) !important; font-size: var(--font-size-sm) !important; margin: 0; }
+.card-header h6, .card-header .h6 { color: var(--text-secondary) !important; font-size: var(--font-size-xs) !important; margin: 0; }
+
+/* Bağlantı Penceresi Garantisi */
+#connectionPrompt {
+    display: flex !important; /* Varsayılan olarak göster */
+    align-items: center !important;
+    justify-content: center !important;
+    padding: var(--spacing-xl) 0;
+}
+
+/* Bağlantı kurulduğunda pencereyi kesinlikle gizle */
+#connectionPrompt.d-none {
+    display: none !important;
+}
+
+/* ============================================
+   20. COMPACT LAYOUT - Bootstrap Override
+   ============================================ */
+
+/* Grid gutter daraltma */
+.row { --bs-gutter-x: 0.4rem; --bs-gutter-y: 0; }
+.g-3, .gy-3, .gx-3 { --bs-gutter-x: 0.4rem !important; --bs-gutter-y: 0.4rem !important; }
+.g-4, .gy-4, .gx-4 { --bs-gutter-x: 0.4rem !important; --bs-gutter-y: 0.4rem !important; }
+
+/* Container padding daraltma */
+.container-fluid { padding-left: 8px !important; padding-right: 8px !important; }
+
+/* Bootstrap spacing sıfırlama */
+.py-3 { padding-top: 4px !important; padding-bottom: 4px !important; }
+.py-4 { padding-top: 6px !important; padding-bottom: 6px !important; }
+.px-3 { padding-left: 8px !important; padding-right: 8px !important; }
+.p-3  { padding: 8px !important; }
+.p-2  { padding: 4px !important; }
+.pt-3 { padding-top: 4px !important; }
+.pb-3 { padding-bottom: 4px !important; }
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: 2px !important; }
+.mb-2 { margin-bottom: 4px !important; }
+.mb-3 { margin-bottom: 6px !important; }
+.mb-4 { margin-bottom: 6px !important; }
+.mb-5 { margin-bottom: 8px !important; }
+.mt-2 { margin-top: 4px !important; }
+.mt-3 { margin-top: 6px !important; }
+.mt-4 { margin-top: 6px !important; }
+.me-2 { margin-right: 4px !important; }
+.me-3 { margin-right: 6px !important; }
+.ms-2 { margin-left: 4px !important; }
+.gap-3 { gap: 6px !important; }
+.gap-2 { gap: 4px !important; }
+
+/* Badge ve küçük elemanlar */
+.badge { font-size: 0.65rem; padding: 2px 5px; }
+.small, small { font-size: var(--font-size-xs) !important; }
+.h5, h5 { font-size: var(--font-size-sm) !important; margin-bottom: 4px; }
+.h4, h4 { font-size: var(--font-size-md) !important; margin-bottom: 4px; }
+.h3, h3 { font-size: var(--font-size-md) !important; margin-bottom: 4px; }
+.h2, h2 { font-size: var(--font-size-lg) !important; margin-bottom: 4px; }
+.h1, h1 { font-size: var(--font-size-lg) !important; margin-bottom: 4px; }
+.fs-1 { font-size: 1.4rem !important; }
+.fs-4 { font-size: var(--font-size-md) !important; }
+.display-1 { font-size: 2rem !important; }
+
+/* Input group */
+.input-group { height: auto; }
+.input-group-sm > .form-control,
+.input-group-sm > .input-group-text,
+.input-group-sm > .btn { padding: 1px 5px !important; font-size: var(--font-size-xs) !important; }
+
+/* Button sınıfları */
+.btn-sm { padding: 1px 6px !important; font-size: var(--font-size-xs) !important; }
+.btn-lg { padding: 4px 12px !important; font-size: var(--font-size-sm) !important; }
+
+/* Accordion */
+.accordion-button { padding: 4px 8px !important; font-size: var(--font-size-sm) !important; }
+.accordion-body  { padding: 4px 8px !important; }
+
+/* 3D canvas küçültme */
+#3d-canvas-container { height: 200px !important; min-height: 180px !important; }
+
+/* HUD panel - euler değerleri kompakt */
+.euler-panel { padding: 6px !important; }
+.arm-status { padding: 2px 0 !important; font-size: var(--font-size-sm) !important; letter-spacing: 1px; }
+.angle-box { padding: 3px !important; }
+.angle-label { font-size: 0.6rem !important; margin-bottom: 1px; }
+.angle-val { font-size: var(--font-size-sm) !important; }
+.mode-section { padding: 3px 6px !important; margin-top: 4px !important; }
+.hud-divider { margin: 4px 0 !important; }
+
+/* Kalibrasyon adımları */
+.cal-steps-container { gap: 4px !important; }
+.cal-step { padding: 6px 4px !important; }
+.cal-step-icon { font-size: 1.2rem !important; margin-bottom: 2px; }
+
+/* Outputs */
+.output-display { padding: 4px 6px !important; }
+.output-value { font-size: var(--font-size-sm) !important; margin: 1px 0 !important; }
+
+/* Mode cards */
+.mode-card { padding: 6px !important; margin-bottom: 4px !important; }
+.range-track-container { height: 24px !important; margin: 6px 0 !important; border-radius: 12px; }
+.input-range::-webkit-slider-thumb { width: 18px !important; height: 24px !important; }
+.live-marker { top: -4px !important; bottom: -4px !important; }
+.live-marker::after { top: -22px !important; font-size: 0.6rem !important; }
+
+/* Channel bars */
+.channel-row { padding: 3px 6px !important; margin-bottom: 2px !important; }
+.channel-track { height: 6px !important; margin: 0 6px !important; }
+.channel-label { width: 55px; font-size: var(--font-size-xs) !important; }
+.channel-value-text { width: 38px; font-size: var(--font-size-xs) !important; }
+
+/* PID */
+.pid-control { padding: 6px !important; margin-bottom: 4px !important; }
+.pid-axis { font-size: var(--font-size-sm) !important; margin-bottom: 4px; }
+
+/* PID slider — kalın ve siyah */
+.panel4 input[type="range"] {
+    height: 10px !important;
+    background: #222 !important;
+    border-radius: 5px !important;
+}
+.panel4 input[type="range"]::-webkit-slider-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    background: #111 !important;
+    border: 3px solid #555 !important;
+    box-shadow: none !important;
+}
+.panel4 input[type="range"]::-moz-range-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    background: #111 !important;
+    border: 3px solid #555 !important;
+}
+
+/* Scrollbar daha ince */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+
+/* Connection prompt - geniş */
+#connectionPrompt .panel { padding: 40px 32px !important; max-width: 480px; text-align: center; }
+#connectionPrompt .display-1 { font-size: 4rem !important; margin-bottom: 16px !important; }
+#connectionPrompt h2 { font-size: 1.4rem !important; margin-bottom: 12px !important; }
+#connectionPrompt p { font-size: 0.9rem !important; margin-bottom: 20px !important; }
+#connectionPrompt .btn-lg { padding: 10px 28px !important; font-size: 0.9rem !important; }
+
+/* Save button */
+.save-button-container { bottom: 14px; right: 14px; }
+#globalSaveBtn { padding: 4px 14px !important; font-size: var(--font-size-sm) !important; }
+
+/* Stat boxes */
+.stat-value { font-size: var(--font-size-lg) !important; }
+.stat-label { font-size: 0.6rem !important; }
+
+/* ============================================
+   21. TERCİHLER SAYFA TAB MENÜSÜ
+   ============================================ */
+.adv-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    border-bottom: 2px solid var(--border-default);
+    margin-bottom: 10px;
+}
+
+.adv-tab {
+    background: rgba(50, 85, 125, 0.70);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-bottom: none;
+    color: #c8dff0;
+    padding: 5px 14px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: -2px;
+}
+
+.adv-tab:hover {
+    background: rgba(60, 100, 145, 0.80);
+    color: #ffffff;
+}
+
+.adv-tab.active {
+    background: #e8eaec;
+    color: #111111;
+    border-color: rgba(0,0,0,0.20);
+    border-bottom: 2px solid transparent;
+    box-shadow: var(--shadow-sm);
+}
+
+.adv-tab-content {
+    min-height: 200px;
+}
+
+.adv-tab-pane {
+    display: none;
+}
+
+.adv-tab-pane.active {
+    display: block;
+    animation: fadeIn 0.15s ease;
+}
+
+/* ============================================
+   SENSOR ALIGNMENT CARDS
+   ============================================ */
+.align-card {
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 16px 12px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s ease;
+    user-select: none;
+}
+
+.align-card:hover {
+    background: rgba(37,99,235,0.12);
+    border-color: rgba(96,165,250,0.4);
+    transform: translateY(-2px);
+}
+
+.align-card--selected {
+    background: rgba(37,99,235,0.15);
+    border-color: rgba(96,165,250,0.7);
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.18);
+}
+
+.align-card--active {
+    background: rgba(37,99,235,0.22);
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.25);
+}
+
+.align-card--active.align-card--selected {
+    border-color: #34d399;
+    box-shadow: 0 0 0 3px rgba(52,211,153,0.25);
+}
+
+.align-card__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.align-card__label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 2px;
+}
+
+.align-card__desc {
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+.align-card__badge {
+    margin-top: 6px;
+    font-size: 0.72rem;
+    color: #60a5fa;
+    font-weight: 600;
+}
+
+/* ============================================
+   PANEL4 — KESİN BACKGROUND OVERRIDE (EN SON)
+   .panel4 !important tek sınıflı; sonradan gelen
+   çift sınıflı kurallar onu ezebilir. Bu blok
+   stylesheet sonunda olduğu için her durumda kazanır.
+   ============================================ */
+.cal-step.panel4                       { background: #e8eaec !important; }
+.cal-step.panel4:hover:not(.disabled)  { background: rgba(14,165,233,0.10) !important; }
+.cal-step.panel4.active                { background: rgba(14,165,233,0.12) !important; }
+.cal-step.panel4.completed             { background: rgba(16,185,129,0.12) !important; }

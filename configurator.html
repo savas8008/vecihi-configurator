@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-Flight Configurator</title>
+    <title>Vecihi Configurator</title>
 
     <!-- PWA Meta Tags -->
     <meta name="description" content="ESP32 tabanlı uçuş kontrolcüsü için profesyonel yapılandırma aracı">
@@ -11,10 +11,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="XFlight">
+    <meta name="apple-mobile-web-app-title" content="Vecihi">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -25,23 +25,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="js/aircraft_model.js"></script>
-<script src="js/serial_communication.js"></script>
-<script src="js/logger.js"></script>
-<script src="js/sensors.js"></script>
-<script src="js/transmitter.js"></script>
-<script src="js/calibration.js"></script> 
-<script src="js/osd.js"></script> 
-<script src="js/pid.js"></script>
-<script src="js/advanced_page.js"></script>
-<script src="js/sensor_alignment.js"></script>
+<script src="assets/js/aircraft_model.js"></script>
+<script src="assets/js/serial_communication.js"></script>
+<script src="assets/js/logger.js"></script>
+<script src="assets/js/sensors.js"></script>
+<script src="assets/js/transmitter.js"></script>
+<script src="assets/js/calibration.js"></script>
+<script src="assets/js/osd.js"></script>
+<script src="assets/js/pid.js"></script>
+<script src="assets/js/advanced_page.js"></script>
+<script src="assets/js/sensor_alignment.js"></script>
 
-<script src="js/page_management.js"></script>
-<script src="js/main.js"></script>
-<script src="js/flight_modes.js"></script>
-<script src="js/outputs_page.js"></script>
-<script src="js/settings_backup.js"></script>
-    <link rel="stylesheet" href="style.css"> 
+<script src="assets/js/page_management.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/flight_modes.js"></script>
+<script src="assets/js/outputs_page.js"></script>
+<script src="assets/js/settings_backup.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css"> 
     <style>
     /* OSD ve diÄŸer Ã¶zel stiller */
     /* Kısayollar accordion dark theme uyumu */
@@ -114,7 +114,7 @@
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <h1 class="h3 mb-0 gradient-text">
-                        <i class="bi bi-airplane"></i> X-Flight Configurator
+                        <i class="bi bi-airplane"></i> Vecihi Configurator
                     </h1>
                 </div>
                 <div class="col-md-6 text-md-end">
@@ -141,7 +141,7 @@
                 <div class="sidebar rounded p-3">
                     <ul class="nav flex-column">
                         <li class="nav-item"><a class="nav-link" href="#" data-page="sensors"><i class="bi bi-radar me-2"></i> Sensörler</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> Kalibrasyon</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> Kalibrasyon</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="outputs"><i class="bi bi-plug me-2"></i> Konfigürasyon</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="transmitter"><i class="bi bi-controller me-2"></i> Kumanda</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i> Uçuş Modları</a></li>
@@ -182,7 +182,7 @@
                     </div>
                 </div>
 <!-- ================== SENSORS PAGE ================== -->
-<div id="sensors" class="page active">
+<div id="sensors" class="page">
   <div class="row g-3">
 
     <!-- SOL: 3D + HUD -->
@@ -2703,7 +2703,7 @@ function switchAdvTab(tabId, btn) {
         $('btnClearSearch').addEventListener('click', clearSearch);
     </script>
 
-<script src="js/waypoint.js"></script>
+<script src="assets/js/waypoint.js"></script>
 
 <!-- PWA Service Worker Kaydı -->
 <script>

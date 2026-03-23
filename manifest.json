@@ -1,6 +1,6 @@
 {
-  "name": "X-Flight Configurator",
-  "short_name": "XFlight",
+  "name": "Vecihi Configurator",
+  "short_name": "Vecihi",
   "description": "ESP32 tabanlı uçuş kontrolcüsü için profesyonel yapılandırma aracı",
   "start_url": "./configurator.html",
   "scope": "./",
@@ -11,19 +11,19 @@
   "lang": "tr",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "assets/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/icon.svg",
+      "src": "assets/icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -35,11 +35,6 @@
       "name": "Konfiguratör",
       "url": "./configurator.html",
       "description": "Uçuş kontrolcüsü yapılandırması"
-    },
-    {
-      "name": "ELRS Backpack",
-      "url": "./elrs_backpack.html",
-      "description": "ELRS canlı telemetri"
     }
   ]
 }
