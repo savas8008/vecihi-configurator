@@ -1,7 +1,7 @@
 /**
  * @file page_management.js
  * @brief Sayfa yönetimi, navigasyon ve stream kontrolü
- * X-Flight Configurator için modüler JS
+ * Vecihi Configurator için modüler JS
  */
 
 // === SAYFA DURUMU ===

@@ -1,4 +1,4 @@
-# X-Flight Configurator — Yapılacaklar Listesi
+# Vecihi Configurator — Yapılacaklar Listesi
 
 ---
 

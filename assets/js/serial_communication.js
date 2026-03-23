@@ -1,7 +1,7 @@
 /**
  * @file serial_communication.js
  * @brief Seri port bağlantısı ve veri iletişimi
- * X-Flight Configurator için modüler JS
+ * Vecihi Configurator için modüler JS
  */
 
 // === GLOBAL DEĞİŞKENLER ===

@@ -1,6 +1,6 @@
 ﻿/**
  * @file main.js
- * @brief X-Flight Configurator - Ana Başlatma ve Event Listener Modülü
+ * @brief Vecihi Configurator - Ana Başlatma ve Event Listener Modülü
  * @description Bu dosya, uygulamanın ana init() ve setupEventListeners() fonksiyonlarını içerir.
  *              configurator.html içindeki aynı kodlar kaldırılmalıdır.
  * 

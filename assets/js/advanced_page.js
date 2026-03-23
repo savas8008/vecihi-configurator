@@ -1,7 +1,7 @@
 /**
  * @file advanced_page.js
  * @brief Gelişmiş ayarlar sayfası yönetimi
- * X-Flight Configurator için modüler JS
+ * Vecihi Configurator için modüler JS
  */
 
 // === GLOBAL DEĞİŞKENLER ===

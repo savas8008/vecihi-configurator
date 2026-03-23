@@ -1,6 +1,6 @@
 {
-  "name": "X-Flight Configurator",
-  "short_name": "XFlight",
+  "name": "Vecihi Configurator",
+  "short_name": "Vecihi",
   "description": "ESP32 tabanlı uçuş kontrolcüsü için profesyonel yapılandırma aracı",
   "start_url": "./configurator.html",
   "scope": "./",

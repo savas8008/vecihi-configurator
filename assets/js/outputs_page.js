@@ -1,6 +1,6 @@
 /**
  * @file outputs_page.js
- * @brief X-Flight Configurator - Outputs (Konfigürasyon) Sayfası Modülü
+ * @brief Vecihi Configurator - Outputs (Konfigürasyon) Sayfası Modülü
  * @description Motor, servo, pin konfigürasyonu ve throttle yönetimi
  * 
  * @requires serial_communication.js - sendCommand, isConnected

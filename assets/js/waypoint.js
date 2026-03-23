@@ -1,7 +1,7 @@
 /**
  * @file waypoint.js
  * @brief Waypoint misyon planlayıcı — Harita, liste yönetimi ve FC iletişimi
- * X-Flight Configurator
+ * Vecihi Configurator
  */
 
 // ==================== DURUM ====================

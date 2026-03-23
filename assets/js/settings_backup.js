@@ -1,6 +1,6 @@
 /**
  * @file settings_backup.js
- * @brief X-Flight Configurator - Ayar Yedekleme / Geri Yükleme Modülü
+ * @brief Vecihi Configurator - Ayar Yedekleme / Geri Yükleme Modülü
  * @description Tüm kullanıcı ayarlarını tek JSON dosyasına aktarır ve geri yükler.
  *
  * Dışa aktarılan ayarlar:
@@ -28,7 +28,7 @@ function exportSettings() {
 
         const backup = {
             version: '1.0',
-            app: 'XFlightConfigurator',
+            app: 'VeciHiConfigurator',
             exported_at: new Date().toISOString(),
             settings: {
                 pid: JSON.parse(JSON.stringify(pidValues || {})),
@@ -51,7 +51,7 @@ function exportSettings() {
         const date = new Date().toISOString().slice(0, 10);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `xflight_settings_${date}.json`;
+        a.download = `vecihi_settings_${date}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

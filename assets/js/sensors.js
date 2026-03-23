@@ -1,6 +1,6 @@
 /**
  * ============================================
- * X-FLIGHT CONFIGURATOR - SENSORS PAGE MODULE
+ * VECİHİ CONFIGURATOR - SENSORS PAGE MODULE
  * ============================================
  * Sensörler sayfasına ait tüm JavaScript kodları
  * 

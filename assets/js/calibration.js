@@ -1,6 +1,6 @@
 /**
  * ============================================
- * X-FLIGHT CONFIGURATOR - CALIBRATION PAGE MODULE
+ * VECİHİ CONFIGURATOR - CALIBRATION PAGE MODULE
  * ============================================
  * Kalibrasyon sayfasına ait tüm JavaScript kodları
  * 

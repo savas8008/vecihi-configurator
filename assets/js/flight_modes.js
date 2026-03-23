@@ -1,6 +1,6 @@
 /**
  * @file flight_modes.js
- * @brief X-Flight Configurator - Uçuş Modları (Modes) Sayfası Modülü
+ * @brief Vecihi Configurator - Uçuş Modları (Modes) Sayfası Modülü
  * @description Uçak uçuş modlarını, kategori ve aralıklarını yönetir
  * 
  * @requires serial_communication.js - sendCommand, isConnected

@@ -69,7 +69,7 @@
             const a = document.createElement('a');
             const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
             a.href = url;
-            a.download = `xflight-logs-${timestamp}.txt`;
+            a.download = `vecihi-logs-${timestamp}.txt`;
             a.click();
             URL.revokeObjectURL(url);
             log('📤 Loglar dışa aktarıldı', 'success');

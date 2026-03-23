@@ -1,6 +1,6 @@
 /**
  * @file osd.js
- * @brief X-Flight Configurator - OSD (On-Screen Display) Modülü
+ * @brief Vecihi Configurator - OSD (On-Screen Display) Modülü
  * @description DJI HD Sistem için OSD element yönetimi, drag-drop ve konfigürasyon
  * 
  * @requires serial_communication.js - sendCommand, isConnected

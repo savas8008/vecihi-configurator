@@ -1,10 +1,10 @@
 /**
- * X-Flight Configurator - Service Worker
+ * Vecihi Configurator - Service Worker
  * PWA desteği için statik varlıkları önbelleğe alır.
  * Web Serial API çalışmak için HTTPS veya localhost gerektirir.
  */
 
-const CACHE_NAME = 'xflight-v1';
+const CACHE_NAME = 'vecihi-v1';
 
 // Önbelleğe alınacak statik dosyalar
 const STATIC_ASSETS = [
