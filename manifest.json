@@ -35,11 +35,6 @@
       "name": "Konfiguratör",
       "url": "./configurator.html",
       "description": "Uçuş kontrolcüsü yapılandırması"
-    },
-    {
-      "name": "ELRS Backpack",
-      "url": "./elrs_backpack.html",
-      "description": "ELRS canlı telemetri"
     }
   ]
 }

@@ -9,7 +9,6 @@ const CACHE_NAME = 'xflight-v1';
 // Önbelleğe alınacak statik dosyalar
 const STATIC_ASSETS = [
   './configurator.html',
-  './elrs_backpack.html',
   './manifest.json',
   './assets/css/style.css',
   './assets/icons/icon.svg',
