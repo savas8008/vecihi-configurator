@@ -6,3 +6,44 @@
    Değiştirmek için sadece :root içindeki değişkenleri düzenleyin.
    Tüm renkler ve boyutlar merkezi olarak yönetilir.
    ============================================ */
+
+/* ============================================
+   1. MERKEZI DEĞİŞKENLER (THEME TOKENS)
+   ============================================ */
+:root {
+    /* --- ANA RENKLER --- */
+    --color-brand-blue: #38bdf8;        /* Sky-400 — aviation mavi */
+    --color-brand-blue-rgb: 56, 189, 248;
+
+    --color-primary: #000102;           /* Sky Blue */
+    --color-primary-hover: #abccdc;     /* Darker Blue */
+    --color-primary-glow: rgba(14, 165, 233, 0.3);
+    
+    --color-secondary: #94a3b8;         /* Slate 400 */
+    --color-secondary-hover: #64748b;
+    
+    /* --- DURUM RENKİ�ERİ --- */
+    --color-success: #10b981;           /* Yeşil - Armed, OK */
+    --color-success-glow: rgba(16, 185, 129, 0.4);
+    
+    --color-warning: #f59e0b;           /* Amber - Dikkat */
+    --color-warning-glow: rgba(245, 158, 11, 0.4);
+    
+    --color-danger: #ef4444;            /* Kırmızı - Hata, Disarmed */
+    --color-danger-glow: rgba(239, 68, 68, 0.4);
+    
+    --color-info: #0ea5e9;              /* Açık mavi - Bilgi */
+    
+    /* --- ARKAPLAN RENKİ�ERİ --- */
+    --bg-body: #c0cfe3;
+    --bg-body-gradient: linear-gradient(160deg, #0a111c 0%, #0f1e30 50%, #0a1628 100%);
+
+    /* =========================================
+       PANEL HİYERARŞİSİ  (koyu aviation teması)
+       .panel  → Sayfa bölümü dış kap
+       .panel2 → İç grup/kart
+       .panel3 → En iç içerik kartı
+       Değiştirmek için sadece bu değişkenleri güncelleyin.
+    ========================================= */
+    --bg-panel:   rgba(9, 80, 76, 0.9);    /* Dış: koyu lacivert */
+    --bg-panel-2: rgba(43, 94, 91, 0.9);     /* Orta: biraz açık çelik mavi */
