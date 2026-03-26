@@ -1142,6 +1142,26 @@ successfully downloaded text file (SHA: 875cc40c0c56c8c3ac597383814cd15023120dbf
                                         <input type="number" class="form-control form-control-sm" id="inp_launch_spool_time" min="0" max="1000" step="50" value="300">
                                     </div>
                                 </div>
+								<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        Stick İptal Eşiği (PWM)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Merkezden stick sapması bu değeri aşarsa Auto Launch veya otomatik iniş iptal edilir (pilot devralır)"></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_la_stick_cancel_thr" min="50" max="500" step="10" value="100">
+                                    </div>
+                                </div>
+								<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        Gaz İptal Eşiği (PWM)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Gaz bu değeri aşarsa Auto Launch veya otomatik iniş iptal edilir (pilot devralır)"></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_la_thr_cancel_thr" min="1100" max="2000" step="10" value="1150">
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Stall Koruması -->
@@ -2263,18 +2283,10 @@ function switchAdvTab(tabId, btn) {
                             </div>
                         </div>
 
-                        <!-- Pilot İptal & Pist -->
+                        <!-- Pist -->
                         <div class="col-md-3">
                             <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
-                                <div class="fw-bold mb-2" style="color:#fd7e14;font-size:0.8em;"><i class="bi bi-x-circle me-1"></i>Pilot İptal & Pist</div>
-                                <div class="mb-2">
-                                    <label class="form-label small mb-1" style="color:#ccc;">Stick İptal Eşiği (PWM)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_stick_cancel_thr" min="50" max="500" step="10" value="100" title="Merkezden stick sapması bu değeri aşarsa iniş iptal edilir">
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small mb-1" style="color:#ccc;">Gaz İptal Eşiği (PWM)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_thr_cancel_thr" min="1100" max="2000" step="10" value="1150" title="Gaz bu değeri aşarsa iniş iptal edilir (pilot devralır)">
-                                </div>
+                                <div class="fw-bold mb-2" style="color:#fd7e14;font-size:0.8em;"><i class="bi bi-sign-turn-right me-1"></i>Pist</div>
                                 <div class="mb-2">
                                     <label class="form-label small mb-1" style="color:#ccc;">Min Rüzgar Hızı (m/s)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_min_wind_speed" min="0.5" max="20.0" step="0.5" value="2.0" title="Rüzgar yönünü pist başlığı olarak kullanmak için gereken minimum rüzgar hızı">
