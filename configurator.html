@@ -1938,7 +1938,7 @@ function switchAdvTab(tabId, btn) {
                             <div id="accInstall" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
                                 <div class="accordion-body pt-1 pb-2 px-0">
                                     <p class="text-muted small mb-2">Vecihi Configurator'u Chrome uygulaması olarak masaüstünüze yükleyin &mdash; Betaflight Configurator gibi çevrimdışı çalışır.</p>
-                                    <button class="btn btn-success btn-sm w-100 mb-2" id="btnInstallPWA" onclick="installPWA()" style="display:none">
+                                    <button class="btn btn-success btn-sm w-100 mb-2" id="btnInstallPWA" onclick="installPWA()">
                                         <i class="bi bi-box-arrow-in-down me-1"></i> Chrome'a Uygulama Olarak Yükle
                                     </button>
                                     <div id="pwaAlreadyInstalled" style="display:none">
@@ -2737,8 +2737,7 @@ function switchAdvTab(tabId, btn) {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     pwaInstallPrompt = e;
-    const btn = document.getElementById('btnInstallPWA');
-    if (btn) btn.style.display = '';
+    // Hide manual hint, native prompt is available
     const hint = document.getElementById('pwaBrowserHint');
     if (hint) hint.style.display = 'none';
   });
@@ -2749,37 +2748,50 @@ function switchAdvTab(tabId, btn) {
     if (btn) btn.style.display = 'none';
     const installed = document.getElementById('pwaAlreadyInstalled');
     if (installed) installed.style.display = '';
+    const hint = document.getElementById('pwaBrowserHint');
+    if (hint) hint.style.display = 'none';
   });
 
   function installPWA() {
     if (pwaInstallPrompt) {
+      // Native PWA install (HTTPS/localhost)
       pwaInstallPrompt.prompt();
       pwaInstallPrompt.userChoice.then((choice) => {
         if (choice.outcome === 'accepted') {
           console.log('[PWA] Kullanıcı yüklemeyi kabul etti');
         }
         pwaInstallPrompt = null;
-        const btn = document.getElementById('btnInstallPWA');
-        if (btn) btn.style.display = 'none';
       });
+    } else {
+      // Fallback: show modal with manual instructions
+      showInstallInstructions();
     }
+  }
+
+  function showInstallInstructions() {
+    showModal(
+      'Chrome Uygulama Olarak Yükle',
+      '<div class="text-start">' +
+      '<p class="mb-2"><strong>Chrome'da uygulama olarak açmak için:</strong></p>' +
+      '<ol class="mb-2">' +
+      '<li class="mb-1">Sağ üstteki <strong>⋮ menüsüne</strong> tıklayın</li>' +
+      '<li class="mb-1"><strong>Yayınla, kaydet ve paylaş</strong> seçeneğine gidin</li>' +
+      '<li class="mb-1"><strong>Kısayol oluştur...</strong> seçeneğine tıklayın</li>' +
+      '<li class="mb-1"><strong>"Pencere olarak aç"</strong> kutucuğunu işaretleyin</li>' +
+      '<li>Oluştur'a tıklayın — masaüstünde uygulama gibi açılır</li>' +
+      '</ol>' +
+      '<p class="text-muted small mb-0">Not: Betaflight Configurator gibi tam PWA desteği için uygulamanın bir web sunucusu üzerinden (HTTPS) açılması gerekir.</p>' +
+      '</div>',
+      'info'
+    );
   }
 
   // Check if already installed (standalone mode)
   if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    const btn = document.getElementById('btnInstallPWA');
+    if (btn) btn.style.display = 'none';
     const installed = document.getElementById('pwaAlreadyInstalled');
     if (installed) installed.style.display = '';
-  } else {
-    // Show browser hint if beforeinstallprompt doesn't fire (e.g. Firefox)
-    setTimeout(() => {
-      if (!pwaInstallPrompt) {
-        const btn = document.getElementById('btnInstallPWA');
-        const hint = document.getElementById('pwaBrowserHint');
-        if (btn && btn.style.display === 'none' && hint) {
-          hint.style.display = '';
-        }
-      }
-    }, 3000);
   }
 </script>
 
