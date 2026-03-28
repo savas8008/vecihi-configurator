@@ -13,7 +13,7 @@ const DATA_PAGES = new Set(['calibration', 'outputs', 'transmitter', 'modes', 'p
 // Loading timeout handle'ları (sayfa başına)
 const loadingTimeouts = {};
 
-// === SAYFA DEĞİŞTİRME ===
+// === SAYFA DEĞİŞTIRME ===
 
 /**
  * @brief Aktif sayfayı değiştirir ve gerekli stream'leri yönetir
@@ -123,7 +123,7 @@ function startPageSpecificStream(page) {
             break;
             
         case 'osd':
-            log('Bağlam: OSD -> OSD Konfigürasyonu İsteniyor', 'info');
+            log('Bağlam: OSD -> OSD Konfigürasyonı İsteniyor', 'info');
             // OSD için stream yok, tek seferlik veri
             break;
             
@@ -426,6 +426,9 @@ function updateConnectionStatus() {
         if (typeof updateThrottle === 'function') updateThrottle(1000);
         if (typeof updateSafetyWarning === 'function') updateSafetyWarning();
     }
+
+    // Firmware sayfası bağlantı durumuna duyarlı
+    if (typeof updateFirmwarePageState === 'function') updateFirmwarePageState();
 }
 
 // === İLK YÜKLEME ===

@@ -44,10 +44,27 @@ async function loadFirmwareInfo() {
 }
 
 /**
+ * @brief Flash wrapper'ını bağlantı durumuna göre günceller
+ */
+function updateFirmwarePageState() {
+    const warning = document.getElementById('firmwareConnectedWarning');
+    const wrapper = document.getElementById('firmwareFlashWrapper');
+    const connected = typeof window.isConnected === 'function' ? window.isConnected() : !!window.port;
+
+    if (warning) warning.classList.toggle('d-none', !connected);
+    if (wrapper) {
+        wrapper.style.opacity = connected ? '0.4' : '1';
+        wrapper.style.pointerEvents = connected ? 'none' : 'auto';
+    }
+}
+
+/**
  * @brief Firmware sayfası gösterildiğinde çağrılır
  */
 function initFirmwarePage() {
     loadFirmwareInfo();
+    updateFirmwarePageState();
 }
 
 window.initFirmwarePage = initFirmwarePage;
+window.updateFirmwarePageState = updateFirmwarePageState;

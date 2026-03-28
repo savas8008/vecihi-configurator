@@ -2539,49 +2539,7 @@ function switchAdvTab(tabId, btn) {
             return Number(num).toFixed(decimals);
         }
 
-        function updateConnectionStatus() {
-            let connected = false;
-            if (typeof window.isConnected === 'function') {
-                connected = window.isConnected();
-            }
-            if (!connected && window.port) {
-                connected = true;
-            }
-
-            $('btnConnect').classList.toggle('d-none', connected);
-            $('btnConnectPrompt').classList.toggle('d-none', connected);
-            $('btnDisconnect').classList.toggle('d-none', !connected);
-            $('statusIndicator').className = `status-indicator ${connected ? 'status-connected' : 'status-off'}`;
-            $('connectionStatus').textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
-
-            const prompt = $('connectionPrompt');
-            if (prompt) {
-                if (connected) {
-                    prompt.classList.add('d-none');
-                    prompt.style.setProperty('display', 'none', 'important');
-                } else {
-                    prompt.classList.remove('d-none');
-                    prompt.style.setProperty('display', 'flex', 'important');
-                }
-            }
-
-            document.querySelectorAll('.page').forEach(page => {
-                if (connected) {
-                    page.style.display = page.classList.contains('active') ? 'block' : 'none';
-                } else {
-                    page.style.setProperty('display', 'none', 'important');
-                }
-            });
-
-            if (!connected) {
-                stopThrottleUpdates();
-                if (throttleSlider) throttleSlider.disabled = true;
-                if (safetyCheck) safetyCheck.checked = false;
-                safetyChecked = false;
-                updateThrottle(1000);
-                updateSafetyWarning();
-            }
-        }
+        // updateConnectionStatus() page_management.js'den kullanılır
 
         activateSensorsPage();
 
@@ -2718,27 +2676,37 @@ function switchAdvTab(tabId, btn) {
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="panel mb-4">
-                    <h5 class="panel-title"><i class="bi bi-info-circle"></i> Mevcut Versiyon</h5>
-                    <div id="firmwareVersionInfo">
-                        <p class="text-muted">Versiyon bilgisi yükleniyor...</p>
+                    <h5 class="panel-title"><i class="bi bi-info-circle"></i> Son Sürüm Bilgisi</h5>
+                    <div id="firmwareVersionInfo" class="d-flex align-items-center gap-3 mt-2">
+                        <span class="text-muted">Versiyon:</span>
+                        <span id="firmwareVersion" class="badge bg-secondary">Yükleniyor...</span>
+                        <span class="text-muted small">Derleme tarihi: <span id="firmwareBuildDate">—</span></span>
                     </div>
                 </div>
                 <div class="panel mb-4">
                     <h5 class="panel-title"><i class="bi bi-download"></i> ESP32'ye Flash Et</h5>
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        Flash işlemi sırasında configurator bağlantısını kesin.
+                    <div id="firmwareConnectedWarning" class="alert alert-danger d-none">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <span>
+                                <i class="bi bi-x-circle me-2"></i>
+                                Flash işlemi için önce seri bağlantıyı kesmelisiniz.
+                            </span>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="document.getElementById('btnDisconnect').click()">
+                                <i class="bi bi-usb-plug me-1"></i> Bağlantıyı Kes
+                            </button>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-center mt-3">
+                    <div id="firmwareFlashWrapper" class="d-flex flex-column align-items-center mt-3">
                         <esp-web-install-button manifest="https://savas8008.github.io/vecihi-public/manifest.json">
                             <button slot="activate" class="btn btn-primary btn-lg">
                                 <i class="bi bi-cpu me-2"></i> Flash Başlat
                             </button>
                         </esp-web-install-button>
+                        <p class="text-muted text-center mt-2 small">
+                            Web Serial API gerektirir. Chrome/Edge tarayıcı kullanın.
+                        </p>
                     </div>
-                    <p class="text-muted text-center mt-2 small">
-                        Web Serial API gerektirir. Chrome/Edge tarayıcı kullanın.
-                    </p>
                 </div>
             </div>
         </div>
