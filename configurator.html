@@ -2539,49 +2539,7 @@ function switchAdvTab(tabId, btn) {
             return Number(num).toFixed(decimals);
         }
 
-        function updateConnectionStatus() {
-            let connected = false;
-            if (typeof window.isConnected === 'function') {
-                connected = window.isConnected();
-            }
-            if (!connected && window.port) {
-                connected = true;
-            }
-
-            $('btnConnect').classList.toggle('d-none', connected);
-            $('btnConnectPrompt').classList.toggle('d-none', connected);
-            $('btnDisconnect').classList.toggle('d-none', !connected);
-            $('statusIndicator').className = `status-indicator ${connected ? 'status-connected' : 'status-off'}`;
-            $('connectionStatus').textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
-
-            const prompt = $('connectionPrompt');
-            if (prompt) {
-                if (connected) {
-                    prompt.classList.add('d-none');
-                    prompt.style.setProperty('display', 'none', 'important');
-                } else {
-                    prompt.classList.remove('d-none');
-                    prompt.style.setProperty('display', 'flex', 'important');
-                }
-            }
-
-            document.querySelectorAll('.page').forEach(page => {
-                if (connected) {
-                    page.style.display = page.classList.contains('active') ? 'block' : 'none';
-                } else {
-                    page.style.setProperty('display', 'none', 'important');
-                }
-            });
-
-            if (!connected) {
-                stopThrottleUpdates();
-                if (throttleSlider) throttleSlider.disabled = true;
-                if (safetyCheck) safetyCheck.checked = false;
-                safetyChecked = false;
-                updateThrottle(1000);
-                updateSafetyWarning();
-            }
-        }
+        // updateConnectionStatus() page_management.js'den kullanılır
 
         activateSensorsPage();
 
