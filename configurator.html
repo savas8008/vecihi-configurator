@@ -1,4 +1,4 @@
-﻿<html lang="tr">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1927,6 +1927,28 @@ function switchAdvTab(tabId, btn) {
                             </div>
                         </div>
 
+                        <!-- 6. Uygulamayı Yükle -->
+                        <div class="accordion-item bg-transparent border-secondary" id="accInstallItem">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accInstall">
+                                    <i class="bi bi-box-arrow-in-down me-2 text-success"></i> Uygulamayı Yükle
+                                </button>
+                            </h2>
+                            <div id="accInstall" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <p class="text-muted small mb-2">Vecihi Configurator'u Chrome uygulaması olarak masaüstünüze yükleyin &mdash; Betaflight Configurator gibi çevrimdışı çalışır.</p>
+                                    <button class="btn btn-success btn-sm w-100 mb-2" id="btnInstallPWA" onclick="installPWA()">
+                                        <i class="bi bi-box-arrow-in-down me-1"></i> Chrome'a Uygulama Olarak Yükle
+                                    </button>
+                                    <div id="pwaAlreadyInstalled" style="display:none">
+                                        <span class="badge bg-success w-100 py-2"><i class="bi bi-check-circle me-1"></i> Uygulama zaten yüklü</span>
+                                    </div>
+                                    <p class="text-muted small mt-1 mb-0" id="pwaBrowserHint" style="display:none">Tarayıcınız otomatik yüklemeyi desteklemiyor. Chrome adres çubuğundaki yükleme simgesine tıklayarak yükleyebilirsiniz.</p>
+                                </div>
+                            </div>
+                        </div>
+
                     </div><!-- /accordion -->
                 </div>
             </div>
@@ -2707,6 +2729,71 @@ function switchAdvTab(tabId, btn) {
     </script>
 
 <script src="assets/js/waypoint.js"></script>
+
+<!-- PWA Install Handler -->
+<script>
+  let pwaInstallPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    pwaInstallPrompt = e;
+    // Hide manual hint, native prompt is available
+    const hint = document.getElementById('pwaBrowserHint');
+    if (hint) hint.style.display = 'none';
+  });
+
+  window.addEventListener('appinstalled', () => {
+    pwaInstallPrompt = null;
+    const btn = document.getElementById('btnInstallPWA');
+    if (btn) btn.style.display = 'none';
+    const installed = document.getElementById('pwaAlreadyInstalled');
+    if (installed) installed.style.display = '';
+    const hint = document.getElementById('pwaBrowserHint');
+    if (hint) hint.style.display = 'none';
+  });
+
+  function installPWA() {
+    if (pwaInstallPrompt) {
+      // Native PWA install (HTTPS/localhost)
+      pwaInstallPrompt.prompt();
+      pwaInstallPrompt.userChoice.then((choice) => {
+        if (choice.outcome === 'accepted') {
+          console.log('[PWA] Kullanıcı yüklemeyi kabul etti');
+        }
+        pwaInstallPrompt = null;
+      });
+    } else {
+      // Fallback: show modal with manual instructions
+      showInstallInstructions();
+    }
+  }
+
+  function showInstallInstructions() {
+    showModal(
+      'Chrome Uygulama Olarak Yükle',
+      '<div class="text-start">' +
+      '<p class="mb-2"><strong>Chrome'da uygulama olarak açmak için:</strong></p>' +
+      '<ol class="mb-2">' +
+      '<li class="mb-1">Sağ üstteki <strong>⋮ menüsüne</strong> tıklayın</li>' +
+      '<li class="mb-1"><strong>Yayınla, kaydet ve paylaş</strong> seçeneğine gidin</li>' +
+      '<li class="mb-1"><strong>Kısayol oluştur...</strong> seçeneğine tıklayın</li>' +
+      '<li class="mb-1"><strong>"Pencere olarak aç"</strong> kutucuğunu işaretleyin</li>' +
+      '<li>Oluştur'a tıklayın — masaüstünde uygulama gibi açılır</li>' +
+      '</ol>' +
+      '<p class="text-muted small mb-0">Not: Betaflight Configurator gibi tam PWA desteği için uygulamanın bir web sunucusu üzerinden (HTTPS) açılması gerekir.</p>' +
+      '</div>',
+      'info'
+    );
+  }
+
+  // Check if already installed (standalone mode)
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    const btn = document.getElementById('btnInstallPWA');
+    if (btn) btn.style.display = 'none';
+    const installed = document.getElementById('pwaAlreadyInstalled');
+    if (installed) installed.style.display = '';
+  }
+</script>
 
 <!-- PWA Service Worker Kaydı -->
 <script>
