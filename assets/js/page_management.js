@@ -13,7 +13,7 @@ const DATA_PAGES = new Set(['calibration', 'outputs', 'transmitter', 'modes', 'p
 // Loading timeout handle'ları (sayfa başına)
 const loadingTimeouts = {};
 
-// === SAYFA DEĞİŞTIRME ===
+// === SAYFA DEĞİŞTİRME ===
 
 /**
  * @brief Aktif sayfayı değiştirir ve gerekli stream'leri yönetir
@@ -123,7 +123,7 @@ function startPageSpecificStream(page) {
             break;
             
         case 'osd':
-            log('Bağlam: OSD -> OSD Konfigürasyonı İsteniyor', 'info');
+            log('Bağlam: OSD -> OSD Konfigürasyonu İsteniyor', 'info');
             // OSD için stream yok, tek seferlik veri
             break;
             
@@ -326,6 +326,16 @@ function updateConnectionStatus() {
     if (!connected && window.port) {
         connected = true;
     }
+
+    // 2. Bağlantı durumu değişince otomatik sayfa yönlendir
+    if (!connected && currentPage !== 'firmware') {
+        changePage('firmware');
+        return;
+    }
+    if (connected && currentPage === 'firmware') {
+        changePage('calibration');
+        return;
+    }
     
     // Element seçici helper (Global $ yoksa diye)
     const el = (id) => document.getElementById(id);
@@ -360,38 +370,42 @@ function updateConnectionStatus() {
     const connStatus = el('connectionStatus');
     if (connStatus) connStatus.textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
 
-    // Navigasyon menüsü: Firmware sekmesi her zaman erişilebilir
+    // Navigasyon menüsü: Bağlantı durumuna göre göster/gizle
+    // - Bağlantı yok: sadece Firmware sekmesi görünür
+    // - Bağlı: Firmware gizli, diğer tüm sekmeler görünür
     document.querySelectorAll('.nav-link').forEach(nav => {
         const navPage = nav.getAttribute('data-page');
-        // Firmware sekmesi bağlantıdan bağımsız çalışır
         if (navPage === 'firmware') {
-            nav.style.opacity = '1';
-            nav.style.pointerEvents = 'auto';
-            nav.style.cursor = 'pointer';
-            if (navPage === currentPage) nav.classList.add('active');
-            else nav.classList.remove('active');
-            return;
-        }
-        if (connected) {
-            nav.style.opacity = '1';
-            nav.style.pointerEvents = 'auto';
-            nav.style.cursor = 'pointer';
-            if (navPage === currentPage) {
-                nav.classList.add('active');
+            // Firmware: yalnızca bağlantı yokken görünür
+            nav.style.display = connected ? 'none' : '';
+            if (!connected) {
+                nav.style.opacity = '1';
+                nav.style.pointerEvents = 'auto';
+                nav.style.cursor = 'pointer';
+                if (navPage === currentPage) nav.classList.add('active');
+                else nav.classList.remove('active');
+            } else {
+                nav.classList.remove('active');
             }
         } else {
-            nav.classList.remove('active');
-            nav.style.opacity = '0.5';
-            nav.style.pointerEvents = 'none';
-            nav.style.cursor = 'not-allowed';
+            // Diğer sekmeler: yalnızca bağlıyken görünür
+            nav.style.display = connected ? '' : 'none';
+            if (connected) {
+                nav.style.opacity = '1';
+                nav.style.pointerEvents = 'auto';
+                nav.style.cursor = 'pointer';
+                if (navPage === currentPage) nav.classList.add('active');
+            } else {
+                nav.classList.remove('active');
+            }
         }
     });
 
-    // Sayfa görünürlüğü: Firmware sayfası bağlantısız da görünür
+    // Sayfa görünürlüğü
     document.querySelectorAll('.page').forEach(page => {
         if (page.id === 'firmware') {
-            // Firmware sayfası bağlantıdan bağımsız
-            if (page.classList.contains('active')) {
+            // Firmware sayfası: bağlantı yokken ve aktifken görünür
+            if (!connected && page.classList.contains('active')) {
                 page.style.removeProperty('display');
                 page.style.display = 'block';
             } else {
@@ -426,9 +440,6 @@ function updateConnectionStatus() {
         if (typeof updateThrottle === 'function') updateThrottle(1000);
         if (typeof updateSafetyWarning === 'function') updateSafetyWarning();
     }
-
-    // Firmware sayfası bağlantı durumuna duyarlı
-    if (typeof updateFirmwarePageState === 'function') updateFirmwarePageState();
 }
 
 // === İLK YÜKLEME ===
@@ -441,8 +452,8 @@ function initPageManagement() {
     setupSaveButtonListeners();
     updateConnectionStatus();
     
-    // Varsayılan sayfa
-    changePage('calibration');
+    // Varsayılan sayfa: Başlangıçta bağlantı olmadığından firmware'de başla
+    changePage('firmware');
 }
 
 
