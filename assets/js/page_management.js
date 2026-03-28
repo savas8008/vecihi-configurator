@@ -37,6 +37,11 @@ function changePage(targetPage) {
     if (isConnected) {
         managePageStreams(targetPage);
     }
+
+    // 3. Firmware sayfası bağlantısız da çalışır
+    if (targetPage === 'firmware') {
+        if (typeof initFirmwarePage === 'function') initFirmwarePage();
+    }
 }
 
 /**
@@ -45,6 +50,9 @@ function changePage(targetPage) {
  */
 function managePageStreams(page) {
     log(`Yönlendiriliyor: ${page}...`, 'info');
+
+    // Firmware sayfası için komut gönderme — sadece UI güncelle
+    if (page === 'firmware') return;
 
     // A) Tüm stream'leri durdur
     stopAllStreams();
@@ -127,6 +135,11 @@ function startPageSpecificStream(page) {
         case 'waypoint':
             log('Bağlam: Waypoint -> Harita başlatılıyor', 'info');
             if (typeof initWaypointPage === 'function') initWaypointPage();
+            break;
+
+        case 'firmware':
+            log('Bağlam: Firmware -> Versiyon bilgisi yükleniyor', 'info');
+            if (typeof initFirmwarePage === 'function') initFirmwarePage();
             break;
 
         default:
@@ -326,15 +339,13 @@ function updateConnectionStatus() {
     const btnDisconnect = el('btnDisconnect');
     if (btnDisconnect) btnDisconnect.classList.toggle('d-none', !connected);
     
-    // Connection Prompt Yönetimi (ZORLA GÖSTER/GİZLE)
+    // Connection Prompt: Firmware sayfasındayken veya bağlıyken gizle
     const prompt = el('connectionPrompt');
     if (prompt) {
-        if (connected) {
-            // Bağlıysa: GİZLE
+        if (connected || currentPage === 'firmware') {
             prompt.classList.add('d-none');
             prompt.style.setProperty('display', 'none', 'important');
         } else {
-            // Bağlı değilse: GÖSTER
             prompt.classList.remove('d-none');
             prompt.style.setProperty('display', 'flex', 'important');
         }
@@ -349,13 +360,23 @@ function updateConnectionStatus() {
     const connStatus = el('connectionStatus');
     if (connStatus) connStatus.textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
 
-    // Navigasyon menüsünü yönet (Bağlantı yoksa devre dışı bırak)
+    // Navigasyon menüsü: Firmware sekmesi her zaman erişilebilir
     document.querySelectorAll('.nav-link').forEach(nav => {
+        const navPage = nav.getAttribute('data-page');
+        // Firmware sekmesi bağlantıdan bağımsız çalışır
+        if (navPage === 'firmware') {
+            nav.style.opacity = '1';
+            nav.style.pointerEvents = 'auto';
+            nav.style.cursor = 'pointer';
+            if (navPage === currentPage) nav.classList.add('active');
+            else nav.classList.remove('active');
+            return;
+        }
         if (connected) {
             nav.style.opacity = '1';
             nav.style.pointerEvents = 'auto';
             nav.style.cursor = 'pointer';
-            if (nav.getAttribute('data-page') === currentPage) {
+            if (navPage === currentPage) {
                 nav.classList.add('active');
             }
         } else {
@@ -366,11 +387,21 @@ function updateConnectionStatus() {
         }
     });
 
-    // Sayfaların görünürlüğünü ayarla (ZORLA GİZLE)
+    // Sayfa görünürlüğü: Firmware sayfası bağlantısız da görünür
     document.querySelectorAll('.page').forEach(page => {
+        if (page.id === 'firmware') {
+            // Firmware sayfası bağlantıdan bağımsız
+            if (page.classList.contains('active')) {
+                page.style.removeProperty('display');
+                page.style.display = 'block';
+            } else {
+                page.style.display = 'none';
+            }
+            return;
+        }
         if (connected) {
             if (page.classList.contains('active')) {
-                page.style.removeProperty('display'); // Varsa !important temizle
+                page.style.removeProperty('display');
                 page.style.display = 'block';
             } else {
                 page.style.display = 'none';

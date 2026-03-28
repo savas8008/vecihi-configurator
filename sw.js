@@ -4,7 +4,7 @@
  * Web Serial API çalışmak için HTTPS veya localhost gerektirir.
  */
 
-const CACHE_NAME = 'vecihi-v1';
+const CACHE_NAME = 'vecihi-v2';
 
 // Önbelleğe alınacak statik dosyalar
 const STATIC_ASSETS = [
@@ -31,6 +31,7 @@ const STATIC_ASSETS = [
   './assets/js/waypoint.js',
   './assets/js/outputs.js',
   './assets/js/outputs_page.js',
+  './assets/js/firmware.js',
 ];
 
 // Install: Statik varlıkları önbelleğe al
