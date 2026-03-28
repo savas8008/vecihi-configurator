@@ -2,3 +2,2730 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vecihi Configurator</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="ESP32 tabanlı uçuş kontrolcüsü için profesyonel yapılandırma aracı">
+    <meta name="theme-color" content="#38bdf8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vecihi">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="assets/js/aircraft_model.js"></script>
+<script src="assets/js/serial_communication.js"></script>
+<script src="assets/js/logger.js"></script>
+<script src="assets/js/sensors.js"></script>
+<script src="assets/js/transmitter.js"></script>
+<script src="assets/js/calibration.js"></script>
+<script src="assets/js/osd.js"></script>
+<script src="assets/js/pid.js"></script>
+<script src="assets/js/advanced_page.js"></script>
+<script src="assets/js/sensor_alignment.js"></script>
+
+<script src="assets/js/page_management.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/flight_modes.js"></script>
+<script src="assets/js/outputs_page.js"></script>
+<script src="assets/js/settings_backup.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css"> 
+    <style>
+    /* OSD ve diÄŸer Ã¶zel stiller */
+    /* Kısayollar accordion dark theme uyumu */
+    #shortcutsAccordion .accordion-item {
+        border-left: none;
+        border-right: none;
+        border-top: none;
+    }
+    #shortcutsAccordion .accordion-button::after {
+        filter: invert(1) brightness(0.7);
+    }
+    #shortcutsAccordion .accordion-button:not(.collapsed) {
+        box-shadow: none;
+        color: #fff;
+    }
+    #shortcutsAccordion .accordion-button:focus {
+        box-shadow: none;
+    }
+
+    #prev_horizon {
+        width: 32% !important;
+        text-align: center;
+    }
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    .osd-monitor-frame {
+        border-color: #1a1a1a !important;
+        background: #000;
+    }
+    .osd-element-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    .osd-element-list::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 10px;
+    }
+    #osd-preview-screen {
+        background: yellow;
+        background-image: linear-gradient(to bottom, #1a2a3a 0%, #0c0c0c 50%, #2a1a0a 100%);
+        border: 5px solid #222 !important;
+        position: relative;
+    }
+    .osd-draggable {
+        color: #e0e0e0;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        text-shadow: 1px 1px 0px #000;
+        font-weight: bold;
+        font-size: 10px;
+        z-index: 5;
+        white-space: nowrap;
+    }
+    .osd-crosshair {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        color: yellow;
+        font-size: 24px;
+        pointer-events: none;
+    }
+    </style>
+
+</head>
+<body>
+    
+    <header class="dashboard-header py-3 panel2" >
+      <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h3 mb-0 gradient-text">
+                        <i class="bi bi-airplane"></i> Vecihi Configurator
+                    </h1>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex align-items-center justify-content-md-end gap-3">
+                        <div class="connection-status" id="connectionStatusBox">
+                            <span class="status-indicator status-off" id="statusIndicator"></span>
+                            <span id="connectionStatus">Bağlantı Yok</span>
+                        </div>
+                        <button class="btn btn-connect" id="btnConnect">
+                            <i class="bi bi-usb-plug me-1"></i> Porta Bağlan
+                        </button>
+                        <button class="btn btn-disconnect d-none" id="btnDisconnect">
+                            <i class="bi bi-usb-plug-fill me-1"></i> Bağlantıyı Kes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid py-3 ">
+        <div class="row">
+            <div class="col-lg-2 col-md-3 mb-3 panel2">
+                <div class="sidebar rounded p-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="sensors"><i class="bi bi-radar me-2"></i> Sensörler</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> Kalibrasyon</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="outputs"><i class="bi bi-plug me-2"></i> Konfigürasyon</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="transmitter"><i class="bi bi-controller me-2"></i> Kumanda</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i> Uçuş Modları</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="pid"><i class="bi bi-graph-up me-2"></i> PID</a></li>
+						<li class="nav-item">
+
+</li>
+						<li class="nav-item">
+    <a class="nav-link" href="#" data-page="advanced">
+        <i class="bi bi-sliders me-2"></i> Tercihler
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="#" data-page="osd">
+        <i class="bi bi-aspect-ratio me-2"></i> OSD
+    </a>
+</li>
+                        <li class="nav-item">
+    <a class="nav-link" href="#" data-page="waypoint">
+        <i class="bi bi-map me-2"></i> Waypoint
+    </a>
+</li>
+                        <li class="nav-item">
+    <a class="nav-link" href="#" data-page="firmware">
+        <i class="bi bi-cpu me-2"></i> Firmware
+    </a>
+</li>
+
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> Loglar</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-10 col-md-9">
+                <div id="connectionPrompt" class="connection-prompt">
+                    <div class="panel text-center">
+                        <i class="bi bi-usb-symbol display-1 text-muted mb-4 gradient-text mb-3"></i>
+                        <h2 class="gradient-text mb-3">Seri Port Bağlantısı Gerekli</h2>
+                        <p class="gradient-text mb-3">Uygulamayı kullanmak için lütfen cihazınızı seri porta bağlayın.</p>
+                        <button class="btn btn-connect btn-lg" id="btnConnectPrompt">
+                            <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
+                        </button>
+                    </div>
+                </div>
+<!-- ================== SENSORS PAGE ================== -->
+<div id="sensors" class="page">
+  <div class="row g-3">
+
+    <!-- SOL: 3D + HUD -->
+    <div class="col-lg-6">
+      <div class="panel3 p-3">
+        <div class="d-flex align-items-center mb-2 baslik">
+          <div class="fw-semibold">Kalibrasyon Görünümü</div>
+        </div>
+
+        <div id="3d-canvas-container"
+             style="width:100%; height:320px; background:transparent; border-radius:12px; position:relative; overflow:hidden; min-height:240px;">
+        </div>
+
+        <div class="row justify-content-center mt-3 mb-0">
+          <div class="col-12">
+            <div class="panel3 euler-panel mb-0">
+
+              <div class="arm-section">
+                <span id="arm-status-text" class="arm-status status-disarmed">DISARMED</span>
+              </div>
+
+              <div class="hud-divider"></div>
+
+              <div class="angles-grid">
+                <div class="angle-box">
+                  <span class="angle-label">ROLL</span>
+                  <strong id="euler-roll" class="angle-val">0.0°</strong>
+                </div>
+                <div class="angle-box">
+                  <span class="angle-label">PITCH</span>
+                  <strong id="euler-pitch" class="angle-val">0.0°</strong>
+                </div>
+                <div class="angle-box">
+                  <span class="angle-label">YAW</span>
+                  <strong id="euler-yaw" class="angle-val">0.0°</strong>
+                </div>
+              </div>
+
+              <div class="hud-divider"></div>
+
+              <div class="mode-section">
+                <span class="mode-label">UÇUŞ MODU</span>
+                <strong id="flight-mode-display" class="mode-val">--</strong>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SAĞ: Canlı Sensör Verileri + Harita -->
+    <div class="col-lg-6">
+      <div class="panel">
+        <h2 class="panel-title"><i class="bi bi-radar"></i> Canlı Sensör Verileri</h2>
+
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="panel3 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="h5 text-warning mb-0"><i class="bi bi-geo-alt-fill"></i> GPS Durumu</h3>
+                <span id="gps-fix-badge" class="badge bg-danger">NO FIX</span>
+              </div>
+
+              <div class="row g-3 text-center">
+                <div class="col-6">
+                  <div class="p-2 border border-secondary rounded">
+                    <small class="text-muted d-block">UYDU SAYISI</small>
+                    <span id="gps-sats" class="fs-4 fw-bold text-white">0</span>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-2 border border-secondary rounded">
+                    <small class="text-muted d-block">HIZ (km/h)</small>
+                    <span id="gps-speed" class="fs-4 fw-bold text-info">0</span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="input-group input-group-sm mb-1">
+                    <span class="input-group-text bg-dark text-muted border-secondary">ENLEM</span>
+                    <input type="text" class="form-control bg-dark text-white border-secondary" id="gps-lat" readonly value="--">
+                  </div>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-dark text-muted border-secondary">BOYLAM</span>
+                    <input type="text" class="form-control bg-dark text-white border-secondary" id="gps-lon" readonly value="--">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="panel3 h-100">
+              <h3 class="h5 text-info mb-3"><i class="bi bi-cloud-arrow-up"></i> İrtifa &amp; Pusula</h3>
+
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="text-center p-3 border border-secondary rounded h-100">
+                    <i class="bi bi-arrow-up-circle fs-1 text-primary mb-2"></i>
+                    <div class="text-muted small">BARO İRTİFA</div>
+                    <div class="fs-3 fw-bold"><span id="sens-alt">0.0</span> m</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="text-center p-3 border border-secondary rounded h-100">
+                    <i class="bi bi-speedometer2 fs-1 text-success mb-2"></i>
+                    <div class="text-muted small">TIRMANIŞ (Vario)</div>
+                    <div class="fs-3 fw-bold"><span id="sens-vario">0.0</span> m/s</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Konum Haritası - Sensörler panelinin altında -->
+        <div class="panel3 mt-2">
+          <h3 class="h5 mb-1"><i class="bi bi-map"></i> Konum</h3>
+          <div id="map-container" style="width:100%; height:240px; border-radius:4px; border:1px solid #444; z-index:1;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EN ALT: MCU & Sistem (tam genişlik) -->
+    <div class="col-12">
+      <div class="panel3">
+        <h3 class="h5 text-danger mb-3"><i class="bi bi-cpu"></i> MCU &amp; Sistem Durumu</h3>
+        <div class="row g-3 text-center">
+          <div class="col-md-3 col-6">
+            <div class="p-2 border border-secondary rounded">
+              <small class="text-muted d-block">CORE 1 (LOOP)</small>
+              <span id="sys-hz" class="fs-4 fw-bold text-white">0</span> <small class="text-muted">Hz</small>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="p-2 border border-secondary rounded">
+              <small class="text-muted d-block">CORE 0 (SYS)</small>
+              <span id="sys-hz0" class="fs-4 fw-bold text-info">0</span> <small class="text-muted">Hz</small>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="p-2 border border-secondary rounded">
+              <small class="text-muted d-block">SICAKLIK</small>
+              <span id="sys-temp" class="fs-4 fw-bold text-warning">--</span> <small class="text-muted">°C</small>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="p-2 border border-secondary rounded">
+              <small class="text-muted d-block">BOŞ RAM</small>
+              <span id="sys-ram" class="fs-4 fw-bold text-info">--</span> <small class="text-muted">KB</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================== CALIBRATION PAGE ================== -->
+<div id="calibration" class="page">
+
+  <!-- Satır 1: 6 Yüz Adımları (geniş) + Mevcut Değerler -->
+  <div class="row g-3 mb-3">
+
+    <div class="col-lg-8">
+      <div class="panel3 p-2">
+        <div class="t-baslik mb-1">Pozisyon Kalibrasyonu (6 Yüz)</div>
+        <div class="t-aciklama mb-2">Her adımda uçağı konumlandırıp tıklayın</div>
+
+        <div class="cal-steps-container cal-steps-6 mb-0" style="background-color:rgb(242, 244, 242) ;" >
+
+          <div class="cal-step panel4"  data-target="#btn-pose-zp" data-step="1">
+            <div class="cal-step-body">
+              <i class="bi bi-record-circle cal-step-icon"></i>
+              <div class="cal-step-values">
+                <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
+              </div>
+            </div>
+            <div class="cal-step-footer" ><span class="t-aciklama step-label">Düz (tekerlekler aşağıda)</span></div>
+            <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+
+          <div class="cal-step panel4" data-target="#btn-pose-zn" data-step="2">
+            <div class="cal-step-body">
+              <i class="bi bi-record-circle-fill cal-step-icon"></i>
+              <div class="cal-step-values">
+                <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
+              </div>
+            </div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Ters (tekerlekler havada)</span></div>
+            <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+
+          <div class="cal-step panel4" data-target="#btn-pose-xp" data-step="3">
+            <div class="cal-step-body">
+              <i class="bi bi-arrow-up cal-step-icon"></i>
+              <div class="cal-step-values">
+                <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
+              </div>
+            </div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Burun yukarı (dik)</span></div>
+            <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+
+          <div class="cal-step panel4" data-target="#btn-pose-xn" data-step="4">
+            <div class="cal-step-body">
+              <i class="bi bi-arrow-down cal-step-icon"></i>
+              <div class="cal-step-values">
+                <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
+              </div>
+            </div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Burun aşağı (dik)</span></div>
+            <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+
+          <div class="cal-step panel4" data-target="#btn-pose-yp" data-step="5">
+            <div class="cal-step-body">
+              <i class="bi bi-arrow-right cal-step-icon"></i>
+              <div class="cal-step-values">
+                <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
+              </div>
+            </div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Sol kanat yukarı</span></div>
+            <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+
+          <div class="cal-step panel4" data-target="#btn-pose-yn" data-step="6">
+            <div class="cal-step-body">
+              <i class="bi bi-arrow-left cal-step-icon"></i>
+              <div class="cal-step-values">
+                <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
+              </div>
+            </div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Sağ kanat yukarı</span></div>
+            <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mevcut Kalibrasyon Değerleri -->
+    <div class="col-lg-4">
+      <div class="panel3 p-3 h-100">
+        <div class="t-alt-baslik mb-2">Mevcut Kalibrasyon Değerleri</div>
+        <div class="row g-2">
+          <div class="col-6">
+            <div class="t-alt-baslik">ACC Bias</div>
+            <div id="cal_acc_bias" class="t-deger mono">x: --  y: --  z: --</div>
+          </div>
+          <div class="col-6">
+            <div class="t-alt-baslik">ACC Scale</div>
+            <div id="cal_acc_scale" class="t-deger mono">x: --  y: --  z: --</div>
+          </div>
+          <div class="col-6">
+            <div class="t-alt-baslik">GYRO Bias</div>
+            <div id="cal_gyro_bias" class="t-deger mono">x: --  y: --  z: --</div>
+          </div>
+          <div class="col-6">
+            <div class="t-alt-baslik">Level Trim</div>
+            <div id="cal_level_trim" class="t-deger mono">pitch: --  roll: --</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Satır 2: Gyro + Hard Kalibrasyon yan yana -->
+  <div class="row g-3 mb-3">
+
+    <div class="col-lg-6">
+      <div class="panel3 p-2">
+        <div class="t-alt-baslik mb-2">Gyro Kalibrasyonu</div>
+        <div class="cal-steps-container mb-0">
+          <div class="cal-step panel4" data-target="#btn-pose-gy">
+            <div class="cal-step-body">
+              <i class="bi bi-speedometer cal-step-icon"></i>
+              <div class="cal-step-values" style="display:none;">
+                <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
+              </div>
+            </div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Cihazı tamamen hareketsiz tutun ve tıklayın.</span></div>
+            <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="panel3 p-2">
+        <div class="t-alt-baslik mb-2">Hard Kalibrasyon (Level)</div>
+        <div class="cal-steps-container mb-0">
+          <div class="cal-step panel4" data-target="#btn-pose-level">
+            <div class="cal-step-body">
+              <i class="bi bi-bullseye cal-step-icon"></i>
+              <div class="cal-step-values" style="display:none;">
+                <span class="cal-val-ax">TRIM</span>
+                <span class="cal-val-ay">PITCH</span>
+                <span class="cal-val-az">ROLL</span>
+              </div>
+            </div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label">Cihazı düz konuma alıp 2sn bekleyin, sonra tıklayın.</span></div>
+            <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sensör Yönelimi -->
+  <div class="panel3 p-3 mb-3">
+    <div class="t-baslik mb-1">Sensör Yönelimi (Board Alignment)</div>
+    <div class="t-aciklama mb-2">Uçuş kontrol kartının gövde içindeki montaj yönünü seçin. Değiştirildiğinde kalibrasyon sıfırlanır.</div>
+    <div class="d-flex align-items-center gap-2">
+      <select class="form-select form-select-sm" id="sensorAlignSelect" style="max-width:220px;" onchange="selectAlignOption(parseInt(this.value))">
+        <!-- JS tarafından doldurulur -->
+      </select>
+      <button class="btn btn-warning btn-md" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
+        <i class="bi bi-save me-1"></i> Yönelimi Kaydet
+      </button>
+    </div>
+  </div>
+
+  <!-- Butonlar (sayfa altı) -->
+  <div class="d-flex gap-2">
+    <button type="button" class="btn btn-warning btn-md" id="btnSaveCalibration">
+      <i class="bi bi-save2 me-1"></i> Kalibrasyonu Kaydet
+    </button>
+    <button type="button" class="btn btn-danger btn-md" onclick="sendQuickCommand('CALIB_RESET')">
+      <i class="bi bi-arrow-counterclockwise me-1"></i> Kalibrasyonu Sıfırla
+    </button>
+  </div>
+
+</div>
+
+<div id="outputs" class="page">
+  <!-- 1) PANEL: Uçak Tipi Seçimi -->
+  <div class="panel mb-4">
+    <h2 class="panel-title"><i class="bi bi-airplane"></i> Uçak Tipi Seçimi</h2>
+
+    <div class="row g-3">
+      <div class="col-6 col-lg-3">
+        <div class="panel4">
+          <div class="aircraft-card active" data-aircraft-type="v-tail">
+            <div class="mixer-title">V-TAIL</div>
+            <div class="mixer-description">V şeklinde kuyruk yapısı</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="panel4">
+          <div class="aircraft-card" data-aircraft-type="t-tail">
+            <div class="mixer-title">T-TAIL</div>
+            <div class="mixer-description">T şeklinde kuyruk yapısı</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="panel4">
+          <div class="aircraft-card" data-aircraft-type="no-ruder">
+            <div class="mixer-title">RUDERSIZ</div>
+            <div class="mixer-description">Ruder olmadan</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="panel4">
+          <div class="aircraft-card" data-aircraft-type="delta">
+            <div class="mixer-title">DELTA</div>
+            <div class="mixer-description">Delta kanat</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2) PANEL: Mikser Kazançları -->
+  <div class="panel mb-4">
+    <h2 class="panel-title"><i class="bi bi-sliders"></i> Mikser Kazançları</h2>
+    <p class="text-muted small mb-3">
+      Her eksen için mikser oranını ayarlayın. <strong>100 = normal</strong>, <strong>-100 = ters</strong>, <strong>50 = %50 güç</strong>.
+      Yaw tersleniyorsa Yaw değerini negatif yapın (örn: -100).
+    </p>
+    <div class="row g-3">
+      <div class="col-6 col-lg-3">
+        <div class="panel4 p-3 text-center">
+          <div class="output-title mb-2">ROLL</div>
+          <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel4 p-3 text-center">
+          <div class="output-title mb-2">PITCH</div>
+          <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel4 p-3 text-center">
+          <div class="output-title mb-2">YAW</div>
+          <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="panel4 p-3 text-center">
+          <div class="output-title mb-2">THROTTLE</div>
+          <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
+          <small class="text-muted">-200 ... 200</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3) PANEL: Motor & Servo Çıkış Pinleri -->
+  <div class="panel mb-2">
+    <h2 class="panel-title"><i class="bi bi-plug"></i> Motor & Servo Çıkış Pinleri</h2>
+    <!-- 7 kutu yan yana: Motor1, Motor2, Servo1-4, Motor Kontrol -->
+    <div class="d-flex gap-1 align-items-stretch" style="flex-wrap:nowrap;">
+
+      <!-- Motor 1 -->
+      <div class="panel3 output-box" style="flex:1;min-width:0;">
+        <div class="output-display h-100">
+          <div class="output-title" id="motor1Title">MOTOR 1</div>
+          <div class="output-value" id="output1">1000</div>
+          <select class="form-select pin-select mt-1" id="motor1Pin"></select>
+        </div>
+      </div>
+
+      <!-- Motor 2 -->
+      <div class="panel3 output-box" style="flex:1;min-width:0;">
+        <div class="output-display h-100">
+          <div class="output-title" id="motor2Title">MOTOR 2</div>
+          <div class="output-value" id="output2">1000</div>
+          <select class="form-select pin-select mt-1" id="motor2Pin"></select>
+        </div>
+      </div>
+
+      <!-- Servo 1 -->
+      <div class="panel3 output-box" id="servo1Card" style="flex:1;min-width:0;">
+        <div class="output-display h-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="output-title" id="servo1Title">SERVO 1</div>
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input" type="checkbox" id="revServo1">
+              <label class="form-check-label small" for="revServo1">Rev</label>
+            </div>
+          </div>
+          <div class="output-value" id="servo1">1500</div>
+          <select class="form-select pin-select mt-1" id="servo1Pin"></select>
+          <div class="servo-controls">
+            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo1Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo1Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo1Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Servo 2 -->
+      <div class="panel3 output-box" id="servo2Card" style="flex:1;min-width:0;">
+        <div class="output-display h-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="output-title" id="servo2Title">SERVO 2</div>
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input" type="checkbox" id="revServo2">
+              <label class="form-check-label small" for="revServo2">Rev</label>
+            </div>
+          </div>
+          <div class="output-value" id="servo2">1500</div>
+          <select class="form-select pin-select mt-1" id="servo2Pin"></select>
+          <div class="servo-controls">
+            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo2Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo2Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo2Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Servo 3 -->
+      <div class="panel3 output-box" id="servo3Card" style="flex:1;min-width:0;">
+        <div class="output-display h-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="output-title" id="servo3Title">SERVO 3</div>
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input" type="checkbox" id="revServo3">
+              <label class="form-check-label small" for="revServo3">Rev</label>
+            </div>
+          </div>
+          <div class="output-value" id="servo3">1500</div>
+          <select class="form-select pin-select mt-1" id="servo3Pin"></select>
+          <div class="servo-controls">
+            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo3Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo3Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo3Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Servo 4 -->
+      <div class="panel3 output-box" id="servo4Card" style="flex:1;min-width:0;">
+        <div class="output-display h-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="output-title" id="servo4Title">SERVO 4</div>
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input" type="checkbox" id="revServo4">
+              <label class="form-check-label small" for="revServo4">Rev</label>
+            </div>
+          </div>
+          <div class="output-value" id="servo4">1500</div>
+          <select class="form-select pin-select mt-1" id="servo4Pin"></select>
+          <div class="servo-controls">
+            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo4Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo4Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo4Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Kutu: Motor Kontrol (Slider) -->
+      <div class="panel3 output-box" style="flex:0.85;min-width:0;">
+        <div class="output-title text-center">MOTOR CTRL</div>
+        <div class="text-center fw-bold output-value" id="throttleValue">1000</div>
+        <div class="d-flex flex-column align-items-center">
+          <input type="range" class="throttle-slider" min="1000" max="2000" value="1000" id="throttleSlider" disabled style="height:120px;">
+          <div class="d-flex justify-content-between w-100"><small>1k</small><small>2k</small></div>
+          <div class="form-check mt-1">
+            <input class="form-check-input" type="checkbox" id="safetyCheck">
+            <label class="form-check-label small" for="safetyCheck">Pervane yok</label>
+          </div>
+          <div class="safety-warning small" id="safetyWarning">⚠️ Onay gerekiyor</div>
+        </div>
+      </div>
+
+    </div><!-- d-flex 7 kutu -->
+  </div>
+
+  <!-- 3) PANEL: AUX Portları -->
+  <div class="panel">
+    <h2 class="panel-title"><i class="bi bi-usb-plug"></i> AUX Portları</h2>
+
+    <!-- 5 kutu yan yana: Alıcı, GPS, OSD, I2C, Voltaj -->
+    <div class="d-flex gap-1 align-items-stretch" style="flex-wrap:nowrap;">
+
+      <div class="panel3" style="flex:1;min-width:0;">
+        <div class="output-title mb-1">ALICI (RX)</div>
+        <label class="port-label">TX</label>
+        <select class="form-select pin-select mb-1" id="rxTxPin"></select>
+        <label class="port-label">RX</label>
+        <select class="form-select pin-select" id="rxRxPin"></select>
+      </div>
+
+      <div class="panel3" style="flex:1;min-width:0;">
+        <div class="output-title mb-1">GPS</div>
+        <label class="port-label">TX</label>
+        <select class="form-select pin-select mb-1" id="gpsTxPin"></select>
+        <label class="port-label">RX</label>
+        <select class="form-select pin-select" id="gpsRxPin"></select>
+      </div>
+
+      <div class="panel3" style="flex:1;min-width:0;">
+        <div class="output-title mb-1">OSD</div>
+        <label class="port-label">TX</label>
+        <select class="form-select pin-select mb-1" id="osdTxPin"></select>
+        <label class="port-label">RX</label>
+        <select class="form-select pin-select" id="osdRxPin"></select>
+      </div>
+
+      <div class="panel3" style="flex:1;min-width:0;">
+        <div class="output-title mb-1">I2C</div>
+        <label class="port-label">SCL</label>
+        <select class="form-select pin-select mb-1" id="i2cSclPin"></select>
+        <label class="port-label">SDA</label>
+        <select class="form-select pin-select" id="i2cSdaPin"></select>
+      </div>
+
+      <div class="panel3" style="flex:1;min-width:0;">
+        <div class="output-title mb-1">VOLTAJ ADC</div>
+        <label class="port-label">ADC Pin</label>
+        <select class="form-select pin-select mb-1" id="voltageAdcPin"></select>
+        <small class="text-muted">Batarya voltajı</small>
+      </div>
+
+    </div><!-- d-flex 5 kutu -->
+
+    <div class="mt-3">
+      <button type="button" class="btn btn-warning shadow-sm" id="btnSaveOutputs">
+        <i class="bi bi-save2 me-2"></i> Kaydet
+      </button>
+    </div>
+  </div>
+</div>
+
+ <div id="transmitter" class="page">
+    <div class="panel">
+        <h2 class="panel-title"><i class="bi bi-controller"></i> Kumanda ve Alıcı Ayarları</h2>
+        
+        <div class="row">
+            <div class="col-md-5">
+                <div class="panel3 h-100">
+                    <h3 class="h5 mb-3 text-info"><i class="bi bi-sliders"></i> Konfigürasyon</h3>
+                    
+                    <div class="mb-4">
+                        <label class="form-label text-muted small">HABERLEŞME PROTOKOLÜ</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-white"><i class="bi bi-broadcast"></i></span>
+                            <select class="form-select" id="protocolSelect">
+                                <option value="sbus">SBUS / IBUS</option>
+                                <option value="elrs">CRSF (ELRS / Crossfire)</option>
+                                <option value="mavlink_elrs">MAVLink</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-muted small">KANAL SIRALAMASI (CHANNEL MAP)</label>
+                        <div class="p-3 border border-secondary rounded bg-dark bg-opacity-25">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Roll (Aileron)</label>
+                                    <select class="form-select form-select-sm" id="chRoll">
+                                        <option value="1">CH 1</option>
+                                        <option value="2">CH 2</option>
+                                        <option value="3">CH 3</option>
+                                        <option value="4">CH 4</option>
+                                        <option value="5">CH 5</option>
+                                        <option value="6">CH 6</option>
+                                        <option value="7">CH 7</option>
+                                        <option value="8">CH 8</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Pitch (Elevator)</label>
+                                    <select class="form-select form-select-sm" id="chPitch">
+                                        <option value="1">CH 1</option>
+                                        <option value="2">CH 2</option>
+                                        <option value="3">CH 3</option>
+                                        <option value="4">CH 4</option>
+                                        <option value="5">CH 5</option>
+                                        <option value="6">CH 6</option>
+                                        <option value="7">CH 7</option>
+                                        <option value="8">CH 8</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Throttle (Gaz)</label>
+                                    <select class="form-select form-select-sm" id="chThrottle">
+                                        <option value="1">CH 1</option>
+                                        <option value="2">CH 2</option>
+                                        <option value="3">CH 3</option>
+                                        <option value="4">CH 4</option>
+                                        <option value="5">CH 5</option>
+                                        <option value="6">CH 6</option>
+                                        <option value="7">CH 7</option>
+                                        <option value="8">CH 8</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Yaw (Rudder)</label>
+                                    <select class="form-select form-select-sm" id="chYaw">
+                                        <option value="1">CH 1</option>
+                                        <option value="2">CH 2</option>
+                                        <option value="3">CH 3</option>
+                                        <option value="4">CH 4</option>
+                                        <option value="5">CH 5</option>
+                                        <option value="6">CH 6</option>
+                                        <option value="7">CH 7</option>
+                                        <option value="8">CH 8</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted" style="font-size: 0.75rem;">Her eksene istediğiniz fiziksel alıcı kanalını atayın</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">KANAL TERSLEME (REVERSE)</label>
+                        <div class="p-3 border border-secondary rounded bg-dark bg-opacity-25">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="revRoll">
+                                        <label class="form-check-label" for="revRoll">Roll (Aileron)</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="revPitch">
+                                        <label class="form-check-label" for="revPitch">Pitch (Elevator)</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="revYaw">
+                                        <label class="form-check-label" for="revYaw">Yaw (Rudder)</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="revThrottle">
+                                        <label class="form-check-label" for="revThrottle">Throttle (Gaz)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+<button type="button" class="btn btn-warning shadow-sm" id="btnSaveTransmitter">
+    <i class="bi bi-save2 me-2"></i> Kumanda Ayarlarını Kaydet
+</button>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="panel3 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5 mb-0 text-success"><i class="bi bi-bar-chart"></i> Canlı Kanal Değerleri</h3>
+              
+                    </div>
+                    
+                    <div id="transmitterChannelValues" class="pe-2" style="max-height: 500px; overflow-y: auto;">
+                        <div class="text-center text-muted py-5">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p>Veri bekleniyor... Bağlantıyı kontrol edin.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+				
+          <div id="modes" class="page">
+    <div class="panel">
+        <h2 class="panel-title"><i class="bi bi-gear"></i> Uçuş Modları</h2>
+        <div class="row wrapper" id="modesWrapper"> 
+        </div>
+    </div>
+	<button type="button" class="btn btn-warning shadow-sm" id="btnSaveModes">
+    <i class="bi bi-save2 me-2"></i> Modları Kaydet
+</button>
+</div>
+
+      <div id="pid" class="page">
+    <div class="panel">
+        <h2 class="panel-title"><i class="bi bi-graph-up"></i> PID Ayarları</h2>
+        <div class="row">
+            <div class="col-md-4 panel4">
+                <div class="pid-control">
+                    <div class="pid-axis">ROLL</div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">P</span><span class="pid-value" id="rollPValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="2" step="0.01" value="0.08" id="rollPSlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">I</span><span class="pid-value" id="rollIValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="1" step="0.01" value="0.04" id="rollISlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">I Limit</span><span class="pid-value" id="rollILimitValue">0</span></div><input type="range" class="pid-slider" min="0" max="200" step="1" value="50" id="rollILimitSlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">FF</span><span class="pid-value" id="rollFFValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="5" step="0.01" value="0.0" id="rollFFSlider"></div>
+                </div>
+            </div>
+            <div class="col-md-4 panel4">
+                <div class="pid-control">
+                    <div class="pid-axis">PITCH</div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">P</span><span class="pid-value" id="pitchPValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="2" step="0.01" value="0.08" id="pitchPSlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">I</span><span class="pid-value" id="pitchIValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="1" step="0.01" value="0.04" id="pitchISlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">I Limit</span><span class="pid-value" id="pitchILimitValue">0</span></div><input type="range" class="pid-slider" min="0" max="200" step="1" value="50" id="pitchILimitSlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">FF</span><span class="pid-value" id="pitchFFValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="5" step="0.01" value="0.0" id="pitchFFSlider"></div>
+                </div>
+            </div>
+            <div class="col-md-4 panel4">
+                <div class="pid-control">
+                    <div class="pid-axis">YAW</div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">P</span><span class="pid-value" id="yawPValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="2" step="0.01" value="0.15" id="yawPSlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">I</span><span class="pid-value" id="yawIValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="1" step="0.01" value="0.05" id="yawISlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">I Limit</span><span class="pid-value" id="yawILimitValue">0</span></div><input type="range" class="pid-slider" min="0" max="200" step="1" value="50" id="yawILimitSlider"></div>
+                    <div class="pid-parameter"><div class="pid-label"><span class="pid-name">FF</span><span class="pid-value" id="yawFFValue">0.00</span></div><input type="range" class="pid-slider" min="0" max="5" step="0.01" value="0.0" id="yawFFSlider"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4 panel4">
+                <div class="pid-control">
+                    <div class="pid-axis text-info">ROLL MAX RATE</div>
+                    <div class="pid-parameter">
+                        <div class="pid-label"><span class="pid-name">Max Rate</span><span class="pid-value" id="rollMaxRateValue">200</span><span class="pid-unit ms-1">°/s</span></div>
+                        <input type="range" class="pid-slider" min="50" max="720" step="1" value="200" id="rollMaxRateSlider">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 panel4">
+                <div class="pid-control">
+                    <div class="pid-axis text-info">PITCH MAX RATE</div>
+                    <div class="pid-parameter">
+                        <div class="pid-label"><span class="pid-name">Max Rate</span><span class="pid-value" id="pitchMaxRateValue">200</span><span class="pid-unit ms-1">°/s</span></div>
+                        <input type="range" class="pid-slider" min="50" max="720" step="1" value="200" id="pitchMaxRateSlider">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 panel4">
+                <div class="pid-control">
+                    <div class="pid-axis text-info">YAW MAX RATE</div>
+                    <div class="pid-parameter">
+                        <div class="pid-label"><span class="pid-name">Max Rate</span><span class="pid-value" id="yawMaxRateValue">200</span><span class="pid-unit ms-1">°/s</span></div>
+                        <input type="range" class="pid-slider" min="50" max="720" step="1" value="200" id="yawMaxRateSlider">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      <div class="row mt-4">
+             <div class="col-md-5 panel4">
+                 <div class="pid-control">
+                    <div class="pid-axis text-warning">ANGLE MODE (LEVEL STRENGTH)</div>
+                    <div class="pid-parameter">
+                        <div class="pid-label"><span class="pid-name">Strength (P)</span><span class="pid-value" id="levelPValue"></span></div>
+                        <input type="range" class="pid-slider" min="0" max="20" step="0.5" value="" id="levelPSlider">
+                        <small class="text-muted d-block mt-2">Uçağın kendini düzeltme sertliği.</small>
+                    </div>
+                </div>
+             </div>
+             <div class="col-md-1 ">
+             
+             </div>
+		
+             <div class="col-md-5 panel4" >
+                 <div class="pid-control">
+                    <div class="pid-axis text-warning">TPA FAKTÖRÜ</div>
+                    <div class="pid-parameter">
+                        <div class="pid-label"><span class="pid-name">TPA</span><span class="pid-value" id="tpaValue"></span></div>
+                        <input type="range" class="pid-slider" min="0" max="100" step="1" value="" id="tpaPSlider">
+                        <small class="text-muted d-block mt-2"> throttle veya pitot tüpü varsa hava hızı arttıkça PIFF kazancını yüzde bazında düşürür.</small>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+<button type="button" class="btn btn-warning shadow-sm" id="btnSavePID">
+    <i class="bi bi-save2 me-8"></i> PID Kaydet
+</button>
+            </div>
+        </div>
+    </div>
+    </div>
+   
+	<div id="advanced" class="page">
+    <div class="panel">
+        <h2 class="panel-title"><i class="bi bi-sliders"></i> Tercihler</h2>
+
+        <!-- Tab Menü -->
+        <div class="adv-tabs" id="advTabBar">
+            <button class="adv-tab active" data-tab="adv-tab-1" onclick="switchAdvTab('adv-tab-1',this)">
+                <i class="bi bi-airplane-engines"></i> Uçuş Limitleri
+            </button>
+            <button class="adv-tab" data-tab="adv-tab-2" onclick="switchAdvTab('adv-tab-2',this)">
+                <i class="bi bi-geo-fill"></i> Navigasyon & GPS
+            </button>
+            <button class="adv-tab" data-tab="adv-tab-3" onclick="switchAdvTab('adv-tab-3',this)">
+                <i class="bi bi-arrow-bar-up"></i> İrtifa
+            </button>
+            <button class="adv-tab" data-tab="adv-tab-4" onclick="switchAdvTab('adv-tab-4',this)">
+                <i class="bi bi-cpu"></i> Donanım & Filtreler
+            </button>
+        </div>
+
+        <!-- Tab İçerikleri -->
+        <div class="adv-tab-content">
+
+            <!-- ==================== 1. UÇUŞ LİMİTLERİ & AUTO LAUNCH ==================== -->
+            <div id="adv-tab-1" class="adv-tab-pane active">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-header bg-danger bg-opacity-25 text-danger border-danger">
+                        <h5 class="mb-0"><i class="bi bi-airplane-engines"></i> 1. Uçuş Limitleri & Auto Launch</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Angle Mod Limitleri -->
+                            <div class="col-md-4 border-end border-secondary">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Angle Mod Limitleri</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">Max Roll Açısı (°)</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_ang_lim_roll" min="10" max="80" step="1" value="45">
+                                    </div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">Max Pitch Açısı (°)</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_ang_lim_pitch" min="10" max="60" step="1" value="45">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Otomatik Kalkış -->
+                            <div class="col-md-4 border-end border-secondary">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Otomatik Kalkış (Auto Launch)</h6>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="inp_auto_launch_on_arm" checked>
+                                    <label class="form-check-label small" for="inp_auto_launch_on_arm">Her arm sonrasında otomatik kalkış moduna geç</label>
+                                </div>
+                                <hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        Fırlatma Eşiği (G)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Kalkışı tetiklemek için gereken ivme"></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_launch_acc_threshold" min="1.0" max="5.0" step="0.1" value="2.5">
+                                    </div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">Kalkış Gazı (PWM)</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_launch_throttle" min="1000" max="2000" step="10" value="1700">
+                                    </div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">Auto Launch max süresi (saniye)</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_launch_time"  step="100" value="20000">
+                                    </div>
+                                </div>
+																<hr>
+																                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">Auto Launch max Yüksekliği (metre)</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_launch_altitude" min="0" max="200" step="1" value="50">
+                                    </div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">Kalkış Açısı (°)</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_launch_angle" min="0" max="45" step="1" value="20">
+                                    </div>
+                                </div>
+								<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                       Fırlatma ile motorun çalışması arasındaki süre (ms)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Fırlatma öncesi motor ısınma süresi"></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_launch_spool_time" min="0" max="1000" step="50" value="300">
+                                    </div>
+                                </div>
+								<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        Stick İptal Eşiği (PWM)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Merkezden stick sapması bu değeri aşarsa Auto Launch veya otomatik iniş iptal edilir (pilot devralır)"></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_la_stick_cancel_thr" min="50" max="500" step="10" value="100" title="Merkezden stick sapması bu değeri aşarsa Auto Launch veya otomatik iniş iptal edilir (pilot devralır)">
+                                    </div>
+                                </div>
+								<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        Gaz İptal Eşiği (PWM)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Gaz bu değeri aşarsa otomatik iniş iptal edilir (pilot devralır)"></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_la_thr_cancel_thr" min="1100" max="2000" step="10" value="1150" title="Gaz bu değeri aşarsa otomatik iniş iptal edilir (pilot devralır)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stall Koruması -->
+                            <div class="col-md-4">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Stall Koruması</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        Stall Hızı (km/h)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Bu hızın altında stall koruması devreye girer"></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_stall_speed_kmh" min="20" max="100" step="1" value="40">
+                                    </div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        Pitch Düşürme (°)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Stall'da burun ne kadar düşürülsün"></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_stall_pitch_drop" min="0" max="15" step="0.5" value="3.0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Flaperon Droop -->
+                        <div class="row mt-3 border-top border-secondary pt-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted border-bottom border-secondary pb-1"><i class="bi bi-arrows-collapse me-1"></i>Flaperon Droop</h6>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="form-label mb-0 text-nowrap small">Droop Miktarı (µs)</label>
+                                    <input type="range" class="form-range flaperon-range" id="flaperonOffsetSlider" min="0" max="500" step="10" value="150" oninput="document.getElementById('flaperonOffsetValue').textContent=this.value; var p=((this.value-this.min)/(this.max-this.min)*100).toFixed(1); this.style.background='linear-gradient(to right,#0ea5e9 '+p+'%,rgba(0,0,0,0.15) '+p+'%)'">
+                                    <span class="badge bg-secondary" id="flaperonOffsetValue">150</span>
+                                </div>
+                                <small class="text-muted">Flaperon aktifken aileronlara uygulanan simetrik droop. Aralık: 0–500 µs</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== 2. NAVİGASYON & GPS ==================== -->
+            <div id="adv-tab-2" class="adv-tab-pane">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-header bg-primary bg-opacity-25 text-primary border-primary">
+                        <h5 class="mb-0"><i class="bi bi-geo-fill"></i> 2. Navigasyon & GPS</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            
+                            <!-- GPS Donanım Ayarları -->
+                            <div class="col-md-4 border-end border-secondary">
+                                <h6 class="text-muted mb-3">Donanım Ayarları</h6>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="inp_has_gps" onchange="toggleGpsSettings()">
+                                    <label class="form-check-label text-white" for="inp_has_gps">GPS Modülü Aktif</label>
+                                </div>
+                                <div id="gps_hardware_settings">
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-secondary text-light border-0">Protokol</span>
+                                        <select class="form-select" id="inp_gps_proto">
+                                            <option value="0">UBX (U-Blox)</option>
+                                            <option value="1">NMEA (Genel)</option>
+                                        </select>
+                                    </div>
+																	<hr>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-secondary text-light border-0">Baud</span>
+                                        <select class="form-select" id="inp_gps_baud">
+                                            <option value="9600">9600</option>
+                                            <option value="57600">57600</option>
+                                            <option value="115200">115200</option>
+                                        </select>
+                                    </div>
+																	<hr>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-secondary text-light border-0">Mag Yönü</span>
+                                        <select class="form-select" id="inp_mag_align">
+                                            <option value="0">CW 0°</option>
+                                            <option value="1">CW 90°</option>
+                                            <option value="2">CW 180°</option>
+                                            <option value="3">CW 270°</option>
+                                        </select>
+                                    </div>
+                                    <hr class="border-secondary my-2">
+                                    <h6 class="text-warning small mb-2">GPS Güvenlik</h6>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm">Min Uydu Sayısı</label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control form-control-sm" id="inp_gps_min_sats" min="4" max="12" step="1" value="6">
+                                        </div>
+                                    </div>
+																	<hr>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm">Min Fix Tipi</label>
+                                        <div class="col-sm-5">
+                                            <select class="form-select form-select-sm" id="inp_gps_min_fix_type">
+                                                <option value="2">2D Fix</option>
+                                                <option value="3" selected>3D Fix</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RTH (Eve Dönüş) -->
+                            <div class="col-md-4 border-end border-secondary">
+                                <h6 class="text-muted mb-3">RTH (Eve Dönüş)</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">RTH İrtifası (m)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_rth_alt" value="50"></div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">RTH Yarıçapı (m)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_radius" value="50"></div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm text-danger">Geofence (m)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dist" placeholder="0=Yok" value="0"></div>
+                                </div>
+																<hr>
+                                <div class="col-12 mt-2">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="inp_nav_climb_first">
+                                        <label class="form-check-label small" for="inp_nav_climb_first">Eve Dönerken Önce Yüksel</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Otopilot Açı Limitleri -->
+                            <div class="col-md-4">
+                                <h6 class="text-muted mb-3">Otopilot Açı Limitleri</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Roll (°)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_bank_roll" min="10" max="60" value="45"></div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Pitch (°)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_bank_pitch" min="5" max="45" value="20"></div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Tırmanma (°)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_climb" value="20"></div>
+                                </div>
+																<hr>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Dalış (°)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dive" value="15"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="border-secondary my-4">
+
+                        <!-- İkinci Satır: Gaz Ayarları & Kazançlar & L1 -->
+                        <div class="row g-4">
+                            <!-- Gaz (Throttle) AyarlarÄ± -->
+                            <!-- Gaz (Throttle) Ayarları -->
+                            <div class="col-md-4 border-end border-secondary">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Gaz (Throttle) Ayarları</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm text-danger">Nav Min Gaz</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_min_throttle" min="1000" max="1500" step="10" value="1100"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Alçalma Gazı</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_descend" min="1000" max="1800" step="10" value="1100"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm text-info">Seyir Gazı</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_cruise" min="1200" max="1900" step="10" value="1650"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Tırmanma Gazı</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_climb" min="1300" max="2000" step="10" value="1700"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm text-danger">Nav Max Gaz</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_throttle" min="1500" max="2000" step="10" value="1900"></div>
+                                </div>
+                            </div>
+
+                            <!-- Otopilot Kazançları -->
+                            <div class="col-md-4 border-end border-secondary">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Otopilot Kazançları</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm text-info">
+                                        Pitch → Gaz
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Otopilot irtifa düzeltirken burnu kaldırdığında (pitch arttığında) otomatik olarak gaz ekler. Her 1° pitch için kaç birim PWM gaz ekleneceğini belirler. Örnek: değer=10 ise +5° pitch → +50 µs gaz artışı. Düşük değer: irtifa değişimlerine yavaş tepki. Yüksek değer: agresif gaz tepkisi, titreşime yol açabilir."></i>
+                                    </label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_fw_pitch2thr" step="0.1" value="8.0"></div>
+                                </div>
+                            </div>
+
+                            <!-- L1 Navigasyon -->
+                            <div class="col-md-4">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">L1 Navigasyon (Rota Takibi)</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">
+                                        L1 Periyodu (sn)
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Düşük=Sert, Yüksek=Yumuşak Dönüş"></i>
+                                    </label>
+                                    <div class="col-sm-5">
+                                        <input type="number" class="form-control form-control-sm" id="inp_nav_l1_period" min="5" max="30" step="1" value="17">
+                                    </div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">L1 Damping</label>
+                                    <div class="col-sm-5">
+                                        <input type="number" class="form-control form-control-sm" id="inp_nav_l1_damping" min="0.5" max="1.0" step="0.05" value="0.75">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== 3. İRTİFA ==================== -->
+            <div id="adv-tab-3" class="adv-tab-pane">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-header bg-success bg-opacity-25 text-success border-success">
+                        <h5 class="mb-0"><i class="bi bi-arrow-bar-up"></i> 3. İrtifa Tahmini</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 border-end border-secondary">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Sensör Kaynağı</h6>
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" id="inp_alt_has_baro" checked>
+                                    <label class="form-check-label" for="inp_alt_has_baro">Barometre Kullan</label>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Kalman Filtre Katsayıları</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Baro Pozisyon (P)</label>
+                                        <input type="number" class="form-control form-control-sm" id="inp_alt_w_z_baro_p" min="0.0" max="5.0" step="0.1" value="1.5">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Baro Hız (V)</label>
+                                        <input type="number" class="form-control form-control-sm" id="inp_alt_w_z_baro_v" min="0.0" max="10.0" step="0.1" value="4.0">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="small text-muted">ACC Bias</label>
+                                        <input type="number" class="form-control form-control-sm" id="inp_alt_w_z_acc_bias" step="0.005" value="0.05">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="small text-muted">ACC Deadzone</label>
+                                        <input type="number" class="form-control form-control-sm" id="inp_alt_acc_deadzone" step="0.05" value="0.35">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="small text-muted">ACC LPF</label>
+                                        <input type="number" class="form-control form-control-sm" id="inp_alt_acc_lpf" step="0.01" value="0.15">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== 4. DONANIM, SENSÖR & FİLTRELER ==================== -->
+            <div id="adv-tab-4" class="adv-tab-pane">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-header bg-info bg-opacity-25 text-info border-info">
+                        <h5 class="mb-0"><i class="bi bi-cpu"></i> 4. Donanım, Sensör & Filtreler</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <!-- ESC Protokolü -->
+                            <div class="col-md-3 border-end border-secondary">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">ESC Protokolü</h6>
+                                <div class="mb-3">
+                                    <label class="form-label small">ESC Hızı</label>
+                                    <select class="form-select form-select-sm" id="inp_esc_hz">
+                                        <option value="50">PWM (50Hz - Analog)</option>
+                                        <option value="400">FastPWM (400Hz)</option>
+                                        <option value="1000">Oneshot125</option>
+                                        <option value="2000">Oneshot42</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Gyro & IMU Filtreleri -->
+                            <div class="col-md-3 border-end border-secondary">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Gyro & IMU</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Gyro LPF</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_gyro_beta" step="0.01" value="0.2"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Mahony Kp</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_mahony_kp" step="0.1" value="2.0"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Mahony Ki</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_mahony_ki" step="0.001" value="0.05"></div>
+                                </div>
+                            </div>
+
+                            <!-- RPM Filtresi -->
+                            <div class="col-md-3 border-end border-secondary">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">RPM Filtresi</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Min Frekans (Hz)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_rpm_min_freq" min="50" max="200" step="10" value="100"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Frekans (Hz)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_rpm_max_freq" min="200" max="800" step="10" value="400"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Bandwidth (%)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_rpm_bw_percent" min="0.1" max="0.5" step="0.05" value="0.2"></div>
+                                </div>
+                            </div>
+
+                            <!-- Kart Hizalama (Trim) -->
+                            <div class="col-md-3">
+                                <h6 class="text-muted border-bottom border-secondary pb-1">Kart Hizalama (Trim)</h6>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Roll Trim (°)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_trim_roll" step="0.1" value="0.0"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Pitch Trim (°)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_trim_pitch" step="0.1" value="0.0"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="border-secondary my-4">
+                        
+                        <!-- Grafikler -->
+                        <div class="row">
+                             <div class="col-12 text-center mb-3">
+                                 <h6 class="text-info"><i class="bi bi-activity"></i> Gerçek Zamanlı Sensör Verileri</h6>
+                                 <div class="form-check form-switch d-inline-block">
+                                    <input class="form-check-input" type="checkbox" id="toggleGraphs"  onchange="toggleGraphStream(this.checked)">
+                                    <label class="form-check-label text-muted small" for="toggleGraphs">Veri Akışını Başlat</label>
+                                </div>
+                             </div>
+                            <div class="col-md-6">
+                                <div class="bg-black bg-opacity-25 p-2 rounded border border-dark">
+                                    <h6 class="text-muted mb-2 small text-center">GYROSCOPE (deg/s)</h6>
+                                    <div style="height: 200px;"><canvas id="chartGyro"></canvas></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="bg-black bg-opacity-25 p-2 rounded border border-dark">
+                                    <h6 class="text-muted mb-2 small text-center">ACCELEROMETER (g)</h6>
+                                    <div style="height: 200px;"><canvas id="chartAccel"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /adv-tab-content -->
+
+    </div>
+    <button type="button" class="btn btn-warning shadow-sm mt-2" id="btnSaveAdvanced">
+        <i class="bi bi-save2 me-2"></i> Tercihleri Kaydet
+    </button>
+</div>
+
+<script>
+function switchAdvTab(tabId, btn) {
+    document.querySelectorAll('.adv-tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.adv-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+</script>
+
+<div id="osd" class="page">
+    <div class="panel mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
+            <div>
+                <h2 class="panel-title mb-0"><i class="bi bi-aspect-ratio me-2 text-info"></i>OSD Tasarımcı</h2>
+                <small class="text-muted">Ekran öğelerini ve sistem bilgilerini özelleştirin</small>
+            </div>
+            <div class="form-check form-switch fs-5">
+                <input class="form-check-input" type="checkbox" id="osd_enabled" checked>
+                <label class="form-check-label text-light" for="osd_enabled">OSD Aktif</label>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="panel3 p-3 h-100 bg-dark">
+                            <h6 style="color: #ff6b35;" class="text-info border-bottom border-secondary pb-2 mb-3">
+                                <i class="bi bi-list-check me-2"></i>Ekran Öğeleri
+                            </h6>
+                    <div class="osd-element-list" style="max-height: 450px; overflow-y: auto;">
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_arm" checked data-target="prev_arm_status">
+        <label class="form-check-label small" for="osd_show_arm">Arm Durumu</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_mode" checked data-target="prev_flight_mode">
+        <label class="form-check-label small" for="osd_show_mode">Uçuş Modu</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_spd" checked data-target="prev_speed">
+        <label class="form-check-label small" for="osd_show_spd">Hız (Ground Speed)</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_rssi" checked data-target="prev_rssi">
+        <label class="form-check-label small" for="osd_show_rssi">RSSI (Sinyal Gücü)</label>
+    </div>
+
+    <hr class="my-2 border-secondary">
+
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_bat" checked data-target="prev_battery">
+        <label class="form-check-label small" for="osd_show_bat">Pil Voltajı</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_alt" checked data-target="prev_altitude">
+        <label class="form-check-label small" for="osd_show_alt">İrtifa</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_vario" checked data-target="prev_vario">
+        <label class="form-check-label small" for="osd_show_vario">Vario (Dikey Hız)</label>
+    </div>
+
+    <hr class="my-2 border-secondary">
+
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_horizon" checked data-target="prev_horizon">
+        <label class="form-check-label small" for="osd_show_horizon">Yapay Ufuk</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_home" checked data-target="prev_home_dir">
+        <label class="form-check-label small" for="osd_show_home">Home Bilgisi</label>
+    </div>
+
+    <hr class="my-2 border-secondary">
+
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_thr" checked data-target="prev_throttle">
+        <label class="form-check-label small" for="osd_show_thr">Gaz (Throttle)</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_wind" checked data-target="prev_wind">
+        <label class="form-check-label small" for="osd_show_wind">Rüzgar Bilgisi</label>
+    </div>
+    
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_msg" checked data-target="prev_sys_msg">
+        <label class="form-check-label small" for="osd_show_msg">Sistem Mesajları</label>
+    </div>
+
+    <hr class="my-2 border-secondary">
+<div class="form-check form-switch mb-2">
+    <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_sats" checked data-target="prev_sats">
+    <label class="form-check-label small" for="osd_show_sats">Uydu Sayısı</label>
+</div>
+    <hr class="my-2 border-secondary">
+<div class="form-check form-switch mb-2">
+    <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_lat" checked data-target="prev_lat">
+    <label class="form-check-label small" for="osd_show_lat">GPS Enlem (Lat)</label>
+</div>
+    <hr class="my-2 border-secondary">
+<div class="form-check form-switch mb-2">
+    <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_lon" checked data-target="prev_lon">
+    <label class="form-check-label small" for="osd_show_lon">GPS Boylam (Lon)</label>
+</div>
+
+ <hr class="my-2 border-secondary">
+
+<div class="form-check form-switch">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_gcode" checked data-target="prev_gcode">
+        <label class="form-check-label small text-warning" for="osd_show_gcode">Google Plus Code</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_timer" checked data-target="prev_timer">
+        <label class="form-check-label small" for="osd_show_timer">Uçuş Süresi</label>
+    </div>
+</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="panel3 p-0 h-100 position-relative osd-monitor-frame border border-4 border-dark rounded-3 shadow-lg overflow-hidden">
+                        <div id="osd-preview-screen" class="position-relative b" style="aspect-ratio: 16/9; overflow: hidden;">
+    <div class="osd-crosshair"><i class="bi bi-plus-lg"></i></div>
+
+    <div class="osd-grid-overlay position-absolute w-100 h-100" 
+         style="background-image: radial-gradient(circle, #444 1px, transparent 1px); 
+                background-size: 1.886% 5.0%; 
+                opacity: 0.5; pointer-events: none; z-index: 1;">
+    </div>
+
+    <div id="prev_speed" class="osd-draggable position-absolute" style="top: 5%; left: 2%;">SPD: 45km/h</div>
+    
+    <div id="prev_rssi" class="osd-draggable position-absolute" style="top: 10%; left: 2%;">RSSI: 99%</div>
+
+    <div id="prev_flight_mode" class="osd-draggable position-absolute" style="top: 90%; left: 2%;">STAB</div>
+
+    <div id="prev_battery" class="osd-draggable position-absolute" style="top: 5%; left: 84%;">12.4V</div>
+
+    <div id="prev_altitude" class="osd-draggable position-absolute" style="top: 10%; left: 84%;">ALT: 154m</div>
+
+    <div id="prev_vario" class="osd-draggable position-absolute" style="top: 15%; left: 84%;">+1.2m/s</div>
+
+    <div id="prev_home_dir" class="osd-draggable position-absolute text-center" style="top: 5%; left: 44%;">
+      Home:  <i class="bi bi-arrow-down"></i> 450m
+    </div>
+
+    <div id="prev_horizon" class="osd-draggable position-absolute" style="top: 50%; left: 25%; width: 50%; text-align: center;">
+        --- - - - <i class="bi bi-airplane-fill"></i> - - - ---
+    </div>
+
+    <div id="prev_arm_status" class="osd-draggable position-absolute text-center" style="width: 100px; top: 65%; left: 50%; transform: translateX(-50%);">DISARMED</div>
+
+    <div id="prev_sys_msg" class="osd-draggable position-absolute text-warning text-center w-100" style="top: 70%; left: 0;">-- LOW BATTERY --</div>
+
+    <div id="prev_wind" class="osd-draggable position-absolute" style="top: 50%; left: 2%;">
+        <i class="bi bi-arrow-up-right"></i> 12km/h
+    </div>
+	
+<div id="prev_sats" class="osd-draggable position-absolute" style="top: 85%; left: 85%;">
+    <i class="bi bi-disc-fill me-1"></i>12
+</div>
+    <div id="prev_throttle" class="osd-draggable position-absolute" style="top: 50%; left: 84%;">THR: 65%</div>
+
+<div id="prev_lat" class="osd-draggable position-absolute" style="top: 90%; left: 1%;">
+    LAT: 37.1234
+</div>
+
+<div id="prev_lon" class="osd-draggable position-absolute" style="top: 95%; left: 1%;">
+    LON: 28.5678
+</div>
+
+<div id="prev_gcode" class="osd-draggable position-absolute text-warning" style="top: 85%; left: 1%;">
+    <i class="bi bi-geo-alt-fill me-1"></i>8Q7X+W9
+</div>
+
+    <div id="prev_timer" class="osd-draggable position-absolute" style="top: 90%; left: 84%;">fly time 04:20</div>
+</div>
+                            <div class="bg-dark p-2 text-center small text-secondary">
+                                <i class="bi bi-arrows-move me-1"></i> Önizleme Ekranı (50x20 Karakter Izgarası)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="panel3 p-3 h-100 bg-dark-">
+                    <h6 class="text-warning border-bottom border-secondary pb-2 mb-3">
+                        <i class="bi bi-gear-fill me-2"></i>Sistem & Görüntü Ayarları
+                    </h6>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Ekran Oranı</label>
+                        <select class="form-select form-select-sm bg-dark text-white border-secondary" id="osd_video_format">
+                            <option value="0">16:4</option>
+                            <option value="1">4:3</option>
+                         
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Pilot Adı (Callsign)</label>
+                        <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary" id="osd_pilot_name" placeholder="">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Hava Aracı Adı</label>
+                        <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary" id="osd_craft_name" placeholder="">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Ölçü Birimi</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="osd_units" id="unit_metric" checked>
+                            <label class="btn btn-outline-secondary btn-sm" for="unit_metric">Metrik (m, km/h)</label>
+                            
+                            <input type="radio" class="btn-check" name="osd_units" id="unit_imperial">
+                            <label class="btn btn-outline-secondary btn-sm" for="unit_imperial">Imperial (ft, mph)</label>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-4">
+                        <div class="col-6">
+                            <label class="form-label small text-muted">Düşük Voltaj (V)</label>
+                            <input type="number" step="0.1" class="form-control form-control-sm bg-dark text-white border-secondary" id="osd_low_bat" value="10.8">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small text-muted">Mesafe Uyarısı (m)</label>
+                            <input type="number" class="form-control form-control-sm bg-dark text-white border-secondary" id="osd_max_dist" value="1000">
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-warning w-100 shadow-sm mt-auto" id="btnSaveOSD">
+                        <i class="bi bi-cloud-upload me-2 "></i>Ayarları Cihaza Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // JS: Checkbox ile Ã–nizleme ElemanlarÄ±nÄ± Gizle/GÃ¶ster
+    document.querySelectorAll('.osd-toggle').forEach(el => {
+        el.addEventListener('change', function() {
+            const target = document.getElementById(this.dataset.target);
+            if (target) {
+                target.style.display = this.checked ? 'block' : 'none';
+            }
+        });
+    });
+
+    // Kaydet Butonu LogiÄŸi
+    document.getElementById('btnSaveOSD').addEventListener('click', function() {
+        console.log("OSD Yapılandırması Kaydediliyor...");
+        // ESP32'ye gönderilecek veri paketi hazırlama buraya gelecek
+    });
+</script>
+		
+<div id="logs" class="page">
+    <div class="panel panel2">
+        <h2 class="panel-title"><i class="bi bi-terminal"></i> Komut Konsolu & Sistem Logları</h2>
+        <div class="row">
+
+            <!-- ============ SOL: KISAYOLLAR ============ -->
+            <div class="col-md-4">
+                <div class="panel">
+                    <h3 class="h5 mb-3"><i class="bi bi-lightning-charge"></i> Kısayollar</h3>
+
+                    <div class="accordion accordion-flush" id="shortcutsAccordion">
+
+                        <!-- 1. Sistem & Konfigürasyon -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accSistem">
+                                    <i class="bi bi-gear me-2 text-danger"></i> Sistem &amp; Konfigürasyon
+                                </button>
+                            </h2>
+                            <div id="accSistem" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-danger btn-sm" onclick="sendQuickCommand('CFG_RESET')" title="Tüm ayarları fabrika çıkışına döndür">FABRİKA AYARLARI</button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="sendQuickCommand('PID RESET')" title="PID değerlerini varsayılana döndür">PID SIFIRLA</button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="sendQuickCommand('CALIB_RESET')" title="Kalibrasyon verisini sil">KALİB. SİL</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Kalibrasyon -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accKalib">
+                                    <i class="bi bi-crosshair me-2 text-warning"></i> Kalibrasyon İşlemleri
+                                </button>
+                            </h2>
+                            <div id="accKalib" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="btn-group w-100 mb-1">
+                                        <button class="btn btn-outline-warning " onclick="sendQuickCommand('CAL_GYRO')" title="Jiroskop sapmasını sıfırla">JİROSKOP SIFIRLA</button>
+                                        <button class="btn btn-outline-warning " onclick="sendQuickCommand('CAL_LEVEL')" title="İvmeölçer düzlemini ayarla (Trim)">TERAZİ (TRIM)</button>
+                                    </div>
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('CAL_BEGIN')" title="6 Eksenli kalibrasyonu başlat">BAŞLAT</button>
+                                        <button class="btn btn-outline-warning btn-sm" onclick="sendQuickCommand('CALIB_SOLVE')" title="Kalibrasyon sonucunu hesapla ve kaydet">HESAPLA &amp; KAYDET</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Canlı Veri Akışları -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accStream">
+                                    <i class="bi bi-broadcast me-2 text-success"></i> Canlı Veri Akışları
+                                </button>
+                            </h2>
+                            <div id="accStream" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="GPS, Barometre, Pusula verileri">SENSÖRLER (GPS/BARO)</span>
+                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_sensor_stream')">AÇ</button>
+                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_sensor_stream')">KAPAT</button>
+                                    </div>
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Jiroskop ve İvmeölçer ham verileri">IMU (JİRO/İVME)</span>
+                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_gyro_stream')">AÇ</button>
+                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_gyro_stream')">KAPAT</button>
+                                    </div>
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Uçak duruş açısı (Quaternion & Euler)">3D DURUŞ (QUAT/EULER)</span>
+                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_quaternion_stream')">AÇ</button>
+                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_quaternion_stream')">KAPAT</button>
+                                    </div>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Kumandadan gelen kanal sinyalleri">ALICI &amp; KANALLAR</span>
+                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_receiver_stream')">AÇ</button>
+                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_receiver_stream')">KAPAT</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Sayfa Verilerini Güncelle -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accPages">
+                                    <i class="bi bi-arrow-clockwise me-2 text-info"></i> Sayfa Verilerini Güncelle
+                                </button>
+                            </h2>
+                            <div id="accPages" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('advanced_page_data')" title="Gelişmiş ayarları oku">GELİŞMİŞ</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('pid_page_data')" title="PID ayarlarını oku">PID</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('calibration_page_data')" title="Kalibrasyon verisini oku">KALİB.</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('outputs_page_data')" title="Çıkış ayarlarını oku">ÇIKIŞLAR</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('modes_page_data')" title="Uçuş modlarını oku">MODLAR</button>
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('transmitter_page_data')" title="Alıcı ayarlarını oku">ALICI</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Ayar Yedekleme -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#accBackup">
+                                    <i class="bi bi-archive me-2 text-primary"></i> Ayar Yedekleme
+                                </button>
+                            </h2>
+                            <div id="accBackup" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
+                                <div class="accordion-body pt-1 pb-2 px-0">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="exportSettings()" title="Tüm ayarları JSON dosyasına aktar">
+                                            <i class="bi bi-download me-1"></i>Dışa Aktar
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="importSettings()" title="JSON dosyasından ayarları geri yükle">
+                                            <i class="bi bi-upload me-1"></i>İçe Aktar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /accordion -->
+                </div>
+            </div>
+
+            <!-- ============ SAĞ: LOG PANELİ ============ -->
+            <div class="col-md-8">
+
+                <div class="panel">
+
+                    <!-- ── ÜST: Arama + Filtre + Kontroller ── -->
+                    <div class="d-flex gap-2 mb-2">
+                        <div class="input-group input-group-sm flex-grow-1">
+                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="logSearch" placeholder="Loglarda arama yap...">
+                            <button class="btn btn-outline-secondary" type="button" id="btnLogSearch"><i class="bi bi-search"></i></button>
+                            <button class="btn btn-outline-secondary" type="button" id="btnClearSearch"><i class="bi bi-x"></i></button>
+                        </div>
+                        <select class="form-select form-select-sm" id="logLevelFilter" style="max-width:180px">
+                            <option value="all">Tüm Kayıtlar</option>
+                            <option value="info">Bilgi (Info)</option>
+                            <option value="success">Başarılı</option>
+                            <option value="warning">Uyarılar</option>
+                            <option value="error">Hatalar</option>
+                            <option value="command">Giden Komutlar</option>
+                            <option value="receive">Gelen Veri</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between mb-3 gap-2 flex-wrap">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary" id="logCount">0 satır</span>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="autoScroll" checked>
+                                <label class="form-check-label small" for="autoScroll">Oto. Kaydır</label>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="pauseLogs">
+                                <label class="form-check-label small" for="pauseLogs">Akışı Durdur</label>
+                            </div>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-warning" id="btnLogClear" title="Ekranda görünen logları temizle"><i class="bi bi-eraser"></i> Temizle</button>
+                            <button class="btn btn-outline-danger" id="btnLogClearAll" title="Geçmişi tamamen sil ve sıfırla"><i class="bi bi-trash"></i> Geçmişi Sil</button>
+                            <button class="btn btn-outline-success" id="btnLogExport" title="Logları dosyaya kaydet"><i class="bi bi-download"></i> Kaydet</button>
+                        </div>
+                    </div>
+
+                    <!-- ── Log başlığı ── -->
+                    <h3 class="h5 mb-2"><i class="bi bi-terminal"></i> Sistem Kayıtları (Logs)</h3>
+
+                    <!-- ── Log Ekranı ── -->
+                    <div class="log-container" id="logContainer">
+                        <div class="log-entry log-info"><span class="log-time">[Sistem]</span> 🚀 Flight Controller arayüzü hazır...</div>
+                        <div class="log-entry log-info"><span class="log-time">[Sistem]</span> 📡 Bağlantı bekleniyor...</div>
+                    </div>
+
+                    <!-- ── ALT: Manuel Komut Girişi ── -->
+                    <div class="mt-3">
+                        <label class="form-label small text-muted">MANUEL KOMUT GİRİŞİ</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="commandInput" placeholder="Örn: CAL_GYRO yazıp gönderin..." onkeypress="handleCommandKeypress(event)">
+                            <button class="btn btn-primary" type="button" id="btnSendCommand" title="Komutu Gönder"><i class="bi bi-send"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── İstatistikler ── -->
+                <div class="panel">
+                    <h3 class="h5 mb-3"><i class="bi bi-graph-up"></i> İletişim İstatistikleri</h3>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="system-stat">
+                                <div class="stat-value" id="statTotalLogs">0</div>
+                                <div class="stat-label">Toplam Satır</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="system-stat">
+                                <div class="stat-value" id="statCommandsSent">0</div>
+                                <div class="stat-label">Giden Komut</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="system-stat">
+                                <div class="stat-value" id="statErrors">0</div>
+                                <div class="stat-label">Hata Sayısı</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="progress mb-2" style="height: 8px;">
+                            <div class="progress-bar bg-success" id="progressSuccess" style="width: 0%"></div>
+                            <div class="progress-bar bg-warning" id="progressWarning" style="width: 0%"></div>
+                            <div class="progress-bar bg-danger" id="progressError" style="width: 0%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>Başarılı: <span id="countSuccess">0</span></span>
+                            <span>Uyarı: <span id="countWarning">0</span></span>
+                            <span>Hata: <span id="countError">0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /col-md-8 -->
+
+        </div>
+    </div>
+</div>
+
+
+<!-- ==================== WAYPOINT MİSYON SAYFASI ==================== -->
+<div id="waypoint" class="page">
+    <div class="panel panel2">
+        <h2 class="panel-title"><i class="bi bi-map"></i> Waypoint Misyon Planlayıcı</h2>
+
+        <!-- ===== HARITA + WAYPOINT LİSTESİ ===== -->
+        <div class="row">
+            <!-- Sol: Harita -->
+            <div class="col-lg-8 mb-3">
+                <div class="panel">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Harita</h5>
+                        <small class="text-muted">Haritaya tıklayarak waypoint ekleyin</small>
+                    </div>
+                    <div id="wp-map" style="height: 450px; border-radius: 8px; border: 1px solid #333;"></div>
+                </div>
+            </div>
+
+            <!-- Sağ: Waypoint Listesi ve Kontroller -->
+            <div class="col-lg-4 mb-3">
+                <!-- Misyon Kontrolleri -->
+                <div class="panel mb-3">
+                    <h5 class="mb-3"><i class="bi bi-cloud-upload"></i> FC'ye Yükle</h5>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" id="btnUploadWaypoints" onclick="uploadWaypoints()">
+                            <i class="bi bi-cloud-upload me-2"></i> Waypoint'leri Kaydet
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="clearAllWaypoints()">
+                            <i class="bi bi-trash me-2 warning"></i> Tüm Waypoint'leri Temizle
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Misyonu başlatmak için vericideki Waypoint kanal switch'ini açın.
+                        Tüm noktalar tamamlanınca uçak otomatik RTH yapar.
+                    </small>
+                    <!-- Misyon durumu -->
+                    <div class="mt-3 p-2 rounded" id="wp-mission-status" style="background:#1a1a2e; font-size:0.85em;">
+                        <span id="wp-status-text" class="text-muted">Misyon hazır değil</span>
+                    </div>
+                </div>
+
+                <!-- Waypoint Listesi -->
+                <div class="panel">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0"><i class="bi bi-list-ol"></i> Waypoint Listesi</h5>
+                        <span id="wp-count-badge" class="badge bg-secondary">0 / 16</span>
+                    </div>
+                    <div id="wp-list" style="max-height: 320px; overflow-y:auto;">
+                        <p class="text-muted text-center small mt-3">Henüz waypoint eklenmedi.<br>Haritaya tıklayın.</p>
+                    </div>
+                    <!-- Manuel ekleme -->
+                    <div class="mt-3 border-top pt-3">
+                        <small class="text-muted d-block mb-2">Manuel Ekle</small>
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text">Lat</span>
+                            <input type="number" step="0.0001" class="form-control" id="inp-wp-lat" placeholder="45.0000">
+                        </div>
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text">Lon</span>
+                            <input type="number" step="0.0001" class="form-control" id="inp-wp-lon" placeholder="28.0000">
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text">Alt (m)</span>
+                            <input type="number" step="1" class="form-control" id="inp-wp-alt" placeholder="50" value="50">
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm w-100" onclick="addWaypointManual()">
+                            <i class="bi bi-plus-circle me-1"></i> Ekle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /row harita+liste -->
+
+        <!-- ===== KAMİKAZE GÖREV AYARLARI ===== -->
+        <div class="row mt-2 mb-2">
+            <div class="col-12">
+                <div class="panel" style="border-left:3px solid #dc3545;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0" style="color:#ff6b6b;">
+                            <i class="bi bi-bullseye me-1"></i> Kamikaze Görev Ayarları
+                        </h5>
+                        <button class="btn btn-sm btn-outline-danger" onclick="applyKamikazeDefaults()" title="Listedeki tüm Kamikaze WP'lere bu değerleri uygula">
+                            <i class="bi bi-arrow-repeat me-1"></i> Listedeki KM WP'lere Uygula
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <!-- Dalış -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded" style="background:#1a0808;border:1px solid #501010;">
+                                <div class="mb-1" style="color:#ff6b6b;font-weight:600;font-size:0.82em;letter-spacing:0.03em;">DALIŞ</div>
+                                <div class="mb-3">
+                                    <label class="form-label small mb-1" style="color:#e0e0e0;">Dalış Açısı (°)</label>
+                                    <input type="number" class="form-control form-control-sm" id="km_def_dive_angle" min="5" max="90" step="1" value="45"
+                                        title="Hedef üzerine dik dalış açısı. Açı belirlenince mesafe irtifaya göre otomatik hesaplanır.">
+                                    <small style="color:#888;font-size:0.78em;">5° = sığ  —  90° = dik dik</small>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#e0e0e0;">Başlama İrtifa Farkı (m)</label>
+                                    <input type="number" class="form-control form-control-sm" id="km_def_alt_offset" step="1" value="0"
+                                        title="WP irtifasına göre dalış başlangıç yükseklik farkı (m). 0 = WP irtifasından başla, negatif = daha alçaktan">
+                                    <small style="color:#888;font-size:0.78em;">0 = WP irtifasından  —  negatif = daha alçak</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tetikleme -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded" style="background:#1a0808;border:1px solid #501010;">
+                                <div class="mb-1" style="color:#ffc107;font-weight:600;font-size:0.82em;letter-spacing:0.03em;">GÖREV SİSTEMİ</div>
+                                <div class="mb-3">
+                                    <label class="form-label small mb-1" style="color:#e0e0e0;">Tetikleme İrtifası (m AGL)</label>
+                                    <input type="number" class="form-control form-control-sm" id="km_def_trigger_alt" min="0" max="500" step="1" value="15"
+                                        title="Uçak bu AGL irtifasına inince görev servosuna 2000 PWM sinyali verilir">
+                                    <small style="color:#888;font-size:0.78em;">Bu irtifada servo tam gaz konumuna geçer</small>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#e0e0e0;">Görev Servosu</label>
+                                    <select class="form-select form-select-sm" id="km_def_mission_servo">
+                                        <option value="0">Devre Dışı</option>
+                                        <option value="1">Servo 1</option>
+                                        <option value="2">Servo 2</option>
+                                        <option value="3">Servo 3</option>
+                                        <option value="4">Servo 4</option>
+                                    </select>
+                                    <small style="color:#888;font-size:0.78em;">Tetiklenecek çıkış servosu</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Kullanım -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded d-flex flex-column justify-content-between h-100" style="background:#120808;border:1px solid #3a1010;">
+                                <div>
+                                    <div class="mb-2" style="color:#aaa;font-weight:600;font-size:0.82em;letter-spacing:0.03em;">KULLANIM</div>
+                                    <ol class="mb-0 ps-3" style="color:#ccc;font-size:0.82em;line-height:1.7;">
+                                        <li>Haritaya hedef noktasını tıklayın</li>
+                                        <li>Waypoint görevini <span style="color:#dc3545;font-weight:600;">Kamikaze</span> olarak seçin</li>
+                                        <li>Sol taraftaki alanlarda dalış açısı ve servo ayarlarını yapın</li>
+                                        <li><strong style="color:#e0e0e0;">Listedeki KM WP'lere Uygula</strong> butonuna basın</li>
+                                        <li>Waypoint'leri FC'ye yükleyin</li>
+                                    </ol>
+                                </div>
+                                <div class="mt-2 p-2 rounded" style="background:#2a1010;border:1px solid #6b2020;">
+                                    <small style="color:#ff9090;"><i class="bi bi-info-circle me-1"></i>
+                                    Dalış açısı sabit tutulur; başlama mesafesi mevcut irtifaya göre otomatik hesaplanır.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== WAYPOINT MİSYON GENEL AYARLARI ===== -->
+        <div class="row mt-2 mb-2">
+            <div class="col-12">
+                <div class="panel" style="border-left:3px solid #6f42c1;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0" style="color:#a78bfa;">
+                            <i class="bi bi-sliders me-1"></i> Misyon Genel Parametreleri
+                        </h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="saveAdvancedConfig()">
+                            <i class="bi bi-floppy me-1"></i> Kaydet
+                        </button>
+                    </div>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small mb-1" style="color:#e0e0e0;">WP Yakalama Yarıçapı (m)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_wp_capture_radius" min="5" max="200" step="5" value="25"
+                                title="Uçak bir waypoint'e bu mesafede girince o noktayı tamamlandı say ve sonrakine geç (metre)">
+                            <small style="color:#888;font-size:0.78em;">Varsayılan: 25m</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== İNİŞ ASISTAN AYARLARI ===== -->
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="panel" style="border-left:3px solid #0dcaf0;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0" style="color:#0dcaf0;">
+                            <i class="bi bi-wind me-1"></i> İniş Asistan Ayarları
+                            <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#aaa;">Land Assist — Rüzgara Göre Otomatik Devre</small>
+                        </h5>
+                        <button class="btn btn-sm btn-outline-info" onclick="saveAdvancedConfig()">
+                            <i class="bi bi-floppy me-1"></i> Kaydet
+                        </button>
+                    </div>
+                    <div class="row g-3">
+
+                        <!-- Yaklaşma -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
+                                <div class="fw-bold mb-2" style="color:#0dcaf0;font-size:0.8em;"><i class="bi bi-arrow-down-right me-1"></i>Yaklaşma</div>
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Yaklaşma İrtifası (m AGL)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_circuit_alt" min="20" max="300" step="5" value="50" title="Final yaklaşma başlangıç irtifası — AGL metre">
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Devre Yönü</label>
+                                    <select class="form-select form-select-sm" id="inp_la_loiter_dir" title="Sol devre veya sağ devre">
+                                        <option value="1">Sağ Devre</option>
+                                        <option value="-1">Sol Devre</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Son Yaklaşma -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
+                                <div class="fw-bold mb-2" style="color:#17a2b8;font-size:0.8em;"><i class="bi bi-send me-1"></i>Son Yaklaşma (Final)</div>
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Final Başlangıç Mesafesi (m)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_final_approach_distance" min="0" max="2000" step="10" value="0" title="Final waypoint, iniş noktasından kaç metre uzakta olsun? 0 = Otomatik (irtifa÷tan3°)">
+                                    <small style="color:#888;font-size:0.78em;">0 = Otomatik (irtifa÷tan3°)</small>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Devre Genişliği (m)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_circuit_width" min="50" max="600" step="10" value="150" title="Pist merkezinden yanal uzaklık — downwind ve base leg için (m)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Flare & Gaz -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
+                                <div class="fw-bold mb-2" style="color:#ffc107;font-size:0.8em;"><i class="bi bi-arrow-down-circle me-1"></i>Flare & Gaz</div>
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Flare Başlangıç İrtifası (m AGL)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_flare_alt" min="0.5" max="30.0" step="0.5" value="5.0" title="Bu irtifanın altında flare fazına girilir — pitch up ve gaz kesilir (AGL metre)">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Yaklaşma Gazı (PWM)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_approach_throttle" min="1000" max="2000" step="10" value="1200" title="Final yaklaşma fazındaki gaz değeri (PWM 1000-2000)">
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Flare Gazı (PWM)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_flare_throttle" min="1000" max="2000" step="10" value="1000" title="Flare fazındaki gaz değeri — genellikle rölanti (1000)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pist -->
+                        <div class="col-md-3">
+                            <div class="p-3 rounded" style="background:#0a1520;border:1px solid #1a4060;">
+                                <div class="fw-bold mb-2" style="color:#fd7e14;font-size:0.8em;"><i class="bi bi-sign-turn-right me-1"></i>Pist</div>
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Min Rüzgar Hızı (m/s)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_min_wind_speed" min="0.5" max="20.0" step="0.5" value="2.0" title="Rüzgar yönünü pist başlığı olarak kullanmak için gereken minimum rüzgar hızı">
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small mb-1" style="color:#ccc;">Manuel Pist Başlığı (°)</label>
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_manual_runway_hdg" min="0" max="359" step="1" value="0" title="Rüzgar yoksa kullanılacak varsayılan pist başlığı (0-359°)">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="mt-2">
+                        <small style="color:#aaa;"><i class="bi bi-info-circle me-1"></i>
+                        Land Assist: Eve dönüş loiteri ile rüzgar yönü tespit edilir → DOWNWIND WP → BASE_LEG WP → APPROACH WP → FLARE WP. Devre genişliği pist merkezinden yanal uzaklığı belirler. Alçalma açısı geometriden otomatik hesaplanır. Pilot stick veya gaz ile iptal edilir.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Onay Modali (Sensor Align vb. için) -->
+    <div class="modal fade theme-modal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content theme-modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Onay</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="confirmModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-danger" id="confirmModalOkBtn">Devam Et</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade theme-modal" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content theme-modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="saveModalLabel">Kayıt Durumu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="saveModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // 3D Model DeÄŸiÅŸkenleri
+
+        let scene, camera, renderer, airplaneModel, controls, gridHelper;
+        const targetQuaternion = new THREE.Quaternion();
+
+        // Sayfa Durum DeÄŸiÅŸkenleri
+
+        let selectedAircraft = 'v-tail';
+        let throttleValue = 1000;
+        let safetyChecked = false;
+        let throttleInterval = null;
+        let logPaused = false;
+        let currentSearchTerm = '';
+
+        // Harita DeÄŸiÅŸkenleri
+        let map = null;
+        let planeMarker = null;
+        let flightPath = null;
+        let pathCoordinates = [];
+
+        // Grafik Global DeÄŸiÅŸkenleri
+        let gyroChart, accelChart;
+        const maxDataPoints = 100;
+
+        // Kalibrasyon Durumu
+
+        let isCalibrating = false;
+        let poseCalibrationState = {
+            zp: false, zn: false, xp: false, xn: false, yp: false, yn: false
+        };
+
+        // Ayar Objeleri
+
+        let pinConfig = { motor1: 12, motor2: 13, servo1: 14, servo2: 15, servo3: 16, servo4: 17 };
+        let servoValues = {
+            servo1: { min: 1000, mid: 1500, max: 2000 },
+            servo2: { min: 1000, mid: 1500, max: 2000 },
+            servo3: { min: 1000, mid: 1500, max: 2000 },
+            servo4: { min: 1000, mid: 1500, max: 2000 }
+        };
+        let transmitterConfig = {
+            protocol: 'sbus',
+            channels: { roll: 1, pitch: 2, yaw: 4, throttle: 3, mod: 5 }
+        };
+        let pidValues = {
+            roll: { p: 0.08, i: 0.04, i_limit: 50, ff: 0.0 },
+            pitch: { p: 0.08, i: 0.04, i_limit: 50, ff: 0.0 },
+            yaw: { p: 0.15, i: 0.05, i_limit: 50, ff: 0.0 }
+        };
+        let flightModes = {
+            manual: { name: "MANUEL", channel: 5, min: 1000, max: 1200 },
+            angle: { name: "ANGLE", channel: 5, min: 1201, max: 1400 },
+            horizon: { name: "HORIZON", channel: 5, min: 1401, max: 1600 },
+            rth: { name: "EVE DÃ–N", channel: 5, min: 1601, max: 1800 },
+            launch: { name: "OTO LAUNCH", channel: 5, min: 1801, max: 2000 }
+        };
+        let logStats = { total: 0, commands: 0, errors: 0, success: 0, warning: 0, info: 0, receive: 0 };
+        const minGap = 50;
+
+        // Global DeÄŸiÅŸkenler
+        const esp32Pins = [
+            -1,
+            0, 1, 2, 3, 4, 5,
+            12, 13, 14, 15, 16, 17, 18, 19,
+            21, 22, 23,
+            25, 26, 27,
+            32, 33, 34, 35, 36, 39
+        ];
+        const channelOptions = Array.from({length: 16}, (_, i) => `<option value="${i+1}">Kanal ${i+1}</option>`).join('');
+
+        // Global DOM Element Referansları
+
+        let statusIndicator, connectionStatus, connectionPrompt, throttleSlider, safetyCheck, safetyWarning, logContainer;
+
+        const $ = id => document.getElementById(id);
+
+        function log(message, type = 'info') {
+            if (logPaused) return;
+            if (!logContainer) logContainer = $('logContainer'); 
+            if (!logContainer) return; 
+
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            
+            const typeIcons = { 'info': 'ℹ️', 'success': '✅', 'warning': '⚠️', 'error': '❌', 'command': '📤', 'receive': '📥' };
+            entry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${typeIcons[type] || '📋'} ${message}`;
+            
+            const currentFilter = $('logLevelFilter').value;
+            if (currentFilter !== 'all' && currentFilter !== type) {
+                entry.style.display = 'none';
+            }
+            
+            if (currentSearchTerm && message.toLowerCase().includes(currentSearchTerm.toLowerCase())) {
+                entry.classList.add('search-match');
+            }
+            
+            logContainer.appendChild(entry);
+            
+            if (!logStats[type]) logStats[type] = 0;
+            logStats.total++;
+            logStats[type]++;
+            
+            if ($('statTotalLogs')) {
+                updateLogStats();
+            }
+            
+            if ($('autoScroll') && $('autoScroll').checked) {
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+            
+            if (logContainer.children.length > 500) {
+                for (let i = 0; i < 100; i++) {
+                    if (logContainer.firstChild) logContainer.removeChild(logContainer.firstChild);
+                }
+            }
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            removeModalBackdrops();
+            const modalEl = $('confirmModal');
+            $('confirmModalLabel').textContent = title;
+            $('confirmModalBody').innerHTML = message;
+
+            const modalContent = modalEl.querySelector('.modal-content');
+            modalContent.style.background = "rgba(40, 50, 70, 0.85)";
+            modalContent.style.backdropFilter = "blur(10px)";
+            modalContent.style.color = "white";
+            modalContent.style.border = "1px solid var(--warning)";
+            modalEl.querySelector('.modal-header').style.borderBottom = "3px solid var(--warning)";
+
+            const okBtn = $('confirmModalOkBtn');
+            // Eski listener'ı temizle
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            newOkBtn.addEventListener('click', () => {
+                bootstrap.Modal.getInstance(modalEl)?.hide();
+                removeModalBackdrops();
+                if (typeof onConfirm === 'function') onConfirm();
+            });
+
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+            modalEl.addEventListener('hidden.bs.modal', removeModalBackdrops, { once: true });
+        }
+
+        function showModal(title, message, type = 'success') {
+            removeModalBackdrops();
+            const modal = new bootstrap.Modal($('saveModal'));
+            $('saveModalLabel').textContent = title;
+            $('saveModalBody').innerHTML = message;
+            
+            const modalHeader = $('saveModal').querySelector('.modal-header');
+            const modalContent = $('saveModal').querySelector('.modal-content');
+            
+            modalContent.style.background = "rgba(40, 50, 70, 0.85)";
+            modalContent.style.backdropFilter = "blur(10px)";
+            modalContent.style.color = "white";
+
+            const colorMap = {
+                'success': 'var(--success)',
+                'error': 'var(--danger)',
+                'warning': 'var(--warning)',
+                'info': 'var(--primary)'
+            };
+            const color = colorMap[type] || colorMap['info'];
+            
+            modalHeader.style.borderBottom = `3px solid ${color}`;
+            modalContent.style.border = `1px solid ${color}`;
+
+            modal.show();
+            $('saveModal').addEventListener('hidden.bs.modal', removeModalBackdrops, { once: true });
+        }
+
+        function removeModalBackdrops() {
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        }
+
+        function formatNumber(num, decimals = 0) {
+            if (num === undefined || num === null) return '0';
+            return Number(num).toFixed(decimals);
+        }
+
+        // updateConnectionStatus() page_management.js'den kullanılır
+
+        activateSensorsPage();
+
+        setTimeout(() => {
+            log('🔄 İlk veriler isteniyor.', 'info');
+            initMap();
+            sendCommand('start_sensor_stream');
+            startQuaternionStream();
+        }, 500);
+
+        function handleReceiverStream(data) {
+            if (!Array.isArray(data)) return;
+            data.forEach((val, index) => {
+                const channelIndex = index + 1;
+                let percent = ((val - 1000) / 1000) * 100;
+                percent = Math.max(0, Math.min(100, percent));
+                const bar = $(`rx-bar-${channelIndex}`);
+                const text = $(`rx-val-${channelIndex}`);
+                if (bar && text) {
+                    bar.style.width = `${percent}%`;
+                    text.textContent = val;
+                    if (val < 1050 || val > 1950) bar.style.background = 'var(--color-warning)';
+                    else bar.style.background = 'linear-gradient(90deg, #0d6efd, #0dcaf0)';
+                }
+            });
+            updateLiveModeMarkers(data);
+        }
+
+        function initCharts() {
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { mode: 'none' },
+                elements: { point: { radius: 0 } },
+                scales: {
+                    x: { display: false },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: '#888', font: { size: 10 } }
+                    }
+                },
+                plugins: { legend: { labels: { color: '#ccc', boxWidth: 10, font: { size: 10 } } } }
+            };
+
+            const ctxG = document.getElementById('chartGyro').getContext('2d');
+            gyroChart = new Chart(ctxG, {
+                type: 'line',
+                data: {
+                    labels: Array(maxDataPoints).fill(''),
+                    datasets: [
+                        { label: 'X', data: [], borderColor: '#ff6b6b', borderWidth: 1.5, fill: false, tension: 0.1 },
+                        { label: 'Y', data: [], borderColor: '#51cf66', borderWidth: 1.5, fill: false, tension: 0.1 },
+                        { label: 'Z', data: [], borderColor: '#339af0', borderWidth: 1.5, fill: false, tension: 0.1 }
+                    ]
+                },
+                options: commonOptions
+            });
+
+            const ctxA = document.getElementById('chartAccel').getContext('2d');
+            accelChart = new Chart(ctxA, {
+                type: 'line',
+                data: {
+            labels: Array(maxDataPoints).fill(''),
+            datasets: [
+                { label: 'X', data: [], borderColor: '#ff6b6b', borderWidth: 1.5, fill: false, tension: 0.1 },
+                { label: 'Y', data: [], borderColor: '#51cf66', borderWidth: 1.5, fill: false, tension: 0.1 },
+                { label: 'Z', data: [], borderColor: '#339af0', borderWidth: 1.5, fill: false, tension: 0.1 }
+            ]
+                },
+                options: commonOptions
+            });
+        }
+
+        function handleGyroStream(data) {
+            if (!gyroChart || !accelChart) return;
+            updateSingleChart(gyroChart, [data.gx, data.gy, data.gz]);
+            updateSingleChart(accelChart, [data.ax, data.ay, data.az]);
+        }
+
+        function updateSingleChart(chart, values) {
+            for(let i=0; i<3; i++) {
+                chart.data.datasets[i].data.push(values[i]);
+                if (chart.data.datasets[i].data.length > maxDataPoints) {
+                    chart.data.datasets[i].data.shift();
+                }
+            }
+            chart.update('none');
+        }
+
+        window.toggleGraphStream = function(isActive) {
+            if(isConnected) {
+                if(isActive) sendCommand('start_gyro_stream');
+                else sendCommand('stop_gyro_stream');
+            }
+        }
+
+        function debugIncomingData(line) {
+            if (line.includes('pose_data') || line.includes('calibration')) {
+                console.log('🔍 Kalibrasyon verisi tespit edildi:', line);
+            }
+        }
+
+        function resetSaveButton(btn) {
+            setTimeout(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-save2 me-2"></i> Kaydet';
+                }
+            }, 2000);
+        }
+
+        function savePIDConfig() {
+            log('💾 PID değerleri gönderiliyor...', 'info');
+            sendCommand(`PID_SAVE ${JSON.stringify(pidValues)}`);
+        }
+
+        $('btnSendCommand').addEventListener('click', sendCommandFromInput);
+        $('btnLogClear').addEventListener('click', clearLogs);
+        $('btnLogClearAll').addEventListener('click', clearAllLogs);
+        $('btnLogExport').addEventListener('click', exportLogs);
+        $('logLevelFilter').addEventListener('change', filterLogs);
+        $('autoScroll').addEventListener('change', toggleAutoScroll);
+        $('pauseLogs').addEventListener('change', togglePauseLogs);
+        $('btnLogSearch').addEventListener('click', searchLogs);
+        $('btnClearSearch').addEventListener('click', clearSearch);
+    </script>
+
+
+<!-- ==================== FIRMWARE SAYFASI ==================== -->
+<div id="firmware" class="page">
+    <div class="panel panel2">
+        <h2 class="panel-title"><i class="bi bi-cpu"></i> Firmware Güncelleme</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="panel mb-4">
+                    <h5 class="panel-title"><i class="bi bi-info-circle"></i> Son Sürüm Bilgisi</h5>
+                    <div id="firmwareVersionInfo" class="d-flex align-items-center gap-3 mt-2">
+                        <span class="text-muted">Versiyon:</span>
+                        <span id="firmwareVersion" class="badge bg-secondary">Yükleniyor...</span>
+                        <span class="text-muted small">Derleme tarihi: <span id="firmwareBuildDate">—</span></span>
+                    </div>
+                </div>
+                <div class="panel mb-4">
+                    <h5 class="panel-title"><i class="bi bi-download"></i> ESP32'ye Flash Et</h5>
+                    <div id="firmwareConnectedWarning" class="alert alert-danger d-none">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <span>
+                                <i class="bi bi-x-circle me-2"></i>
+                                Flash işlemi için önce seri bağlantıyı kesmelisiniz.
+                            </span>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="document.getElementById('btnDisconnect').click()">
+                                <i class="bi bi-usb-plug me-1"></i> Bağlantıyı Kes
+                            </button>
+                        </div>
+                    </div>
+                    <div id="firmwareFlashWrapper" class="d-flex flex-column align-items-center mt-3">
+                        <esp-web-install-button manifest="https://savas8008.github.io/vecihi-public/manifest.json">
+                            <button slot="activate" class="btn btn-primary btn-lg">
+                                <i class="bi bi-cpu me-2"></i> Flash Başlat
+                            </button>
+                        </esp-web-install-button>
+                        <p class="text-muted text-center mt-2 small">
+                            Web Serial API gerektirir. Chrome/Edge tarayıcı kullanın.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/waypoint.js"></script>
+<script src="assets/js/firmware.js"></script>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js"></script>
+
+<!-- PWA Service Worker Kaydı -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('[PWA] Service Worker kayıt edildi:', reg.scope))
+        .catch(err => console.warn('[PWA] Service Worker hatası:', err));
+    });
+  }
+</script>
+</body>
+</html>
