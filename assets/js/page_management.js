@@ -408,6 +408,18 @@ function updateConnectionStatus() {
         sidebarCol.style.display = connected ? '' : 'none';
     }
 
+    // İçerik kolonu: bağlantı yokken tam genişlik
+    const contentCol = document.querySelector('.col-lg-10.col-md-9');
+    if (contentCol) {
+        if (connected) {
+            contentCol.classList.remove('col-12');
+            contentCol.classList.add('col-lg-10', 'col-md-9');
+        } else {
+            contentCol.classList.remove('col-lg-10', 'col-md-9');
+            contentCol.classList.add('col-12');
+        }
+    }
+
     // Sayfa görünürlüğü
     document.querySelectorAll('.page').forEach(page => {
         if (page.classList.contains('active')) {
