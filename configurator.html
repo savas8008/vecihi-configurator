@@ -279,12 +279,18 @@
                 <div class="col-6">
                   <div class="p-2 border border-secondary rounded">
                     <small class="text-muted d-block">UYDU SAYISI</small>
+                        <img src="assets/icons/satellite.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+                        <br>
+
                     <span id="gps-sats" class="fs-4 fw-bold text-white">0</span>
                   </div>
                 </div>
                 <div class="col-6">
                   <div class="p-2 border border-secondary rounded">
                     <small class="text-muted d-block">HIZ (km/h)</small>
+
+                                     <img src="assets/icons/speed.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+<br>
                     <span id="gps-speed" class="fs-4 fw-bold text-info">0</span>
                   </div>
                 </div>
@@ -310,15 +316,19 @@
               <div class="row g-3">
                 <div class="col-6">
                   <div class="text-center p-3 border border-secondary rounded h-100">
-                    <i class="bi bi-arrow-up-circle fs-1 text-primary mb-2"></i>
-                    <div class="text-muted small">BARO İRTİFA</div>
+                    <div class="text-muted small">İRTİFA</div>
+
+                 <img src="assets/icons/barometer.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
                     <div class="fs-3 fw-bold"><span id="sens-alt">0.0</span> m</div>
                   </div>
                 </div>
                 <div class="col-6">
                   <div class="text-center p-3 border border-secondary rounded h-100">
-                    <i class="bi bi-speedometer2 fs-1 text-success mb-2"></i>
-                    <div class="text-muted small">TIRMANIŞ (Vario)</div>
+                  <div class="text-muted small">VARİO</div>
+               
+                 <img src="assets/icons/parachute.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+
+                   
                     <div class="fs-3 fw-bold"><span id="sens-vario">0.0</span> m/s</div>
                   </div>
                 </div>
@@ -346,24 +356,32 @@
           <div class="col-md-3 col-6">
             <div class="p-2 border border-secondary rounded">
               <small class="text-muted d-block">CORE 1 (LOOP)</small>
-              <span id="sys-hz" class="fs-4 fw-bold text-white">0</span> <small class="text-muted">Hz</small>
+             <img src="assets/icons/core01.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+             <br>
+    <span id="sys-hz" class="fs-4 fw-bold text-white">0</span> <small class="text-muted">Hz</small>
             </div>
           </div>
           <div class="col-md-3 col-6">
             <div class="p-2 border border-secondary rounded">
-              <small class="text-muted d-block">CORE 0 (SYS)</small>
-              <span id="sys-hz0" class="fs-4 fw-bold text-info">0</span> <small class="text-muted">Hz</small>
+              <small class="text-muted d-block">CORE 0 (SYS)</small>            
+                <img src="assets/icons/core01.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+<br>
+  <span id="sys-hz0" class="fs-4 fw-bold text-info">0</span> <small class="text-muted">Hz</small>
             </div>
           </div>
           <div class="col-md-3 col-6">
             <div class="p-2 border border-secondary rounded">
               <small class="text-muted d-block">SICAKLIK</small>
+                                <img src="assets/icons/thermometer.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+<br>
               <span id="sys-temp" class="fs-4 fw-bold text-warning">--</span> <small class="text-muted">°C</small>
             </div>
           </div>
           <div class="col-md-3 col-6">
             <div class="p-2 border border-secondary rounded">
               <small class="text-muted d-block">BOŞ RAM</small>
+                                <img src="assets/icons/ram-memory.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+<br>
               <span id="sys-ram" class="fs-4 fw-bold text-info">--</span> <small class="text-muted">KB</small>
             </div>
           </div>
@@ -1658,6 +1676,8 @@ function switchAdvTab(tabId, btn) {
 <div class="form-check form-switch mb-2">
     <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_sats" checked data-target="prev_sats">
     <label class="form-check-label small" for="osd_show_sats">Uydu Sayısı</label>
+  
+
 </div>
     <hr class="my-2 border-secondary">
 <div class="form-check form-switch mb-2">
@@ -2722,7 +2742,8 @@ function switchAdvTab(tabId, btn) {
                             </span>
                             <button class="btn btn-sm btn-outline-danger"
                                     onclick="document.getElementById('btnDisconnect').click()">
-                                <i class="bi bi-usb-plug me-1"></i> Bağlantıyı Kes
+                                <i class="bi bi-usb-plug me-1">                 <img src="assets/icons/barometer.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+</i> Bağlantıyı Kes
                             </button>
                         </div>
                     </div>
