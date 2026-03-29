@@ -1,4 +1,4 @@
-<head>
+﻿<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vecihi Configurator</title>
@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Vecihi">
-    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -121,9 +120,6 @@
                             <span class="status-indicator status-off" id="statusIndicator"></span>
                             <span id="connectionStatus">Bağlantı Yok</span>
                         </div>
-                        <button class="btn btn-connect" id="btnConnect">
-                            <i class="bi bi-usb-plug me-1"></i> Porta Bağlan
-                        </button>
                         <button class="btn btn-disconnect d-none" id="btnDisconnect">
                             <i class="bi bi-usb-plug-fill me-1"></i> Bağlantıyı Kes
                         </button>
@@ -162,12 +158,6 @@
         <i class="bi bi-map me-2"></i> Waypoint
     </a>
 </li>
-                        <li class="nav-item">
-    <a class="nav-link" href="#" data-page="firmware">
-        <i class="bi bi-cpu me-2"></i> Firmware
-    </a>
-</li>
-
                         <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> Loglar</a></li>
                     </ul>
                 </div>
@@ -175,13 +165,46 @@
 
             <div class="col-lg-10 col-md-9">
                 <div id="connectionPrompt" class="connection-prompt">
-                    <div class="panel text-center">
-                        <i class="bi bi-usb-symbol display-1 text-muted mb-4 gradient-text mb-3"></i>
-                        <h2 class="gradient-text mb-3">Seri Port Bağlantısı Gerekli</h2>
-                        <p class="gradient-text mb-3">Uygulamayı kullanmak için lütfen cihazınızı seri porta bağlayın.</p>
-                        <button class="btn btn-connect btn-lg" id="btnConnectPrompt">
-                            <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
-                        </button>
+                    <div class="row gx-3 gy-3 justify-content-center inner-row">
+                        <div class="col-md-5">
+                            <div class="panel panel2 prompt-card h-100 firmware-preview">
+                                <div class="text-center mb-3">
+                                    <i class="bi bi-cpu display-1 text-white mb-4"></i>
+                                    <br>
+                                    <br>
+                                    <h2 class="text-white mb-0">Firmware Güncelleme</h2>
+                                </div>
+                                <div class="d-flex flex-column gap-20 mt-3">
+                                    <div class="d-flex flex-column align-items-start">
+                                        <div class="text-muted">Versiyon:</div>
+                                        <span id="firmwareVersionPreview" class="badge bg-secondary firmware-version">Yükleniyor...</span>
+                                        <small class="text-muted">Derleme tarihi: <span id="firmwareBuildDatePreview" class="firmware-build-date">—</span></small>
+                                    </div>
+                                    <div class="alert alert-warning small mb-0">
+                                        Flash işlemi için önce seri bağlantıyı kesin.
+                                    </div>
+                                    <div class="text-center">
+                                        <esp-web-install-button manifest="https://savas8008.github.io/vecihi-public/manifest.json">
+                                            <button slot="activate" class="btn btn-warning btn-lg w-100">
+                                                <i class="bi bi-cpu me-2"></i> Flash Başlat
+                                            </button>
+                                        </esp-web-install-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="panel text-center prompt-card h-100">
+                                <i class="bi bi-usb-symbol display-1 text-muted mb-4 gradient-text mb-3"></i>
+                                <h2 class="gradient-text mb-3">Konfiguratöre Giriş</h2>
+                                <p class="gradient-text mb-3">Uygulamayı kullanmak için lütfen cihazınızı seri porta bağlayın.</p>
+                              <br><br>
+                                <button class="btn btn-connect btn-lg" id="btnConnectPrompt">
+
+                                    <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 <!-- ================== SENSORS PAGE ================== -->
@@ -2541,7 +2564,7 @@ function switchAdvTab(tabId, btn) {
 
         // updateConnectionStatus() page_management.js'den kullanılır
 
-        activateSensorsPage();
+        // Sensör sayfası otomatik açılmamalı.
 
         setTimeout(() => {
             log('🔄 İlk veriler isteniyor.', 'info');
@@ -2672,15 +2695,20 @@ function switchAdvTab(tabId, btn) {
 <!-- ==================== FIRMWARE SAYFASI ==================== -->
 <div id="firmware" class="page">
     <div class="panel panel2">
-        <h2 class="panel-title"><i class="bi bi-cpu"></i> Firmware Güncelleme</h2>
+        <h2 class="panel-title"><i class="bi bi-cpu"></i></h2>
+
+     
+    
+
+
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="panel mb-4">
                     <h5 class="panel-title"><i class="bi bi-info-circle"></i> Son Sürüm Bilgisi</h5>
                     <div id="firmwareVersionInfo" class="d-flex align-items-center gap-3 mt-2">
                         <span class="text-muted">Versiyon:</span>
-                        <span id="firmwareVersion" class="badge bg-secondary">Yükleniyor...</span>
-                        <span class="text-muted small">Derleme tarihi: <span id="firmwareBuildDate">—</span></span>
+                        <span id="firmwareVersion" class="badge bg-secondary firmware-version">Yükleniyor...</span>
+                        <span class="text-muted small">Derleme tarihi: <span id="firmwareBuildDate" class="firmware-build-date">—</span></span>
                     </div>
                 </div>
                 <div class="panel mb-4">
@@ -2719,12 +2747,24 @@ function switchAdvTab(tabId, btn) {
 
 <!-- PWA Service Worker Kaydı -->
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('[PWA] Service Worker kayıt edildi:', reg.scope))
-        .catch(err => console.warn('[PWA] Service Worker hatası:', err));
-    });
+  // Tarayıcı protokolünü kontrol et (PWA özellikleri file:// protokolünde çalışmaz)
+  if (window.location.protocol !== 'file:') {
+    // Manifest dosyasını dinamik olarak ekle
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = 'manifest.json';
+    document.head.appendChild(manifestLink);
+
+    // Service Worker kaydı
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('[PWA] Service Worker kayıt edildi:', reg.scope))
+          .catch(err => console.warn('[PWA] Service Worker hatası:', err));
+      });
+    }
+  } else {
+    console.log('⚠️ Yerel dosya sistemindesiniz (file://). PWA özellikleri (Manifest, SW) devre dışı bırakıldı.');
   }
 </script>
 </body>

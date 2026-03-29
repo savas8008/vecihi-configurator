@@ -45,9 +45,9 @@
        .panel3 → En iç içerik kartı
        Değiştirmek için sadece bu değişkenleri güncelleyin.
     ========================================= */
-    --bg-panel:   rgba(9, 80, 76, 0.9);    /* Dış: koyu lacivert */
-    --bg-panel-2: rgba(43, 94, 91, 0.9);     /* Orta: biraz açık çelik mavi */
-    --bg-panel-3: rgba(13, 81, 78, 0.9);   /* İç: hafif aydınlık çelik mavi */
+    --bg-panel:   rgba(8, 47, 102, 0.9);    /* Dış: koyu lacivert */
+    --bg-panel-2: rgba(43, 69, 94, 0.9);     /* Orta: biraz açık çelik mavi */
+    --bg-panel-3: rgba(13, 29, 81, 0.9);   /* İç: hafif aydınlık çelik mavi */
     --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
 
     --bg-panel-solid: #dbe0e8;
@@ -1774,6 +1774,98 @@ label.small.text-muted,
     padding: var(--spacing-xl) 0;
 }
 
+#connectionPrompt .prompt-card {
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#connectionPrompt .prompt-card .btn {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+#connectionPrompt .inner-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: stretch;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    gap: 3rem;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+#connectionPrompt .inner-row > .col-md-5 {
+    display: flex !important;
+    justify-content: center !important;
+    flex: 0 0 42% !important;
+    max-width: 42% !important;
+}
+
+#connectionPrompt .inner-row > .col-md-5:last-child {
+    margin-left: 0 !important;
+}
+
+#connectionPrompt .prompt-card {
+    min-height: 360px;
+    width: 100%;
+    max-width: 100%;
+    background: var(--bg-panel) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+    padding: 44px 32px 32px !important;
+    color: rgba(255,255,255,0.95) !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+#connectionPrompt .prompt-card > .text-center {
+    padding-top: 20px;
+}
+
+#connectionPrompt .prompt-card .panel-title,
+#connectionPrompt .prompt-card h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    margin-bottom: 1rem !important;
+}
+
+#connectionPrompt .prompt-card p,
+#connectionPrompt .prompt-card .text-muted,
+#connectionPrompt .prompt-card small {
+    color: rgba(255,255,255,0.88) !important;
+}
+
+#connectionPrompt .prompt-card .badge {
+    background: rgba(40, 180, 115, 0.16) !important;
+    color: #b6f0bc !important;
+    border: 1px solid rgba(40, 180, 115, 0.28) !important;
+}
+
+#connectionPrompt .prompt-card .badge {
+    background: rgba(40, 180, 115, 0.16) !important;
+    color: #b6f0bc !important;
+    border: 1px solid rgba(40, 180, 115, 0.28) !important;
+}
+
+#connectionPrompt .prompt-card .btn {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.firmware-preview {
+    min-height: 360px;
+}
+
 /* Bağlantı kurulduğunda pencereyi kesinlikle gizle */
 #connectionPrompt.d-none {
     display: none !important;
@@ -2044,3 +2136,28 @@ label.small.text-muted,
 .cal-step.panel4:hover:not(.disabled)  { background: rgba(14,165,233,0.10) !important; }
 .cal-step.panel4.active                { background: rgba(14,165,233,0.12) !important; }
 .cal-step.panel4.completed             { background: rgba(16,185,129,0.12) !important; }
+
+/* ============================================
+   FIRMWARE GÜNCELLE BUTONU - SARI RENG
+   ============================================ */
+.btn-firmware-nav {
+    background: linear-gradient(135deg, #fcd34d, #fbbf24) !important;
+    color: #1f2937 !important;
+    font-weight: 700;
+    padding: 6px 18px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 14px rgba(251, 191, 36, 0.45), 0 2px 8px rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(251, 191, 36, 0.55);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-firmware-nav:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+    box-shadow: 0 0 22px rgba(251, 191, 36, 0.65), 0 4px 14px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+    color: #1f2937 !important;
+}

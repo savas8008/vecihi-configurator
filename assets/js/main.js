@@ -86,8 +86,14 @@ function populateChannelSelectors() {
  */
 function setupEventListeners() {
     // --- Sistem ve Bağlantı ---
-    $('btnConnect').addEventListener('click', connectSerial);
-    $('btnConnectPrompt').addEventListener('click', connectSerial);
+    const btnConnect = $('btnConnect');
+    if (btnConnect) {
+        btnConnect.addEventListener('click', connectSerial);
+    }
+    const btnConnectPrompt = $('btnConnectPrompt');
+    if (btnConnectPrompt) {
+        btnConnectPrompt.addEventListener('click', connectSerial);
+    }
     $('btnDisconnect').addEventListener('click', disconnectSerial);
 
     // --- Kalibrasyon Sayfası Event Listener'ları ---

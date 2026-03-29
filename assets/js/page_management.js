@@ -5,7 +5,7 @@
  */
 
 // === SAYFA DURUMU ===
-let currentPage = 'calibration';
+let currentPage = '';
 
 // Veri beklenen sayfalar (ESP'den page_data gelmeden kaydet engellenir)
 const DATA_PAGES = new Set(['calibration', 'outputs', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint']);
@@ -328,12 +328,13 @@ function updateConnectionStatus() {
     }
 
     // 2. Bağlantı durumu değişince otomatik sayfa yönlendir
-    if (!connected && currentPage !== 'firmware') {
-        changePage('firmware');
-        return;
-    }
+    // Firmware sayfası sadece kullanıcı tıkladığında görünmeli.
     if (connected && currentPage === 'firmware') {
         changePage('calibration');
+        return;
+    }
+    if (connected && !currentPage) {
+        changePage('sensors');
         return;
     }
     
@@ -401,28 +402,19 @@ function updateConnectionStatus() {
         }
     });
 
+    // Sol menü: bağlantı yokken tamamen gizle
+    const sidebarCol = document.querySelector('.sidebar')?.closest('.col-lg-2');
+    if (sidebarCol) {
+        sidebarCol.style.display = connected ? '' : 'none';
+    }
+
     // Sayfa görünürlüğü
     document.querySelectorAll('.page').forEach(page => {
-        if (page.id === 'firmware') {
-            // Firmware sayfası: bağlantı yokken ve aktifken görünür
-            if (!connected && page.classList.contains('active')) {
-                page.style.removeProperty('display');
-                page.style.display = 'block';
-            } else {
-                page.style.display = 'none';
-            }
-            return;
-        }
-        if (connected) {
-            if (page.classList.contains('active')) {
-                page.style.removeProperty('display');
-                page.style.display = 'block';
-            } else {
-                page.style.display = 'none';
-            }
+        if (page.classList.contains('active')) {
+            page.style.removeProperty('display');
+            page.style.display = 'block';
         } else {
-            // Bağlantı yoksa kesinlikle gizle
-            page.style.setProperty('display', 'none', 'important');
+            page.style.display = 'none';
         }
     });
 
@@ -451,9 +443,6 @@ function initPageManagement() {
     setupNavigationListeners();
     setupSaveButtonListeners();
     updateConnectionStatus();
-    
-    // Varsayılan sayfa: Başlangıçta bağlantı olmadığından firmware'de başla
-    changePage('firmware');
 }
 
 

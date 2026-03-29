@@ -11,10 +11,10 @@ const FIRMWARE_MANIFEST_URL = 'https://savas8008.github.io/vecihi-public/manifes
  * @brief Firmware manifest bilgilerini yükler ve UI'ı günceller
  */
 async function loadFirmwareInfo() {
-    const versionEl = document.getElementById('firmwareVersion');
-    const dateEl = document.getElementById('firmwareBuildDate');
+    const versionEls = Array.from(document.querySelectorAll('.firmware-version'));
+    const dateEls = Array.from(document.querySelectorAll('.firmware-build-date'));
 
-    if (!versionEl) return;
+    if (!versionEls.length) return;
 
     try {
         const response = await fetch(FIRMWARE_MANIFEST_URL, { cache: 'no-store' });
@@ -22,23 +22,25 @@ async function loadFirmwareInfo() {
 
         const manifest = await response.json();
 
-        if (versionEl) {
+        versionEls.forEach(versionEl => {
             versionEl.textContent = manifest.version || '?';
-            versionEl.className = 'badge bg-success';
-        }
+            versionEl.className = 'badge bg-success firmware-version';
+        });
 
-        if (dateEl) {
-            const date = manifest.build_info && manifest.build_info.date
-                ? manifest.build_info.date
-                : '—';
+        const date = manifest.build_info && manifest.build_info.date
+            ? manifest.build_info.date
+            : '—';
+        dateEls.forEach(dateEl => {
             dateEl.textContent = date;
-        }
+        });
     } catch (err) {
-        if (versionEl) {
+        versionEls.forEach(versionEl => {
             versionEl.textContent = 'Bağlanamadı';
-            versionEl.className = 'badge bg-danger';
-        }
-        if (dateEl) dateEl.textContent = '—';
+            versionEl.className = 'badge bg-danger firmware-version';
+        });
+        dateEls.forEach(dateEl => {
+            dateEl.textContent = '—';
+        });
         console.warn('[Firmware] Manifest yüklenemedi:', err);
     }
 }
@@ -68,3 +70,6 @@ function initFirmwarePage() {
 
 window.initFirmwarePage = initFirmwarePage;
 window.updateFirmwarePageState = updateFirmwarePageState;
+
+// Manifest bilgilerini sayfa yüklendiğinde de önden çek
+loadFirmwareInfo();
