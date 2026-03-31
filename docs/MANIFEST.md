@@ -1,0 +1,17 @@
+# VECİHİ PROJESİ MANİFESTOSU
+
+**Neden Yeni Bir Uçuş Kontrol Yazılımına İhtiyaç Duyduk?**
+
+Vecihi projesi, mevcut açık kaynak uçuş kontrol ekosisteminin giderek hantallaşan yapısına, son kullanıcıdan kopuk geliştirme süreçlerine ve eski donanım miraslarının getirdiği kısıtlamalara karşı bir mühendislik tepkisi olarak doğmuştur. Projemizin geliştirilme felsefesi ve sektördeki mevcut yazılımlardan ayrıştığı temel noktalar aşağıda dört ana başlık altında özetlenmiştir:
+
+### 1. Çoklu Platform Odaklılığın (One-Size-Fits-All) Getirdiği Dezavantajlar
+Mevcut pazar standartlarındaki uçuş kontrol yazılımları; çok rotorlu (multicopter), sabit kanatlı ve insansız kara araçları gibi birbirinden tamamen farklı fiziksel yapıları tek bir kod tabanında destekleme vizyonuyla hareket etmektedir. Bu genelleştirilmiş yaklaşım, sabit kanatlı hava araçlarının kendine has aerodinamik gereksinimlerinin, mikser yapılarının ve özgün uçuş dinamiklerinin ihmal edilmesine veya taviz verilerek uygulanmasına neden olmaktadır. Vecihi, "her şeye uyan tek beden" mantığını reddederek; tüm işlem gücünü, algoritmalarını ve geliştirme eforunu yalnızca **sabit kanatlı** araçların karakteristiklerine adar.
+
+### 2. Miras (Legacy) Kod Yükü ve Geliştirme Odağının Kayması
+Sektörde standart haline gelmiş birçok uçuş kontrol yazılımı, 10-15 yıl öncesinin son derece kısıtlı işlem gücüne sahip mikrodenetleyicileri üzerinde inşa edilmeye başlanmıştır. Geçmişin donanım kısıtlarını aşmak için yapılan aşırı optimizasyonlar, günümüzde kodun modülerliğini yitirmesine ve yeni teknolojilerin entegrasyonunun zorlaşmasına yol açmıştır. Dahası, mevcut geliştirme eforunun büyük bir kısmı, genel kullanıcı tabanının %1'ini dahi oluşturmayan marjinal veya endüstriyel senaryolara yönlendirilmektedir. Bu durum, standart son kullanıcının temel uçuş deneyimini iyileştirecek adımların sürekli ertelenmesine sebep olmaktadır.
+
+### 3. Aşırı Mühendislik (Over-Engineering) ve Kullanıcı Deneyiminden Kopukluk
+Açık kaynak ekosistemlerindeki topluluk yönetimleri, sıklıkla pratik kullanıcı ihtiyaçları ile katı teorik doğrular arasında sıkışıp kalmaktadır. Örneğin; kullanıcıların OSD (On-Screen Display) ekranında pratik bir "Stall (Tutunma Kaybı) Hız Uyarısı" görme talebi, stall olayının sadece hıza değil hücum açısına (AoA) bağlı olduğu gibi salt akademik ve teorik gerekçelerle reddedilebilmektedir. Oysa son kullanıcı, karmaşık aerodinamik denklemlerin tartışılmasından ziyade, uçuş güvenliğini artıracak işlevsel çözümlere (belirli bir hız eşiğinin altında tetiklenen basit bir uyarı gibi) ihtiyaç duyar. Vecihi, mühendislik teorilerini göz ardı etmeden, akademik katılık yerine **kullanıcı odaklı ve pragmatik (faydacı)** bir tasarım felsefesini benimser.
+
+### 4. Modern İşlemci Mimarisinin (Çift Çekirdek) Kullanılamaması
+Pazardaki köklü yazılımların temelleri tek çekirdekli eski işlemcilere dayandığı için, günümüzün modern çok çekirdekli mikrodenetleyicilerine geçildiğinde bile yazılım mimarisi tek bir iş parçacığı (thread) üzerinden yürümeye devam etmektedir. Vecihi ise ESP32'nin **çift çekirdekli (Dual-Core)** yapısına özgü (native) olarak sıfırdan tasarlanmıştır. Uçuş için hayati önem taşıyan PID döngüleri ve hassas sensör okumaları (Core 0) izole edilirken; arayüz haberleşmesi ve DJI O4 OSD çizimleri gibi ağır yükler (Core 1) ayrı bir çekirdekte işlenir. Bu sayede sistemsel darboğazların ve gecikmelerin (latency) donanımsal düzeyde önüne geçilir.
