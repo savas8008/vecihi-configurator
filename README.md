@@ -6,7 +6,18 @@
 ---
 
 ## 📖 Proje Hakkında
-**Vecihi**, ESP32 (WROOM) mimarisi üzerinde çalışan, modern ve erişilebilir bir uçuş kontrol yazılımıdır. Sensör okumaları, uçuş dinamiği hesaplamaları ve OSD (DJI O4) haberleşmesi gibi işlemleri ESP32'nin çift çekirdekli yapısını kullanarak optimize edilmiş bir şekilde yürütür. MPU6050 (Jiroskop/İvmeölçer) ve BMP180 (Barometre) gibi standart sensörleri destekler.
+**Vecihi**, ESP32 (WROOM) mimarisi üzerinde çalışan, modern ve erişilebilir bir uçuş kontrol yazılımıdır. 
+## 🛠️ Desteklenen Donanımlar ve Modüller
+
+Sensör okumaları, uçuş dinamiği hesaplamaları ve OSD haberleşmesi gibi işlemler ESP32'nin çift çekirdekli yapısı kullanılarak optimize edilmiş bir şekilde yürütülür. Sistem şu an için aşağıdaki donanımları desteklemektedir:
+
+| Kategori | Desteklenen Modül | İletişim Protokolü | Açıklama |
+| :--- | :--- | :--- | :--- |
+| **Mikrodenetleyici (MCU)** | ESP32 WROOM-32 | Çift Çekirdek | Temel uçuş kontrol, hesaplama ve arayüz bağlantısı. |
+| **IMU (Jiroskop/İvmeölçer)** | MPU6050 | I2C | Hava aracının uzaydaki açı ve ivme hesaplamaları. |
+| **Barometre (İrtifa)** | BMP180 / BME280 | I2C | İrtifa sabitleme ve hassas yükseklik ölçümü. |
+| **GPS / Konum** | Standart NMEA (M8N, M10 vb.)| UART | Hız, konum takibi ve otonom görev verileri. |
+| **OSD / FPV Görüntü** | DJI O4 | UART (MSP) | DisplayPort üzerinden dijital gözlüğe anlık veri aktarımı. |
 
 ## 🚀 Kurulum ve Kullanım (Web Flasher)
 
@@ -34,4 +45,4 @@ Sistemin kurulumu, ayarlanması ve sınırları hakkında detaylı bilgiler içi
 *(Hazırlanıyor)*
 
 ---
-*Geliştirici:* **Dr. Muhammet Savaş Yılmaz / Takım Vecihi**
+*Geliştirici:* **Dr. Muhammet Savaş Yılmaz**
