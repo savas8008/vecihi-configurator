@@ -2762,6 +2762,28 @@ function switchAdvTab(tabId, btn) {
         </div>
     </div>
 </div>
+<div class="modal fade" id="sensorErrorModal" tabindex="-1" aria-labelledby="sensorErrorModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light border-danger">
+      <div class="modal-header border-bottom border-secondary">
+        <h5 class="modal-title text-danger" id="sensorErrorModalLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Donanım Başlatma Hatası
+        </h5>
+      </div>
+      <div class="modal-body">
+        <p class="text-secondary mb-3">Uçuş kontrolcüsü (Vecihi) başlatılırken kritik sensörlerle iletişim kuramadı. Lütfen bağlantıları kontrol edin.</p>
+        <ul class="list-group list-group-flush rounded" id="sensorStatusList">
+          </ul>
+      </div>
+      <div class="modal-footer border-top border-secondary">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Yoksay (Sadece Arayüz Testi)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="sendCommand('{\"command\": \"get_sensor_status\"}')">
+          <i class="bi bi-arrow-clockwise me-1"></i>Tekrar Sorgula
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="assets/js/waypoint.js"></script>
 <script src="assets/js/firmware.js"></script>

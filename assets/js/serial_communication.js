@@ -425,7 +425,83 @@ function processSingleLine(line) {
  */
 function handleStandardJsonData(data) {
     console.log("[DEBUG] handleStandardJsonData:", data);
-    
+    // ==========================================
+    // YENİ EKLENEN KISIM: EL SIKIŞMA VE SENSÖR KONTROLÜ
+    // ==========================================
+
+    // 2. ADIM: Sensör statüsü geldi mi?
+    if (data.stream_data && data.stream_data.type === 'init_status') {
+        const sensors = data.stream_data.data;
+        
+        // Kritik sensörler (Gyro ve Accel) çalışıyor mu?
+        const isSystemReady = sensors.gyro && sensors.accel; 
+        
+        if (isSystemReady) {
+            log('✅ Tüm kritik sensörler çalışıyor. Sayfa verileri ve akış başlatılıyor...', 'success');
+            
+            // Eğer varsa modalı kapat
+            const modalEl = document.getElementById('sensorErrorModal');
+            if (modalEl) {
+                const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (modalInstance) modalInstance.hide();
+            }
+
+            // Sensörler sağlamsa, başlangıçta (connectSerial'da) sildiğimiz 
+            // diğer sayfa verilerini ŞİMDİ iste.
+            sendCommand('calibration_page_data');
+            setTimeout(() => sendCommand('advanced_page_data'), 200);
+            setTimeout(() => sendCommand('pid_page_data'), 400);
+            setTimeout(() => sendCommand('outputs_page_data'), 600);
+            setTimeout(() => sendCommand('transmitter_page_data'), 800);
+            setTimeout(() => sendCommand('modes_page_data'), 1000);
+            setTimeout(() => sendCommand('osd_page_data'), 1200);
+            setTimeout(() => {
+                if (typeof startQuaternionStream === 'function') {
+                    startQuaternionStream();
+                }
+            }, 1600);
+
+        } else {
+            log('⚠️ Sensör başlatma hatası algılandı, modal gösteriliyor.', 'warning');
+            
+            // Listeyi dinamik doldur
+            const statusList = document.getElementById('sensorStatusList');
+            if (statusList) {
+                statusList.innerHTML = `
+                    <li class="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center">
+                        Jiroskop (MPU6050)
+                        <span class="badge ${sensors.gyro ? 'bg-success' : 'bg-danger'} rounded-pill">${sensors.gyro ? 'OK' : 'BAĞLI DEĞİL'}</span>
+                    </li>
+                    <li class="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center">
+                        İvmeölçer (MPU6050)
+                        <span class="badge ${sensors.accel ? 'bg-success' : 'bg-danger'} rounded-pill">${sensors.accel ? 'OK' : 'BAĞLI DEĞİL'}</span>
+                    </li>
+                    <li class="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center">
+                        Barometre
+                        <span class="badge ${sensors.baro ? 'bg-success' : 'bg-warning text-dark'} rounded-pill">${sensors.baro ? 'OK' : 'BAĞLI DEĞİL'}</span>
+                    </li>
+                    <li class="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center">
+                        GPS
+                        <span class="badge ${sensors.gps ? 'bg-success' : 'bg-warning text-dark'} rounded-pill">${sensors.gps ? 'OK' : 'BAĞLI DEĞİL'}</span>
+                    </li>
+                `;
+            }
+
+            // Modalı göster
+            const modalEl = document.getElementById('sensorErrorModal');
+            if (modalEl) {
+                let modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (!modalInstance) {
+                    modalInstance = new bootstrap.Modal(modalEl);
+                }
+                modalInstance.show();
+            }
+        }
+        return; // İşlem tamamlandı, geri dön
+    }
+    // ==========================================
+    // YENİ EKLENEN KISIM BİTTİ
+    // ==========================================
     if (data.page_data) {
         handlePageData(data.page_data.type, data.page_data.data);
         return;
