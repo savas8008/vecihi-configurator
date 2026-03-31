@@ -66,10 +66,10 @@ ESP32 mikrodenetleyicisi donanımsal olarak toplam 3 adet UART (Seri İletişim)
 Kullanıcıların, ayar yapmak amacıyla karta güç verdikten sonraki ilk 10 saniye içerisinde web arayüzü üzerinden "Bağlan" butonuna tıklaması gerekmektedir. Eğer bu süre zarfında arayüz bağlantısı kurulmazsa, sistem otomatik olarak **"Uçuş Modu"na** geçer ve paylaşımlı UART portunu tamamen OSD biriminin kullanımına sunar. Uçuş moduna geçildikten sonra USB üzerinden arayüze bağlanılamaz; bağlantı kurmak için sistemin yeniden başlatılması gerekir.
 
 #### 2. Donanım Ekosistemi ve Geliştirme Süreci
-Vecihi, kurumsal bir çatı altında veya geniş bir açık kaynak topluluğu tarafından değil, tek bir geliştiricinin özverisi ve erişebildiği sınırlı donanım imkanlarıyla hayata geçirilmiş bir projedir. 
+Vecihi, kurumsal bir çatı altında veya geniş bir açık kaynak topluluğu tarafından değil, tek bir geliştiricinin erişebildiği sınırlı donanım imkanlarıyla hayata geçirilmiş bir projedir. 
 
 **Operasyonel Kısıt:** Mevcut sürüm, yalnızca test imkanı bulunan kısıtlı sayıdaki sensör (MPU6050, BMP180) ve OSD (DJI O4) modülleriyle %100 uyumlu ve kararlı çalışmaktadır.
-Projenin altyapısı modüler bir esnekliğe sahip olup genişlemeye müsaittir. İlerleyen süreçlerde, farklı donanımlara (yeni nesil IMU'lar, barometreler, farklı dijital/analog kamera ve VTX sistemleri) erişim sağlandıkça gerekli Ar-Ge ve test süreçleri yürütülecek; desteklenen modüller listesi güncellemelerle kademeli olarak genişletilecektir.
+Projenin altyapısı modüler bir esnekliğe sahip olup genişlemeye müsaittir. İlerleyen süreçlerde, farklı donanımlara (yeni nesil IMU'lar, barometreler, farklı dijital/analog kamera ve VTX sistemleri) erişim sağlandıkça gerekli test süreçleri yürütülecek; desteklenen modüller listesi güncellemelerle kademeli olarak genişletilecektir.
 *(Hazırlanıyor)*
 
 ---
