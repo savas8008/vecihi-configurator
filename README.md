@@ -48,10 +48,7 @@ Sistemin kurulumu, ayarlanması ve sınırları hakkında detaylı bilgiler içi
 
 ### Bağlantı Kılavuzu: https://github.com/savas8008/vecihi-configurator/blob/main/docs/WIRING.md
 
-### Konfigüratör Kılavuzu:
-*(Hazırlanıyor)*
-
-### Vecihi Yazılımının Yetenekleri ve Kısıtları
+### Vecihi Yazılımının Kısıtları
 
 Vecihi uçuş kontrol yazılımı, ESP32 mimarisinin sunduğu çift çekirdekli işlem gücünden maksimum verimi almak üzere tasarlanmıştır. Ancak, donanımsal yapısı ve mevcut geliştirme süreci gereği kullanıcıların dikkate alması gereken bazı operasyonel kısıtlar bulunmaktadır:
 
