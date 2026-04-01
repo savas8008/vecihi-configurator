@@ -46,8 +46,7 @@ Herhangi bir derleyici kurmanıza, kod indirmenize veya karmaşık ayarlar yapma
 
 Sistemin kurulumu, ayarlanması ve sınırları hakkında detaylı bilgiler için aşağıdaki kılavuzları inceleyebilirsiniz:
 
-### Bağlantı Kılavuzu:
-*(Hazırlanıyor)*
+### Bağlantı Kılavuzu: https://github.com/savas8008/vecihi-configurator/blob/main/docs/WIRING.md
 
 ### Konfigüratör Kılavuzu:
 *(Hazırlanıyor)*
