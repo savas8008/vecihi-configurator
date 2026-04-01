@@ -1,55 +1,61 @@
 # 🛠 Vecihi Uçuş Kontrolcüsü Bağlantı Kılavuzu
 
-Bu kılavuz, Vecihi yazılımının ESP32 donanımı üzerinde nasıl yapılandırılacağını ve çevre bileşenlerinin (sensörler, GPS, alıcı vb.) nasıl bağlanacağını açıklar.
+Bu kılavuz, Vecihi uçuş kontrol yazılımının ESP32 donanımı üzerinde nasıl yapılandırılacağını ve çevre bileşenlerinin (MPU6050 sensörü, GPS, alıcı vb.) nasıl bağlanacağını açıklar. Vecihi, sabit kanatlı uçaklara özel olarak geliştirilmiştir.
 
 ## 📌 Donanım Kurulum Seçenekleri
 
 Kullanıcılar donanımı üç farklı şekilde kurabilirler:
 1. **ESP32 Shield:** Hazır geliştirme kartı genişletme modülleri kullanarak.
-2. **Özgün PCB:** Kendi ürettiğiniz veya projenin sağladığı özel tasarım PCB'ler üzerine.
+2. **Özgün Tasarım PCB:** Kendi ürettiğiniz veya projenin sağladığı özel tasarım PCB'ler üzerine.
 3. **Doğrudan Bağlantı:** Sensör ve modülleri ESP32 pinlerine doğrudan lehimleyerek.
 
 ---
 
-## ⚡ Temel Bağlantı Şeması
+### Seçenek 1: ESP32 Shield Bağlantısı
+Hazır ESP32 genişletme kartları (Shield) kullanarak, bileşenleri lehim yapmadan veya jumper kablolarla hızlıca bağlayabilirsiniz. Prototipleme ve ilk testler için idealdir.
 
-Aşağıdaki şemalar, sistemin kalbi olan MPU6050 ve diğer bileşenlerin temel yerleşimini göstermektedir:
+![ESP32 Shield Bağlantı Şeması](../assets/icons/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-04-01%20232607.png)
+*Görsel 1: Shield üzerinden bileşen yerleşimi.*
 
-![Genel Bağlantı Şeması 1](../image_d5e980.png)
-*Görsel 1: Sensör ve ESP32 temel pin dizilimi.*
+### Seçenek 2: Özgün Tasarım PCB
+Uçağın ağırlık ve alan verimliliğini artırmak için hazırlanan, tüm bileşenlerin (MPU6050, ESP32, konnektörler) doğrudan üzerine monte edildiği profesyonel çözümdür.
 
-![Genel Bağlantı Şeması 2](../image_d5ec6f.png)
-*Görsel 2: Güç dağıtımı ve çevre birim etkileşimi.*
+![Özgün Tasarım PCB](../assets/icons/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-04-01%20232643.png)
+*Görsel 2: Özgün PCB tasarımı ve yol takibi.*
 
 ---
 
-## 🔌 Pin Tanımlamaları
+## 🔌 Varsayılan Pin Tanımlamaları
 
-Yazılımda varsayılan olarak tanımlanmış (veya yapılandırılabilir) pin dizilimi şöyledir:
+Yazılımda sabit kanatlı uçaklar için varsayılan olarak tanımlanmış pin dizilimi aşağıdadır. Bağlantıları yaparken bu şemaya sadık kalmanız uçuş güvenliği açısından önemlidir.
 
 ### 1. I2C Sensör Grubu (MPU6050)
-| Bileşen | ESP32 Pin | Not |
+| Bileşen | ESP32 Pin | Açıklama |
 | :--- | :--- | :--- |
 | **SDA** | GPIO 21 | Veri hattı |
 | **SCL** | GPIO 22 | Saat hattı |
-| **VCC** | 3.3V | |
-| **GND** | GND | |
+| **VCC** | 3.3V | Güç |
+| **GND** | GND | Toprak |
 
-### 2. GPS ve Harici UART
-| Bileşen | ESP32 Pin | Not |
+### 2. Haberleşme (GPS ve Harici UART)
+| Bileşen | ESP32 Pin | Açıklama |
 | :--- | :--- | :--- |
-| **TX** | GPIO 17 | GPS RX'e bağlanır |
-| **RX** | GPIO 16 | GPS TX'e bağlanır |
+| **RX2** | GPIO 16 | GPS/Telemetri modülünün TX pinine bağlanır |
+| **TX2** | GPIO 17 | GPS/Telemetri modülünün RX pinine bağlanır |
 
-### 3. Motor / Servo Çıkışları (PWM)
-Uçak konfigürasyonuna göre PWM pinleri `config.h` içerisinden değiştirilebilir. Standart dizilim:
-* **Motor 1:** GPIO 13
-* **Servo (Aileron):** GPIO 12
-* **Servo (Elevator):** GPIO 14
+### 3. Motor ve Servo Çıkışları (PWM)
+Kontrol yüzeyleri ve itki sistemi bağlantıları:
+| Bileşen | ESP32 Pin | Açıklama |
+| :--- | :--- | :--- |
+| **Motor (ESC)** | GPIO 13 | Ana motor itki kontrolü |
+| **Aileron (Kanatçık)** | GPIO 12 | Sağa/sola yatış (Roll) kontrolü |
+| **Elevator (Yükseliş)**| GPIO 14 | Aşağı/yukarı yunuslama (Pitch) kontrolü |
 
 ---
 
-## ⚠️ Dikkat Edilmesi Gerekenler
-* **Güç Kaynağı:** ESP32'yi ve sensörleri beslerken voltaj dalgalanmalarını önlemek için kaliteli bir 5V BEC veya regülatör kullanın.
-* **Titreşim:** MPU6050 sensörünü gövdeye sabitlerken çift taraflı kalın sünger bant (gyro tape) kullanmanız uçuş kararlılığı için kritiktir.
-* **Lehimleme:** Doğrudan lehimleme yapıyorsanız, kabloların kısa tutulması paraziti (noise) azaltacaktır.
+## ⚡ Montaj ve Donanım Notları
+
+* **Güç Kaynağı:** ESP32'nin stabil çalışması için en az 2A çıkış verebilen bir 5V BEC (Batarya Eliminasyon Devresi) kullanılmalıdır.
+* **Titreşim ve İzolasyon:** MPU6050 sensörünü uçak gövdesine sabitlerken titreşim sönümleyici bant (gyro tape) kullanmak uçuş kararlılığı için kritiktir.
+* **Sensör Yönü:** MPU6050 sensörünün uçuş yönüyle (burun) uyumlu olduğundan emin olun. Gerekirse Vecihi Configurator üzerinden `Sensor Alignment` sekmesinden yön düzeltmesi yapılabilir.
+* **Doğrudan Lehimleme:** Kendi bağlantılarınızı yapıyorsanız, I2C hatlarını (SDA/SCL) mümkün olduğunca kısa tutarak paraziti (noise) azaltabilirsiniz.
