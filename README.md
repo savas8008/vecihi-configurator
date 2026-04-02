@@ -66,7 +66,7 @@ Vecihi, kurumsal bir çatı altında veya geniş bir açık kaynak topluluğu ta
 
 **Operasyonel Kısıt:** Mevcut sürüm, yalnızca test imkanı bulunan kısıtlı sayıdaki sensör (MPU6050, BMP180) ve OSD (DJI O4) modülleriyle %100 uyumlu ve kararlı çalışmaktadır.
 Projenin altyapısı modüler bir esnekliğe sahip olup genişlemeye müsaittir. İlerleyen süreçlerde, farklı donanımlara (yeni nesil IMU'lar, barometreler, farklı dijital/analog kamera ve VTX sistemleri) erişim sağlandıkça gerekli test süreçleri yürütülecek; desteklenen modüller listesi güncellemelerle kademeli olarak genişletilecektir.
-*(Hazırlanıyor)*
+
 
 ---
 *Geliştirici:* **Dr. Muhammet Savaş Yılmaz**
