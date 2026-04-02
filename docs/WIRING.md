@@ -59,3 +59,4 @@ Kontrol yüzeyleri ve itki sistemi bağlantıları:
 * **Titreşim ve İzolasyon:** MPU6050 sensörünü uçak gövdesine sabitlerken titreşim sönümleyici bant (gyro tape) kullanmak uçuş kararlılığı için kritiktir.
 * **Sensör Yönü:** MPU6050 sensörünün uçuş yönüyle (burun) uyumlu olduğundan emin olun. Gerekirse Vecihi Configurator üzerinden `Sensor Alignment` sekmesinden yön düzeltmesi yapılabilir.
 * **Doğrudan Lehimleme:** Kendi bağlantılarınızı yapıyorsanız, I2C hatlarını (SDA/SCL) mümkün olduğunca kısa tutarak paraziti (noise) azaltabilirsiniz.
+* **RF ve IMU Besleme Ayrımı:** GPS, alıcı gibi RF bağlantıları ile IMU bileşenleri arasında besleme hattında mutlaka uygun kapasitör kullanın. Ani akım çekişi ve parazitler IMU verisini bozabilir, reset veya ölçüm kararsızlığı oluşturabilir.

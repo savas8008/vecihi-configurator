@@ -207,9 +207,39 @@
                 <div class="row justify-content-center mt-4" id="connectionHelpPanel">
                     <div class="col-12 col-lg-8">
                         <div class="panel3 prompt-links-card">
-                            <p class="mb-2">Dokümantasyona ulaşmak için <a class="prompt-link-main" href="https://github.com/savas8008/vecihi-configurator/blob/main/README.md" target="_blank">buraya tıklayın</a>.</p>
-                            <p class="mb-2">Demo 1: <a class="prompt-link-secondary" href="https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn" target="_blank">https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn</a></p>
-                            <p class="mb-0">Demo 2: <a class="prompt-link-secondary" href="https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf" target="_blank">https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf</a></p>
+                            <div class="prompt-links-header">
+                                <div class="prompt-links-icon">
+                                    <i class="bi bi-journal-richtext"></i>
+                                </div>
+                                <div>
+                                    <h3 class="prompt-links-title mb-1">Hızlı Başlangıç Kaynakları</h3>
+                                    <p class="prompt-links-subtitle mb-0">Dokümantasyon ve örnek videolara buradan hızlıca ulaşabilirsiniz.</p>
+                                </div>
+                            </div>
+                    <div class="prompt-link-grid">
+    <a class="prompt-link-tile prompt-link-guide" href="https://github.com/savas8008/vecihi-configurator/blob/main/docs/WIRING.md" target="_blank">
+        <span class="prompt-link-label"><i class="bi bi-usb-symbol me-2"></i>Bağlantı Kılavuzu</span>
+        <span class="prompt-link-caption">Kablolama ve bağlantı şemasını aç</span>
+    </a>
+    
+    <a class="prompt-link-tile prompt-link-doc" href="https://github.com/savas8008/vecihi-configurator/blob/main/README.md" target="_blank">
+        <span class="prompt-link-label"><i class="bi bi-book me-2"></i>Dokümantasyon</span>
+        <span class="prompt-link-caption">Kurulum ve kullanım adımlarını aç</span>
+    </a>
+
+    <div class="prompt-link-tile prompt-link-video" style="cursor: default;">
+        <span class="prompt-link-label"><i class="bi bi-play-circle-fill me-2"></i>Demo 1 & Demo 2</span>
+        <div class="mt-2">
+            <a href="https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn" target="_blank" class="text-white me-3" style="text-decoration: none;">
+                <i class="bi bi-play-btn me-1"></i> İzle 1
+            </a>
+            <a href="https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf" target="_blank" class="text-white" style="text-decoration: none;">
+                <i class="bi bi-play-btn me-1"></i> İzle 2
+            </a>
+        </div>
+        <span class="prompt-link-caption">Kullanım ve ekran anlatım videoları</span>
+    </div>
+</div>
                         </div>
                     </div>
                 </div>
@@ -662,7 +692,12 @@
 
   <!-- 3) PANEL: Motor & Servo Çıkış Pinleri -->
   <div class="panel mb-2">
-    <h2 class="panel-title"><i class="bi bi-plug"></i> Motor & Servo Çıkış Pinleri</h2>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+      <h2 class="panel-title mb-0"><i class="bi bi-plug"></i> Motor & Servo Çıkış Pinleri</h2>
+      <button type="button" class="btn btn-outline-info btn-lg pin-guide-trigger warning" data-bs-toggle="modal" data-bs-target="#recommendedPinsModal">
+        <i class="bi bi-info-circle me-2 warning"></i> Tavsiye Edilen Pinler
+      </button>
+    </div>
     <!-- 7 kutu yan yana: Motor1, Motor2, Servo1-4, Motor Kontrol -->
     <div class="d-flex gap-1 align-items-stretch" style="flex-wrap:nowrap;">
 
@@ -2393,6 +2428,67 @@ function switchAdvTab(tabId, btn) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="saveModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade theme-modal" id="recommendedPinsModal" tabindex="-1" aria-labelledby="recommendedPinsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content theme-modal-content recommended-pins-modal">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="recommendedPinsModalLabel">
+                            <i class="bi bi-diagram-3 me-2 text-info"></i>Tavsiye Edilen Pinler
+                        </h5>
+                        <small class="text-muted">Aşağıdaki eşleşmeler paylaştığın görselden çıkarılmış öneri yerleşimidir.</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="recommended-pins-alert">
+                        <div class="recommended-pins-alert-icon">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <div>
+                            <strong>Önemli bağlantı notu</strong>
+                            <p class="mb-0">GPS, alıcı gibi RF bağlantıları ile IMU bileşenleri arasında besleme hattında mutlaka uygun kapasitör kullanın. Ani akım çekişi ve parazitler IMU verisini bozabilir, reset veya ölçüm kararsızlığı oluşturabilir.</p>
+                        </div>
+                    </div>
+
+                    <div class="recommended-pins-grid">
+                        <div class="recommended-pins-section">
+                            <h6><i class="bi bi-fan me-2"></i>Motor ve Servo Çıkışları</h6>
+                            <div class="recommended-pin-list">
+                                <div class="recommended-pin-item"><span>Motor 1</span><strong>GPIO 13</strong></div>
+                                <div class="recommended-pin-item"><span>Motor 2</span><strong>GPIO 13</strong></div>
+                                <div class="recommended-pin-item"><span>Roll Sol</span><strong>GPIO 27</strong></div>
+                                <div class="recommended-pin-item"><span>Roll Sağ</span><strong>GPIO 26</strong></div>
+                                <div class="recommended-pin-item"><span>Sağ Kuyruk</span><strong>GPIO 25</strong></div>
+                                <div class="recommended-pin-item"><span>Sol Kuyruk</span><strong>GPIO 33</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="recommended-pins-section">
+                            <h6><i class="bi bi-broadcast-pin me-2"></i>AUX Portları</h6>
+                            <div class="recommended-pin-list">
+                                <div class="recommended-pin-item"><span>Alıcı TX</span><strong>GPIO 21</strong></div>
+                                <div class="recommended-pin-item"><span>Alıcı RX</span><strong>GPIO 19</strong></div>
+                                <div class="recommended-pin-item"><span>GPS TX</span><strong>GPIO 5</strong></div>
+                                <div class="recommended-pin-item"><span>GPS RX</span><strong>GPIO 18</strong></div>
+                                <div class="recommended-pin-item"><span>I2C SCL</span><strong>GPIO 22</strong></div>
+                                <div class="recommended-pin-item"><span>I2C SDA</span><strong>GPIO 23</strong></div>
+                                <div class="recommended-pin-item"><span>OSD</span><strong>Devre Dışı</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recommended-pins-note">
+                        <i class="bi bi-info-circle me-2"></i>Görselde voltaj ADC pini tam görünmediği için bu alan için öneri eklenmedi.
+                    </div>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
                 </div>

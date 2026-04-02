@@ -1389,6 +1389,120 @@ input[type="range"]::-moz-range-thumb {
     filter: invert(1) grayscale(100%) brightness(200%);
 }
 
+.pin-guide-trigger {
+    background: #f59e0b !important;
+    border-color: #f59e0b !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.pin-guide-trigger:hover {
+    background: #d97706 !important;
+    border-color: #d97706 !important;
+    color: #ffffff !important;
+}
+
+.pin-guide-trigger:focus {
+    background: #d97706 !important;
+    border-color: #d97706 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.28);
+}
+
+.recommended-pins-modal {
+    background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 30%),
+        linear-gradient(160deg, rgba(8, 18, 34, 0.98), rgba(13, 31, 57, 0.98)) !important;
+    color: #e6f1fb !important;
+    border: 1px solid rgba(123, 172, 255, 0.14);
+}
+
+.recommended-pins-modal .modal-title {
+    color: #f6fbff;
+}
+
+.recommended-pins-modal .text-muted {
+    color: rgba(210, 228, 244, 0.72) !important;
+}
+
+.recommended-pins-modal .modal-header,
+.recommended-pins-modal .modal-footer {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.recommended-pins-alert {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(245, 158, 11, 0.16), rgba(239, 68, 68, 0.08));
+    border: 1px solid rgba(245, 158, 11, 0.24);
+}
+
+.recommended-pins-alert-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: #ffd978;
+    background: rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+
+.recommended-pins-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.recommended-pins-section {
+    padding: 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recommended-pins-section h6 {
+    display: flex;
+    align-items: center;
+    color: #dff4ff;
+    font-size: 1rem;
+    margin-bottom: 14px;
+}
+
+.recommended-pin-list {
+    display: grid;
+    gap: 10px;
+}
+
+.recommended-pin-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(7, 18, 34, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(220, 232, 245, 0.9);
+}
+
+.recommended-pin-item strong {
+    color: #7dd3fc;
+    font-family: var(--font-mono);
+    white-space: nowrap;
+}
+
+.recommended-pins-note {
+    margin-top: 16px;
+    color: rgba(220, 232, 245, 0.76);
+    padding: 12px 4px 0;
+}
+
 /* ============================================
    15. TOOLTIP
    ============================================ */
@@ -2129,23 +2243,95 @@ label.small.text-muted,
 .prompt-links-card {
     max-width: 950px;
     margin: 0 auto;
-    padding: 18px 22px !important;
-    border-radius: 14px;
+    padding: 20px 22px !important;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 32%),
+        linear-gradient(145deg, rgba(14, 32, 92, 0.96), rgba(19, 35, 96, 0.92)) !important;
+    border: 1px solid rgba(123, 172, 255, 0.18) !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
 }
 
-.prompt-links-card p {
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.55;
-    overflow-wrap: anywhere;
+.prompt-links-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
 }
 
-.prompt-link-main {
-    color: #ff6b6b !important;
+.prompt-links-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, rgba(56, 189, 248, 0.2), rgba(59, 130, 246, 0.12));
+    color: #8fdcff;
+    border: 1px solid rgba(143, 220, 255, 0.18);
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+
+.prompt-links-title {
+    color: #f7fbff;
+    font-size: 1.15rem;
     font-weight: 700;
 }
 
-.prompt-link-secondary {
-    color: #d48383 !important;
+.prompt-links-subtitle {
+    color: rgba(220, 232, 245, 0.76);
+    line-height: 1.5;
+}
+
+.prompt-link-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.prompt-link-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 104px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #eff6ff !important;
+    text-decoration: none;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.prompt-link-tile:hover {
+    transform: translateY(-2px);
+    border-color: rgba(143, 220, 255, 0.28);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.prompt-link-doc {
+    background: linear-gradient(145deg, rgba(255, 107, 107, 0.16), rgba(255, 107, 107, 0.08));
+}
+
+.prompt-link-guide {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.18), rgba(56, 189, 248, 0.08));
+}
+
+.prompt-link-video {
+    background: linear-gradient(145deg, rgba(77, 124, 255, 0.16), rgba(56, 189, 248, 0.08));
+}
+
+.prompt-link-label {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+}
+
+.prompt-link-caption {
+    color: rgba(220, 232, 245, 0.78);
+    line-height: 1.45;
+    font-size: 0.9rem;
 }
 
 @media (max-width: 992px) {
@@ -2155,6 +2341,10 @@ label.small.text-muted,
 
     .prompt-links-card {
         padding: 16px 18px !important;
+    }
+
+    .prompt-link-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -2197,6 +2387,47 @@ label.small.text-muted,
 
     .prompt-links-card {
         font-size: 0.92rem;
+    }
+
+    .prompt-links-header {
+        align-items: flex-start;
+        margin-bottom: 14px;
+    }
+
+    .prompt-links-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+    }
+
+    .prompt-links-title {
+        font-size: 1rem;
+    }
+
+    .prompt-links-subtitle {
+        font-size: 0.88rem;
+    }
+
+    .prompt-link-tile {
+        min-height: unset;
+        padding: 14px 15px;
+        border-radius: 14px;
+    }
+
+    .prompt-link-label {
+        font-size: 0.95rem;
+    }
+
+    .prompt-link-caption {
+        font-size: 0.84rem;
+    }
+
+    .recommended-pins-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .recommended-pins-alert {
+        padding: 14px;
     }
 }
 
