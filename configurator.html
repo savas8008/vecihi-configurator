@@ -171,8 +171,6 @@
                             <div class="panel panel2 prompt-card h-100 firmware-preview">
                                 <div class="text-center mb-3">
                                     <img src="assets/icons/firmware.png" alt="Firmware" width="80" height="80" class="mb-4">
-                                    <br>
-                                    <br>
                                     <h2 class="text-white mb-0">Firmware Güncelleme</h2>
                                 </div>
                                 <div class="d-flex flex-column gap-20 mt-3">
@@ -195,28 +193,26 @@
                             </div>
                         </div>
                         <div class="col-md-5">
-                            <div class="panel text-center prompt-card h-100">
+                            <div class="panel text-center prompt-card h-100 configurator-entry-card">
                                 <img src="assets/icons/configurator.png" alt="Configurator" width="80" height="80" class="d-block mx-auto mb-4">
                                 <h2 class="gradient-text mb-3">Konfiguratöre Giriş</h2>
-                                <p class="">Uygulamayı kullanmak için lütfen cihazınıza enerji verdikten sonra <b style="color: red;">ilk 10 saniye içerisinde </b>  seri porta bağlayın. Aksi takdirde uçuş moduna geçecektir.</p>
-                              <br><br>
+                                <p class="prompt-description">Uygulamayı kullanmak için lütfen cihazınıza enerji verdikten sonra <b style="color: red;">ilk 10 saniye içerisinde </b>  seri porta bağlayın. Aksi takdirde uçuş moduna geçecektir.</p>
                                 <button class="btn btn-connect btn-lg" id="btnConnectPrompt">
-
                                     <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            <div class="panel3 col-md-6 offset-md-3 mt-4">
-                                                Dokümantasyona Ulaşmak İçin <a style="color: red;" href="https://github.com/savas8008/vecihi-configurator/blob/main/README.md" target="_blank">Buraya Tıklayın.</a>
-                                                <br>
-                                                Demo1:<a style="color: rgb(212, 131, 131);" href="https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn" target="_blank">https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn</a>
-                                                <br>
-                                                Demo2:<a style="color:  rgb(212, 131, 131);" href="https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf" target="_blank">https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf</a>
-                                        
-
-        </div>
+                <div class="row justify-content-center mt-4" id="connectionHelpPanel">
+                    <div class="col-12 col-lg-8">
+                        <div class="panel3 prompt-links-card">
+                            <p class="mb-2">Dokümantasyona ulaşmak için <a class="prompt-link-main" href="https://github.com/savas8008/vecihi-configurator/blob/main/README.md" target="_blank">buraya tıklayın</a>.</p>
+                            <p class="mb-2">Demo 1: <a class="prompt-link-secondary" href="https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn" target="_blank">https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn</a></p>
+                            <p class="mb-0">Demo 2: <a class="prompt-link-secondary" href="https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf" target="_blank">https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf</a></p>
+                        </div>
+                    </div>
+                </div>
 
 <!-- ================== SENSORS PAGE ================== -->
 <div id="sensors" class="page">

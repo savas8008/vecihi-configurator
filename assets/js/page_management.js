@@ -362,6 +362,17 @@ function updateConnectionStatus() {
         }
     }
 
+    const helpPanel = el('connectionHelpPanel');
+    if (helpPanel) {
+        if (connected) {
+            helpPanel.classList.add('d-none');
+            helpPanel.style.setProperty('display', 'none', 'important');
+        } else {
+            helpPanel.classList.remove('d-none');
+            helpPanel.style.removeProperty('display');
+        }
+    }
+
     const statusInd = el('statusIndicator');
     if (statusInd) statusInd.className = `status-indicator ${connected ? 'status-connected' : 'status-off'}`;
 
@@ -424,6 +435,11 @@ function updateConnectionStatus() {
 
     // Sayfa görünürlüğü
     document.querySelectorAll('.page').forEach(page => {
+        if (!connected) {
+            page.style.display = 'none';
+            return;
+        }
+
         if (page.classList.contains('active')) {
             page.style.removeProperty('display');
             page.style.display = 'block';
