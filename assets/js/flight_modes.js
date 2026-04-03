@@ -18,26 +18,24 @@
 const modeDefinitions = [
     // --- GÜVENLİK (SAFETY) ---
     { key: 'arm', name: 'ARM (Motor Kilidi)', cat: 'safety', defaultMin: 1800, defaultMax: 2100, defaultCh: 5 },
-    { key: 'beeper', name: 'Beeper (Buzzer)', cat: 'safety', defaultMin: 1800, defaultMax: 2100, defaultCh: 12 },
 
     // --- UÇUŞ MODLARI (FLIGHT MODES) - Genelde 3'lü Switch ---
-    { key: 'manual', name: 'MANUAL (Passthrough)', cat: 'flight', defaultMin: 900, defaultMax: 1300, defaultCh: 6 },
-    { key: 'angle', name: 'ANGLE (Stabilize)', cat: 'flight', defaultMin: 1301, defaultMax: 1700, defaultCh: 6 },
-    { key: 'horizon', name: 'HORIZON', cat: 'flight', defaultMin: 1701, defaultMax: 2100, defaultCh: 6 },
-    { key: 'acro', name: 'ACRO (Rate)', cat: 'flight', defaultMin: 900, defaultMax: 900, defaultCh: 16 }, // Default kapalı
+    { key: 'manual', name: 'MANUAL (Passthrough)', cat: 'flight', defaultMin: 900, defaultMax: 1300, defaultCh: 0 },
+    { key: 'angle', name: 'ANGLE (Stabilize)', cat: 'flight', defaultMin: 1301, defaultMax: 1700, defaultCh: 0 },
+    { key: 'horizon', name: 'HORIZON', cat: 'flight', defaultMin: 1701, defaultMax: 2100, defaultCh: 0 },
+    { key: 'acro', name: 'ACRO (Rate)', cat: 'flight', defaultMin: 900, defaultMax: 900, defaultCh: 0 },
 
     // --- NAVİGASYON (NAV MODES) - Yüksek Öncelik ---
-    { key: 'rth', name: 'RTH (Eve Dön)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 7 },
-    { key: 'launch', name: 'AUTO LAUNCH', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 8 },
-    { key: 'waypoint', name: 'WAYPOINT', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
-    { key: 'land_assist', name: 'LAND ASSIST (İniş Asistanı)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
+    { key: 'rth', name: 'RTH (Eve Dön)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'launch', name: 'AUTO LAUNCH', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'waypoint', name: 'WAYPOINT', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'land_assist', name: 'LAND ASSIST (İniş Asistanı)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
 
     // --- ASİSTANLAR (ASSIST) - Eklenebilir ---
-    { key: 'cruise', name: 'CRUISE', cat: 'assist', defaultMin: 1500, defaultMax: 1700, defaultCh: 9 },
-    { key: 'althold', name: 'ALTITUDE HOLD', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 9 },
-    { key: 'headhold', name: 'HEADING HOLD', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
-    { key: 'autotune', name: 'AUTO TUNE', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 },
-    { key: 'flaperon', name: 'FLAPERON', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 16 }
+    { key: 'cruise', name: 'CRUISE', cat: 'assist', defaultMin: 1500, defaultMax: 1700, defaultCh: 0 },
+    { key: 'althold', name: 'ALTITUDE HOLD', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'autotune', name: 'AUTO TUNE', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'flaperon', name: 'FLAPERON', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 }
 ];
 
 // ============================================================================

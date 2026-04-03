@@ -46,7 +46,7 @@
        Değiştirmek için sadece bu değişkenleri güncelleyin.
     ========================================= */
     --bg-panel:   rgba(8, 47, 102, 0.9);    /* Dış: koyu lacivert */
-    --bg-panel-2: rgba(43, 69, 94, 0.9);     /* Orta: biraz açık çelik mavi */
+    --bg-panel-2: rgba(16, 17, 48, 0.9);     /* Orta: biraz açık çelik mavi */
     --bg-panel-3: rgba(13, 29, 81, 0.9);   /* İç: hafif aydınlık çelik mavi */
     --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
 
@@ -273,6 +273,8 @@ a:hover {
     --t-baslik-color:       #111111;
     --t-alt-baslik-color:   #111111;
     --t-aciklama-color:     #444444;
+    --t-deger-color:        #1a6b2e;
+    --text-value:           #1a6b2e;
 }
 /* panel4 içindeki !important ile ayarlanan metin renkleri */
 .panel4 .step-label                         { color: #444444 !important; }
@@ -287,6 +289,22 @@ a:hover {
 .panel4 .mixer-title        { color: #111111; }
 .panel4 .mixer-description  { color: #444444; }
 .panel4 small               { color: #555555 !important; }
+.panel4 .servo-value-label  { color: #333333; }
+.panel4 .servo-value-display { color: #111111; font-weight: 600; }
+.panel4 .form-check-label   { color: #333333 !important; }
+.panel4 .safety-warning     { color: #555555 !important; }
+.panel4 .port-label         { color: #444444 !important; }
+.panel4 .t-deger            { color: #1a6b2e !important; }
+.panel4 .mono               { color: #1a6b2e !important; }
+.panel4 .form-label         { color: #222222 !important; }
+.panel4 label               { color: #222222 !important; }
+.panel4 .text-muted         { color: #555555 !important; }
+.panel4 h6.text-muted       { color: #444444 !important; }
+.panel4 .border-secondary   { border-color: rgba(0,0,0,0.15) !important; }
+.panel4 .text-white         { color: #111111 !important; }
+.panel4 .input-group-text.bg-secondary { background: #cdd0d4 !important; color: #111 !important; border-color: rgba(0,0,0,0.2) !important; }
+.panel4 .output-display     { background: transparent !important; border-color: rgba(0,0,0,0.12) !important; }
+.panel4 .throttle-slider    { height: 120px !important; }
 .panel4 .form-control,
 .panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
 .panel4 .form-control:focus,
@@ -1918,6 +1936,8 @@ label.small.text-muted,
     color: var(--text-primary) !important;
 }
 .osd-element-list .form-check-label { color: var(--text-primary) !important; }
+.panel4 .osd-element-list .form-check-label { color: #222222 !important; }
+.panel4 .osd-element-list hr { border-color: rgba(0,0,0,0.15) !important; }
 
 /* Aircraft seçim kartları */
 .aircraft-card {
@@ -2183,7 +2203,9 @@ label.small.text-muted,
 .output-value { font-size: var(--font-size-sm) !important; margin: 1px 0 !important; }
 
 /* Mode cards */
-.mode-card { padding: 6px !important; margin-bottom: 4px !important; }
+.mode-card { padding: 6px !important; margin-bottom: 10px !important; }
+.mode-card:last-child { margin-bottom: 0 !important; }
+#modesWrapper .col-12 > .panel4 { margin-bottom: 14px !important; }
 .range-track-container { height: 24px !important; margin: 6px 0 !important; border-radius: 12px; }
 .input-range::-webkit-slider-thumb { width: 18px !important; height: 24px !important; }
 .live-marker { top: -4px !important; bottom: -4px !important; }
@@ -2198,21 +2220,24 @@ label.small.text-muted,
 /* PID */
 .pid-control { padding: 6px !important; margin-bottom: 4px !important; }
 .pid-axis { font-size: var(--font-size-sm) !important; margin-bottom: 4px; }
+#pid .row > [class*="col-"] { padding: 6px !important; }
+#pid .row { margin-left: -6px !important; margin-right: -6px !important; }
+#pid .row + .row { margin-top: 12px !important; }
 
 /* PID slider — kalın ve siyah */
-.panel4 input[type="range"] {
+.panel4 input[type="range"]:not(.throttle-slider) {
     height: 10px !important;
     background: #222 !important;
     border-radius: 5px !important;
 }
-.panel4 input[type="range"]::-webkit-slider-thumb {
+.panel4 input[type="range"]:not(.throttle-slider)::-webkit-slider-thumb {
     width: 20px !important;
     height: 20px !important;
     background: #111 !important;
     border: 3px solid #555 !important;
     box-shadow: none !important;
 }
-.panel4 input[type="range"]::-moz-range-thumb {
+.panel4 input[type="range"]:not(.throttle-slider)::-moz-range-thumb {
     width: 20px !important;
     height: 20px !important;
     background: #111 !important;

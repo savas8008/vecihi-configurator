@@ -385,12 +385,32 @@ function saveOutputsConfig() {
         console.error("sendCommand fonksiyonu bulunamadı!");
     }
 }
- document.querySelectorAll('.aircraft-card').forEach(card => {
+const defaultMixerValues = {
+    'v-tail':      { roll: 100, pitch:  50, yaw:  50 },
+    't-tail':      { roll: 100, pitch: 100, yaw: 100 },
+    'no-ruder':    { roll: 100, pitch: 100, yaw:   0 },
+    'delta':       { roll:  50, pitch:  50, yaw: 100 },
+    'flying-wing': { roll:  50, pitch:  50, yaw: 100 },
+};
+
+function applyDefaultMixerValues(aircraftType) {
+    const defaults = defaultMixerValues[aircraftType];
+    if (!defaults) return;
+    const rollEl  = document.getElementById('mixRoll');
+    const pitchEl = document.getElementById('mixPitch');
+    const yawEl   = document.getElementById('mixYaw');
+    if (rollEl)  rollEl.value  = defaults.roll;
+    if (pitchEl) pitchEl.value = defaults.pitch;
+    if (yawEl)   yawEl.value   = defaults.yaw;
+}
+
+document.querySelectorAll('.aircraft-card').forEach(card => {
                 card.addEventListener('click', () => {
                     document.querySelectorAll('.aircraft-card').forEach(c => c.classList.remove('active'));
                     card.classList.add('active');
                     selectedAircraft = card.getAttribute('data-aircraft-type');
                     updateServoNames();
+                    applyDefaultMixerValues(selectedAircraft);
                 });
             });
             document.querySelectorAll('.servo-arrow').forEach(arrow => {

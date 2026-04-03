@@ -108,6 +108,7 @@ function setupEventListeners() {
             card.classList.add('active');
             selectedAircraft = card.getAttribute('data-aircraft-type');
             updateServoNames();
+            if (typeof applyDefaultMixerValues === 'function') applyDefaultMixerValues(selectedAircraft);
         });
     });
 
