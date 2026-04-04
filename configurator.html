@@ -1011,6 +1011,125 @@
         </div>
     </div>
 
+    <!-- Stick Komutları info ikonu -->
+    <span data-bs-toggle="modal" data-bs-target="#stickCmdsModal" style="cursor:pointer; color:#f59e0b; font-size:0.85rem; user-select:none;" title="Stick komutlarını göster">
+        <i class="bi bi-info-circle me-1"></i>Kumanda Stick Komutları
+    </span>
+
+</div>
+
+<!-- Stick Komutları Modal -->
+<div class="modal fade" id="stickCmdsModal" tabindex="-1" aria-labelledby="stickCmdsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark text-light border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="stickCmdsModalLabel"><i class="bi bi-joystick me-2"></i>Kumanda Stick Komutları</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="alert alert-warning d-flex align-items-start gap-2 mb-2 py-2" role="alert" style="border-left:4px solid #f59e0b;">
+          <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+          <div class="small"><strong>Önemli:</strong> Bu komutlar yalnızca uçak <strong>DISARM</strong> konumundayken çalışır. Arm durumunda yok sayılır.</div>
+        </div>
+        <div class="alert alert-info d-flex align-items-start gap-2 mb-3 py-2" role="alert" style="border-left:4px solid #38bdf8;">
+          <i class="bi bi-info-circle-fill mt-1"></i>
+          <div class="small"><strong>Kumanda Tipi Uyarısı:</strong> Görseller varsayılan <strong>Mode 2</strong> düzenine göredir. Kanal atamanıza göre pozisyonlar değişebilir. Komutu uygulamadan önce <strong>PWM eşik değerlerini</strong> canlı kanal panelinden doğrulayın.</div>
+        </div>
+
+        <div class="row g-3">
+
+          <!-- Force Arm -->
+          <div class="col-md-6">
+            <div class="p-3 rounded h-100" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.35);">
+              <h6 class="mb-2" style="color:#ef4444;"><i class="bi bi-shield-exclamation me-2"></i>Force Arm</h6>
+              <p class="small text-muted mb-3">Normal arm koşulları sağlanmasa bile (yetersiz uydu vb.) zorla arm eder. 2 saniye boyunca aşağıdaki pozisyonu koruyun.</p>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <div class="p-2 rounded text-center" style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);">
+                    <div class="small text-muted mb-1">Sol Çubuk</div>
+                    <svg width="64" height="64" viewBox="0 0 64 64" style="display:block;margin:auto;">
+                      <rect x="4" y="4" width="56" height="56" rx="8" fill="none" stroke="#555" stroke-width="2"/>
+                      <line x1="32" y1="4" x2="32" y2="60" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/>
+                      <line x1="4" y1="32" x2="60" y2="32" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/>
+                      <circle cx="52" cy="52" r="7" fill="#ef4444" opacity="0.9"/>
+                    </svg>
+                    <div class="mt-1" style="font-size:0.7rem;color:#aaa;">Throttle ↓ &nbsp; Rudder →</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-2 rounded text-center" style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);">
+                    <div class="small text-muted mb-1">Arm Switch</div>
+                    <svg width="64" height="64" viewBox="0 0 64 64" style="display:block;margin:auto;">
+                      <rect x="20" y="4" width="24" height="56" rx="12" fill="none" stroke="#555" stroke-width="2"/>
+                      <rect x="22" y="6" width="20" height="24" rx="10" fill="#22c55e" opacity="0.85"/>
+                      <circle cx="32" cy="16" r="7" fill="#16a34a"/>
+                    </svg>
+                    <div class="mt-1" style="font-size:0.7rem;color:#aaa;">Arm Switch: ON</div>
+                  </div>
+                </div>
+              </div>
+              <table class="table table-sm table-dark mb-0" style="font-size:0.8rem;">
+                <tbody>
+                  <tr><td class="text-muted">Throttle</td><td><code>&lt; 1100</code></td></tr>
+                  <tr><td class="text-muted">Rudder (Yaw)</td><td><code>&gt; 1900</code></td></tr>
+                  <tr><td class="text-muted">Arm Switch</td><td><code>ON (&gt; 1800)</code></td></tr>
+                  <tr><td class="text-muted">Süre</td><td><code>2 saniye</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Save Settings -->
+          <div class="col-md-6">
+            <div class="p-3 rounded h-100" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.35);">
+              <h6 class="mb-2" style="color:#22c55e;"><i class="bi bi-floppy2 me-2"></i>Save Settings</h6>
+              <p class="small text-muted mb-3">Autotune bu oturumda yapılmışsa PID değerlerini kalıcı belleğe (NVS) yazar. Autotune yapılmamışsa kayıt <strong>atlanır</strong> — veri bozulması riski yoktur. 2 saniye boyunca aşağıdaki pozisyonu koruyun.</p>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <div class="p-2 rounded text-center" style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);">
+                    <div class="small text-muted mb-1">Sol Çubuk</div>
+                    <svg width="64" height="64" viewBox="0 0 64 64" style="display:block;margin:auto;">
+                      <rect x="4" y="4" width="56" height="56" rx="8" fill="none" stroke="#555" stroke-width="2"/>
+                      <line x1="32" y1="4" x2="32" y2="60" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/>
+                      <line x1="4" y1="32" x2="60" y2="32" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/>
+                      <circle cx="12" cy="52" r="7" fill="#22c55e" opacity="0.9"/>
+                    </svg>
+                    <div class="mt-1" style="font-size:0.7rem;color:#aaa;">Throttle ↓ &nbsp; Rudder ←</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-2 rounded text-center" style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);">
+                    <div class="small text-muted mb-1">Sağ Çubuk</div>
+                    <svg width="64" height="64" viewBox="0 0 64 64" style="display:block;margin:auto;">
+                      <rect x="4" y="4" width="56" height="56" rx="8" fill="none" stroke="#555" stroke-width="2"/>
+                      <line x1="32" y1="4" x2="32" y2="60" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/>
+                      <line x1="4" y1="32" x2="60" y2="32" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/>
+                      <circle cx="52" cy="52" r="7" fill="#22c55e" opacity="0.9"/>
+                    </svg>
+                    <div class="mt-1" style="font-size:0.7rem;color:#aaa;">Roll → &nbsp; Pitch ↓</div>
+                  </div>
+                </div>
+              </div>
+              <table class="table table-sm table-dark mb-0" style="font-size:0.8rem;">
+                <tbody>
+                  <tr><td class="text-muted">Throttle</td><td><code>&lt; 1100</code></td></tr>
+                  <tr><td class="text-muted">Rudder (Yaw)</td><td><code>&lt; 1100</code></td></tr>
+                  <tr><td class="text-muted">Roll</td><td><code>&gt; 1900</code></td></tr>
+                  <tr><td class="text-muted">Pitch</td><td><code>&lt; 1100</code></td></tr>
+                  <tr><td class="text-muted">Süre</td><td><code>2 saniye</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /row -->
+      </div><!-- /modal-body -->
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
 </div>
 				
           <div id="modes" class="page">
