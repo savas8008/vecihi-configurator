@@ -1,4 +1,7 @@
-﻿/**
+﻿// Copyright (c) 2024-2026 savas8008 - All Rights Reserved
+// Bu dosyanın izinsiz kopyalanması, değiştirilmesi veya dağıtılması yasaktır.
+
+/**
  * @file main.js
  * @brief Vecihi Configurator - Ana Başlatma ve Event Listener Modülü
  * @description Bu dosya, uygulamanın ana init() ve setupEventListeners() fonksiyonlarını içerir.

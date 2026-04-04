@@ -1,3 +1,6 @@
+// Copyright (c) 2024-2026 savas8008 - All Rights Reserved
+// Bu dosyanın izinsiz kopyalanması, değiştirilmesi veya dağıtılması yasaktır.
+
 function handlePIDPageData(data) {
   try {
     // Sayfadan gelen ham obje: {roll,pitch,yaw,level_p,tpa_factor}
