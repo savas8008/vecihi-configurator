@@ -1,3 +1,6 @@
+// Copyright (c) 2024-2026 savas8008 - All Rights Reserved
+// Bu dosyanın izinsiz kopyalanması, değiştirilmesi veya dağıtılması yasaktır.
+
 /**
  * @file advanced_page.js
  * @brief Gelişmiş ayarlar sayfası yönetimi

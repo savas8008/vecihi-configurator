@@ -1,4 +1,7 @@
-﻿// ============ OUTPUTS PAGE FUNCTIONS ============
+﻿// Copyright (c) 2024-2026 savas8008 - All Rights Reserved
+// Bu dosyanın izinsiz kopyalanması, değiştirilmesi veya dağıtılması yasaktır.
+
+// ============ OUTPUTS PAGE FUNCTIONS ============
 
 const servoControls = {
 servo1: { value: 1500, element: null },
