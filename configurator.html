@@ -827,9 +827,10 @@
       <div class="panel4" style="flex:1;min-width:0;">
         <div class="output-title mb-1">ALICI (RX)</div>
         <label class="port-label">TX</label>
-        <select class="form-select pin-select mb-1" id="rxTxPin"></select>
+             <select class="form-select pin-select" id="rxRxPin"></select>
         <label class="port-label">RX</label>
-        <select class="form-select pin-select" id="rxRxPin"></select>
+   
+        <select class="form-select pin-select mb-1" id="rxTxPin"></select>
       </div>
 
       <div class="panel4" style="flex:1;min-width:0;">
@@ -1139,6 +1140,8 @@
         </div>
     </div>
 	<button type="button" class="btn btn-warning shadow-sm" id="btnSaveModes">
+        <br>
+        <br>
     <i class="bi bi-save2 me-2"></i> Modları Kaydet
 </button>
 </div>
@@ -2585,13 +2588,14 @@ function switchAdvTab(tabId, btn) {
                         <div class="recommended-pins-section">
                             <h6><i class="bi bi-broadcast-pin me-2"></i>AUX Portları</h6>
                             <div class="recommended-pin-list">
-                                <div class="recommended-pin-item"><span>Alıcı TX</span><strong>GPIO 21</strong></div>
-                                <div class="recommended-pin-item"><span>Alıcı RX</span><strong>GPIO 19</strong></div>
+                                <div class="recommended-pin-item"><span>Alıcı TX</span><strong>GPIO 19</strong></div>
+                                <div class="recommended-pin-item"><span>Alıcı RX</span><strong>GPIO 21</strong></div>
                                 <div class="recommended-pin-item"><span>GPS TX</span><strong>GPIO 5</strong></div>
                                 <div class="recommended-pin-item"><span>GPS RX</span><strong>GPIO 18</strong></div>
                                 <div class="recommended-pin-item"><span>I2C SCL</span><strong>GPIO 22</strong></div>
                                 <div class="recommended-pin-item"><span>I2C SDA</span><strong>GPIO 23</strong></div>
-                                <div class="recommended-pin-item"><span>OSD</span><strong>Devre Dışı</strong></div>
+                                <div class="recommended-pin-item"><span>OSD TX</span><strong>GPIO 17</strong></div>
+                                <div class="recommended-pin-item"><span>OSD RX</span><strong>GPIO 16</strong></div>
                             </div>
                         </div>
                     </div>
