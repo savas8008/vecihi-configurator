@@ -7,8 +7,8 @@ Bu kılavuz, Vecihi uçuş kontrol yazılımının ESP32 donanımı üzerinde na
 Kullanıcılar donanımı üç farklı şekilde kurabilirler:
 1. **ESP32 Shield:** Hazır geliştirme kartı genişletme modülleri kullanarak.
 2. **Özgün Tasarım PCB:** Kendi ürettiğiniz veya projenin sağladığı özel tasarım PCB'ler üzerine.
-3. **Doğrudan Bağlantı:** Sensör ve modülleri ESP32 pinlerine doğrudan lehimleyerek.
-4. **Pertinaks üzerine montaj**
+3. **Pertinaks üzerine montaj**
+4. **Doğrudan Bağlantı:** Sensör ve modülleri ESP32 pinlerine doğrudan lehimleyerek.
 
 ---
 
