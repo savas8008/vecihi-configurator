@@ -24,6 +24,13 @@ Uçağın ağırlık ve alan verimliliğini artırmak için hazırlanan, tüm bi
 *Görsel 2: Özgün PCB tasarımı ve yol takibi.*
 
 ---
+### Seçenek 3: Delikli Pertinaks
+PCB üretiminde zorlanan kullanıcılar için pratik bir çözüm olarak delikli pertinakslar kullanılabilir
+
+![Pertinaks](../assets/icons/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-04-07%20091328.png)
+*Görsel 3: Pertinaks.*
+
+---
 
 ## 🔌 Varsayılan Pin Tanımlamaları
 
