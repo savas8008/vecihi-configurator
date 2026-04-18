@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/headtracker-alici/src/**)",
+      "Read(//d/headtracker-verici/**)"
+    ],
+    "additionalDirectories": [
+      "d:\\headtracker-alici\\src",
+      "d:\\headtracker-verici"
+    ]
+  }
+}
