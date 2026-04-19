@@ -6,7 +6,8 @@
     ],
     "additionalDirectories": [
       "d:\\headtracker-alici\\src",
-      "d:\\headtracker-verici"
+      "d:\\headtracker-verici",
+      "d:\\headtracker-configurator"
     ]
   }
 }
