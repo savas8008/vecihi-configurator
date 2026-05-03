@@ -173,7 +173,7 @@ function setupEventListeners() {
  *        Eğer yerel Python launcher çalışıyorsa, script başlatma isteği de gönderir.
  */
 async function openGroundControl() {
-    const groundControlUrl = 'drafts/elrs_backpack.html';
+    const groundControlUrl = 'elrs_backpack.html';
     const launcherUrl = 'http://127.0.0.1:8766/launch-ground-control';
 
     try {

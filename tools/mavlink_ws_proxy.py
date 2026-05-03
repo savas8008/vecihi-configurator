@@ -2,7 +2,7 @@
 # Bu dosyanin izinsiz kopyalanmasi, degistirilmesi veya dagitilmasi yasaktir.
 
 """
-MAVLink UDP to WebSocket proxy for drafts/elrs_backpack.html.
+MAVLink UDP to WebSocket proxy for elrs_backpack.html.
 
 Mission Planner's UDP mode listens for MAVLink telemetry, commonly on UDP 14550.
 The browser page expects a WebSocket, so this bridge listens on UDP 14550,
@@ -60,8 +60,8 @@ class WebSocketHub:
             await self.remove(writer)
 
 
-def websocket_text_frame(payload: bytes) -> bytes:
-    header = bytearray([0x81])
+def websocket_frame(payload: bytes, opcode: int) -> bytes:
+    header = bytearray([0x80 | opcode])
     length = len(payload)
     if length < 126:
         header.append(length)
@@ -74,7 +74,35 @@ def websocket_text_frame(payload: bytes) -> bytes:
     return bytes(header) + payload
 
 
-async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, hub: WebSocketHub) -> None:
+def websocket_text_frame(payload: bytes) -> bytes:
+    return websocket_frame(payload, 0x1)
+
+
+async def read_websocket_frame(reader: asyncio.StreamReader) -> tuple[int, bytes]:
+    header = await reader.readexactly(2)
+    opcode = header[0] & 0x0F
+    masked = bool(header[1] & 0x80)
+    length = header[1] & 0x7F
+
+    if length == 126:
+        length = struct.unpack("!H", await reader.readexactly(2))[0]
+    elif length == 127:
+        length = struct.unpack("!Q", await reader.readexactly(8))[0]
+
+    mask = await reader.readexactly(4) if masked else b""
+    payload = await reader.readexactly(length) if length else b""
+    if masked:
+        payload = bytes(byte ^ mask[index % 4] for index, byte in enumerate(payload))
+    return opcode, payload
+
+
+async def handle_client(
+    reader: asyncio.StreamReader,
+    writer: asyncio.StreamWriter,
+    hub: WebSocketHub,
+    udp_sock: socket.socket,
+    target: tuple[str, int],
+) -> None:
     try:
         request = await reader.readuntil(b"\r\n\r\n")
         headers = parse_headers(request)
@@ -97,8 +125,17 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         await writer.drain()
         await hub.add(writer)
 
+        loop = asyncio.get_running_loop()
         while not reader.at_eof():
-            await reader.read(1024)
+            opcode, payload = await read_websocket_frame(reader)
+            if opcode == 0x8:  # close
+                break
+            if opcode == 0x9:  # ping
+                writer.write(websocket_frame(payload, 0xA))
+                await writer.drain()
+                continue
+            if opcode in (0x0, 0x1, 0x2) and payload:
+                await loop.sock_sendto(udp_sock, payload, target)
     except Exception:
         pass
     finally:
@@ -200,9 +237,16 @@ def decode_message(msg_id: int, payload: bytes) -> dict:
         if heading < 360:
             data["cog"] = heading
 
-    elif msg_id == 65 and len(payload) >= 42:  # RC_CHANNELS
-        channel_count = payload[4]
-        channels = [u16(payload, 5 + i * 2) for i in range(min(channel_count, 16))]
+    elif msg_id == 35 and len(payload) >= 20:  # RC_CHANNELS_RAW (8 kanal, eski ELRS fw)
+        rssi = payload[4]
+        channels = [u16(payload, 5 + i * 2) for i in range(8)]
+        data["channels"] = channels + [1500] * 8   # 9-16 arası padding
+        if rssi != 255:
+            data["lq"] = round(rssi / 254 * 100)
+
+    elif msg_id == 65 and len(payload) >= 42:  # RC_CHANNELS (16 kanal, yeni ELRS fw)
+        channel_count = min(payload[4], 16)
+        channels = [u16(payload, 5 + i * 2) for i in range(channel_count)]
         data["channels"] = channels + [1500] * (16 - len(channels))
         rssi = payload[37]
         if rssi != 255:
@@ -243,13 +287,16 @@ def s8(payload: bytes, offset: int) -> int:
     return value - 256 if value > 127 else value
 
 
-async def read_udp(args: argparse.Namespace, hub: WebSocketHub) -> None:
+def create_udp_socket(args: argparse.Namespace) -> socket.socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     sock.setblocking(False)
     sock.bind((args.udp_host, args.udp_port))
+    return sock
 
+
+async def read_udp(args: argparse.Namespace, hub: WebSocketHub, sock: socket.socket) -> None:
     loop = asyncio.get_running_loop()
     parser = MavlinkParser()
     print(f"MAVLink UDP listening: {args.udp_host}:{args.udp_port}")
@@ -310,16 +357,21 @@ def x25_crc(data: bytes) -> int:
 
 async def main_async(args: argparse.Namespace) -> None:
     hub = WebSocketHub()
+    udp_sock = create_udp_socket(args)
+    target = (args.target_host, args.target_port)
     server = await asyncio.start_server(
-        lambda r, w: handle_client(r, w, hub),
+        lambda r, w: handle_client(r, w, hub, udp_sock, target),
         args.ws_host,
         args.ws_port,
     )
     print(f"WebSocket output: ws://{args.ws_host}:{args.ws_port}/")
     print("Yer kontrol sayfasinda IP=127.0.0.1, Port=8765, Path=/ kullan.")
 
-    async with server:
-        await asyncio.gather(server.serve_forever(), read_udp(args, hub))
+    try:
+        async with server:
+            await asyncio.gather(server.serve_forever(), read_udp(args, hub, udp_sock))
+    finally:
+        udp_sock.close()
 
 
 def parse_args() -> argparse.Namespace:

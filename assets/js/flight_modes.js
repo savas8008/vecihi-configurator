@@ -33,6 +33,7 @@ const modeDefinitions = [
     { key: 'launch', name: 'AUTO LAUNCH', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'waypoint', name: 'WAYPOINT', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'land_assist', name: 'LAND ASSIST (İniş Asistanı)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'gcs', name: 'GCS KONTROL (Yer İstasyonu)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
 
     // --- ASİSTANLAR (ASSIST) - Eklenebilir ---
     { key: 'cruise', name: 'CRUISE', cat: 'assist', defaultMin: 1500, defaultMax: 1700, defaultCh: 0 },
@@ -128,7 +129,7 @@ function renderModesPage() {
 
     const categories = {
         'safety': { title: '⚠️ Güvenlik & Sistem', icon: 'bi-shield-check' },
-        'nav': { title: '🛰️ Navigasyon & Otonom', icon: 'bi-geo-alt' },
+        'nav': { title: '🛰️ Navigasyon & Otonom & GCS', icon: 'bi-geo-alt' },
         'flight': { title: '✈️ Temel Uçuş Modları', icon: 'bi-joystick' },
         'assist': { title: '🛠️ Asistanlar', icon: 'bi-magic' }
     };

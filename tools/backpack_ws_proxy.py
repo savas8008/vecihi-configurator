@@ -2,7 +2,7 @@
 # Bu dosyanin izinsiz kopyalanmasi, degistirilmesi veya dagitilmasi yasaktir.
 
 """
-CRSF telemetry to WebSocket proxy for drafts/elrs_backpack.html.
+CRSF telemetry to WebSocket proxy for elrs_backpack.html.
 
 The yer kontrol page connects to ws://127.0.0.1:8765/ and expects raw CRSF
 frames. Browsers can only connect to WebSocket servers directly; if your
