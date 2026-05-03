@@ -1309,11 +1309,13 @@ function connect() {
         if (event.data instanceof ArrayBuffer) {
             processBytes(new Uint8Array(event.data));
         } else if (typeof event.data === 'string') {
-            // JSON format desteği (fallback)
+            // JSON format desteği (MAVLink UDP proxy / CRSF fallback)
             try {
                 const d = JSON.parse(event.data);
                 if (d.type === 'crsf' && d.data) {
                     processBytes(new Uint8Array(d.data));
+                } else if (d.type === 'mavlink_telemetry' && d.data) {
+                    applyTelemetryPatch(d.data);
                 }
             } catch(_) {}
         }
@@ -1337,6 +1339,23 @@ function connect() {
             reconnectTimer = setTimeout(() => connect(), reconnectDelay);
         }
     };
+}
+
+function applyTelemetryPatch(data) {
+    Object.entries(data).forEach(([key, value]) => {
+        if (key === 'channels' && Array.isArray(value)) {
+            value.forEach((ch, i) => {
+                if (i < telemetry.channels.length && Number.isFinite(ch)) {
+                    telemetry.channels[i] = Math.round(ch);
+                }
+            });
+        } else if (key in telemetry) {
+            telemetry[key] = value;
+        }
+    });
+    pktCount++;
+    lastPacketTime = Date.now();
+    renderAll();
 }
 
 function disconnect() {

@@ -89,6 +89,11 @@ function populateChannelSelectors() {
  */
 function setupEventListeners() {
     // --- Sistem ve Bağlantı ---
+    const btnGroundControl = $('btnGroundControl');
+    if (btnGroundControl) {
+        btnGroundControl.addEventListener('click', openGroundControl);
+    }
+
     const btnConnect = $('btnConnect');
     if (btnConnect) {
         btnConnect.addEventListener('click', connectSerial);
@@ -161,6 +166,43 @@ function setupEventListeners() {
     $('btnLogSearch').addEventListener('click', searchLogs);
     $('btnClearSearch').addEventListener('click', clearSearch);
     $('logSearch').addEventListener('keypress', (e) => e.key === 'Enter' && searchLogs());
+}
+
+/**
+ * @brief Yer kontrol sayfasını yeni sekmede açar.
+ *        Eğer yerel Python launcher çalışıyorsa, script başlatma isteği de gönderir.
+ */
+async function openGroundControl() {
+    const groundControlUrl = 'drafts/elrs_backpack.html';
+    const launcherUrl = 'http://127.0.0.1:8766/launch-ground-control';
+
+    try {
+        const response = await fetch(launcherUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: 'launch'
+        });
+        if (!response.ok) throw new Error('Launcher yanıt vermedi');
+        if (typeof log === 'function') {
+            log('Yer kontrol proxy başlatıldı.', 'success');
+        }
+    } catch (error) {
+        if (typeof showModal === 'function') {
+            showModal(
+                'Yer Kontrol Launcher Kapalı',
+                'Proxy otomatik başlatılamadı. Lütfen proje klasöründeki <strong>start_ground_control.cmd</strong> dosyasını bir kez çalıştırın, sonra butona tekrar basın.',
+                'warning'
+            );
+        } else if (typeof log === 'function') {
+            log('Yer kontrol launcher kapalı. start_ground_control.cmd dosyasını çalıştırın.', 'warning');
+        }
+    }
+
+    window.open(groundControlUrl, '_blank', 'noopener');
+
+    if (typeof log === 'function') {
+        log('Yer kontrol sayfası yeni sekmede açıldı.', 'info');
+    }
 }
 
 // ============================================================================
