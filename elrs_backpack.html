@@ -58,6 +58,7 @@
             font-family: 'Inter', sans-serif;
             font-size: 13px;
             min-height: 100vh;
+            padding-bottom: 0;
             display: flex;
             flex-direction: column;
         }
@@ -204,7 +205,7 @@
         /* ── MAIN GRID ── */
         .main {
             display: grid;
-            grid-template-columns: 360px 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 14px;
             padding: 14px;
             flex: 1;
@@ -270,6 +271,7 @@
         }
         .mode-btn {
             padding: 9px 6px;
+            font-size: 11px;
             border-radius: var(--radius-sm);
             border: 2px solid var(--border);
             background: var(--surface-2);
@@ -292,6 +294,10 @@
         .mode-btn.mode-warning.active { background: var(--yellow);  border-color: var(--yellow);  color: #fff; }
         .mode-btn.mode-purple.active  { background: var(--purple);  border-color: var(--purple); }
         .mode-btn.mode-orange.active  { background: var(--orange);  border-color: var(--orange); }
+        /* GCS mod butonları: pending=kırmızı, confirmed=yeşil */
+        .mode-btn.pending   { border-color: var(--red);   background: var(--red-pale);   color: var(--red);   animation: blink .6s infinite; }
+        .mode-btn.confirmed { border-color: var(--green); background: var(--green-pale);  color: var(--green); font-weight: 700; }
+
 
         /* ── STICKS ── */
         .stick-row {
@@ -590,6 +596,92 @@
         .card-slate  { border-color: #94a3b8; background: #f8fafc; }
         .card-slate  .card-head { background: #f1f5f9; border-color: #94a3b8; color: #334155; }
         .card-slate  .card-head i { color: #64748b; }
+
+        /* ── MAP MODAL ── */
+        .map-modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.45); z-index: 500;
+            align-items: center; justify-content: center;
+        }
+        .map-modal-overlay.open { display: flex; }
+        .map-modal {
+            background: var(--surface); border-radius: var(--radius);
+            box-shadow: var(--shadow-md); width: min(560px, 95vw);
+            max-height: 85vh; display: flex; flex-direction: column;
+            border: 1px solid var(--border);
+        }
+        .map-modal-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; border-bottom: 1px solid var(--border);
+            font-weight: 700; font-size: 14px; color: var(--text);
+        }
+        .map-modal-head button {
+            background: none; border: none; font-size: 20px; cursor: pointer;
+            color: var(--muted); line-height: 1; padding: 0 4px;
+        }
+        .map-modal-body { overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+        .map-section-title {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .6px; color: var(--muted); margin-bottom: 8px;
+        }
+        .map-row {
+            display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+            border-radius: var(--radius-sm); border: 1px solid var(--border);
+            background: var(--surface-2); transition: border-color .15s;
+        }
+        .map-row.active-map { border-color: var(--green); background: var(--green-pale); }
+        .map-row-info { flex: 1; min-width: 0; }
+        .map-row-name { font-size: 12px; font-weight: 600; color: var(--text); }
+        .map-row-meta { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+        .map-row-badge {
+            font-size: 9px; font-weight: 700; padding: 2px 7px;
+            border-radius: 10px; background: var(--green-mid); color: var(--green);
+        }
+        .map-btn {
+            padding: 5px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+            font-size: 11px; font-weight: 600; cursor: pointer; background: var(--surface);
+            color: var(--text-2); transition: all .15s;
+        }
+        .map-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .map-btn.danger:hover { border-color: var(--red); color: var(--red); }
+        .map-dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .map-dl-field { display: flex; flex-direction: column; gap: 4px; }
+        .map-dl-label { font-size: 10px; font-weight: 600; color: var(--muted); }
+        .map-dl-input {
+            padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 12px; background: var(--surface); color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .map-dl-input:focus { outline: none; border-color: var(--primary); }
+        .map-dl-btn {
+            padding: 8px 16px; border-radius: var(--radius-sm); border: none;
+            font-size: 12px; font-weight: 700; cursor: pointer;
+            background: var(--primary); color: #fff; width: 100%;
+            transition: background .15s; margin-top: 4px;
+        }
+        .map-dl-btn:hover { background: var(--primary-hover); }
+        .map-dl-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+        .map-progress-wrap {
+            background: var(--border); border-radius: 4px; height: 8px; overflow: hidden;
+        }
+        .map-progress-bar {
+            height: 100%; background: var(--primary); border-radius: 4px;
+            transition: width .3s; width: 0%;
+        }
+        .map-progress-text { font-size: 10px; color: var(--muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+        .map-empty { font-size: 12px; color: var(--muted); text-align: center; padding: 12px 0; font-style: italic; }
+        .map-modal-btn {
+            padding: 3px 8px; font-size: 10px; font-weight: 600;
+            border-radius: 6px; border: 1px solid var(--border-strong);
+            background: var(--surface); color: var(--text-2); cursor: pointer;
+            transition: all .15s; white-space: nowrap;
+        }
+        .map-modal-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+        .tile-source-badge {
+            font-size: 9px; padding: 1px 6px; border-radius: 8px; font-weight: 700;
+            background: var(--primary-pale); color: var(--primary); border: 1px solid var(--primary-mid);
+        }
+        .tile-source-badge.local { background: var(--green-pale); color: var(--green); border-color: var(--green-mid); }
     </style>
 </head>
 <body>
@@ -651,7 +743,6 @@
         <div class="card card-blue">
             <div class="card-head">
                 <i class="bi bi-toggles"></i> Uçuş Modu Seçimi
-                <span class="badge-sm badge-send">GÖNDER</span>
             </div>
             <div class="card-body">
                 <div class="mode-grid">
@@ -673,63 +764,11 @@
             </div>
         </div>
 
-        <!-- Sanal Stickler -->
-        <div class="card card-purple">
-            <div class="card-head">
-                <i class="bi bi-joystick"></i> Sanal Stickler
-                <span class="badge-sm badge-send">GÖNDER</span>
-            </div>
-            <div class="card-body">
-                <div class="stick-row">
-                    <div>
-                        <div class="stick-item">
-                            <div class="stick-label">Roll<small>Aileron</small></div>
-                            <input type="range" class="stick-slider" id="sRoll" min="1000" max="2000" value="1500"
-                                   oninput="updateStick('roll',this.value)"
-                                   onmouseup="centerStick('sRoll')" ontouchend="centerStick('sRoll')">
-                            <div class="stick-val" id="vRoll">1500</div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="stick-item">
-                            <div class="stick-label">Pitch<small>Elevator</small></div>
-                            <input type="range" class="stick-slider" id="sPitch" min="1000" max="2000" value="1500"
-                                   oninput="updateStick('pitch',this.value)"
-                                   onmouseup="centerStick('sPitch')" ontouchend="centerStick('sPitch')">
-                            <div class="stick-val" id="vPitch">1500</div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="stick-item">
-                            <div class="stick-label">Throttle<small>Gaz</small></div>
-                            <input type="range" class="stick-slider thr" id="sThr" min="1000" max="2000" value="1000"
-                                   oninput="updateStick('throttle',this.value)">
-                            <div class="stick-val" id="vThr">1000</div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="stick-item">
-                            <div class="stick-label">Yaw<small>Rudder</small></div>
-                            <input type="range" class="stick-slider" id="sYaw" min="1000" max="2000" value="1500"
-                                   oninput="updateStick('yaw',this.value)"
-                                   onmouseup="centerStick('sYaw')" ontouchend="centerStick('sYaw')">
-                            <div class="stick-val" id="vYaw">1500</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="divider"></div>
-                <div style="font-size:10px;color:var(--muted);text-align:center;">
-                    <i class="bi bi-info-circle"></i>
-                    Roll · Pitch · Yaw bırakıldığında 1500'e döner
-                </div>
-            </div>
-        </div>
 
         <!-- Hızlı Komutlar -->
         <div class="card card-green">
             <div class="card-head">
                 <i class="bi bi-lightning-charge-fill"></i> Hızlı Komutlar
-                <span class="badge-sm badge-send">GÖNDER</span>
             </div>
             <div class="card-body">
                 <div class="cmd-grid">
@@ -755,21 +794,72 @@
             </div>
         </div>
 
-        <!-- Rüzgar Tahmini -->
-        <div class="card card-cyan">
-            <div class="card-head"><i class="bi bi-wind"></i> Rüzgar Tahmini</div>
-            <div class="card-body">
-                <canvas id="windCanvas" width="180" height="180"></canvas>
-                <div class="wind-stats">
-                    <div class="wind-stat-box">
-                        <div class="wind-stat-label">Hız</div>
-                        <div class="wind-stat-val" id="windSpeed">--</div>
-                        <div class="wind-stat-unit">m/s</div>
+        <!-- GPS Harita -->
+        <div class="card card-teal">
+            <div class="card-head">
+                <i class="bi bi-geo-alt-fill"></i> GPS Harita
+                <span id="tileSourceBadge" class="tile-source-badge" style="margin-left:8px;">OSM</span>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:8px;margin-bottom:0;">
+                    <button class="map-modal-btn" onclick="openMapModal()"><i class="bi bi-map"></i> Haritalar</button>
+                    <div id="gpsFix" class="gps-fix-badge fix-none" style="margin-bottom:0;">
+                        <i class="bi bi-circle-fill" style="font-size:7px;"></i> FIX YOK
                     </div>
-                    <div class="wind-stat-box">
-                        <div class="wind-stat-label">Yön</div>
-                        <div class="wind-stat-val" id="windDir">--</div>
-                        <div class="wind-stat-unit">derece</div>
+                </div>
+            </div>
+            <div class="card-body" style="padding:10px;">
+                <div id="mapContainer"></div>
+                <div class="gps-grid" style="margin-top:10px;">
+                    <div>
+                        <div class="gps-item-label">Enlem</div>
+                        <div class="gps-item-val" id="gpsLat">--</div>
+                    </div>
+                    <div>
+                        <div class="gps-item-label">Boylam</div>
+                        <div class="gps-item-val" id="gpsLon">--</div>
+                    </div>
+                    <div>
+                        <div class="gps-item-label">Uydu</div>
+                        <div class="gps-item-val" id="gpsSats">--</div>
+                    </div>
+                    <div>
+                        <div class="gps-item-label">Yön (COG)</div>
+                        <div class="gps-item-val" id="gpsCog">--°</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sanal Stickler -->
+        <div class="card card-purple">
+            <div class="card-head"><i class="bi bi-joystick"></i> Sanal Stickler</div>
+            <div class="card-body">
+                <div class="stick-row">
+                    <div class="stick-item">
+                        <span class="stick-label">Roll<small>Aileron</small></span>
+                        <input type="range" class="stick-slider" id="sRoll" min="1000" max="2000" value="1500"
+                               oninput="updateStick('roll',this.value)"
+                               onmouseup="centerStick('sRoll')" ontouchend="centerStick('sRoll')">
+                        <span class="stick-val" id="vRoll">1500</span>
+                    </div>
+                    <div class="stick-item">
+                        <span class="stick-label">Pitch<small>Elevator</small></span>
+                        <input type="range" class="stick-slider" id="sPitch" min="1000" max="2000" value="1500"
+                               oninput="updateStick('pitch',this.value)"
+                               onmouseup="centerStick('sPitch')" ontouchend="centerStick('sPitch')">
+                        <span class="stick-val" id="vPitch">1500</span>
+                    </div>
+                    <div class="stick-item">
+                        <span class="stick-label">Thr<small>Gaz</small></span>
+                        <input type="range" class="stick-slider thr" id="sThr" min="1000" max="2000" value="1000"
+                               oninput="updateStick('throttle',this.value)">
+                        <span class="stick-val" id="vThr">1000</span>
+                    </div>
+                    <div class="stick-item">
+                        <span class="stick-label">Yaw<small>Rudder</small></span>
+                        <input type="range" class="stick-slider" id="sYaw" min="1000" max="2000" value="1500"
+                               oninput="updateStick('yaw',this.value)"
+                               onmouseup="centerStick('sYaw')" ontouchend="centerStick('sYaw')">
+                        <span class="stick-val" id="vYaw">1500</span>
                     </div>
                 </div>
             </div>
@@ -779,17 +869,6 @@
     <!-- ══════════════ SAĞ: TELEMETRİ ══════════════ -->
     <div class="right-col">
         <div class="col-heading recv"><i class="bi bi-arrow-down-circle-fill"></i> Uçaktan Gelen</div>
-
-        <!-- Uçuş Modu + ARM -->
-        <div class="card card-amber">
-            <div class="card-head"><i class="bi bi-airplane-fill"></i> Durum</div>
-            <div class="card-body">
-                <div class="mode-display">
-                    <div class="mode-badge" id="flightModeBadge">--</div>
-                    <div class="arm-badge disarmed" id="armBadge">DISARMED</div>
-                </div>
-            </div>
-        </div>
 
         <!-- Attitude -->
         <div class="card card-indigo">
@@ -811,6 +890,17 @@
                             <span class="euler-val" id="yawVal">0.0°</span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Uçuş Modu + ARM -->
+        <div class="card card-amber">
+            <div class="card-head"><i class="bi bi-airplane-fill"></i> Durum</div>
+            <div class="card-body">
+                <div class="mode-display">
+                    <div class="mode-badge" id="flightModeBadge">--</div>
+                    <div class="arm-badge disarmed" id="armBadge">DISARMED</div>
                 </div>
             </div>
         </div>
@@ -842,37 +932,6 @@
                         <div class="alt-label">Hız</div>
                         <div class="alt-val" id="speedVal">--</div>
                         <div class="alt-unit">km/h</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- GPS Harita -->
-        <div class="card card-teal">
-            <div class="card-head">
-                <i class="bi bi-geo-alt-fill"></i> GPS Harita
-                <div id="gpsFix" class="gps-fix-badge fix-none" style="margin-left:auto;margin-bottom:0;">
-                    <i class="bi bi-circle-fill" style="font-size:7px;"></i> FIX YOK
-                </div>
-            </div>
-            <div class="card-body" style="padding:10px;">
-                <div id="mapContainer"></div>
-                <div class="gps-grid" style="margin-top:10px;">
-                    <div>
-                        <div class="gps-item-label">Enlem</div>
-                        <div class="gps-item-val" id="gpsLat">--</div>
-                    </div>
-                    <div>
-                        <div class="gps-item-label">Boylam</div>
-                        <div class="gps-item-val" id="gpsLon">--</div>
-                    </div>
-                    <div>
-                        <div class="gps-item-label">Uydu</div>
-                        <div class="gps-item-val" id="gpsSats">--</div>
-                    </div>
-                    <div>
-                        <div class="gps-item-label">Yön (COG)</div>
-                        <div class="gps-item-val" id="gpsCog">--°</div>
                     </div>
                 </div>
             </div>
@@ -911,11 +970,23 @@
             </div>
         </div>
 
-        <!-- RC Kanalları -->
-        <div class="card card-slate">
-            <div class="card-head"><i class="bi bi-controller"></i> RC Kanalları</div>
+        <!-- Rüzgar Tahmini -->
+        <div class="card card-cyan">
+            <div class="card-head"><i class="bi bi-wind"></i> Rüzgar Tahmini</div>
             <div class="card-body">
-                <div class="ch-scroll" id="channelsContainer"></div>
+                <canvas id="windCanvas" width="180" height="180"></canvas>
+                <div class="wind-stats">
+                    <div class="wind-stat-box">
+                        <div class="wind-stat-label">Hız</div>
+                        <div class="wind-stat-val" id="windSpeed">--</div>
+                        <div class="wind-stat-unit">m/s</div>
+                    </div>
+                    <div class="wind-stat-box">
+                        <div class="wind-stat-label">Yön</div>
+                        <div class="wind-stat-val" id="windDir">--</div>
+                        <div class="wind-stat-unit">derece</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -950,6 +1021,7 @@ let mapCentered = false;
 
 // GCS kontrolü state
 let gcsActive = false;
+let _requestedModeIdx = -1; // Kullanıcının tıkladığı ama henüz uçaktan onaylanmamış mod
 
 const telemetry = {
     roll: 0, pitch: 0, yaw: 0,
@@ -959,7 +1031,7 @@ const telemetry = {
     antenna: 0, rfMode: 0, txPower: 0,
     dlRssi: 0, dlLq: 0, dlSnr: 0,
     windSpeed: 0, windDir: 0, windValid: false,
-    flightMode: '--', armed: false, failsafe: false,
+    flightMode: '--', armed: false, failsafe: false, gcsActive: false,
     channels: new Array(16).fill(1500)
 };
 
@@ -1082,7 +1154,7 @@ function parseFlightMode(p) {
     for (let i = 0; i < p.length && p[i] !== 0; i++) str += String.fromCharCode(p[i]);
     telemetry.flightMode = str || '--';
     telemetry.failsafe   = str.toLowerCase().includes('failsafe');
-    telemetry.armed      = str.toLowerCase().includes('armed') || str.toUpperCase().includes('ARMED');
+    telemetry.armed      = str.toLowerCase() === 'armed' || str.toLowerCase().startsWith('armed ');
 }
 
 // ============================================================
@@ -1116,7 +1188,20 @@ function renderStatus() {
     else if (lc.includes('gcs'))      el.classList.add('m-gcs');
     else if (lc.includes('manual'))   el.classList.add('m-manual');
 
-    gcsActive = lc.includes('gcs');
+    gcsActive = telemetry.gcsActive;
+
+    // Mod butonları: confirmed (yeşil) = uçak bu modda, pending (kırmızı) = bekleniyor
+    const currentModeIdx = GCS_MODE_INDEX[telemetry.flightMode] ?? -1;
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        const btnIdx = GCS_MODE_INDEX[btn.dataset.mode] ?? -1;
+        btn.classList.remove('active', 'pending', 'confirmed');
+        if (btnIdx === currentModeIdx) {
+            btn.classList.add('confirmed');
+            if (btnIdx === _requestedModeIdx) _requestedModeIdx = -1; // onaylandı, pending temizle
+        } else if (btnIdx === _requestedModeIdx) {
+            btn.classList.add('pending');
+        }
+    });
 
     const arm = document.getElementById('armBadge');
     if (telemetry.armed) {
@@ -1260,6 +1345,7 @@ function renderChannels() {
         }
         const v = document.getElementById(`chVal${i+1}`);
         if (v) v.textContent = val;
+
     });
 }
 
@@ -1380,9 +1466,13 @@ function drawWindCompass(dir, valid) {
 // ============================================================
 //  MAP
 // ============================================================
+const TILE_SERVER = 'http://127.0.0.1:8767';
+let _activeTileLayer = null;
+let _activeMapName = null;
+
 function initMap() {
     mapInstance = L.map('mapContainer', { zoomControl: true, attributionControl: false }).setView([39.0,35.0], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
+    _activeTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
     const icon = L.divIcon({
         html: '<div style="width:14px;height:14px;background:#2563eb;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px rgba(37,99,235,.6);"></div>',
         iconSize: [14,14], iconAnchor: [7,7]
@@ -1401,51 +1491,86 @@ function updateMap(lat, lon) {
 }
 
 // ============================================================
-//  MAVLink MANUAL_CONTROL builder (msg_id=69, crc_extra=243)
+//  XFlight GCS Protokol — MAVLink v2 zarflı (msg_id 150-153)
 // ============================================================
-let _mavSeq = 0;
+const GCS_MODE_INDEX = {
+    'MANUAL':0,'ANGLE':1,'ACRO':2,'HORIZON':3,'CRUISE':4,
+    'ALTHOLD':5,'RTH':6,'GCS':7,'LAUNCH':8,'WAYPOINT':9,'LAND_ASSIST':10
+};
 
-function mavCrc16(data, crcExtra) {
+let _gcsSeq = 0;
+let _gcsMode = 1; // aktif mod index (default: ANGLE)
+
+function _mavX25(data, crcExtra) {
     let crc = 0xFFFF;
     for (let i = 0; i < data.length; i++) {
-        let tmp = (data[i] ^ (crc & 0xFF)) & 0xFF;
-        tmp = (tmp ^ ((tmp << 4) & 0xFF)) & 0xFF;
-        crc = ((crc >> 8) ^ ((tmp << 8) & 0xFFFF) ^ ((tmp << 3) & 0xFFFF) ^ ((tmp >> 4) & 0xFFFF)) & 0xFFFF;
+        let t = (data[i] ^ (crc & 0xFF)) & 0xFF;
+        t = (t ^ ((t << 4) & 0xFF)) & 0xFF;
+        crc = ((crc >> 8) ^ ((t << 8) & 0xFFFF) ^ ((t << 3) & 0xFFFF) ^ ((t >> 4) & 0xFFFF)) & 0xFFFF;
     }
-    let tmp = (crcExtra ^ (crc & 0xFF)) & 0xFF;
-    tmp = (tmp ^ ((tmp << 4) & 0xFF)) & 0xFF;
-    crc = ((crc >> 8) ^ ((tmp << 8) & 0xFFFF) ^ ((tmp << 3) & 0xFFFF) ^ ((tmp >> 4) & 0xFFFF)) & 0xFFFF;
-    return crc;
+    let t = (crcExtra ^ (crc & 0xFF)) & 0xFF;
+    t = (t ^ ((t << 4) & 0xFF)) & 0xFF;
+    return ((crc >> 8) ^ ((t << 8) & 0xFFFF) ^ ((t << 3) & 0xFFFF) ^ ((t >> 4) & 0xFFFF)) & 0xFFFF;
 }
 
-function buildManualControl(rollPwm, pitchPwm, throttlePwm, yawPwm) {
-    // PWM (1000-2000) → MAVLink range
-    const y = Math.max(-1000, Math.min(1000, (rollPwm     - 1500) * 2)); // roll
-    const x = Math.max(-1000, Math.min(1000, (pitchPwm    - 1500) * 2)); // pitch
-    const z = Math.max(0,     Math.min(1000,  throttlePwm - 1000));       // throttle
-    const r = Math.max(-1000, Math.min(1000, (yawPwm      - 1500) * 2)); // yaw
+function _buildV2Frame(msgId, payload, crcExtra) {
+    const n = payload.length;
+    const f = new Uint8Array(12 + n);
+    f[0]=0xFD; f[1]=n; f[2]=0; f[3]=0;
+    f[4]=_gcsSeq++&0xFF; f[5]=255; f[6]=190;
+    f[7]=msgId&0xFF; f[8]=0; f[9]=0;
+    f.set(payload, 10);
+    const crc = _mavX25(f.slice(1, 10+n), crcExtra);
+    f[10+n]=crc&0xFF; f[11+n]=(crc>>8)&0xFF;
+    return f;
+}
 
-    const frame = new Uint8Array(19);
-    frame[0] = 0xFE; frame[1] = 11; frame[2] = _mavSeq++ & 0xFF;
-    frame[3] = 255; frame[4] = 0; frame[5] = 69; // sys=255(GCS), comp=0, msg=69
+function buildStickPacket(rollPwm, pitchPwm, throttlePwm, yawPwm) {
+    const p = new Uint8Array(9);
+    const clamp = (v,lo,hi) => Math.min(hi, Math.max(lo, Math.round(v)));
+    const wr16 = (off, v) => { p[off]=v&0xFF; p[off+1]=(v>>8)&0xFF; };
+    p[0] = _gcsMode;
+    wr16(1, clamp(rollPwm,     1000, 2000));
+    wr16(3, clamp(pitchPwm,    1000, 2000));
+    wr16(5, clamp(throttlePwm, 1000, 2000));
+    wr16(7, clamp(yawPwm,      1000, 2000));
+    return _buildV2Frame(150, p, 0);
+}
 
-    const wr16 = (buf, off, v) => { const u = v & 0xFFFF; buf[off] = u & 0xFF; buf[off+1] = (u >> 8) & 0xFF; };
-    wr16(frame, 6, x); wr16(frame, 8, y); wr16(frame, 10, z); wr16(frame, 12, r);
-    frame[14] = 0; frame[15] = 0; // buttons
-    frame[16] = 1;                 // target sys_id
+function buildModePacket(modeIdx) {
+    return _buildV2Frame(151, new Uint8Array([modeIdx & 0xFF]), 0);
+}
 
-    const crc = mavCrc16(frame.slice(1, 17), 243);
-    frame[17] = crc & 0xFF; frame[18] = (crc >> 8) & 0xFF;
-    return frame;
+function buildCmdPacket(cmdId, cmdPayload) {
+    const p = new Uint8Array(2 + cmdPayload.length);
+    p[0]=cmdId; p[1]=cmdPayload.length;
+    p.set(cmdPayload, 2);
+    return _buildV2Frame(152, p, 0);
 }
 
 // ============================================================
 //  CONTROLS (sol panel)
 // ============================================================
 function selectMode(btn) {
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    sendCmd('SET_MODE', { mode: btn.dataset.mode });
+    const idx = GCS_MODE_INDEX[btn.dataset.mode] ?? 1;
+    _gcsMode = idx;
+    _requestedModeIdx = idx;
+    // Hepsini temizle, tıklananı kırmızı (pending) yap
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active', 'pending', 'confirmed'));
+    btn.classList.add('pending');
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(buildModePacket(idx).buffer);
+    }
+}
+
+function handleAck(seq, result) {
+    const el = document.getElementById('ackToast');
+    if (!el) return;
+    el.textContent = result === 0 ? '✓ Komut iletildi' : '✗ Komut reddedildi';
+    el.style.background = result === 0 ? 'var(--green)' : 'var(--red)';
+    el.style.display = 'block';
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => { el.style.display = 'none'; }, 2500);
 }
 
 function updateStick(axis, val) {
@@ -1465,12 +1590,27 @@ function centerStick(sliderId) {
 
 function sendStickUpdate() {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
-    ws.send(buildManualControl(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
+    ws.send(buildStickPacket(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
+}
+
+function sendCmdRetry(buildFn, retries = 4, interval = 150) {
+    for (let i = 0; i < retries; i++) {
+        setTimeout(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) ws.send(buildFn().buffer);
+        }, i * interval);
+    }
 }
 
 function sendCmd(type, data = {}) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
-    ws.send(JSON.stringify({ type, ...data }));
+    switch (type) {
+        case 'ARM':       sendCmdRetry(() => buildCmdPacket(0x03, new Uint8Array([0]))); break;
+        case 'FORCE_ARM': sendCmdRetry(() => buildCmdPacket(0x03, new Uint8Array([1]))); break;
+        case 'DISARM':    sendCmdRetry(() => buildCmdPacket(0x04, new Uint8Array([])), 8, 100); break;
+        case 'RTH':       sendCmdRetry(() => buildModePacket(6)); break;
+        case 'SET_HOME':  sendCmdRetry(() => buildCmdPacket(0x05, new Uint8Array([]))); break;
+        default:          ws.send(JSON.stringify({ type, ...data }));
+    }
 }
 
 
@@ -1507,6 +1647,7 @@ function connect() {
                 const d = JSON.parse(ev.data);
                 if (d.type === 'crsf' && d.data) processBytes(new Uint8Array(d.data));
                 else if (d.type === 'mavlink_telemetry' && d.data) applyPatch(d.data);
+                else if (d.type === 'ack') handleAck(d.seq, d.result);
             } catch(_) {}
         }
     };
@@ -1574,17 +1715,216 @@ function stopPktRate() {
 // ============================================================
 //  INIT
 // ============================================================
+// ============================================================
+//  MAP MANAGEMENT
+// ============================================================
+let _dlPollTimer = null;
+
+function switchToLocalMap(name) {
+    if (_activeTileLayer) mapInstance.removeLayer(_activeTileLayer);
+    _activeTileLayer = L.tileLayer(
+        TILE_SERVER + '/tiles/' + name + '/{z}/{x}/{y}.png',
+        { maxZoom: 19, tileSize: 256 }
+    ).addTo(mapInstance);
+    _activeMapName = name;
+    const badge = document.getElementById('tileSourceBadge');
+    if (badge) { badge.textContent = name; badge.className = 'tile-source-badge local'; }
+}
+
+function switchToOSM() {
+    if (_activeTileLayer) mapInstance.removeLayer(_activeTileLayer);
+    _activeTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
+    _activeMapName = null;
+    const badge = document.getElementById('tileSourceBadge');
+    if (badge) { badge.textContent = 'OSM'; badge.className = 'tile-source-badge'; }
+}
+
+function openMapModal() {
+    document.getElementById('mapModalOverlay').classList.add('open');
+    loadMapList();
+}
+function closeMapModal() {
+    document.getElementById('mapModalOverlay').classList.remove('open');
+}
+
+function loadMapList() {
+    fetch(TILE_SERVER + '/api/maps')
+        .then(r => r.json())
+        .then(d => { setServerAvailable(true); renderMapList(d.maps); })
+        .catch(() => {
+            setServerAvailable(false);
+            document.getElementById('mapListContainer').innerHTML =
+                '<div class="map-empty" style="color:var(--red)">⚠ Tile sunucusu çalışmıyor (port 8767).<br>' +
+                '<span style="font-size:10px;color:var(--muted)">Başlatmak için: <code>tools\\start_ground_control.cmd</code></span></div>';
+        });
+}
+
+function setServerAvailable(ok) {
+    ['dlAreaBtn','dlUrlBtn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = !ok;
+    });
+    const info = document.getElementById('dlAreaInfo');
+    if (!ok && info) {
+        info.textContent = 'Sunucu çalışmıyor — indirme devre dışı.';
+        info.style.color = 'var(--red)';
+    }
+}
+
+function renderMapList(maps) {
+    const c = document.getElementById('mapListContainer');
+    if (!maps || maps.length === 0) {
+        c.innerHTML = '<div class="map-empty">Henüz yüklü harita yok. Aşağıdan indirin.</div>';
+        return;
+    }
+    c.innerHTML = maps.map(m => {
+        const isActive = m.name === _activeMapName;
+        return `<div class="map-row ${isActive ? 'active-map' : ''}" id="maprow_${m.name}">
+            <div class="map-row-info">
+                <div class="map-row-name">${m.name}${isActive ? ' <span class="map-row-badge">AKTİF</span>' : ''}</div>
+                <div class="map-row-meta">${m.size_mb} MB &nbsp;·&nbsp; z${m.minzoom}–${m.maxzoom} &nbsp;·&nbsp; ${m.description || ''}</div>
+            </div>
+            <button class="map-btn" onclick="switchToLocalMap('${m.name}');loadMapList()">Kullan</button>
+            <button class="map-btn danger" onclick="deleteMap('${m.name}')">Sil</button>
+        </div>`;
+    }).join('') + (maps.length ? `<div style="margin-top:8px;">
+        <button class="map-btn" onclick="switchToOSM();loadMapList()">OSM'e Dön</button>
+    </div>` : '');
+}
+
+function deleteMap(name) {
+    if (!confirm(name + ' haritasını silmek istiyor musunuz?')) return;
+    fetch(TILE_SERVER + '/api/maps/delete', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({name})
+    }).then(() => { if (_activeMapName === name) switchToOSM(); loadMapList(); });
+}
+
+function _deg2tile(lat, lon, z) {
+    const n = 1 << z;
+    const x = Math.floor((lon + 180) / 360 * n);
+    const latR = lat * Math.PI / 180;
+    const y = Math.floor((1 - Math.log(Math.tan(latR) + 1 / Math.cos(latR)) / Math.PI) / 2 * n);
+    return [Math.max(0, Math.min(n - 1, x)), Math.max(0, Math.min(n - 1, y))];
+}
+
+function _countTiles(w, s, e, n, minz, maxz) {
+    let total = 0;
+    for (let z = minz; z <= maxz; z++) {
+        const [x1, y1] = _deg2tile(n, w, z);
+        const [x2, y2] = _deg2tile(s, e, z);
+        total += (Math.abs(x2 - x1) + 1) * (Math.abs(y2 - y1) + 1);
+    }
+    return total;
+}
+
+function _showAreaInfo(msg, isError) {
+    const el = document.getElementById('dlAreaInfo');
+    el.textContent = msg;
+    el.style.color = isError ? 'var(--red)' : 'var(--muted)';
+}
+
+function _showDlError(msg) {
+    document.getElementById('dlProgressSection').style.display = '';
+    document.getElementById('dlProgressName').textContent = '⚠ Hata';
+    document.getElementById('dlProgressBar').style.width = '0%';
+    document.getElementById('dlProgressText').textContent = msg;
+    document.getElementById('dlProgressText').style.color = 'var(--red)';
+}
+
+function calcTiles() {
+    if (!mapInstance) return;
+    const b = mapInstance.getBounds();
+    const minz = parseInt(document.getElementById('dlMinZoom').value) || 10;
+    const maxz = parseInt(document.getElementById('dlMaxZoom').value) || 14;
+    const total = _countTiles(b.getWest(), b.getSouth(), b.getEast(), b.getNorth(), minz, maxz);
+    const mins = Math.ceil(total * 0.05 / 60);
+    if (total > 5000) {
+        _showAreaInfo(`⚠ ${total.toLocaleString()} tile — çok fazla (max 5000). Alanı/zoom'u küçültün.`, true);
+    } else {
+        _showAreaInfo(`≈ ${total.toLocaleString()} tile · tahmini ~${mins} dk`, false);
+    }
+}
+
+function downloadArea() {
+    if (!mapInstance) return;
+    const b = mapInstance.getBounds();
+    const name = document.getElementById('dlAreaName').value.trim() || 'bolge';
+    const minz = parseInt(document.getElementById('dlMinZoom').value) || 10;
+    const maxz = parseInt(document.getElementById('dlMaxZoom').value) || 14;
+    const total = _countTiles(b.getWest(), b.getSouth(), b.getEast(), b.getNorth(), minz, maxz);
+    if (total > 5000) {
+        _showAreaInfo(`⚠ ${total.toLocaleString()} tile — çok fazla. Alanı veya zoom aralığını küçültün.`, true);
+        return;
+    }
+    document.getElementById('dlAreaBtn').disabled = true;
+    document.getElementById('dlUrlBtn').disabled = true;
+    fetch(TILE_SERVER + '/api/download/area', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name, west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth(), minzoom: minz, maxzoom: maxz })
+    }).then(r => r.json()).then(d => {
+        if (d.ok) { _showAreaInfo(`${total.toLocaleString()} tile indiriliyor…`, false); startProgressPoll(); }
+        else { _showDlError(d.error); resetDlButtons(); }
+    }).catch(() => { _showDlError('Tile sunucusuna ulaşılamadı. Launcher çalışıyor mu? (port 8767)'); resetDlButtons(); });
+}
+
+function downloadUrl() {
+    const name = document.getElementById('dlUrlName').value.trim() || 'harita';
+    const url  = document.getElementById('dlUrlInput').value.trim();
+    if (!url) { _showDlError('URL giriniz.'); return; }
+    document.getElementById('dlAreaBtn').disabled = true;
+    document.getElementById('dlUrlBtn').disabled = true;
+    fetch(TILE_SERVER + '/api/download/url', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, url})
+    }).then(r => r.json()).then(d => {
+        if (d.ok) startProgressPoll();
+        else { _showDlError(d.error); resetDlButtons(); }
+    }).catch(() => { _showDlError('Tile sunucusuna ulaşılamadı. Launcher çalışıyor mu? (port 8767)'); resetDlButtons(); });
+}
+
+function resetDlButtons() {
+    document.getElementById('dlAreaBtn').disabled = false;
+    document.getElementById('dlUrlBtn').disabled = false;
+}
+
+function startProgressPoll() {
+    document.getElementById('dlProgressSection').style.display = '';
+    if (_dlPollTimer) clearInterval(_dlPollTimer);
+    _dlPollTimer = setInterval(() => {
+        fetch(TILE_SERVER + '/api/download/progress').then(r => r.json()).then(d => {
+            document.getElementById('dlProgressName').textContent = d.name;
+            const pct = d.total > 0 ? Math.round(d.done / d.total * 100) : 0;
+            document.getElementById('dlProgressBar').style.width = pct + '%';
+            const sizeStr = d.total === -1
+                ? (d.done / 1024 / 1024).toFixed(1) + ' MB indirildi'
+                : `${d.done.toLocaleString()} / ${d.total.toLocaleString()} tile (${pct}%)`;
+            document.getElementById('dlProgressText').textContent = d.error
+                ? '⚠ ' + d.error
+                : (d.active ? sizeStr : '✓ Tamamlandı — ' + sizeStr);
+            if (!d.active) {
+                clearInterval(_dlPollTimer);
+                resetDlButtons();
+                loadMapList();
+                if (!d.error && d.name) {
+                    document.getElementById('dlProgressText').textContent += ' — Haritalar listesinden "Kullan" ile aktive edin.';
+                }
+            }
+        });
+    }, 600);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     initMap();
     drawHorizon(0, 0);
     drawWindCompass(0, false);
     renderChannels();
-    // GCS kontrolü için 20Hz MANUAL_CONTROL heartbeat (mod bağımsız)
+    // GCS kontrolü için 50Hz stick heartbeat (mod bağımsız)
     setInterval(() => {
         if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(buildManualControl(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
+            ws.send(buildStickPacket(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
         }
-    }, 50);
+    }, 20);
 });
 </script>
 
@@ -1597,5 +1937,84 @@ if ('serviceWorker' in navigator) {
     });
 }
 </script>
+
+<div id="ackToast" style="display:none;position:fixed;bottom:20px;right:20px;
+     padding:10px 18px;border-radius:8px;color:#fff;font-weight:600;
+     font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);
+     transition:opacity .3s;"></div>
+
+<!-- ── MAP MANAGEMENT MODAL ── -->
+<div id="mapModalOverlay" class="map-modal-overlay" onclick="if(event.target===this)closeMapModal()">
+  <div class="map-modal">
+    <div class="map-modal-head">
+      <span><i class="bi bi-map" style="margin-right:8px;"></i>Harita Yönetimi</span>
+      <button onclick="closeMapModal()">&#x2715;</button>
+    </div>
+    <div class="map-modal-body">
+
+      <!-- Yüklü Haritalar -->
+      <div>
+        <div class="map-section-title">Yüklü Haritalar</div>
+        <div id="mapListContainer"><div class="map-empty">Yükleniyor…</div></div>
+      </div>
+
+      <!-- Alan İndir -->
+      <div style="border-top:1px solid var(--border);padding-top:14px;">
+        <div class="map-section-title">Harita İndir — Mevcut Görünüm (OSM)</div>
+        <div class="map-dl-grid" style="margin-bottom:8px;">
+          <div class="map-dl-field">
+            <label class="map-dl-label">Harita Adı</label>
+            <input class="map-dl-input" id="dlAreaName" value="bolge" placeholder="bolge">
+          </div>
+          <div class="map-dl-field">
+            <label class="map-dl-label">Min Zoom</label>
+            <input class="map-dl-input" id="dlMinZoom" type="number" value="10" min="1" max="18">
+          </div>
+          <div class="map-dl-field">
+            <label class="map-dl-label">Max Zoom</label>
+            <input class="map-dl-input" id="dlMaxZoom" type="number" value="14" min="1" max="18">
+          </div>
+          <div class="map-dl-field" style="justify-content:flex-end;">
+            <label class="map-dl-label">&nbsp;</label>
+            <button class="map-btn" onclick="calcTiles()" style="height:30px;">Tile Say</button>
+          </div>
+        </div>
+        <div id="dlAreaInfo" style="font-size:10px;color:var(--muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace;"></div>
+        <button class="map-dl-btn" id="dlAreaBtn" onclick="downloadArea()" disabled>
+          <i class="bi bi-download"></i> Mevcut Görünümü İndir
+        </button>
+      </div>
+
+      <!-- URL İndir -->
+      <div style="border-top:1px solid var(--border);padding-top:14px;">
+        <div class="map-section-title">URL'den İndir (.mbtiles)</div>
+        <div class="map-dl-grid" style="margin-bottom:8px;">
+          <div class="map-dl-field">
+            <label class="map-dl-label">Harita Adı</label>
+            <input class="map-dl-input" id="dlUrlName" value="harita" placeholder="harita">
+          </div>
+          <div class="map-dl-field" style="grid-column:1/-1;">
+            <label class="map-dl-label">URL</label>
+            <input class="map-dl-input" id="dlUrlInput" placeholder="https://…/harita.mbtiles" style="width:100%;box-sizing:border-box;">
+          </div>
+        </div>
+        <button class="map-dl-btn" id="dlUrlBtn" onclick="downloadUrl()" disabled>
+          <i class="bi bi-cloud-download"></i> URL'den İndir
+        </button>
+      </div>
+
+      <!-- İlerleme -->
+      <div id="dlProgressSection" style="display:none;border-top:1px solid var(--border);padding-top:14px;">
+        <div class="map-section-title">İndirme İlerlemesi</div>
+        <div id="dlProgressName" style="font-size:12px;font-weight:600;margin-bottom:6px;"></div>
+        <div class="map-progress-wrap"><div class="map-progress-bar" id="dlProgressBar"></div></div>
+        <div class="map-progress-text" id="dlProgressText">—</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>

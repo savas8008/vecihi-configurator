@@ -190,11 +190,11 @@ async function openGroundControl() {
         if (typeof showModal === 'function') {
             showModal(
                 'Yer Kontrol Launcher Kapalı',
-                'Proxy otomatik başlatılamadı. Lütfen proje klasöründeki <strong>start_ground_control.cmd</strong> dosyasını bir kez çalıştırın, sonra butona tekrar basın.',
+                'Proxy otomatik başlatılamadı. Lütfen proje klasöründeki <strong>tools\\start_ground_control.cmd</strong> dosyasını bir kez çalıştırın, sonra butona tekrar basın.',
                 'warning'
             );
         } else if (typeof log === 'function') {
-            log('Yer kontrol launcher kapalı. start_ground_control.cmd dosyasını çalıştırın.', 'warning');
+            log('Yer kontrol launcher kapalı. tools\\start_ground_control.cmd dosyasını çalıştırın.', 'warning');
         }
     }
 

@@ -24,7 +24,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("GROUND_CONTROL_LAUNCHER_PORT", "8766"))
-DEFAULT_SCRIPTS = ["tools/mavlink_ws_proxy.py"]
+DEFAULT_SCRIPTS = ["tools/mavlink_ws_proxy.py", "tools/tile_server.py"]
 running_processes: dict[str, subprocess.Popen] = {}
 
 

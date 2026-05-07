@@ -29,6 +29,11 @@ from contextlib import suppress
 
 GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
+_GCS_MODE_NAMES = [
+    "MANUAL", "ANGLE", "ACRO", "HORIZON", "CRUISE",
+    "ALTHOLD", "RTH", "GCS", "LAUNCH", "WAYPOINT", "LAND_ASSIST", "FAILSAFE",
+]
+
 
 class WebSocketHub:
     def __init__(self) -> None:
@@ -101,7 +106,7 @@ async def handle_client(
     writer: asyncio.StreamWriter,
     hub: WebSocketHub,
     udp_sock: socket.socket,
-    target: tuple[str, int],
+    uplink_target: list,
 ) -> None:
     try:
         request = await reader.readuntil(b"\r\n\r\n")
@@ -135,7 +140,7 @@ async def handle_client(
                 await writer.drain()
                 continue
             if opcode in (0x0, 0x1, 0x2) and payload:
-                await loop.sock_sendto(udp_sock, payload, target)
+                await loop.sock_sendto(udp_sock, payload, (uplink_target[0], uplink_target[1]))
     except Exception:
         pass
     finally:
@@ -194,11 +199,16 @@ def decode_message(msg_id: int, payload: bytes) -> dict:
     data: dict = {}
 
     if msg_id == 0 and len(payload) >= 9:  # HEARTBEAT
-        base_mode = payload[6]
+        mode_idx    = payload[0]   # custom_mode[0] = efektif mod index
+        armed_flag  = payload[1]   # custom_mode[1] = armed
+        gcs_switch  = payload[2]   # custom_mode[2] = GCS switch aktif
+        base_mode   = payload[6]
         system_status = payload[7]
-        data["failsafe"] = system_status in (4, 5)
-        if base_mode & 0x80:
-            data["flightMode"] = "ARMED"
+        data["failsafe"]  = system_status in (5, 6)
+        data["armed"]     = bool(base_mode & 0x80) or bool(armed_flag)
+        data["gcsActive"] = bool(gcs_switch)
+        if mode_idx < len(_GCS_MODE_NAMES):
+            data["flightMode"] = _GCS_MODE_NAMES[mode_idx]
 
     elif msg_id == 1 and len(payload) >= 31:  # SYS_STATUS
         voltage_mv = u16(payload, 14)
@@ -263,6 +273,14 @@ def decode_message(msg_id: int, payload: bytes) -> dict:
         channels[2] = 1000 + throttle * 10
         data["channels"] = channels
 
+    elif msg_id == 154 and len(payload) >= 9:  # WIND (XFlight custom, msg_id=154)
+        speed = struct.unpack_from("<f", payload, 0)[0]
+        direction = struct.unpack_from("<f", payload, 4)[0]
+        valid = bool(payload[8])
+        data["windValid"] = valid
+        data["windSpeed"] = round(float(speed), 1) if valid else 0.0
+        data["windDir"]   = round(float(direction), 1) if valid else 0.0
+
     return data
 
 
@@ -296,18 +314,24 @@ def create_udp_socket(args: argparse.Namespace) -> socket.socket:
     return sock
 
 
-async def read_udp(args: argparse.Namespace, hub: WebSocketHub, sock: socket.socket) -> None:
+async def read_udp(args: argparse.Namespace, hub: WebSocketHub, sock: socket.socket, uplink_target: list) -> None:
     loop = asyncio.get_running_loop()
     parser = MavlinkParser()
     print(f"MAVLink UDP listening: {args.udp_host}:{args.udp_port}")
-    heartbeat_task = asyncio.create_task(send_heartbeat(sock, args.target_host, args.target_port))
+    heartbeat_task = asyncio.create_task(send_heartbeat(sock, uplink_target))
 
     try:
         while True:
             packet, addr = await loop.sock_recvfrom(sock, 4096)
-            print(f"UDP packet: {len(packet)} bytes from {addr[0]}:{addr[1]}")
+            # ELRS backpack IP'sini dinamik güncelle — komutlar doğru adrese gitsin
+            if addr[0] not in ("127.0.0.1", "0.0.0.0"):
+                uplink_target[0] = addr[0]
+            print(f"UDP packet: {len(packet)} bytes from {addr[0]}:{addr[1]} → uplink: {uplink_target[0]}:{uplink_target[1]}")
             patch: dict = {}
             for msg_id, payload in parser.feed(packet):
+                if msg_id == 153 and len(payload) >= 2:  # GCS_ACK (uçaktan yer kontrole)
+                    await hub.broadcast_json({"type": "ack", "seq": payload[0], "result": payload[1]})
+                    continue
                 patch.update(decode_message(msg_id, payload))
             if patch:
                 await hub.broadcast_json({"type": "mavlink_telemetry", "data": patch})
@@ -315,16 +339,14 @@ async def read_udp(args: argparse.Namespace, hub: WebSocketHub, sock: socket.soc
         heartbeat_task.cancel()
 
 
-async def send_heartbeat(sock: socket.socket, target_host: str, target_port: int) -> None:
+async def send_heartbeat(sock: socket.socket, uplink_target: list) -> None:
     loop = asyncio.get_running_loop()
     seq = 0
-    target = (target_host, target_port)
-    print(f"MAVLink heartbeat target: {target_host}:{target_port}")
 
     while True:
         packet = mavlink_v1_heartbeat(seq)
         try:
-            await loop.sock_sendto(sock, packet, target)
+            await loop.sock_sendto(sock, packet, (uplink_target[0], uplink_target[1]))
         except OSError as exc:
             print(f"Heartbeat send failed: {exc}")
         seq = (seq + 1) & 0xFF
@@ -358,18 +380,19 @@ def x25_crc(data: bytes) -> int:
 async def main_async(args: argparse.Namespace) -> None:
     hub = WebSocketHub()
     udp_sock = create_udp_socket(args)
-    target = (args.target_host, args.target_port)
+    # Mutable liste: read_udp ELRS IP'sini dinamik günceller, handle_client okur
+    uplink_target = [args.target_host, args.target_port]
     server = await asyncio.start_server(
-        lambda r, w: handle_client(r, w, hub, udp_sock, target),
+        lambda r, w: handle_client(r, w, hub, udp_sock, uplink_target),
         args.ws_host,
         args.ws_port,
     )
     print(f"WebSocket output: ws://{args.ws_host}:{args.ws_port}/")
-    print("Yer kontrol sayfasinda IP=127.0.0.1, Port=8765, Path=/ kullan.")
+    print(f"Uplink başlangıç hedefi: {args.target_host}:{args.target_port} (telemetri alınınca güncellenir)")
 
     try:
         async with server:
-            await asyncio.gather(server.serve_forever(), read_udp(args, hub, udp_sock))
+            await asyncio.gather(server.serve_forever(), read_udp(args, hub, udp_sock, uplink_target))
     finally:
         udp_sock.close()
 
@@ -379,7 +402,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--udp-host", default="0.0.0.0", help="MAVLink UDP dinleme hostu")
     parser.add_argument("--udp-port", type=int, default=14550, help="MAVLink UDP dinleme portu")
     parser.add_argument("--target-host", default="255.255.255.255", help="Backpack MAVLink hedef IP")
-    parser.add_argument("--target-port", type=int, default=14555, help="Backpack MAVLink listen/uplink portu")
+    parser.add_argument("--target-port", type=int, default=14555, help="Backpack MAVLink uplink portu (backpack Listen Port, genellikle 14555)")
     parser.add_argument("--ws-host", default="127.0.0.1", help="WebSocket host")
     parser.add_argument("--ws-port", type=int, default=8765, help="WebSocket port")
     return parser.parse_args()

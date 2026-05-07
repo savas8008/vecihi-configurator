@@ -1,6 +1,7 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+set "ROOT=%~dp0.."
+cd /d "%ROOT%"
 start "Vecihi Ground Control Launcher" /min python tools\ground_control_launcher.py
-start "" "%~dp0configurator.html"
+start "" "%ROOT%\configurator.html"
 endlocal
