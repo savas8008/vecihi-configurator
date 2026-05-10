@@ -1386,9 +1386,12 @@ let _activeTileLayer = null;
 
 function initMap() {
     mapInstance = L.map('mapContainer', { zoomControl: true, attributionControl: false }).setView([39.0,35.0], 6);
-    _activeTileLayer = L.tileLayer.offline('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
-    _activeTileLayer.on('savetileend', _onSaveTileEnd);
-    _activeTileLayer.on('loadend', _onSaveLoadEnd);
+    const _offlineFn = (L.tileLayer && L.tileLayer.offline) ? L.tileLayer.offline : L.tileLayer;
+    _activeTileLayer = _offlineFn('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
+    if (_activeTileLayer.on && L.tileLayer.offline) {
+        _activeTileLayer.on('savetileend', _onSaveTileEnd);
+        _activeTileLayer.on('loadend', _onSaveLoadEnd);
+    }
     const icon = L.divIcon({
         html: '<div style="width:14px;height:14px;background:#2563eb;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px rgba(37,99,235,.6);"></div>',
         iconSize: [14,14], iconAnchor: [7,7]
@@ -1656,6 +1659,7 @@ function _setMapBadge(text, state) {
 
 function saveMapArea() {
     if (!mapInstance || !_activeTileLayer) return;
+    if (typeof _activeTileLayer.getTileUrls !== 'function') { alert('Çevrimdışı kayıt bu tarayıcıda/sürümde desteklenmiyor.'); return; }
     const zoom = mapInstance.getZoom();
     const minZ = Math.max(zoom - 1, 1);
     const maxZ = Math.min(zoom + 2, 18);
