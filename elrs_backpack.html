@@ -1677,24 +1677,7 @@ const OfflineTileLayer = L.TileLayer.extend({
         }
         return tiles;
     },
-    saveTiles: async function(tiles, onProgress) {
-        const db = await this._openDb();
-        let saved = 0;
-        for (const t of tiles) {
-            const url = this.getTileUrl({x: t.x, y: t.y, z: t.z});
-            try {
-                const blob = await fetch(url).then(r => r.blob());
-                await new Promise((res, rej) => {
-                    const tx = db.transaction('tiles', 'readwrite');
-                    const r = tx.objectStore('tiles').put(blob, t.key);
-                    r.onsuccess = res; r.onerror = rej;
-                });
-                saved++;
-                if (onProgress) onProgress(saved, tiles.length);
-            } catch(e) { console.warn('Tile kaydedilemedi:', url); }
-        }
-        return saved;
-    },
+
     clearAllTiles: function() {
         return this._openDb().then(db => new Promise((res, rej) => {
             const r = db.transaction('tiles', 'readwrite').objectStore('tiles').clear();
@@ -1714,18 +1697,17 @@ function _setMapBadge(text, state) {
 
 function saveMapArea() {
     if (!mapInstance || !_activeTileLayer) return;
-    const zoom = mapInstance.getZoom();
-    const minZ = Math.max(zoom - 1, 1);
-    const maxZ = Math.min(zoom + 2, 18);
-    const tiles = _activeTileLayer.getTileKeys(mapInstance.getBounds(), minZ, maxZ);
-    if (!tiles.length) { alert('Görünümde tile bulunamadı.'); return; }
-    if (tiles.length > 3000) { alert('Çok fazla tile (' + tiles.length + '). Zoom\'u artırın veya alanı küçültün.'); return; }
-    _setMapBadge('0/' + tiles.length + ' Kaydediliyor…', 'saving');
-    document.getElementById('mapSaveBtn').disabled = true;
-    _activeTileLayer.saveTiles(tiles, (done, total) => {
-        _setMapBadge(done + '/' + total + ' Kaydediliyor…', 'saving');
-        if (done >= total) { _setMapBadge('Kaydedildi ✓', 'saved'); setTimeout(() => _setMapBadge('OSM', ''), 3000); }
-    }).finally(() => { document.getElementById('mapSaveBtn').disabled = false; });
+    _setMapBadge('Önbellekleniyor…', 'saving');
+    const btn = document.getElementById('mapSaveBtn');
+    if (btn) btn.disabled = true;
+    // Görünümdeki tile'ları yeniden yükle; createTile onları IndexedDB'ye kaydeder.
+    // OSM toplu indirmeye izin vermez — haritayı gezince tile'lar otomatik kaydedilir.
+    _activeTileLayer.redraw();
+    setTimeout(() => {
+        _setMapBadge('Kaydedildi ✓', 'saved');
+        if (btn) btn.disabled = false;
+        setTimeout(() => _setMapBadge('OSM', ''), 2500);
+    }, 1500);
 }
 
 function clearSavedTiles() {
