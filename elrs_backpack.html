@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet.offline@2/dist/bundle.min.js"></script>
     <style>
         :root {
             --bg:           #b8c9d8;
@@ -1386,12 +1385,7 @@ let _activeTileLayer = null;
 
 function initMap() {
     mapInstance = L.map('mapContainer', { zoomControl: true, attributionControl: false }).setView([39.0,35.0], 6);
-    const _offlineFn = (L.tileLayer && L.tileLayer.offline) ? L.tileLayer.offline : L.tileLayer;
-    _activeTileLayer = _offlineFn('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
-    if (_activeTileLayer.on && L.tileLayer.offline) {
-        _activeTileLayer.on('savetileend', _onSaveTileEnd);
-        _activeTileLayer.on('loadend', _onSaveLoadEnd);
-    }
+    _activeTileLayer = new OfflineTileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
     const icon = L.divIcon({
         html: '<div style="width:14px;height:14px;background:#2563eb;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px rgba(37,99,235,.6);"></div>',
         iconSize: [14,14], iconAnchor: [7,7]
@@ -1633,23 +1627,84 @@ function stopPktRate() {
 //  INIT
 // ============================================================
 // ============================================================
-//  MAP — OFFLINE (leaflet.offline / IndexedDB)
+//  MAP — OFFLINE (IndexedDB, yerleşik — CDN gerektirmez)
 // ============================================================
-let _mapSaveTotal = 0;
-let _mapSaveDone = 0;
-
-function _onSaveTileEnd(e) {
-    _mapSaveDone++;
-    const pct = _mapSaveTotal > 0 ? Math.round(_mapSaveDone / _mapSaveTotal * 100) : 0;
-    _setMapBadge(`%${pct} Kaydediliyor…`, 'saving');
-    if (_mapSaveDone >= _mapSaveTotal) _setMapBadge('Kaydedildi ✓', 'saved');
-}
-function _onSaveLoadEnd(e) {
-    if (_mapSaveTotal > 0 && _mapSaveDone >= _mapSaveTotal) {
-        setTimeout(() => _setMapBadge('OSM', ''), 3000);
-        _mapSaveTotal = 0; _mapSaveDone = 0;
+const OfflineTileLayer = L.TileLayer.extend({
+    _idb: null,
+    _openDb: function() {
+        if (this._idb) return Promise.resolve(this._idb);
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open('vecihi-tiles', 1);
+            req.onupgradeneeded = e => e.target.result.createObjectStore('tiles');
+            req.onsuccess = e => { this._idb = e.target.result; resolve(this._idb); };
+            req.onerror = reject;
+        });
+    },
+    createTile: function(coords, done) {
+        const img = document.createElement('img');
+        img.setAttribute('role', 'presentation');
+        const key = coords.z + '/' + coords.x + '/' + coords.y;
+        const networkUrl = this.getTileUrl(coords);
+        this._openDb().then(db => {
+            const req = db.transaction('tiles').objectStore('tiles').get(key);
+            req.onsuccess = e => {
+                if (e.target.result) {
+                    img.src = URL.createObjectURL(e.target.result);
+                    done(null, img);
+                } else {
+                    fetch(networkUrl).then(r => r.blob()).then(blob => {
+                        const tx = db.transaction('tiles', 'readwrite');
+                        tx.objectStore('tiles').put(blob, key);
+                        img.src = URL.createObjectURL(blob);
+                        done(null, img);
+                    }).catch(() => { img.src = networkUrl; done(null, img); });
+                }
+            };
+            req.onerror = () => { img.src = networkUrl; done(null, img); };
+        }).catch(() => { img.src = networkUrl; done(null, img); });
+        return img;
+    },
+    getTileKeys: function(bounds, minZ, maxZ) {
+        const tiles = [];
+        for (let z = minZ; z <= maxZ; z++) {
+            const min = this._map.project(bounds.getNorthWest(), z).divideBy(256).floor();
+            const max = this._map.project(bounds.getSouthEast(), z).divideBy(256).floor();
+            for (let x = min.x; x <= max.x; x++) {
+                for (let y = min.y; y <= max.y; y++) {
+                    tiles.push({x, y, z, key: z+'/'+x+'/'+y});
+                }
+            }
+        }
+        return tiles;
+    },
+    saveTiles: async function(tiles, onProgress) {
+        const db = await this._openDb();
+        let saved = 0;
+        for (const t of tiles) {
+            const url = this.getTileUrl({x: t.x, y: t.y, z: t.z});
+            try {
+                const blob = await fetch(url).then(r => r.blob());
+                await new Promise((res, rej) => {
+                    const tx = db.transaction('tiles', 'readwrite');
+                    const r = tx.objectStore('tiles').put(blob, t.key);
+                    r.onsuccess = res; r.onerror = rej;
+                });
+                saved++;
+                if (onProgress) onProgress(saved, tiles.length);
+            } catch(e) { console.warn('Tile kaydedilemedi:', url); }
+        }
+        return saved;
+    },
+    clearAllTiles: function() {
+        return this._openDb().then(db => new Promise((res, rej) => {
+            const r = db.transaction('tiles', 'readwrite').objectStore('tiles').clear();
+            r.onsuccess = res; r.onerror = rej;
+        }));
     }
-}
+});
+
+let _mapSaveTotal = 0;
+
 function _setMapBadge(text, state) {
     const b = document.getElementById('tileSourceBadge');
     if (!b) return;
@@ -1659,30 +1714,25 @@ function _setMapBadge(text, state) {
 
 function saveMapArea() {
     if (!mapInstance || !_activeTileLayer) return;
-    if (typeof _activeTileLayer.getTileUrls !== 'function') { alert('Çevrimdışı kayıt bu tarayıcıda/sürümde desteklenmiyor.'); return; }
     const zoom = mapInstance.getZoom();
     const minZ = Math.max(zoom - 1, 1);
     const maxZ = Math.min(zoom + 2, 18);
-    const bounds = mapInstance.getBounds();
-    _mapSaveTotal = 0; _mapSaveDone = 0;
-    const tilesToSave = _activeTileLayer.getTileUrls(bounds, minZ, maxZ);
-    if (!tilesToSave || tilesToSave.length === 0) { alert('Görünümde tile bulunamadı.'); return; }
-    if (tilesToSave.length > 3000) { alert(`Çok fazla tile (${tilesToSave.length}). Zoom'u artırın veya alanı küçültün.`); return; }
-    _mapSaveTotal = tilesToSave.length;
-    _setMapBadge(`0/${_mapSaveTotal} Kaydediliyor…`, 'saving');
+    const tiles = _activeTileLayer.getTileKeys(mapInstance.getBounds(), minZ, maxZ);
+    if (!tiles.length) { alert('Görünümde tile bulunamadı.'); return; }
+    if (tiles.length > 3000) { alert('Çok fazla tile (' + tiles.length + '). Zoom\'u artırın veya alanı küçültün.'); return; }
+    _setMapBadge('0/' + tiles.length + ' Kaydediliyor…', 'saving');
     document.getElementById('mapSaveBtn').disabled = true;
-    _activeTileLayer.saveTiles(tilesToSave).catch(err => {
-        console.error('Tile kayıt hatası:', err);
-    }).finally(() => {
-        document.getElementById('mapSaveBtn').disabled = false;
-    });
+    _activeTileLayer.saveTiles(tiles, (done, total) => {
+        _setMapBadge(done + '/' + total + ' Kaydediliyor…', 'saving');
+        if (done >= total) { _setMapBadge('Kaydedildi ✓', 'saved'); setTimeout(() => _setMapBadge('OSM', ''), 3000); }
+    }).finally(() => { document.getElementById('mapSaveBtn').disabled = false; });
 }
 
 function clearSavedTiles() {
     if (!confirm('Tarayıcıda saklanan tüm harita tile\'larını silmek istiyor musunuz?')) return;
-    const req = indexedDB.deleteDatabase('leaflet.offline');
-    req.onsuccess = () => { _setMapBadge('OSM', ''); alert('Kayıtlı harita verileri silindi. Sayfa yenileniyor…'); location.reload(); };
-    req.onerror = () => alert('Silme işlemi başarısız oldu.');
+    (_activeTileLayer ? _activeTileLayer.clearAllTiles() : Promise.resolve())
+        .then(() => { _setMapBadge('OSM', ''); alert('Kayıtlı harita verileri silindi.'); })
+        .catch(() => alert('Silme işlemi başarısız oldu.'));
 }
 window.addEventListener('DOMContentLoaded', () => {
     initMap();
