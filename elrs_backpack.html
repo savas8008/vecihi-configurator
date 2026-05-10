@@ -771,12 +771,6 @@
             </div>
             <div class="card-body">
                 <div class="cmd-grid">
-                    <button class="cmd-btn success" onclick="sendCmd('ARM')">
-                        <i class="bi bi-shield-check"></i> ARM
-                    </button>
-                    <button class="cmd-btn danger" onclick="sendCmd('DISARM')">
-                        <i class="bi bi-shield-x"></i> DISARM
-                    </button>
                     <button class="cmd-btn" onclick="sendCmd('RTH')">
                         <i class="bi bi-house-fill"></i> Eve Dön
                     </button>
@@ -785,9 +779,6 @@
                     </button>
                     <button class="cmd-btn" onclick="sendCmd('FORCE_ARM')">
                         <i class="bi bi-exclamation-triangle"></i> Force ARM
-                    </button>
-                    <button class="cmd-btn" onclick="sendCmd('CAL_GYRO')">
-                        <i class="bi bi-arrow-repeat"></i> Gyro Cal
                     </button>
                 </div>
             </div>
@@ -1603,9 +1594,7 @@ function sendCmdRetry(buildFn, retries = 4, interval = 150) {
 function sendCmd(type, data = {}) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     switch (type) {
-        case 'ARM':       sendCmdRetry(() => buildCmdPacket(0x03, new Uint8Array([0]))); break;
         case 'FORCE_ARM': sendCmdRetry(() => buildCmdPacket(0x03, new Uint8Array([1]))); break;
-        case 'DISARM':    sendCmdRetry(() => buildCmdPacket(0x04, new Uint8Array([])), 8, 100); break;
         case 'RTH':       sendCmdRetry(() => buildModePacket(6)); break;
         case 'SET_HOME':  sendCmdRetry(() => buildCmdPacket(0x05, new Uint8Array([]))); break;
         default:          ws.send(JSON.stringify({ type, ...data }));
