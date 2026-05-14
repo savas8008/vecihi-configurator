@@ -151,6 +151,29 @@
         .btn-connect.live       { background: var(--red); color: #fff; }
         .btn-connect.live:hover { background: #b91c1c; }
 
+        .conn-mode-tabs {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--surface-2);
+        }
+        .conn-mode-tab {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .conn-mode-tab.active { background: var(--primary); color: #fff; }
+        .conn-mode-tab:not(.active):hover { background: var(--primary-pale); color: var(--primary); }
+
         .status-pill {
             display: flex;
             align-items: center;
@@ -623,18 +646,43 @@
     </div>
 
     <div class="conn-row">
-        <div class="conn-group">
-            <span class="conn-label">IP</span>
-            <input type="text" id="inputIP" class="conn-input" value="127.0.0.1">
+        <div class="conn-mode-tabs">
+            <button class="conn-mode-tab active" id="tabWs" onclick="setConnMode('ws')">
+                <i class="bi bi-globe2"></i> WebSocket
+            </button>
+            <button class="conn-mode-tab" id="tabSerial" onclick="setConnMode('serial')">
+                <i class="bi bi-usb-symbol"></i> Serial
+            </button>
         </div>
-        <div class="conn-group">
-            <span class="conn-label">Port</span>
-            <input type="text" id="inputPort" class="conn-input short" value="8765">
+
+        <div id="panelWs" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="conn-group">
+                <span class="conn-label">IP</span>
+                <input type="text" id="inputIP" class="conn-input" value="127.0.0.1">
+            </div>
+            <div class="conn-group">
+                <span class="conn-label">Port</span>
+                <input type="text" id="inputPort" class="conn-input short" value="8765">
+            </div>
+            <div class="conn-group">
+                <span class="conn-label">Path</span>
+                <input type="text" id="inputPath" class="conn-input tiny" value="/">
+            </div>
         </div>
-        <div class="conn-group">
-            <span class="conn-label">Path</span>
-            <input type="text" id="inputPath" class="conn-input tiny" value="/">
+
+        <div id="panelSerial" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="conn-group">
+                <span class="conn-label">Baud</span>
+                <select id="inputBaud" class="conn-input short" style="width:90px;">
+                    <option value="115200" selected>115200</option>
+                    <option value="230400">230400</option>
+                    <option value="460800">460800</option>
+                    <option value="921600">921600</option>
+                </select>
+            </div>
+            <span id="serialPortName" style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;"></span>
         </div>
+
         <button id="btnConnect" class="btn-connect idle" onclick="toggleConnection()">
             <i class="bi bi-plug-fill"></i> Bağlan
         </button>
@@ -929,6 +977,8 @@ const TX_POWERS = ['10mW','25mW','50mW','100mW','250mW','500mW','1W','2W'];
 // ============================================================
 let ws = null, isConnected = false, reconnectTimer = null;
 let reconnectDelay = 2000, userDisconnected = false;
+let connMode = 'ws'; // 'ws' | 'serial'
+let serialPort = null, serialWriter = null, serialReader = null, serialReadLoopActive = false;
 let rxBuf = new Uint8Array(512), rxLen = 0;
 let lastPacketTime = null, pktCount = 0, pktRateTimer = null, pktCountLast = 0;
 let mapInstance = null, mapMarker = null, mapPolyline = null, mapTrail = [];
@@ -1471,8 +1521,8 @@ function selectMode(btn) {
     // Hepsini temizle, tıklananı kırmızı (pending) yap
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active', 'pending', 'confirmed'));
     btn.classList.add('pending');
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(buildModePacket(idx).buffer);
+    if (isReady()) {
+        sendRaw(buildModePacket(idx).buffer);
     }
 }
 
@@ -1502,25 +1552,25 @@ function centerStick(sliderId) {
 }
 
 function sendStickUpdate() {
-    if (!ws || ws.readyState !== WebSocket.OPEN) return;
-    ws.send(buildStickPacket(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
+    if (!isReady()) return;
+    sendRaw(buildStickPacket(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
 }
 
 function sendCmdRetry(buildFn, retries = 4, interval = 150) {
     for (let i = 0; i < retries; i++) {
         setTimeout(() => {
-            if (ws && ws.readyState === WebSocket.OPEN) ws.send(buildFn().buffer);
+            if (isReady()) sendRaw(buildFn().buffer);
         }, i * interval);
     }
 }
 
 function sendCmd(type, data = {}) {
-    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    if (!isReady()) return;
     switch (type) {
         case 'FORCE_ARM': sendCmdRetry(() => buildCmdPacket(0x03, new Uint8Array([1]))); break;
         case 'RTH':       sendCmdRetry(() => buildModePacket(6)); break;
         case 'SET_HOME':  sendCmdRetry(() => buildCmdPacket(0x05, new Uint8Array([]))); break;
-        default:          ws.send(JSON.stringify({ type, ...data }));
+        default:          if (connMode === 'ws' && ws) ws.send(JSON.stringify({ type, ...data }));
     }
 }
 
@@ -1528,9 +1578,36 @@ function sendCmd(type, data = {}) {
 // ============================================================
 //  WEBSOCKET
 // ============================================================
+//  BAĞLANTI MOD SEÇİCİ
+// ============================================================
+function setConnMode(mode) {
+    if (isConnected) return;
+    connMode = mode;
+    document.getElementById('tabWs').classList.toggle('active', mode === 'ws');
+    document.getElementById('tabSerial').classList.toggle('active', mode === 'serial');
+    document.getElementById('panelWs').style.display     = mode === 'ws'     ? 'flex' : 'none';
+    document.getElementById('panelSerial').style.display = mode === 'serial' ? 'flex' : 'none';
+}
+
+// ============================================================
+//  UNIFIED SEND
+// ============================================================
+function isReady() { return isConnected; }
+
+function sendRaw(bytes) {
+    if (!isConnected) return;
+    if (connMode === 'ws') {
+        if (ws && ws.readyState === WebSocket.OPEN) ws.send(bytes);
+    } else if (connMode === 'serial' && serialWriter) {
+        serialWriter.write(bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes);
+    }
+}
+
+// ============================================================
 function toggleConnection() { isConnected ? disconnect() : connect(); }
 
 function connect() {
+    if (connMode === 'serial') { connectSerial(); return; }
     userDisconnected = false; reconnectDelay = 2000;
     clearTimeout(reconnectTimer);
     const ip = document.getElementById('inputIP').value.trim();
@@ -1578,9 +1655,111 @@ function connect() {
     };
 }
 
+async function connectSerial() {
+    if (!('serial' in navigator)) {
+        setStatus('disconnected', 'Web Serial API desteklenmiyor (Chrome/Edge gerekli)');
+        return;
+    }
+    try {
+        serialPort = await navigator.serial.requestPort();
+        const baud = parseInt(document.getElementById('inputBaud').value) || 115200;
+        await serialPort.open({ baudRate: baud });
+        serialWriter = serialPort.writable.getWriter();
+        isConnected = true; rxLen = 0;
+        const info = serialPort.getInfo();
+        const portLabel = info.usbVendorId ? `VID:${info.usbVendorId.toString(16).toUpperCase()}` : 'COM';
+        document.getElementById('serialPortName').textContent = portLabel;
+        setStatus('connected', `Bağlı → Serial @${baud}`);
+        const btn = document.getElementById('btnConnect');
+        btn.innerHTML = '<i class="bi bi-x-circle-fill"></i> Bağlantıyı Kes';
+        btn.className = 'btn-connect live';
+        startPktRate();
+        serialReadLoopActive = true;
+        _serialReadLoop();
+    } catch(e) {
+        setStatus('disconnected', `Serial hata: ${e.message}`);
+    }
+}
+
+// Serial okuyucu için JSON frame tamponu
+// ESP32-C3 bridge protokolü: CRSF ham bytes + [0xAB][LEN_L][LEN_H][JSON] frame
+let _serialJsonBuf = null, _serialJsonExpect = 0, _serialJsonPos = 0;
+let _serialFrameState = 0; // 0=normal, 1=magic_seen, 2=len_l, 3=collecting_json
+
+function _processSerialBytes(bytes) {
+    for (let i = 0; i < bytes.length; i++) {
+        const b = bytes[i];
+        if (_serialFrameState === 0) {
+            if (b === 0xAB) {
+                _serialFrameState = 1;
+            } else {
+                // CRSF ham byte - processBytes'a gönder
+                const single = new Uint8Array(1);
+                single[0] = b;
+                processBytes(single);
+            }
+        } else if (_serialFrameState === 1) {
+            // LEN_L
+            _serialJsonExpect = b;
+            _serialFrameState = 2;
+        } else if (_serialFrameState === 2) {
+            // LEN_H
+            _serialJsonExpect |= (b << 8);
+            _serialJsonBuf = new Uint8Array(_serialJsonExpect);
+            _serialJsonPos = 0;
+            _serialFrameState = 3;
+        } else if (_serialFrameState === 3) {
+            _serialJsonBuf[_serialJsonPos++] = b;
+            if (_serialJsonPos >= _serialJsonExpect) {
+                // JSON frame tamamlandı
+                try {
+                    const str = new TextDecoder().decode(_serialJsonBuf);
+                    const d = JSON.parse(str);
+                    if (d.type === 'crsf' && d.data) processBytes(new Uint8Array(d.data));
+                    else if (d.type === 'mavlink_telemetry' && d.data) applyPatch(d.data);
+                    else if (d.type === 'ack') handleAck(d.seq, d.result);
+                } catch(_) {}
+                _serialFrameState = 0;
+                _serialJsonBuf = null;
+            }
+        }
+    }
+}
+
+async function _serialReadLoop() {
+    const reader = serialPort.readable.getReader();
+    serialReader = reader;
+    _serialFrameState = 0;
+    try {
+        while (serialReadLoopActive) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            if (value) _processSerialBytes(value);
+        }
+    } catch(_) {}
+    finally { reader.releaseLock(); serialReader = null; }
+    if (isConnected) _onSerialDisconnected();
+}
+
+function _onSerialDisconnected() {
+    isConnected = false;
+    setStatus('disconnected', 'Serial bağlantı kapandı');
+    const btn = document.getElementById('btnConnect');
+    btn.innerHTML = '<i class="bi bi-plug-fill"></i> Bağlan';
+    btn.className = 'btn-connect idle';
+    stopPktRate();
+}
+
 function disconnect() {
     userDisconnected = true; clearTimeout(reconnectTimer);
-    if (ws) { ws.close(); ws = null; }
+    if (connMode === 'serial') {
+        serialReadLoopActive = false;
+        if (serialWriter) { try { serialWriter.releaseLock(); } catch(_) {} serialWriter = null; }
+        if (serialPort)   { try { serialPort.close(); } catch(_) {} serialPort = null; }
+        document.getElementById('serialPortName').textContent = '';
+    } else {
+        if (ws) { ws.close(); ws = null; }
+    }
     isConnected = false;
     setStatus('disconnected', 'Bağlantı kesildi');
     const btn = document.getElementById('btnConnect');
@@ -1727,8 +1906,8 @@ window.addEventListener('DOMContentLoaded', () => {
         new Blob(['setInterval(()=>postMessage(0),20)'], {type:'application/javascript'})
     ));
     _keepaliveWorker.onmessage = () => {
-        if (ws && ws.readyState === WebSocket.OPEN && gcsActive) {
-            ws.send(buildStickPacket(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
+        if (isReady() && gcsActive) {
+            sendRaw(buildStickPacket(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
         }
     };
 });
