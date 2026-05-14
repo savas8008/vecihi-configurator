@@ -48,7 +48,8 @@ let advancedConfig = {
         launch_throttle: 1700,
         launch_angle: 20,
         launch_time: 2000,
-        auto_launch_on_arm: true
+        auto_launch_on_arm: true,
+        disarm_on_landing: true
     },
     misc: { 
         tpa: 0.00, 
@@ -188,6 +189,7 @@ function updateAdvancedUI() {
 
         // Auto launch
         setChk("inp_auto_launch_on_arm", n.auto_launch_on_arm);
+        setChk("inp_disarm_on_landing", n.disarm_on_landing);
         setVal("inp_launch_acc_threshold", n.launch_acc_threshold);
         setVal("inp_launch_throttle", n.launch_throttle);
         setVal("inp_launch_time", n.launch_time);
@@ -356,6 +358,7 @@ function saveAdvancedConfig() {
 
     // Auto launch
     setIf(nav, "auto_launch_on_arm", bool("inp_auto_launch_on_arm"));
+    setIf(nav, "disarm_on_landing", bool("inp_disarm_on_landing"));
     setIf(nav, "launch_acc_threshold", num("inp_launch_acc_threshold"));
     setIf(nav, "launch_throttle", int("inp_launch_throttle"));
     setIf(nav, "launch_time", int("inp_launch_time"));
