@@ -98,6 +98,11 @@ function handleOutputsPageData(data) {
         if (scaleEl && pinConfig.adc_voltage_scale != null) {
             scaleEl.value = pinConfig.adc_voltage_scale;
         }
+        // Sensors sayfasındaki pin göstergesi
+        const batPinEl = document.getElementById('sens-bat-pin');
+        if (batPinEl) {
+            batPinEl.textContent = (pinConfig.adc_voltage > 0) ? `GPIO${pinConfig.adc_voltage}` : '--';
+        }
     }
 
     // 3. Servo Değerleri

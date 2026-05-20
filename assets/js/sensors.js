@@ -420,6 +420,22 @@
         if (sensAlt) sensAlt.textContent = data.alt !== undefined ? data.alt.toFixed(1) : '0.0';
         if (sensVario) sensVario.textContent = data.vario !== undefined ? data.vario.toFixed(1) : '0.0';
 
+        // --- Batarya Voltajı ---
+        if (data.bat !== undefined) {
+            var sensBat = document.getElementById('sens-bat');
+            if (sensBat) {
+                sensBat.textContent = data.bat.toFixed(2);
+                // Renk: 10.5V altı kırmızı, 11.1V altı sarı, üstü yeşil
+                if (data.bat < 10.5) {
+                    sensBat.className = 'fs-4 fw-bold text-danger';
+                } else if (data.bat < 11.1) {
+                    sensBat.className = 'fs-4 fw-bold text-warning';
+                } else {
+                    sensBat.className = 'fs-4 fw-bold text-success';
+                }
+            }
+        }
+
         // --- Harita Güncelleme ---
         if (data.lat && data.lon && data.lat !== 0 && data.lon !== 0) {
             updateMapPosition(data.lat, data.lon, data.heading);
