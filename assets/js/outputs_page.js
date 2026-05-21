@@ -94,6 +94,15 @@ function handleOutputsPageData(data) {
 
         // ADC
         setVal('voltageAdcPin', pinConfig.adc_voltage);
+        const scaleEl = document.getElementById('voltageAdcScale');
+        if (scaleEl && pinConfig.adc_voltage_scale != null) {
+            scaleEl.value = pinConfig.adc_voltage_scale;
+        }
+        // Sensors sayfasındaki pin göstergesi
+        const batPinEl = document.getElementById('sens-bat-pin');
+        if (batPinEl) {
+            batPinEl.textContent = (pinConfig.adc_voltage > 0) ? `GPIO${pinConfig.adc_voltage}` : '--';
+        }
     }
 
     // 3. Servo Değerleri
@@ -349,6 +358,13 @@ function saveOutputsConfig() {
 
     // ADC
     pinConfig.adc_voltage = parseInt(_$('voltageAdcPin')?.value);
+    const _scaleEl = document.getElementById('voltageAdcScale');
+    if (_scaleEl) {
+        const scale = parseFloat(_scaleEl.value);
+        if (!isNaN(scale) && scale >= 1.0 && scale <= 50.0) {
+            pinConfig.adc_voltage_scale = scale;
+        }
+    }
 
     // Servo Reverse
     for (let i = 1; i <= 4; i++) {
