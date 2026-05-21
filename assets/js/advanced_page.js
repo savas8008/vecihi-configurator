@@ -74,6 +74,18 @@ let advancedConfig = {
     },
     // Flaperon
     flaperon_offset: 150,
+    // Sanal Akım Sensörü
+    virt_current: {
+        scale:   30.0,
+        idle:     0.5,
+        calib:    1.0,
+        cap_mah: 2200
+    },
+    // Batarya Donanımı
+    battery: {
+        adc_pin:   -1,
+        adc_scale: 11.0
+    },
     // İniş Asistanı Ayarları
     land_assist: {
         circuit_alt: 50,
@@ -139,6 +151,16 @@ function handleAdvancedPageData(data) {
     // 9) Flaperon Offset
     if (data.flaperon_offset !== undefined) {
         advancedConfig.flaperon_offset = data.flaperon_offset;
+    }
+
+    // 10) Sanal Akım Sensörü
+    if (data.virt_current) {
+        advancedConfig.virt_current = Object.assign({}, advancedConfig.virt_current, data.virt_current);
+    }
+
+    // 11) Batarya Donanımı
+    if (data.battery) {
+        advancedConfig.battery = Object.assign({}, advancedConfig.battery, data.battery);
     }
 
     updateAdvancedUI();
@@ -275,6 +297,22 @@ function updateAdvancedUI() {
             updateFlaperonSliderColor(slider);
         }
         if (label)  label.textContent = advancedConfig.flaperon_offset;
+    }
+
+    // --- Sanal Akım Sensörü ---
+    if (advancedConfig.virt_current) {
+        const vc = advancedConfig.virt_current;
+        setVal("inp_vc_scale",   vc.scale);
+        setVal("inp_vc_idle",    vc.idle);
+        setVal("inp_vc_calib",   vc.calib);
+        setVal("inp_vc_cap_mah", vc.cap_mah);
+    }
+
+    // --- Batarya Donanımı ---
+    if (advancedConfig.battery) {
+        const b = advancedConfig.battery;
+        setVal("inp_bat_adc_pin",   b.adc_pin);
+        setVal("inp_bat_adc_scale", b.adc_scale);
     }
 
     // --- Landing Assist ---
@@ -439,6 +477,20 @@ function saveAdvancedConfig() {
     if (flaperonSlider) {
         cfg.flaperon_offset = parseInt(flaperonSlider.value, 10);
     }
+
+    // -------- Sanal Akım Sensörü --------
+    const vc = {};
+    setIf(vc, "scale",   num("inp_vc_scale"));
+    setIf(vc, "idle",    num("inp_vc_idle"));
+    setIf(vc, "calib",   num("inp_vc_calib"));
+    setIf(vc, "cap_mah", num("inp_vc_cap_mah"));
+    if (Object.keys(vc).length) cfg.virt_current = vc;
+
+    // -------- Batarya Donanımı --------
+    const bat = {};
+    setIf(bat, "adc_pin",   int("inp_bat_adc_pin"));
+    setIf(bat, "adc_scale", num("inp_bat_adc_scale"));
+    if (Object.keys(bat).length) cfg.battery = bat;
 
     // -------- Landing Assist --------
     const la = {};

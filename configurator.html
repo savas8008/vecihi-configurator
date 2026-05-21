@@ -906,7 +906,7 @@
         <label class="port-label mt-1">Ölçek Faktörü <small class="text-muted">(R1+R2)/R2</small></label>
         <input type="number" class="form-control form-control-sm mb-1" id="voltageAdcScale"
                min="1" max="50" step="0.1" value="11.0" title="Gerilim bölücü oranı. 100kΩ+10kΩ için 11.0">
-        <small class="text-muted">Batarya voltajı</small>
+        <small class="text-muted">Batarya voltajı<br><span class="text-info" style="font-size:0.7em">Tercihler → Batarya tabından da düzenlenebilir</span></small>
       </div>
 
     </div><!-- d-flex 5 kutu -->
@@ -1310,6 +1310,9 @@
             </button>
             <button class="adv-tab" data-tab="adv-tab-4" onclick="switchAdvTab('adv-tab-4',this)">
                 <i class="bi bi-cpu"></i> Donanım & Filtreler
+            </button>
+            <button class="adv-tab" data-tab="adv-tab-5" onclick="switchAdvTab('adv-tab-5',this)">
+                <i class="bi bi-battery-half"></i> Batarya
             </button>
         </div>
 
@@ -1761,7 +1764,7 @@
                         </div>
 
                         <hr class="border-secondary my-4">
-                        
+
                         <!-- Grafikler -->
                         <div class="row">
                              <div class="col-12 text-center mb-3">
@@ -1785,6 +1788,111 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- ==================== 5. BATARYA ==================== -->
+            <div id="adv-tab-5" class="adv-tab-pane">
+                <div class="panel4">
+                    <div class="p-2 mb-3 rounded" style="background:rgba(255,193,7,0.12);border:1px solid rgba(255,193,7,0.3);">
+                        <h5 class="mb-0 text-warning"><i class="bi bi-battery-half"></i> 5. Batarya</h5>
+                    </div>
+
+                    <!-- Voltaj Ölçümü -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-muted border-bottom border-secondary pb-1">
+                                <i class="bi bi-plug me-1"></i> Voltaj Ölçümü (ADC)
+                            </h6>
+                        </div>
+                        <div class="col-md-4 border-end border-secondary">
+                            <div class="mb-2 row">
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Voltaj bölücünün bağlı olduğu ESP32 GPIO numarası. -1 = devre dışı">ADC GPIO Pin</label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control form-control-sm" id="inp_bat_adc_pin"
+                                           min="-1" max="39" step="1" value="-1">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Gerilim bölücü oranı = (R1+R2)/R2. Örn: 100kΩ+10kΩ → 11.0">Ölçek Faktörü <small class="text-muted">(R1+R2)/R2</small></label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control form-control-sm" id="inp_bat_adc_scale"
+                                           min="1" max="50" step="0.1" value="11.0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="alert alert-dark py-2 px-3 small mb-0">
+                                <strong>Gerilim Bölücü Hesabı:</strong>
+                                <div class="mt-1">
+                                    ESP32 ADC girişi maks. <strong>3.3V</strong> ölçer. Lipo voltajını bölücüyle düşürmek gerekir.<br>
+                                    <code>Ölçek = (R1 + R2) / R2</code> &nbsp;|&nbsp; Tipik: R1=100kΩ, R2=10kΩ → <strong>11.0</strong> (4S lipo ≈ 16.8V ölçebilir)<br>
+                                    Pin -1 ise voltaj ölçümü devre dışı kalır.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-secondary my-3">
+
+                    <!-- Sanal Akım Sensörü -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-muted border-bottom border-secondary pb-1">
+                                <i class="bi bi-lightning-charge me-1"></i> Sanal Akım Sensörü
+                            </h6>
+                        </div>
+
+                        <!-- Sol: Max & Boşta Akım -->
+                        <div class="col-md-3 border-end border-secondary">
+                            <div class="mb-2 row">
+                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Tam gazda motor + tüm elektroniklerin toplam çektiği akım (A)">Max Akım (A)</label>
+                                <div class="col-sm-4">
+                                    <input type="number" class="form-control form-control-sm" id="inp_vc_scale"
+                                           step="0.5" min="1" max="200" value="30.0">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Gaz sıfırken alıcı + servo + ESP32 toplam boşta akım (A)">Boşta Akım (A)</label>
+                                <div class="col-sm-4">
+                                    <input type="number" class="form-control form-control-sm" id="inp_vc_idle"
+                                           step="0.1" min="0" max="10" value="0.5">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Orta: Kalibrasyon & Kapasite -->
+                        <div class="col-md-3 border-end border-secondary">
+                            <div class="mb-2 row">
+                                <label class="col-sm-8 col-form-label col-form-label-sm" title="İlk uçuş sonrası ince ayar: gerçek_tüketim / tahmin_tüketim">Kalibrasyon</label>
+                                <div class="col-sm-4">
+                                    <input type="number" class="form-control form-control-sm" id="inp_vc_calib"
+                                           step="0.01" min="0.5" max="2.0" value="1.0">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Pilin toplam kapasitesi — kumandada Bat% göstergesi bu değere göre hesaplanır">Kapasite (mAh)</label>
+                                <div class="col-sm-4">
+                                    <input type="number" class="form-control form-control-sm" id="inp_vc_cap_mah"
+                                           step="100" min="100" max="20000" value="2200">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sağ: Kullanım kılavuzu -->
+                        <div class="col-md-6">
+                            <div class="alert alert-dark py-2 px-3 small mb-0">
+                                <strong>Kalibrasyon Adımları:</strong>
+                                <ol class="mb-0 ps-3 mt-1">
+                                    <li>Uçak tipine göre max akımı tahmin et (örn. 4S + 40A motor = 40A).</li>
+                                    <li>Boşta akımı gir: alıcı + servolar + ESP32 ≈ 0.5–1A.</li>
+                                    <li>İlk uçuş sonrası şarj cihazından okunan mAh değerini, configuratördeki tahmini ile karşılaştır.</li>
+                                    <li><strong>Kalibrasyon = gerçek mAh ÷ tahmini mAh</strong> olarak ayarla.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
