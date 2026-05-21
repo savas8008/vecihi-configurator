@@ -56,7 +56,10 @@ function populatePinSelectors() {
         'osdRxPin', 'osdTxPin',
         
         // I2C
-        'i2cSclPin', 'i2cSdaPin'
+        'i2cSclPin', 'i2cSdaPin',
+
+        // ADC
+        'voltageAdcPin'
     ];
 
     selects.forEach(id => { 
