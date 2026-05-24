@@ -435,21 +435,27 @@ function handleStandardJsonData(data) {
     // 2. ADIM: Sensör statüsü geldi mi?
     if (data.stream_data && data.stream_data.type === 'init_status') {
         const sensors = data.stream_data.data;
-        
+
         // Kritik sensörler (Gyro ve Accel) çalışıyor mu?
-        const isSystemReady = sensors.gyro && sensors.accel; 
-        
+        const isSystemReady = sensors.gyro && sensors.accel;
+        // Herhangi bir sensör eksik mi?
+        const hasMissingSensor = !sensors.gyro || !sensors.accel || !sensors.baro || !sensors.gps;
+
         if (isSystemReady) {
-            log('✅ Tüm kritik sensörler çalışıyor. Sayfa verileri ve akış başlatılıyor...', 'success');
-            
-            // Eğer varsa modalı kapat
+            if (hasMissingSensor) {
+                log('⚠️ Bazı sensörler bağlı değil, uyarı modalı gösteriliyor.', 'warning');
+            } else {
+                log('✅ Tüm sensörler çalışıyor. Sayfa verileri ve akış başlatılıyor...', 'success');
+            }
+
+            // Eğer varsa modalı kapat (sonra tekrar açılacak)
             const modalEl = document.getElementById('sensorErrorModal');
             if (modalEl) {
                 const modalInstance = bootstrap.Modal.getInstance(modalEl);
                 if (modalInstance) modalInstance.hide();
             }
 
-            // Sensörler sağlamsa, başlangıçta (connectSerial'da) sildiğimiz 
+            // Sensörler sağlamsa, başlangıçta (connectSerial'da) sildiğimiz
             // diğer sayfa verilerini ŞİMDİ iste.
             sendCommand('calibration_page_data');
             setTimeout(() => sendCommand('advanced_page_data'), 200);
@@ -465,8 +471,52 @@ function handleStandardJsonData(data) {
             }, 1600);
 
         } else {
-            log('⚠️ Sensör başlatma hatası algılandı, modal gösteriliyor.', 'warning');
-            
+            log('⚠️ Kritik sensör hatası algılandı, modal gösteriliyor.', 'warning');
+        }
+
+        // Herhangi bir sensör eksikse modalı göster
+        if (hasMissingSensor) {
+            const modalEl = document.getElementById('sensorErrorModal');
+            const modalContent = modalEl?.querySelector('.modal-content');
+            const modalTitle = document.getElementById('sensorErrorModalLabel');
+            const modalDesc = modalEl?.querySelector('.modal-body > p');
+
+            if (isSystemReady) {
+                // Sadece GPS/baro eksik: uyarı stili, backdrop kapatılabilir
+                if (modalEl) {
+                    modalEl.removeAttribute('data-bs-backdrop');
+                    modalEl.removeAttribute('data-bs-keyboard');
+                }
+                if (modalContent) {
+                    modalContent.classList.remove('border-danger');
+                    modalContent.classList.add('border-warning');
+                }
+                if (modalTitle) {
+                    modalTitle.className = 'modal-title text-warning';
+                    modalTitle.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>Sensör Uyarısı';
+                }
+                if (modalDesc) {
+                    modalDesc.textContent = 'Bazı sensörler tespit edilemedi. Sistem çalışıyor ancak eksik donanımı kontrol edin.';
+                }
+            } else {
+                // MPU6050 eksik: kritik hata stili, backdrop kilitli
+                if (modalEl) {
+                    modalEl.setAttribute('data-bs-backdrop', 'static');
+                    modalEl.setAttribute('data-bs-keyboard', 'false');
+                }
+                if (modalContent) {
+                    modalContent.classList.remove('border-warning');
+                    modalContent.classList.add('border-danger');
+                }
+                if (modalTitle) {
+                    modalTitle.className = 'modal-title text-danger';
+                    modalTitle.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Donanım Başlatma Hatası';
+                }
+                if (modalDesc) {
+                    modalDesc.textContent = 'Uçuş kontrolcüsü kritik sensörlerle iletişim kuramadı. Lütfen bağlantıları kontrol edin.';
+                }
+            }
+
             // Listeyi dinamik doldur
             const statusList = document.getElementById('sensorStatusList');
             if (statusList) {
@@ -491,15 +541,14 @@ function handleStandardJsonData(data) {
             }
 
             // Modalı göster
-            const modalEl = document.getElementById('sensorErrorModal');
             if (modalEl) {
                 let modalInstance = bootstrap.Modal.getInstance(modalEl);
-                if (!modalInstance) {
-                    modalInstance = new bootstrap.Modal(modalEl);
-                }
+                if (modalInstance) modalInstance.dispose();
+                modalInstance = new bootstrap.Modal(modalEl);
                 modalInstance.show();
             }
         }
+
         return; // İşlem tamamlandı, geri dön
     }
     // ==========================================
