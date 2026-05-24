@@ -40,10 +40,9 @@ let advancedConfig = {
         nav_d: 0.0,
 
         // GPS Donanım
-        has_gps: false, 
-        gps_protocol: 0, 
-        gps_baud: 9600,
-        
+        has_gps: false,
+        gps_protocol: 0,
+
         // Launch
         launch_throttle: 1700,
         launch_angle: 20,
@@ -227,7 +226,6 @@ function updateAdvancedUI() {
         setChk("inp_has_gps", n.has_gps);
         toggleGpsSettings();
         setVal("inp_gps_proto", n.gps_protocol);
-        setVal("inp_gps_baud", n.gps_baud);
         setVal("inp_mag_align", n.mag_align);
 
         // GPS güvenlik
@@ -411,7 +409,6 @@ function saveAdvancedConfig() {
     // GPS donanım
     setIf(nav, "has_gps", bool("inp_has_gps"));
     setIf(nav, "gps_protocol", selInt("inp_gps_proto"));
-    setIf(nav, "gps_baud", selInt("inp_gps_baud"));
     setIf(nav, "mag_align", selInt("inp_mag_align"));
 
     // GPS güvenlik
