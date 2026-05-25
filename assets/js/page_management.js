@@ -11,7 +11,7 @@
 let currentPage = '';
 
 // Veri beklenen sayfalar (ESP'den page_data gelmeden kaydet engellenir)
-const DATA_PAGES = new Set(['calibration', 'outputs', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint']);
+const DATA_PAGES = new Set(['calibration', 'mixer', 'gps', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint']);
 
 // Loading timeout handle'ları (sayfa başına)
 const loadingTimeouts = {};
@@ -67,11 +67,22 @@ function managePageStreams(page) {
             sendCommand('GET_WAYPOINTS');
         } else if (page === 'calibration') {
             sendCommand('calibration_page_data');
+            // I2C pin değerlerini doldur (i2cSclPin / i2cSdaPin kalibrasyon sayfasında)
+            setTimeout(() => sendCommand('outputs_page_data'), 150);
             // sensor_align ayrı gecikmeyle gönder — firmware single current_command'ı
             // aynı anda iki komut gelirse üzerine yazar, 300ms yeterli süre bırakır
             setTimeout(() => {
                 if (typeof onSensorAlignInit === 'function') onSensorAlignInit();
-            }, 300);
+            }, 400);
+        } else if (page === 'mixer') {
+            sendCommand('mixer_page_data');
+            setTimeout(() => sendCommand('outputs_page_data'), 200);
+        } else if (page === 'gps') {
+            sendCommand('advanced_page_data');
+            setTimeout(() => sendCommand('outputs_page_data'), 200);
+        } else if (page === 'osd') {
+            sendCommand('osd_page_data');
+            setTimeout(() => sendCommand('outputs_page_data'), 200);
         } else if (page !== 'sensors') {
             sendCommand(page + '_page_data');
         }
@@ -117,6 +128,8 @@ function startPageSpecificStream(page) {
             
         case 'transmitter':
             log('Bağlam: Kumanda -> Receiver Stream Başlatılıyor', 'info');
+            // Alıcı pinlerini doldur (rxTxPin / rxRxPin kumanda sayfasında)
+            setTimeout(() => sendCommand('outputs_page_data'), 150);
             sendCommand('start_receiver_stream');
             break;
             
@@ -238,8 +251,13 @@ function savePageData(page) {
             saveCalibration();
             return;
 
-        case 'outputs':
-            saveOutputsConfig();
+        case 'gps':
+            saveGpsConfig();
+            resetSaveButton(btn, 2000);
+            return;
+
+        case 'mixer':
+            saveMixerConfig();
             resetSaveButton(btn, 2000);
             return;
 
@@ -304,7 +322,7 @@ function setupNavigationListeners() {
  * @brief Sayfa bazlı kaydet butonlarına event listener ekler
  */
 function setupSaveButtonListeners() {
-    const pages = ['Calibration', 'Outputs', 'Transmitter', 'Modes', 'PID', 'Advanced'];
+    const pages = ['Calibration', 'Mixer', 'Gps', 'Transmitter', 'Modes', 'PID', 'Advanced'];
     
     pages.forEach(page => {
         const btn = $('btnSave' + page);

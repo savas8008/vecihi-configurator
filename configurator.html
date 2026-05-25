@@ -162,7 +162,8 @@
                     <ul class="nav flex-column">
                         <li class="nav-item"><a class="nav-link" href="#" data-page="sensors"><i class="bi bi-radar me-2"></i> Sensörler</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> Kalibrasyon</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="outputs"><i class="bi bi-plug me-2"></i> Konfigürasyon</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="mixer"><i class="bi bi-sliders me-2"></i> Mikser</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="gps"><i class="bi bi-geo-alt me-2"></i> Navigasyon & GPS</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="transmitter"><i class="bi bi-controller me-2"></i> Kumanda</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i> Uçuş Modları</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="pid"><i class="bi bi-graph-up me-2"></i> PID</a></li>
@@ -641,6 +642,28 @@
     </div>
   </div>
 
+  <!-- IMU Sensör Pinleri (I2C) -->
+  <div class="panel3 p-3 mb-3 pin-panel">
+    <div class="t-baslik mb-1"><i class="bi bi-cpu me-1"></i> IMU Sensör Pinleri (I2C)</div>
+    <div class="t-aciklama mb-2">
+      MPU6050 (ivmeölçer / jiroskop) ve BMP180 (barometre) bu I2C pinlerine bağlanır.
+      <span class="badge bg-secondary ms-1" style="font-size:0.7em;">IMU Sensör Pinleri</span>
+    </div>
+    <div class="d-flex align-items-end gap-3 flex-wrap">
+      <div>
+        <label class="port-label d-block mb-1">SCL</label>
+        <select class="form-select form-select-sm pin-select" id="i2cSclPin" style="min-width:160px;"></select>
+      </div>
+      <div>
+        <label class="port-label d-block mb-1">SDA</label>
+        <select class="form-select form-select-sm pin-select" id="i2cSdaPin" style="min-width:160px;"></select>
+      </div>
+      <button class="btn btn-warning btn-sm" onclick="saveI2CPins()">
+        <i class="bi bi-save me-1"></i> I2C Pinlerini Kaydet
+      </button>
+    </div>
+  </div>
+
   <!-- Butonlar (sayfa altı) -->
   <div class="d-flex gap-2">
     <button type="button" class="btn btn-warning btn-md" id="btnSaveCalibration">
@@ -653,7 +676,182 @@
 
 </div>
 
-<div id="outputs" class="page">
+<!-- GPS & NAVİGASYON SAYFASI -->
+<div id="gps" class="page">
+
+  <!-- Satır 1: GPS Pinleri + Donanım Ayarları -->
+  <div class="row g-3 mb-3">
+
+    <!-- GPS Bağlantı Pinleri -->
+    <div class="col-md-3">
+      <div class="panel h-100 p-3 pin-panel">
+        <h2 class="panel-title"><i class="bi bi-geo-alt"></i> GPS Pinleri</h2>
+        <p class="text-muted small mb-3">GPS modülünün bağlı olduğu UART pinleri.</p>
+        <label class="port-label d-block mb-1">TX (ESP → GPS)</label>
+        <select class="form-select form-select-sm pin-select mb-2" id="gpsTxPin"></select>
+        <label class="port-label d-block mb-1">RX (GPS → ESP)</label>
+        <select class="form-select form-select-sm pin-select mb-3" id="gpsRxPin"></select>
+      </div>
+    </div>
+
+    <!-- GPS Donanım & Güvenlik -->
+    <div class="col-md-4">
+      <div class="panel h-100 p-3">
+        <h2 class="panel-title"><i class="bi bi-reception-4"></i> GPS Donanım</h2>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="inp_has_gps" onchange="toggleGpsSettings()">
+          <label class="form-check-label" for="inp_has_gps">GPS Modülü Aktif</label>
+        </div>
+        <div id="gps_hardware_settings">
+          <div class="input-group input-group-sm mb-2">
+            <span class="input-group-text bg-secondary text-light border-0" style="min-width:90px;">Protokol</span>
+            <select class="form-select form-select-sm" id="inp_gps_proto">
+              <option value="0">Otomatik (Önerilen)</option>
+              <option value="1">UBX Legacy (NEO-6M)</option>
+              <option value="2">UBX PVT (NEO-7+)</option>
+            </select>
+          </div>
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text bg-secondary text-light border-0" style="min-width:90px;">Mag Yönü</span>
+            <select class="form-select form-select-sm" id="inp_mag_align">
+              <option value="0">CW 0°</option>
+              <option value="1">CW 90°</option>
+              <option value="2">CW 180°</option>
+              <option value="3">CW 270°</option>
+            </select>
+          </div>
+          <div class="mb-2 row">
+            <label class="col-7 col-form-label col-form-label-sm text-warning">Min Uydu</label>
+            <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_gps_min_sats" min="4" max="12" step="1" value="6"></div>
+          </div>
+          <div class="mb-2 row">
+            <label class="col-7 col-form-label col-form-label-sm text-warning">Min Fix Tipi</label>
+            <div class="col-5">
+              <select class="form-select form-select-sm" id="inp_gps_min_fix_type">
+                <option value="2">2D Fix</option>
+                <option value="3" selected>3D Fix</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RTH (Eve Dönüş) -->
+    <div class="col-md-5">
+      <div class="panel h-100 p-3">
+        <h2 class="panel-title"><i class="bi bi-house-door"></i> RTH (Eve Dönüş)</h2>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">RTH İrtifası (m)</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_rth_alt" value="60"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">RTH Yarıçapı (m)</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_radius" value="60"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm text-danger">Geofence (m) <small class="text-muted">0=Yok</small></label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dist" placeholder="0=Yok" value="0"></div>
+        </div>
+        <div class="form-check form-switch mt-2">
+          <input class="form-check-input" type="checkbox" id="inp_nav_climb_first">
+          <label class="form-check-label small" for="inp_nav_climb_first">Eve Dönerken Önce Yüksel</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Satır 2: Otopilot Açı Limitleri + Gaz Ayarları + L1 -->
+  <div class="row g-3 mb-3">
+
+    <!-- Otopilot Açı Limitleri -->
+    <div class="col-md-3">
+      <div class="panel h-100 p-3">
+        <h2 class="panel-title"><i class="bi bi-arrow-left-right"></i> Açı Limitleri</h2>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">Max Roll (°)</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_bank_roll" min="10" max="60" value="45"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">Max Pitch (°)</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_bank_pitch" min="5" max="45" value="20"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">Max Tırmanma (°)</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_climb" value="20"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">Max Dalış (°)</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dive" value="15"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav Gaz Ayarları -->
+    <div class="col-md-5">
+      <div class="panel h-100 p-3">
+        <h2 class="panel-title"><i class="bi bi-speedometer2"></i> Gaz (Throttle) Ayarları</h2>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm text-danger">Nav Min Gaz</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_min_throttle" min="1000" max="1500" step="10" value="1100"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">Alçalma Gazı</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_descend" min="1000" max="1800" step="10" value="1100"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm text-info">Seyir Gazı</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_cruise" min="1200" max="1900" step="10" value="1650"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">Tırmanma Gazı</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_climb" min="1300" max="2000" step="10" value="1700"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm text-danger">Nav Max Gaz</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_throttle" min="1500" max="2000" step="10" value="1900"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- L1 Navigasyon + Pitch→Gaz -->
+    <div class="col-md-4">
+      <div class="panel h-100 p-3">
+        <h2 class="panel-title"><i class="bi bi-bezier2"></i> L1 Navigasyon</h2>
+        <p class="text-muted small mb-3">Rota takip algoritması parametreleri.</p>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">
+            L1 Periyodu (sn)
+            <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" title="Düşük=Sert, Yüksek=Yumuşak Dönüş"></i>
+          </label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_l1_period" min="5" max="30" step="1" value="17"></div>
+        </div>
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm">L1 Damping</label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_l1_damping" min="0.5" max="1.0" step="0.05" value="0.75"></div>
+        </div>
+        <hr class="border-secondary my-2">
+        <div class="mb-2 row">
+          <label class="col-7 col-form-label col-form-label-sm text-info">
+            Pitch → Gaz
+            <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" title="Her 1° pitch artışı için eklenen PWM gaz miktarı."></i>
+          </label>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_fw_pitch2thr" step="0.1" value="8.0"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kaydet -->
+  <div class="mt-2">
+    <button type="button" class="btn btn-warning shadow-sm" id="btnSaveGps">
+      <i class="bi bi-save2 me-2"></i> GPS & Nav Kaydet
+    </button>
+  </div>
+</div>
+
+<!-- MIXER SAYFASI -->
+<div id="mixer" class="page">
   <!-- 1) PANEL: Uçak Tipi Seçimi -->
   <div class="panel mb-4">
     <h2 class="panel-title"><i class="bi bi-airplane"></i> Uçak Tipi Seçimi</h2>
@@ -697,43 +895,8 @@
     </div>
   </div>
 
-  <!-- 2) PANEL: Mikser Kazançları -->
-  <div class="panel mb-4">
-    <h2 class="panel-title"><i class="bi bi-sliders"></i> Mikser Kazançları</h2>
-    <p class="text-muted small mb-3">
-      Her eksen için mikser oranını ayarlayın. <strong>100 = normal</strong>, <strong>-100 = ters</strong>, <strong>50 = %50 güç</strong>.
-      Yaw tersleniyorsa Yaw değerini negatif yapın (örn: -100).
-    </p>
-    <div class="row g-3">
-      <div class="col-6 col-lg-3">
-        <div class="panel4 p-3 text-center">
-          <div class="output-title mb-2">ROLL</div>
-          <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
-        </div>
-      </div>
-      <div class="col-6 col-lg-3">
-        <div class="panel4 p-3 text-center">
-          <div class="output-title mb-2">PITCH</div>
-          <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
-        </div>
-      </div>
-      <div class="col-6 col-lg-3">
-        <div class="panel4 p-3 text-center">
-          <div class="output-title mb-2">YAW</div>
-          <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
-        </div>
-      </div>
-      <div class="col-6 col-lg-3">
-        <div class="panel4 p-3 text-center">
-          <div class="output-title mb-2">THROTTLE</div>
-          <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3) PANEL: Motor & Servo Çıkış Pinleri -->
-  <div class="panel mb-2">
+  <!-- 2) PANEL: Motor & Servo Çıkış Pinleri -->
+  <div class="panel mb-2 pin-panel">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
       <h2 class="panel-title mb-0"><i class="bi bi-plug"></i> Motor & Servo Çıkış Pinleri</h2>
       <button type="button" class="btn btn-outline-info btn-lg pin-guide-trigger warning" data-bs-toggle="modal" data-bs-target="#recommendedPinsModal">
@@ -858,61 +1021,47 @@
 
     </div><!-- d-flex 7 kutu -->
   </div>
+  <div class="mt-3 ms-1 mb-3">
+    <button type="button" class="btn btn-warning shadow-sm" id="btnSavePins">
+      <i class="bi bi-save2 me-2"></i> Kaydet
+    </button>
+  </div>
 
-  <!-- 3) PANEL: AUX Portları -->
-  <div class="panel">
-    <h2 class="panel-title"><i class="bi bi-usb-plug"></i> AUX Portları</h2>
-
-    <!-- 5 kutu yan yana: Alıcı, GPS, OSD, I2C, Voltaj -->
-    <div class="d-flex gap-1 align-items-stretch" style="flex-wrap:nowrap;">
-
-      <div class="panel4" style="flex:1;min-width:0;">
-        <div class="output-title mb-1">ALICI (RX)</div>
-        <label class="port-label">TX</label>
-             <select class="form-select pin-select" id="rxRxPin"></select>
-        <label class="port-label">RX</label>
-   
-        <select class="form-select pin-select mb-1" id="rxTxPin"></select>
+  <!-- 3) PANEL: Mikser Kazançları -->
+  <div class="panel mb-4">
+    <h2 class="panel-title"><i class="bi bi-sliders"></i> Mikser Kazançları</h2>
+    <p class="text-muted small mb-3">
+      Her eksen için mikser oranını ayarlayın. <strong>100 = normal</strong>, <strong>-100 = ters</strong>, <strong>50 = %50 güç</strong>.
+      Yaw tersleniyorsa Yaw değerini negatif yapın (örn: -100).
+    </p>
+    <div class="row g-3">
+      <div class="col-6 col-lg-3">
+        <div class="panel4 p-3 text-center">
+          <div class="output-title mb-2">ROLL</div>
+          <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
+        </div>
       </div>
-
-      <div class="panel4" style="flex:1;min-width:0;">
-        <div class="output-title mb-1">GPS</div>
-        <label class="port-label">TX</label>
-        <select class="form-select pin-select mb-1" id="gpsTxPin"></select>
-        <label class="port-label">RX</label>
-        <select class="form-select pin-select" id="gpsRxPin"></select>
+      <div class="col-6 col-lg-3">
+        <div class="panel4 p-3 text-center">
+          <div class="output-title mb-2">PITCH</div>
+          <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
+        </div>
       </div>
-
-      <div class="panel4" style="flex:1;min-width:0;">
-        <div class="output-title mb-1">OSD</div>
-        <label class="port-label">TX</label>
-        <select class="form-select pin-select mb-1" id="osdTxPin"></select>
-        <label class="port-label">RX</label>
-        <select class="form-select pin-select" id="osdRxPin"></select>
+      <div class="col-6 col-lg-3">
+        <div class="panel4 p-3 text-center">
+          <div class="output-title mb-2">YAW</div>
+          <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
+        </div>
       </div>
-
-      <div class="panel4" style="flex:1;min-width:0;">
-        <div class="output-title mb-1">I2C</div>
-        <label class="port-label">SCL</label>
-        <select class="form-select pin-select mb-1" id="i2cSclPin"></select>
-        <label class="port-label">SDA</label>
-        <select class="form-select pin-select" id="i2cSdaPin"></select>
+      <div class="col-6 col-lg-3">
+        <div class="panel4 p-3 text-center">
+          <div class="output-title mb-2">THROTTLE</div>
+          <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
+        </div>
       </div>
-
-      <div class="panel4" style="flex:1;min-width:0;">
-        <div class="output-title mb-1">VOLTAJ ADC</div>
-        <label class="port-label">ADC Pin</label>
-        <select class="form-select pin-select mb-1" id="voltageAdcPin"></select>
-        <label class="port-label mt-1">Ölçek Faktörü <small class="text-muted">(R1+R2)/R2</small></label>
-        <input type="number" class="form-control form-control-sm mb-1" id="voltageAdcScale"
-               min="1" max="50" step="0.1" value="11.0" title="Gerilim bölücü oranı. 100kΩ+10kΩ için 11.0">
-        <small class="text-muted">Batarya voltajı<br><span class="text-info" style="font-size:0.7em">Tercihler → Batarya tabından da düzenlenebilir</span></small>
-      </div>
-
-    </div><!-- d-flex 5 kutu -->
-
+    </div>
     <div class="mt-3">
-      <button type="button" class="btn btn-warning shadow-sm" id="btnSaveOutputs">
+      <button type="button" class="btn btn-warning shadow-sm" id="btnSaveMixer">
         <i class="bi bi-save2 me-2"></i> Kaydet
       </button>
     </div>
@@ -1056,6 +1205,28 @@
             </div>
         </div>
     </div>
+
+  <!-- Alıcı Bağlantı Pinleri -->
+  <div class="panel mt-3 p-3 pin-panel">
+    <div class="t-baslik mb-1"><i class="bi bi-broadcast-pin me-1"></i> Alıcı Bağlantı Pinleri (UART)</div>
+    <div class="t-aciklama mb-3">
+      RC alıcısının (ELRS / CRSF / SBUS) ESP32'ye bağlandığı UART pinleri.
+      <span class="badge bg-secondary ms-1" style="font-size:0.7em;">Alıcı Pinleri</span>
+    </div>
+    <div class="d-flex align-items-end gap-3 flex-wrap">
+      <div>
+        <label class="port-label d-block mb-1">TX (ESP → Alıcı)</label>
+        <select class="form-select form-select-sm pin-select" id="rxTxPin" style="min-width:160px;"></select>
+      </div>
+      <div>
+        <label class="port-label d-block mb-1">RX (Alıcı → ESP)</label>
+        <select class="form-select form-select-sm pin-select" id="rxRxPin" style="min-width:160px;"></select>
+      </div>
+      <button class="btn btn-warning btn-sm" onclick="saveRxPins()">
+        <i class="bi bi-save me-1"></i> Alıcı Pinlerini Kaydet
+      </button>
+    </div>
+  </div>
 
     <!-- Stick Komutları info ikonu -->
     <span data-bs-toggle="modal" data-bs-target="#stickCmdsModal" style="cursor:pointer; color:#f59e0b; font-size:0.85rem; user-select:none;" title="Stick komutlarını göster">
@@ -1302,9 +1473,6 @@
             <button class="adv-tab active" data-tab="adv-tab-1" onclick="switchAdvTab('adv-tab-1',this)">
                 <i class="bi bi-airplane-engines"></i> Uçuş Limitleri
             </button>
-            <button class="adv-tab" data-tab="adv-tab-2" onclick="switchAdvTab('adv-tab-2',this)">
-                <i class="bi bi-geo-fill"></i> Navigasyon & GPS
-            </button>
             <button class="adv-tab" data-tab="adv-tab-3" onclick="switchAdvTab('adv-tab-3',this)">
                 <i class="bi bi-arrow-bar-up"></i> İrtifa
             </button>
@@ -1467,180 +1635,6 @@
                                 </small>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== 2. NAVİGASYON & GPS ==================== -->
-            <div id="adv-tab-2" class="adv-tab-pane">
-                <div class="panel4">
-                    <div class="p-2 mb-3 rounded" style="background:rgba(13,110,253,0.12);border:1px solid rgba(13,110,253,0.3);">
-                        <h5 class="mb-0 text-primary"><i class="bi bi-geo-fill"></i> 2. Navigasyon & GPS</h5>
-                    </div>
-                    <div>
-                        <div class="row g-4">
-                            
-                            <!-- GPS Donanım Ayarları -->
-                            <div class="col-md-4 border-end border-secondary">
-                                <h6 class="text-muted mb-3">Donanım Ayarları</h6>
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="inp_has_gps" onchange="toggleGpsSettings()">
-                                    <label class="form-check-label text-white" for="inp_has_gps">GPS Modülü Aktif</label>
-                                </div>
-                                <div id="gps_hardware_settings">
-                                    <div class="input-group input-group-sm mb-2">
-                                        <span class="input-group-text bg-secondary text-light border-0">Protokol</span>
-                                        <select class="form-select" id="inp_gps_proto">
-                                            <option value="0">Otomatik (Önerilen)</option>
-                                            <option value="1">UBX Legacy (NEO-6M)</option>
-                                            <option value="2">UBX PVT (NEO-7+)</option>
-                                        </select>
-                                    </div>
-																	<hr>
-                                    <div class="input-group input-group-sm mb-2">
-                                        <span class="input-group-text bg-secondary text-light border-0">Mag Yönü</span>
-                                        <select class="form-select" id="inp_mag_align">
-                                            <option value="0">CW 0°</option>
-                                            <option value="1">CW 90°</option>
-                                            <option value="2">CW 180°</option>
-                                            <option value="3">CW 270°</option>
-                                        </select>
-                                    </div>
-                                    <hr class="border-secondary my-2">
-                                    <h6 class="text-warning small mb-2">GPS Güvenlik</h6>
-                                    <div class="mb-2 row">
-                                        <label class="col-sm-7 col-form-label col-form-label-sm">Min Uydu Sayısı</label>
-                                        <div class="col-sm-5">
-                                            <input type="number" class="form-control form-control-sm" id="inp_gps_min_sats" min="4" max="12" step="1" value="6">
-                                        </div>
-                                    </div>
-																	<hr>
-                                    <div class="mb-2 row">
-                                        <label class="col-sm-7 col-form-label col-form-label-sm">Min Fix Tipi</label>
-                                        <div class="col-sm-5">
-                                            <select class="form-select form-select-sm" id="inp_gps_min_fix_type">
-                                                <option value="2">2D Fix</option>
-                                                <option value="3" selected>3D Fix</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- RTH (Eve Dönüş) -->
-                            <div class="col-md-4 border-end border-secondary">
-                                <h6 class="text-muted mb-3">RTH (Eve Dönüş)</h6>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">RTH İrtifası (m)</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_rth_alt" value="60"></div>
-                                </div>
-																<hr>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">RTH Yarıçapı (m)</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_radius" value="60"></div>
-                                </div>
-																<hr>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm text-danger">Geofence (m)</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dist" placeholder="0=Yok" value="0"></div>
-                                </div>
-																<hr>
-                                <div class="col-12 mt-2">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="inp_nav_climb_first">
-                                        <label class="form-check-label small" for="inp_nav_climb_first">Eve Dönerken Önce Yüksel</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Otopilot Açı Limitleri -->
-                            <div class="col-md-4">
-                                <h6 class="text-muted mb-3">Otopilot Açı Limitleri</h6>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Roll (°)</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_bank_roll" min="10" max="60" value="45"></div>
-                                </div>
-																<hr>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Pitch (°)</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_bank_pitch" min="5" max="45" value="20"></div>
-                                </div>
-																<hr>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Tırmanma (°)</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_climb" value="20"></div>
-                                </div>
-																<hr>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Dalış (°)</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dive" value="15"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="border-secondary my-4">
-
-                        <!-- İkinci Satır: Gaz Ayarları & Kazançlar & L1 -->
-                        <div class="row g-4">
-                            <!-- Gaz (Throttle) AyarlarÄ± -->
-                            <!-- Gaz (Throttle) Ayarları -->
-                            <div class="col-md-4 border-end border-secondary">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Gaz (Throttle) Ayarları</h6>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm text-danger">Nav Min Gaz</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_min_throttle" min="1000" max="1500" step="10" value="1100"></div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Alçalma Gazı</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_descend" min="1000" max="1800" step="10" value="1100"></div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm text-info">Seyir Gazı</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_cruise" min="1200" max="1900" step="10" value="1650"></div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Tırmanma Gazı</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_climb" min="1300" max="2000" step="10" value="1700"></div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm text-danger">Nav Max Gaz</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_throttle" min="1500" max="2000" step="10" value="1900"></div>
-                                </div>
-                            </div>
-
-                            <!-- Otopilot Kazançları -->
-                            <div class="col-md-4 border-end border-secondary">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Otopilot Kazançları</h6>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm text-info">
-                                        Pitch → Gaz
-                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Otopilot irtifa düzeltirken burnu kaldırdığında (pitch arttığında) otomatik olarak gaz ekler. Her 1° pitch için kaç birim PWM gaz ekleneceğini belirler. Örnek: değer=10 ise +5° pitch → +50 µs gaz artışı. Düşük değer: irtifa değişimlerine yavaş tepki. Yüksek değer: agresif gaz tepkisi, titreşime yol açabilir."></i>
-                                    </label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_nav_fw_pitch2thr" step="0.1" value="8.0"></div>
-                                </div>
-                            </div>
-
-                            <!-- L1 Navigasyon -->
-                            <div class="col-md-4">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">L1 Navigasyon (Rota Takibi)</h6>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">
-                                        L1 Periyodu (sn)
-                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Düşük=Sert, Yüksek=Yumuşak Dönüş"></i>
-                                    </label>
-                                    <div class="col-sm-5">
-                                        <input type="number" class="form-control form-control-sm" id="inp_nav_l1_period" min="5" max="30" step="1" value="17">
-                                    </div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">L1 Damping</label>
-                                    <div class="col-sm-5">
-                                        <input type="number" class="form-control form-control-sm" id="inp_nav_l1_damping" min="0.5" max="1.0" step="0.05" value="0.75">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>
@@ -1923,6 +1917,20 @@ function switchAdvTab(tabId, btn) {
 </script>
 
 <div id="osd" class="page">
+    <!-- OSD Pin Seçimi -->
+    <div class="panel3 p-3 mb-3 pin-panel">
+        <div class="t-baslik mb-1"><i class="bi bi-display me-1"></i> OSD Bağlantı Pinleri (UART)</div>
+        <div class="t-aciklama mb-2">OSD modülünün ESP32'ye bağlandığı UART pinleri. MSP protokolü ile iletişim kurulur.
+            <span class="badge bg-secondary ms-1">OSD Pinleri</span></div>
+        <div class="d-flex align-items-end gap-3 flex-wrap">
+            <div><label class="port-label d-block mb-1">TX (ESP → OSD)</label>
+                <select class="form-select form-select-sm pin-select" id="osdTxPin" style="min-width:160px;"></select></div>
+            <div><label class="port-label d-block mb-1">RX (OSD → ESP)</label>
+                <select class="form-select form-select-sm pin-select" id="osdRxPin" style="min-width:160px;"></select></div>
+            <button class="btn btn-warning btn-sm" onclick="saveOsdPins()">
+                <i class="bi bi-save me-1"></i> OSD Pinlerini Kaydet</button>
+        </div>
+    </div>
     <div class="panel mb-4">
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
             <div>

@@ -325,11 +325,140 @@ function stopThrottleUpdates() {
 }
 
 // ============================================================================
-// KAYDETME FONKSİYONU
+// MİKSER SAYFA VERİSİ HANDLER
 // ============================================================================
 
+function handleMixerPageData(data) {
+    if (data.aircraft_type) {
+        selectedAircraft = data.aircraft_type;
+        document.querySelectorAll('.aircraft-card').forEach(card => {
+            card.classList.toggle('active', card.getAttribute('data-aircraft-type') === selectedAircraft);
+        });
+        updateServoNames();
+    }
+    const setMix = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+    setMix('mixRoll',     data.roll_mix);
+    setMix('mixPitch',    data.pitch_mix);
+    setMix('mixYaw',      data.yaw_mix);
+    setMix('mixThrottle', data.throttle_mix);
+}
+
+// ============================================================================
+// KAYDETME FONKSİYONLARI
+// ============================================================================
+
+function saveGpsConfig() {
+    // GPS pinlerini pinConfig'e yaz, ardından tüm pin kaydını gönder
+    const tx = parseInt(document.getElementById('gpsTxPin')?.value ?? -1);
+    const rx = parseInt(document.getElementById('gpsRxPin')?.value ?? -1);
+    if (!isNaN(tx)) pinConfig.gps_tx = tx;
+    if (!isNaN(rx)) pinConfig.gps_rx = rx;
+    savePinsConfig();
+    // Nav ayarlarını kaydet (SAVE_ADVANCED_CONFIG — tüm inp_nav_* elemanları DOM'da)
+    if (typeof saveAdvancedConfig === 'function') {
+        saveAdvancedConfig();
+    }
+    _log('📤 GPS & Nav ayarları kaydediliyor...', 'info');
+}
+
+function saveRxPins() {
+    const tx = parseInt(document.getElementById('rxTxPin')?.value ?? -1);
+    const rx = parseInt(document.getElementById('rxRxPin')?.value ?? -1);
+    if (isNaN(tx) || isNaN(rx)) {
+        _log('❌ Geçersiz alıcı pin değeri', 'error');
+        return;
+    }
+    pinConfig.rx_tx = tx;
+    pinConfig.rx_rx = rx;
+    savePinsConfig();
+    _log(`📤 Alıcı pinleri kaydediliyor — TX: GPIO${tx}, RX: GPIO${rx}`, 'info');
+}
+
+function saveI2CPins() {
+    const scl = parseInt(document.getElementById('i2cSclPin')?.value ?? -1);
+    const sda = parseInt(document.getElementById('i2cSdaPin')?.value ?? -1);
+    if (isNaN(scl) || isNaN(sda)) {
+        _log('❌ Geçersiz I2C pin değeri', 'error');
+        return;
+    }
+    // Mevcut pinConfig'e yaz, ardından tam kayıt gönder
+    pinConfig.i2c_scl = scl;
+    pinConfig.i2c_sda = sda;
+    savePinsConfig();
+    _log(`📤 I2C pinleri kaydediliyor — SCL: GPIO${scl}, SDA: GPIO${sda}`, 'info');
+}
+
+function saveOsdPins() {
+    const tx = parseInt(document.getElementById('osdTxPin')?.value ?? -1);
+    const rx = parseInt(document.getElementById('osdRxPin')?.value ?? -1);
+    pinConfig.osd_tx = tx;
+    pinConfig.osd_rx = rx;
+    savePinsConfig();
+    _log(`📤 OSD pinleri kaydediliyor — TX: GPIO${tx}, RX: GPIO${rx}`, 'info');
+}
+
+function savePinsConfig() {
+    const getPin = (id) => { const el = _$(id); return el ? parseInt(el.value) : -1; };
+
+    const pins = {
+        motor1:      getPin('motor1Pin'),
+        motor2:      getPin('motor2Pin'),
+        servo1:      getPin('servo1Pin'),
+        servo2:      getPin('servo2Pin'),
+        servo3:      getPin('servo3Pin'),
+        servo4:      getPin('servo4Pin'),
+        rx_tx:       getPin('rxTxPin'),
+        rx_rx:       getPin('rxRxPin'),
+        gps_tx:      getPin('gpsTxPin'),
+        gps_rx:      getPin('gpsRxPin'),
+        osd_tx:      getPin('osdTxPin'),
+        osd_rx:      getPin('osdRxPin'),
+        i2c_scl:     getPin('i2cSclPin'),
+        i2c_sda:     getPin('i2cSdaPin'),
+        adc_voltage: pinConfig.adc_voltage ?? -1,
+    };
+
+    if (pinConfig.adc_voltage_scale != null) pins.adc_voltage_scale = pinConfig.adc_voltage_scale;
+
+    for (let i = 1; i <= 4; i++) {
+        const checkbox = _$(`revServo${i}`);
+        if (servoValues[`servo${i}`] && checkbox) {
+            servoValues[`servo${i}`].reverse = checkbox.checked;
+        }
+    }
+
+    const payload = { pins, servo_values: servoValues };
+    _log('📤 Pin ayarları gönderiliyor...', 'info');
+    if (typeof sendCommand === 'function') {
+        sendCommand(`PINS_SAVE ${JSON.stringify(payload)}`);
+    }
+}
+
+function saveMixerConfig() {
+    const getMixVal = (id, def) => {
+        const el = document.getElementById(id);
+        if (!el) return def;
+        const v = parseInt(el.value);
+        return (isNaN(v) || v < -200 || v > 200) ? def : v;
+    };
+
+    const payload = {
+        aircraft_type: selectedAircraft,
+        mixer: {
+            roll_mix:     getMixVal('mixRoll', 100),
+            pitch_mix:    getMixVal('mixPitch', 100),
+            yaw_mix:      getMixVal('mixYaw', 100),
+            throttle_mix: getMixVal('mixThrottle', 100),
+        }
+    };
+    _log('📤 Mikser ayarları gönderiliyor...', 'info');
+    if (typeof sendCommand === 'function') {
+        sendCommand(`MIXER_SAVE ${JSON.stringify(payload)}`);
+    }
+}
+
 /**
- * @brief Outputs konfigürasyonunu ESP'ye kaydeder
+ * @brief Outputs konfigürasyonunu ESP'ye kaydeder (eski tam kayıt - uyumluluk için)
  */
 function saveOutputsConfig() {
     // Pinleri al
@@ -356,15 +485,7 @@ function saveOutputsConfig() {
     pinConfig.i2c_scl = parseInt(_$('i2cSclPin')?.value);
     pinConfig.i2c_sda = parseInt(_$('i2cSdaPin')?.value);
 
-    // ADC
-    pinConfig.adc_voltage = parseInt(_$('voltageAdcPin')?.value);
-    const _scaleEl = document.getElementById('voltageAdcScale');
-    if (_scaleEl) {
-        const scale = parseFloat(_scaleEl.value);
-        if (!isNaN(scale) && scale >= 1.0 && scale <= 50.0) {
-            pinConfig.adc_voltage_scale = scale;
-        }
-    }
+    // ADC — değerler pinConfig cache'inden gelir (voltageAdcPin/Scale artık DOM'da yok)
 
     // Servo Reverse
     for (let i = 1; i <= 4; i++) {
@@ -447,6 +568,13 @@ document.querySelectorAll('.aircraft-card').forEach(card => {
 
 // Tüm fonksiyonları global scope'a aktar
 window.handleOutputsPageData = handleOutputsPageData;
+window.handleMixerPageData = handleMixerPageData;
+window.savePinsConfig = savePinsConfig;
+window.saveMixerConfig = saveMixerConfig;
+window.saveI2CPins = saveI2CPins;
+window.saveRxPins = saveRxPins;
+window.saveOsdPins = saveOsdPins;
+window.saveGpsConfig = saveGpsConfig;
 window.handlePwmStream = handlePwmStream;
 window.updatePwmOutputs = updatePwmOutputs;
 window.updateServoNames = updateServoNames;

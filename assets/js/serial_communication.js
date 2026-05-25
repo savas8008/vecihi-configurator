@@ -614,14 +614,21 @@ function handlePageData(pageType, pageData) {
     // Overlay'i kaldır (veri geldi, artık kaydet butonu aktif)
     // 'waypoints' (ESP tipi) → 'waypoint' (sayfa ID) uyumsuzluğunu çöz
     const pageId = pageType === 'waypoints' ? 'waypoint' : pageType;
-    if (typeof hidePageLoading === 'function') hidePageLoading(pageId);
+    if (typeof hidePageLoading === 'function') {
+        hidePageLoading(pageId);
+        if (pageType === 'outputs') { hidePageLoading('mixer'); hidePageLoading('gps'); }
+        if (pageType === 'advanced') hidePageLoading('gps');
+    }
 
     switch (pageType) {
         case 'calibration': 
             if (typeof handleCalibrationPageData === 'function') handleCalibrationPageData(pageData); 
             break;
-        case 'outputs':     
-            if (typeof handleOutputsPageData === 'function') handleOutputsPageData(pageData); 
+        case 'outputs':
+            if (typeof handleOutputsPageData === 'function') handleOutputsPageData(pageData);
+            break;
+        case 'mixer':
+            if (typeof handleMixerPageData === 'function') handleMixerPageData(pageData);
             break;
         case 'transmitter': 
             if (typeof handleTransmitterPageData === 'function') handleTransmitterPageData(pageData); 

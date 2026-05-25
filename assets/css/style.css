@@ -51,6 +51,7 @@
     --bg-panel:   rgba(8, 47, 102, 0.9);    /* Dış: koyu lacivert */
     --bg-panel-2: rgba(16, 17, 48, 0.9);     /* Orta: biraz açık çelik mavi */
     --bg-panel-3: rgba(13, 29, 81, 0.9);   /* İç: hafif aydınlık çelik mavi */
+    --bg-panel-pin: rgba(5, 50, 48, 0.92); /* Pin paneli: koyu teal — donanım bağlantısı */
     --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
 
     --bg-panel-solid: #dbe0e8;
@@ -262,6 +263,15 @@ a:hover {
 .panel, .sidebar { background: var(--bg-panel);   }  /* Dış: teal */
 .panel2           { background: var(--bg-panel-2); }  /* Orta */
 .panel3           { background: var(--bg-panel-3); }  /* İç */
+
+/* Pin bağlantı panelleri — tüm sayfalarda tutarlı donanım rengi */
+.pin-panel {
+    background: var(--bg-panel-pin) !important;
+    border-color: rgba(20, 180, 160, 0.35) !important;
+}
+.pin-panel .t-baslik,
+.pin-panel .panel-title { color: #5dd8cc !important; }
+.pin-panel .port-label  { color: #8ee8e0 !important; }
 
 /* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
 .panel4 {
