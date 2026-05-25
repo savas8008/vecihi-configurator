@@ -542,8 +542,17 @@ function updateAdvDisplay(key) {
  * @brief GPS ayarları bölümünü göster/gizle
  */
 function updateFlaperonSliderColor(slider) {
-    const pct = ((slider.value - slider.min) / (slider.max - slider.min) * 100).toFixed(1);
-    slider.style.background = `linear-gradient(to right, #0ea5e9 ${pct}%, rgba(0,0,0,0.15) ${pct}%)`;
+    const val = parseFloat(slider.value);
+    const min = parseFloat(slider.min);
+    const max = parseFloat(slider.max);
+    const range = max - min;
+    const centerPct = ((0 - min) / range * 100).toFixed(1);
+    const valPct    = ((val   - min) / range * 100).toFixed(1);
+    if (val >= 0) {
+        slider.style.background = `linear-gradient(to right, rgba(0,0,0,0.15) ${centerPct}%, #0ea5e9 ${centerPct}%, #0ea5e9 ${valPct}%, rgba(0,0,0,0.15) ${valPct}%)`;
+    } else {
+        slider.style.background = `linear-gradient(to right, rgba(0,0,0,0.15) ${valPct}%, #f59e0b ${valPct}%, #f59e0b ${centerPct}%, rgba(0,0,0,0.15) ${centerPct}%)`;
+    }
 }
 window.updateFlaperonSliderColor = updateFlaperonSliderColor;
 

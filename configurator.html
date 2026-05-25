@@ -1456,10 +1456,15 @@
                                 <h6 class="text-muted border-bottom border-secondary pb-1"><i class="bi bi-arrows-collapse me-1"></i>Flaperon Droop</h6>
                                 <div class="d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 text-nowrap small">Droop Miktarı (µs)</label>
-                                    <input type="range" class="form-range flaperon-range" id="flaperonOffsetSlider" min="0" max="500" step="10" value="150" oninput="document.getElementById('flaperonOffsetValue').textContent=this.value; var p=((this.value-this.min)/(this.max-this.min)*100).toFixed(1); this.style.background='linear-gradient(to right,#0ea5e9 '+p+'%,rgba(0,0,0,0.15) '+p+'%)'">
+                                    <input type="range" class="form-range flaperon-range" id="flaperonOffsetSlider" min="-500" max="500" step="10" value="150" oninput="document.getElementById('flaperonOffsetValue').textContent=this.value; updateFlaperonSliderColor(this);">
                                     <span class="badge bg-secondary" id="flaperonOffsetValue">150</span>
                                 </div>
-                                <small class="text-muted">Flaperon aktifken aileronlara uygulanan simetrik droop. Aralık: 0–500 µs</small>
+                                <small class="text-muted">
+                                    Flaperon aktifken aileronlara uygulanan simetrik droop. Aralık: -500–+500 µs.<br>
+                                    <strong>Pozitif değer:</strong> aileronlar aşağı iner (normal). &nbsp;
+                                    <strong>Negatif değer:</strong> aileronlar yukarı kalkar —
+                                    servo montajı nedeniyle aileronlar ters yönde hareket ediyorsa negatif değer kullanın (örn: -150).
+                                </small>
                             </div>
                         </div>
                     </div>
