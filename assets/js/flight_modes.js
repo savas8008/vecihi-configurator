@@ -30,7 +30,6 @@ const modeDefinitions = [
 
     // --- NAVİGASYON (NAV MODES) - Yüksek Öncelik ---
     { key: 'rth', name: 'RTH (Eve Dön)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
-    { key: 'launch', name: 'AUTO LAUNCH', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'waypoint', name: 'WAYPOINT', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'land_assist', name: 'LAND ASSIST (İniş Asistanı)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'gcs', name: 'GCS KONTROL (Yer İstasyonu)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },

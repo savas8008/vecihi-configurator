@@ -19,6 +19,35 @@ let pendingReconnect = false;        // Restart sonrası otomatik yeniden bağla
 let pendingReconnectTimer = null;    // Timeout: restart gelmezse bayrağı temizle
 let postConnectDataTimer = null;     // Bağlantı sonrası veri gelmezse uçuş modu uyarısı
 
+// === CFG_SET / CFG_COMMIT ACK MEKANİZMASI ===
+let _cfgPending = null; // { resolve, reject, timeout }
+
+function _setCfgPending(resolve, reject, timeoutMs = 3000) {
+    if (_cfgPending) {
+        clearTimeout(_cfgPending.timeout);
+        _cfgPending.reject(new Error('Replaced'));
+    }
+    _cfgPending = {
+        resolve, reject,
+        timeout: setTimeout(() => {
+            _cfgPending = null;
+            reject(new Error('CFG_SET timeout'));
+        }, timeoutMs)
+    };
+}
+
+function _resolveCfgPending(err) {
+    if (!_cfgPending) return;
+    clearTimeout(_cfgPending.timeout);
+    const p = _cfgPending;
+    _cfgPending = null;
+    if (err) p.reject(err);
+    else p.resolve();
+}
+
+window._setCfgPending = _setCfgPending;
+window._resolveCfgPending = _resolveCfgPending;
+
 // === TEMEL KOMUT FONKSİYONLARI ===
 
 /**
@@ -660,6 +689,11 @@ function handleStreamData(streamType, streamData) {
  * @param {Object} data - Tam veri objesi
  */
 function handleStatusResponse(command, result, data) {
+    // CFG_SET / CFG_COMMIT ack → import akışına bildir
+    if (command === 'CFG_SET' || command === 'CFG_COMMIT') {
+        _resolveCfgPending(null);
+        return;
+    }
     switch (command) {
         case 'CALIBRATE_GYRO':
             if (result === 'completed') {
@@ -786,6 +820,11 @@ function handleStatusResponse(command, result, data) {
  * @param {string} message - Hata mesajı
  */
 function handleErrorResponse(command, message) {
+    // CFG_SET hatası → import akışını durdur, modal gösterme
+    if (command === 'CFG_SET' || command === 'CFG_COMMIT') {
+        _resolveCfgPending(new Error(message));
+        return;
+    }
     log(`❌ HATA (${command}): ${message}`, 'error');
     showModal('Hata', message, 'error');
     setBusy(false);

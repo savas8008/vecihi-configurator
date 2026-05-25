@@ -50,9 +50,10 @@ let advancedConfig = {
         auto_launch_on_arm: true,
         disarm_on_landing: true
     },
-    misc: { 
-        tpa: 0.00, 
-        esc_hz: 50 
+    misc: {
+        tpa: 0.00,
+        esc_hz: 50,
+        servo_hz: 50
     },
     // Altitude & GPS Karışımı
     alt_config: { 
@@ -273,6 +274,7 @@ function updateAdvancedUI() {
     // --- Misc ---
     if (advancedConfig.misc) {
         setVal("inp_esc_hz", advancedConfig.misc.esc_hz);
+        setVal("inp_servo_hz", advancedConfig.misc.servo_hz);
     }
 
     // --- Trim ---
@@ -456,6 +458,7 @@ function saveAdvancedConfig() {
     // -------- Misc --------
     const misc = {};
     setIf(misc, "esc_hz", selInt("inp_esc_hz"));
+    setIf(misc, "servo_hz", selInt("inp_servo_hz"));
     if (Object.keys(misc).length) cfg.misc = misc;
 
     // -------- Calibration extras (trim) --------
