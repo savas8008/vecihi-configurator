@@ -3052,15 +3052,15 @@ function switchAdvTab(tabId, btn) {
             modalEl.addEventListener('hidden.bs.modal', removeModalBackdrops, { once: true });
         }
 
-        function showModal(title, message, type = 'success') {
+        function showModal(title, message, type = 'success', autoCloseMs = 0) {
             removeModalBackdrops();
             const modal = new bootstrap.Modal($('saveModal'));
             $('saveModalLabel').textContent = title;
             $('saveModalBody').innerHTML = message;
-            
+
             const modalHeader = $('saveModal').querySelector('.modal-header');
             const modalContent = $('saveModal').querySelector('.modal-content');
-            
+
             modalContent.style.background = "rgba(40, 50, 70, 0.85)";
             modalContent.style.backdropFilter = "blur(10px)";
             modalContent.style.color = "white";
@@ -3072,12 +3072,16 @@ function switchAdvTab(tabId, btn) {
                 'info': 'var(--primary)'
             };
             const color = colorMap[type] || colorMap['info'];
-            
+
             modalHeader.style.borderBottom = `3px solid ${color}`;
             modalContent.style.border = `1px solid ${color}`;
 
             modal.show();
             $('saveModal').addEventListener('hidden.bs.modal', removeModalBackdrops, { once: true });
+
+            if (autoCloseMs > 0) {
+                setTimeout(() => modal.hide(), autoCloseMs);
+            }
         }
 
         function removeModalBackdrops() {

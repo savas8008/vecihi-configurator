@@ -252,7 +252,11 @@ function init() {
     setupEventListeners();
     
     log('🚀 Flight Controller arayüzü hazır...', 'info');
-    log('📡 \'Porta Bağlan\' butonuna tıklayın', 'info');
+
+    // Önceden izin verilmiş port varsa otomatik bağlan
+    setTimeout(() => {
+        if (typeof tryAutoConnect === 'function') tryAutoConnect();
+    }, 300);
 }
 
 // ============================================================================

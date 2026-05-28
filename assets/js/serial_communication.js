@@ -112,7 +112,7 @@ function handleCommandKeypress(event) {
 // navigator.serial 'disconnect' eventi her zaman güvenilir şekilde tetiklenir.
 if (navigator.serial) {
     navigator.serial.addEventListener('disconnect', (event) => {
-        if (port && event.target === port) {
+        if (port && event.port === port) {
             handleDisconnect();
         }
     });
@@ -121,7 +121,70 @@ if (navigator.serial) {
 // === BAĞLANTI FONKSİYONLARI ===
 
 /**
- * @brief Seri port bağlantı isteği
+ * @brief Sayfa açılışında veya restart sonrası daha önce izin verilmiş porta otomatik bağlanır.
+ *        requestPort() gerektirmez — kullanıcı etkileşimsiz çalışır.
+ */
+async function tryAutoConnect() {
+    if (!navigator.serial || isConnected) return;
+    try {
+        const ports = await navigator.serial.getPorts();
+        if (ports.length === 0) return;
+        log('🔍 Önceki cihaz bulundu, otomatik bağlanılıyor...', 'info');
+        await _openPort(ports[0]);
+    } catch (err) {
+        log(`⚠️ Otomatik bağlantı başarısız: ${err.message}`, 'warning');
+    }
+}
+
+/**
+ * @brief Port açma ve stream kurma — connectSerial ve tryAutoConnect tarafından paylaşılır.
+ * pipeTo/TextDecoderStream kullanılmaz: port.readable doğrudan reader'a bağlanır,
+ * böylece reader.cancel() portu gerçekten serbest bırakır ve port.close() güvenilir çalışır.
+ */
+async function _openPort(targetPort) {
+    port = targetPort;
+    await port.open({ baudRate: 115200 });
+
+    reader = port.readable.getReader();
+    writer = port.writable.getWriter();
+
+    isConnected = true;
+    log('✅ Seri porta bağlandı', 'success');
+
+    clearTimeout(postConnectDataTimer);
+    postConnectDataTimer = setTimeout(() => {
+        if (isConnected) {
+            log('⚠️ 10 saniye veri gelmedi — ESP uçuş moduna geçmiş', 'warning');
+            showFlightModeWarning();
+            handleDisconnect(true);
+        }
+    }, 10000);
+
+    if (typeof activateSensorsPage === 'function') activateSensorsPage();
+    updateConnectionStatus();
+
+    readLoop().catch(error => {
+        log(`❌ Okuma döngüsü hatası: ${error.message}`, 'error');
+        handleDisconnect();
+    });
+
+    setTimeout(() => {
+        log('🔄 Veriler isteniyor...', 'info');
+        sendCommand('calibration_page_data'); // 'c' → ESP'yi USB moduna alır
+        setTimeout(() => sendCommand('advanced_page_data'), 200);
+        setTimeout(() => sendCommand('pid_page_data'), 400);
+        setTimeout(() => sendCommand('outputs_page_data'), 600);
+        setTimeout(() => sendCommand('transmitter_page_data'), 800);
+        setTimeout(() => sendCommand('modes_page_data'), 1000);
+        setTimeout(() => sendCommand('osd_page_data'), 1200);
+        setTimeout(() => {
+            if (typeof startQuaternionStream === 'function') startQuaternionStream();
+        }, 1600);
+    }, 150);
+}
+
+/**
+ * @brief Seri port bağlantı isteği (buton tıklaması — kullanıcı port seçer)
  */
 async function connectSerial() {
     try {
@@ -129,67 +192,17 @@ async function connectSerial() {
             showModal('Hata', 'Tarayıcınız seri port API desteklemiyor. Lütfen Chrome veya Edge kullanın.', 'error');
             return;
         }
-        
         log('🔌 Seri port bağlantısı kuruluyor...', 'info');
-        port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 115200 });
-        log('✅ Port açıldı, reader/writer ayarlanıyor...', 'info');
-        
-        const textDecoder = new TextDecoderStream();
-        port.readable.pipeTo(textDecoder.writable);
-        reader = textDecoder.readable.getReader();
-        writer = port.writable.getWriter();
-        
-        isConnected = true;
-        log('✅ Seri porta bağlandı', 'success');
-
-        // 10s içinde veri gelmezse cihaz uçuş modunda → uyar
-        clearTimeout(postConnectDataTimer);
-        postConnectDataTimer = setTimeout(() => {
-            if (isConnected) {
-                log('⚠️ 10 saniye veri gelmedi — ESP uçuş modunda', 'warning');
-                showFlightModeWarning();
-                handleDisconnect(true);
-            }
-        }, 10000);
-
-        // UI güncelle ve sensör sayfasını aktifle
-        if (typeof activateSensorsPage === 'function') {
-            activateSensorsPage();
-        }
-        updateConnectionStatus();
-
-        // Okuma döngüsünü başlat
-        readLoop().catch(error => {
-            log(`❌ Okuma döngüsü hatası: ${error.message}`, 'error');
-            handleDisconnect();
-        });
-        
-        // Cihazdan ilk verileri iste
-        setTimeout(() => {
-            log('🔄 İlk veriler isteniyor...', 'info');
-            sendCommand('calibration_page_data');
-            setTimeout(() => sendCommand('advanced_page_data'), 200);
-            setTimeout(() => sendCommand('pid_page_data'), 400);
-            setTimeout(() => sendCommand('outputs_page_data'), 600);
-            setTimeout(() => sendCommand('transmitter_page_data'), 800);
-            setTimeout(() => sendCommand('modes_page_data'), 1000);
-            setTimeout(() => sendCommand('osd_page_data'), 1200);
-            setTimeout(() => {
-                if (typeof startQuaternionStream === 'function') {
-                    startQuaternionStream();
-                }
-            }, 1600);
-        }, 500);
-        
+        const selectedPort = await navigator.serial.requestPort();
+        await _openPort(selectedPort);
     } catch (error) {
         log(`❌ Bağlantı hatası: ${error.message}`, 'error');
         showModal(
-            'Bağlantı Hatası', 
+            'Bağlantı Hatası',
             `<div class="text-center">
                 <p>Seri porta bağlanırken hata oluştu: ${error.message}</p>
                 <p class="small">Lütfen portun başka bir program tarafından kullanılmadığından emin olun.</p>
-            </div>`, 
+            </div>`,
             'error'
         );
         handleDisconnect();
@@ -200,6 +213,7 @@ async function connectSerial() {
  * @brief Seri port okuma döngüsü
  */
 async function readLoop() {
+    const decoder = new TextDecoder();
     try {
         while (isConnected && reader) {
             const { value, done } = await reader.read();
@@ -208,7 +222,8 @@ async function readLoop() {
                 break;
             }
             if (value) {
-                processIncomingData(value);
+                // value: Uint8Array (doğrudan port.readable'dan)
+                processIncomingData(decoder.decode(value, { stream: true }));
             }
         }
     } catch (error) {
@@ -217,7 +232,6 @@ async function readLoop() {
             handleDisconnect();
         }
     }
-    // done=true ile reader beklenmedik kapandıysa (uçuş moduna geçiş vb.)
     if (isConnected) {
         handleDisconnect();
     }
@@ -236,21 +250,22 @@ function disconnectSerial() {
  * @brief Bağlantı kesildiğinde portları ve UI'ı temizler
  * @param {boolean} skipWarning - true ise kopuş modalı gösterilmez (çağıran zaten gösterdi)
  */
-function handleDisconnect(skipWarning = false) {
+async function handleDisconnect(skipWarning = false) {
     const wasUnexpected = isConnected && !userInitiatedDisconnect;
     isConnected = false;
     userInitiatedDisconnect = false;
 
+    // Await cleanup sıraya uygun — reader → writer → port
     if (reader) {
-        reader.cancel().catch(() => {});
+        try { await reader.cancel(); } catch (_) {}
         reader = null;
     }
     if (writer) {
-        writer.close().catch(() => {});
+        try { await writer.close(); } catch (_) {}
         writer = null;
     }
     if (port) {
-        port.close().catch(() => {});
+        try { await port.close(); } catch (_) {}
         port = null;
     }
 
@@ -297,72 +312,21 @@ function initiateReconnect(delayMs = 400) {
  */
 async function attemptAutoReconnect() {
     showReconnectOverlay('Cihaz yeniden başlatılıyor...');
+    await new Promise(r => setTimeout(r, 1200)); // ESP32 boot süresi
 
-    // ESP32 boot süresi için bekle
-    await new Promise(r => setTimeout(r, 2500));
-
-    const MAX_TRIES = 4;
+    const MAX_TRIES = 6;
     for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
         updateReconnectStatus(`Bağlanılıyor... (${attempt}/${MAX_TRIES})`);
         try {
             const ports = await navigator.serial.getPorts();
-            if (ports.length === 0) {
-                hideReconnectOverlay();
-                showFlightModeWarning();
-                return;
-            }
-
-            port = ports[0];
-            await port.open({ baudRate: 115200 });
-
-            const textDecoder = new TextDecoderStream();
-            port.readable.pipeTo(textDecoder.writable);
-            reader = textDecoder.readable.getReader();
-            writer = port.writable.getWriter();
-
-            isConnected = true;
-            hideReconnectOverlay();
+            if (ports.length === 0) { hideReconnectOverlay(); showFlightModeWarning(); return; }
+            await _openPort(ports[0]);
+            hideReconnectOverlay(); // Başarıda overlay kapat, sensörler sayfası açılmış olur
             log('✅ Otomatik yeniden bağlandı', 'success');
-
-            // Yeniden bağlantıdan sonra da veri timeout'u başlat
-            clearTimeout(postConnectDataTimer);
-            postConnectDataTimer = setTimeout(() => {
-                if (isConnected) {
-                    log('⚠️ Yeniden bağlantıda veri gelmedi — ESP uçuş moduna geçmiş', 'warning');
-                    showFlightModeWarning();
-                    handleDisconnect(true);
-                }
-            }, 10000);
-
-            if (typeof activateSensorsPage === 'function') activateSensorsPage();
-            updateConnectionStatus();
-
-            readLoop().catch(error => {
-                log(`❌ Okuma döngüsü hatası: ${error.message}`, 'error');
-                handleDisconnect();
-            });
-
-            // Sayfa verilerini yenile
-            setTimeout(() => {
-                log('🔄 Veriler yenileniyor...', 'info');
-                sendCommand('calibration_page_data');
-                setTimeout(() => sendCommand('advanced_page_data'), 200);
-                setTimeout(() => sendCommand('pid_page_data'), 400);
-                setTimeout(() => sendCommand('outputs_page_data'), 600);
-                setTimeout(() => sendCommand('transmitter_page_data'), 800);
-                setTimeout(() => sendCommand('modes_page_data'), 1000);
-                setTimeout(() => sendCommand('osd_page_data'), 1200);
-                setTimeout(() => {
-                    if (typeof startQuaternionStream === 'function') startQuaternionStream();
-                }, 1600);
-            }, 400);
             return;
-
         } catch (err) {
             log(`⚠️ Yeniden bağlanma denemesi ${attempt} başarısız: ${err.message}`, 'warning');
-            if (attempt < MAX_TRIES) {
-                await new Promise(r => setTimeout(r, 1000 * attempt));
-            }
+            if (attempt < MAX_TRIES) await new Promise(r => setTimeout(r, 800));
         }
     }
 
@@ -781,7 +745,7 @@ function handleStatusResponse(command, result, data) {
         case 'PINS_SAVE':
             if (result === 'completed') {
                 log('✅ Pin ayarları kaydedildi, cihaz yeniden başlatılıyor...', 'success');
-                showModal('Pin Kaydedildi', 'Pin ayarları başarıyla kaydedildi.\nCihaz yeniden başlatılıyor — bağlantı otomatik kurulacak.', 'success');
+                showModal('Pin Kaydedildi', 'Pin ayarları başarıyla kaydedildi.\nCihaz yeniden başlatılıyor — bağlantı otomatik kurulacak.', 'success', 2000);
                 initiateReconnect();
             } else {
                 log(`❌ Pin kayıt hatası: ${result}`, 'error');
