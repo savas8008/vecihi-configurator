@@ -93,7 +93,7 @@ function handleOutputsPageData(data) {
         setVal('i2cSclPin', pinConfig.i2c_scl);
 
         // ADC
-        setVal('voltageAdcPin', pinConfig.adc_voltage);
+        setVal('adcVoltagePin', pinConfig.adc_voltage);
         const scaleEl = document.getElementById('voltageAdcScale');
         if (scaleEl && pinConfig.adc_voltage_scale != null) {
             scaleEl.value = pinConfig.adc_voltage_scale;
@@ -104,6 +104,8 @@ function handleOutputsPageData(data) {
             batPinEl.textContent = (pinConfig.adc_voltage > 0) ? `GPIO${pinConfig.adc_voltage}` : '--';
         }
     }
+    // Pin accordion başlıklarını güncelle
+    updatePinSummaries();
 
     // 3. Servo Değerleri
     if (data.servo_values) {
@@ -325,11 +327,169 @@ function stopThrottleUpdates() {
 }
 
 // ============================================================================
-// KAYDETME FONKSİYONU
+// MİKSER SAYFA VERİSİ HANDLER
 // ============================================================================
 
+function handleMixerPageData(data) {
+    if (data.aircraft_type) {
+        selectedAircraft = data.aircraft_type;
+        document.querySelectorAll('.aircraft-card').forEach(card => {
+            card.classList.toggle('active', card.getAttribute('data-aircraft-type') === selectedAircraft);
+        });
+        updateServoNames();
+    }
+    const setMix = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+    setMix('mixRoll',     data.roll_mix);
+    setMix('mixPitch',    data.pitch_mix);
+    setMix('mixYaw',      data.yaw_mix);
+    setMix('mixThrottle', data.throttle_mix);
+}
+
+// ============================================================================
+// KAYDETME FONKSİYONLARI
+// ============================================================================
+
+function saveGpsConfig() {
+    // GPS pinlerini pinConfig'e yaz, ardından tüm pin kaydını gönder
+    const tx = parseInt(document.getElementById('gpsTxPin')?.value ?? -1);
+    const rx = parseInt(document.getElementById('gpsRxPin')?.value ?? -1);
+    if (!isNaN(tx)) pinConfig.gps_tx = tx;
+    if (!isNaN(rx)) pinConfig.gps_rx = rx;
+    savePinsConfig();
+    updatePinSummaries();
+    // Nav ayarlarını kaydet (SAVE_ADVANCED_CONFIG — tüm inp_nav_* elemanları DOM'da)
+    if (typeof saveAdvancedConfig === 'function') {
+        saveAdvancedConfig();
+    }
+    _log('📤 GPS & Nav ayarları kaydediliyor...', 'info');
+}
+
+function saveGpsPinsOnly() {
+    const tx = parseInt(document.getElementById('gpsTxPin')?.value ?? -1);
+    const rx = parseInt(document.getElementById('gpsRxPin')?.value ?? -1);
+    if (!isNaN(tx)) pinConfig.gps_tx = tx;
+    if (!isNaN(rx)) pinConfig.gps_rx = rx;
+    savePinsConfig();
+    updatePinSummaries();
+    _log('📤 GPS pinleri kaydediliyor...', 'info');
+}
+
+function saveAdcPins() {
+    const adcEl   = document.getElementById('adcVoltagePin');
+    const scaleEl = document.getElementById('adcVoltageScale');
+    if (adcEl)   pinConfig.adc_voltage       = parseInt(adcEl.value);
+    if (scaleEl) pinConfig.adc_voltage_scale  = parseFloat(scaleEl.value);
+    savePinsConfig();
+    updatePinSummaries();
+    _log('📤 ADC pinleri kaydediliyor...', 'info');
+}
+
+function saveRxPins() {
+    const tx = parseInt(document.getElementById('rxTxPin')?.value ?? -1);
+    const rx = parseInt(document.getElementById('rxRxPin')?.value ?? -1);
+    if (isNaN(tx) || isNaN(rx)) {
+        _log('❌ Geçersiz alıcı pin değeri', 'error');
+        return;
+    }
+    pinConfig.rx_tx = tx;
+    pinConfig.rx_rx = rx;
+    savePinsConfig();
+    updatePinSummaries();
+    _log(`📤 Alıcı pinleri kaydediliyor — TX: GPIO${tx}, RX: GPIO${rx}`, 'info');
+}
+
+function saveI2CPins() {
+    const scl = parseInt(document.getElementById('i2cSclPin')?.value ?? -1);
+    const sda = parseInt(document.getElementById('i2cSdaPin')?.value ?? -1);
+    if (isNaN(scl) || isNaN(sda)) {
+        _log('❌ Geçersiz I2C pin değeri', 'error');
+        return;
+    }
+    // Mevcut pinConfig'e yaz, ardından tam kayıt gönder
+    pinConfig.i2c_scl = scl;
+    pinConfig.i2c_sda = sda;
+    savePinsConfig();
+    updatePinSummaries();
+    _log(`📤 I2C pinleri kaydediliyor — SCL: GPIO${scl}, SDA: GPIO${sda}`, 'info');
+}
+
+function saveOsdPins() {
+    const tx = parseInt(document.getElementById('osdTxPin')?.value ?? -1);
+    const rx = parseInt(document.getElementById('osdRxPin')?.value ?? -1);
+    pinConfig.osd_tx = tx;
+    pinConfig.osd_rx = rx;
+    savePinsConfig();
+    updatePinSummaries();
+    _log(`📤 OSD pinleri kaydediliyor — TX: GPIO${tx}, RX: GPIO${rx}`, 'info');
+}
+
+function savePinsConfig() {
+    const getPin = (id, fallback = -1) => {
+        const el = _$(id);
+        if (!el) return fallback;
+        const v = parseInt(el.value);
+        return isNaN(v) ? fallback : v;
+    };
+
+    const pins = {
+        motor1:      getPin('motor1Pin',  pinConfig.motor1   ?? -1),
+        motor2:      getPin('motor2Pin',  pinConfig.motor2   ?? -1),
+        servo1:      getPin('servo1Pin',  pinConfig.servo1   ?? -1),
+        servo2:      getPin('servo2Pin',  pinConfig.servo2   ?? -1),
+        servo3:      getPin('servo3Pin',  pinConfig.servo3   ?? -1),
+        servo4:      getPin('servo4Pin',  pinConfig.servo4   ?? -1),
+        rx_tx:       getPin('rxTxPin',    pinConfig.rx_tx    ?? -1),
+        rx_rx:       getPin('rxRxPin',    pinConfig.rx_rx    ?? -1),
+        gps_tx:      getPin('gpsTxPin',   pinConfig.gps_tx   ?? -1),
+        gps_rx:      getPin('gpsRxPin',   pinConfig.gps_rx   ?? -1),
+        osd_tx:      getPin('osdTxPin',   pinConfig.osd_tx   ?? -1),
+        osd_rx:      getPin('osdRxPin',   pinConfig.osd_rx   ?? -1),
+        i2c_scl:     getPin('i2cSclPin',  pinConfig.i2c_scl  ?? -1),
+        i2c_sda:     getPin('i2cSdaPin',  pinConfig.i2c_sda  ?? -1),
+        adc_voltage: pinConfig.adc_voltage ?? -1,
+    };
+
+    if (pinConfig.adc_voltage_scale != null) pins.adc_voltage_scale = pinConfig.adc_voltage_scale;
+
+    for (let i = 1; i <= 4; i++) {
+        const checkbox = _$(`revServo${i}`);
+        if (servoValues[`servo${i}`] && checkbox) {
+            servoValues[`servo${i}`].reverse = checkbox.checked;
+        }
+    }
+
+    const payload = { pins, servo_values: servoValues };
+    _log('📤 Pin ayarları gönderiliyor...', 'info');
+    if (typeof sendCommand === 'function') {
+        sendCommand(`PINS_SAVE ${JSON.stringify(payload)}`);
+    }
+}
+
+function saveMixerConfig() {
+    const getMixVal = (id, def) => {
+        const el = document.getElementById(id);
+        if (!el) return def;
+        const v = parseInt(el.value);
+        return (isNaN(v) || v < -200 || v > 200) ? def : v;
+    };
+
+    const payload = {
+        aircraft_type: selectedAircraft,
+        mixer: {
+            roll_mix:     getMixVal('mixRoll', 100),
+            pitch_mix:    getMixVal('mixPitch', 100),
+            yaw_mix:      getMixVal('mixYaw', 100),
+            throttle_mix: getMixVal('mixThrottle', 100),
+        }
+    };
+    _log('📤 Mikser ayarları gönderiliyor...', 'info');
+    if (typeof sendCommand === 'function') {
+        sendCommand(`MIXER_SAVE ${JSON.stringify(payload)}`);
+    }
+}
+
 /**
- * @brief Outputs konfigürasyonunu ESP'ye kaydeder
+ * @brief Outputs konfigürasyonunu ESP'ye kaydeder (eski tam kayıt - uyumluluk için)
  */
 function saveOutputsConfig() {
     // Pinleri al
@@ -356,15 +516,7 @@ function saveOutputsConfig() {
     pinConfig.i2c_scl = parseInt(_$('i2cSclPin')?.value);
     pinConfig.i2c_sda = parseInt(_$('i2cSdaPin')?.value);
 
-    // ADC
-    pinConfig.adc_voltage = parseInt(_$('voltageAdcPin')?.value);
-    const _scaleEl = document.getElementById('voltageAdcScale');
-    if (_scaleEl) {
-        const scale = parseFloat(_scaleEl.value);
-        if (!isNaN(scale) && scale >= 1.0 && scale <= 50.0) {
-            pinConfig.adc_voltage_scale = scale;
-        }
-    }
+    // ADC — değerler pinConfig cache'inden gelir (voltageAdcPin/Scale artık DOM'da yok)
 
     // Servo Reverse
     for (let i = 1; i <= 4; i++) {
@@ -441,14 +593,100 @@ document.querySelectorAll('.aircraft-card').forEach(card => {
                 });
             });
 
+// ADC pin input değişince badge'i güncelle
+const _adcPinInput = document.getElementById('adcVoltagePin');
+if (_adcPinInput) { _adcPinInput.addEventListener('change', updatePinSummaries); }
+
+// ============================================================================
+// PIN ACCORDION
+// ============================================================================
+
+/**
+ * @brief Pin accordion başlığındaki badge özet etiketlerini günceller.
+ *        handleOutputsPageData ve her kayıt sonrası çağrılmalı.
+ */
+function updatePinSummaries() {
+    const pinLabel = (id) => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        const v = parseInt(el.value);
+        return v === -1 ? null : `GPIO${v}`;
+    };
+
+    const setBadges = (containerId, entries) => {
+        const el = document.getElementById(containerId);
+        if (!el) return;
+        el.innerHTML = entries
+            .map(([label, id]) => {
+                const val = pinLabel(id);
+                if (!val) return `<span class="pin-badge disabled">${label}:—</span>`;
+                return `<span class="pin-badge">${label}:${val}</span>`;
+            })
+            .join('');
+    };
+
+    setBadges('motorServoPinBadges', [
+        ['M1', 'motor1Pin'], ['M2', 'motor2Pin'],
+        ['S1', 'servo1Pin'], ['S2', 'servo2Pin'],
+        ['S3', 'servo3Pin'], ['S4', 'servo4Pin'],
+    ]);
+
+    setBadges('i2cPinBadges', [
+        ['SCL', 'i2cSclPin'], ['SDA', 'i2cSdaPin'],
+    ]);
+
+    setBadges('gpsPinBadges', [
+        ['TX', 'gpsTxPin'], ['RX', 'gpsRxPin'],
+    ]);
+
+    setBadges('rxPinBadges', [
+        ['TX', 'rxTxPin'], ['RX', 'rxRxPin'],
+    ]);
+
+    setBadges('osdPinBadges', [
+        ['TX', 'osdTxPin'], ['RX', 'osdRxPin'],
+    ]);
+
+    const adcEl = document.getElementById('adcPinBadges');
+    if (adcEl) {
+        const adcInput = document.getElementById('adcVoltagePin');
+        const v = adcInput ? parseInt(adcInput.value) : -1;
+        adcEl.innerHTML = v === -1
+            ? '<span class="pin-badge disabled">ADC:—</span>'
+            : `<span class="pin-badge">ADC:GPIO${v}</span>`;
+    }
+}
+
+/**
+ * @brief Pin accordion header'a tıklanınca body'yi aç/kapa.
+ */
+function togglePinAcc(headerEl) {
+    headerEl.classList.toggle('open');
+    const body = headerEl.nextElementSibling;
+    if (body && body.classList.contains('pin-acc-body')) {
+        body.classList.toggle('open');
+    }
+}
+
 // ============================================================================
 // GLOBAL EXPORT
 // ============================================================================
 
 // Tüm fonksiyonları global scope'a aktar
 window.handleOutputsPageData = handleOutputsPageData;
+window.handleMixerPageData = handleMixerPageData;
+window.savePinsConfig = savePinsConfig;
+window.saveMixerConfig = saveMixerConfig;
+window.saveI2CPins = saveI2CPins;
+window.saveRxPins = saveRxPins;
+window.saveOsdPins = saveOsdPins;
+window.saveGpsConfig = saveGpsConfig;
+window.saveGpsPinsOnly = saveGpsPinsOnly;
+window.saveAdcPins = saveAdcPins;
 window.handlePwmStream = handlePwmStream;
 window.updatePwmOutputs = updatePwmOutputs;
+window.togglePinAcc = togglePinAcc;
+window.updatePinSummaries = updatePinSummaries;
 window.updateServoNames = updateServoNames;
 window.updateArrowButtons = updateArrowButtons;
 window.updateServoValuesUI = updateServoValuesUI;

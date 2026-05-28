@@ -311,7 +311,7 @@ function updateAdvancedUI() {
     // --- Batarya Donanımı ---
     if (advancedConfig.battery) {
         const b = advancedConfig.battery;
-        setVal("inp_bat_adc_pin",   b.adc_pin);
+        setVal("adcVoltagePin",   b.adc_pin);
         setVal("inp_bat_adc_scale", b.adc_scale);
     }
 
@@ -488,7 +488,7 @@ function saveAdvancedConfig() {
 
     // -------- Batarya Donanımı --------
     const bat = {};
-    setIf(bat, "adc_pin",   int("inp_bat_adc_pin"));
+    setIf(bat, "adc_pin",   int("adcVoltagePin"));
     setIf(bat, "adc_scale", num("inp_bat_adc_scale"));
     if (Object.keys(bat).length) cfg.battery = bat;
 

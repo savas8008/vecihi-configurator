@@ -59,7 +59,7 @@ function populatePinSelectors() {
         'i2cSclPin', 'i2cSdaPin',
 
         // ADC
-        'voltageAdcPin'
+        'adcVoltagePin'
     ];
 
     selects.forEach(id => { 
@@ -260,3 +260,17 @@ function init() {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', init);
+
+// ============================================================================
+// MASAÜSTÜ UYGULAMA DAVRANIŞ: sağ tık, metin seçimi, kopyala/yapıştır engelle
+// ============================================================================
+
+document.addEventListener('contextmenu', (e) => {
+    // Input/textarea içinde sağ tık serbest (kullanıcı yazı düzenleyebilir)
+    if (e.target.matches('input, textarea, select')) return;
+    e.preventDefault();
+});
+
+document.addEventListener('copy',  (e) => { if (!e.target.matches('input, textarea')) e.preventDefault(); });
+document.addEventListener('cut',   (e) => { if (!e.target.matches('input, textarea')) e.preventDefault(); });
+document.addEventListener('paste',  (e) => { if (!e.target.matches('input, textarea')) e.preventDefault(); });
