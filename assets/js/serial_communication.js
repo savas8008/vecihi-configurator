@@ -781,7 +781,7 @@ function handleStatusResponse(command, result, data) {
         case 'PINS_SAVE':
             if (result === 'completed') {
                 log('✅ Pin ayarları kaydedildi, cihaz yeniden başlatılıyor...', 'success');
-                showModal('Pin Kaydedildi', 'Pin ayarları başarıyla kaydedildi.\nCihaz yeniden başlatılıyor — bağlantı otomatik kurulacak.', 'success');
+                showModal('Pin Kaydedildi', 'Pin ayarları başarıyla kaydedildi.\nCihaz yeniden başlatılıyor — bağlantı otomatik kurulacak.', 'success', 4000);
                 initiateReconnect();
             } else {
                 log(`❌ Pin kayıt hatası: ${result}`, 'error');
