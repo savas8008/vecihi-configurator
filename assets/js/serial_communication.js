@@ -107,6 +107,17 @@ function handleCommandKeypress(event) {
     }
 }
 
+// === DONANIM DISCONNECT EVENT ===
+// reader.read() Chrome'da fiziksel disconnect'te takılı kalabiliyor.
+// navigator.serial 'disconnect' eventi her zaman güvenilir şekilde tetiklenir.
+if (navigator.serial) {
+    navigator.serial.addEventListener('disconnect', (event) => {
+        if (port && event.target === port) {
+            handleDisconnect();
+        }
+    });
+}
+
 // === BAĞLANTI FONKSİYONLARI ===
 
 /**
@@ -136,8 +147,9 @@ async function connectSerial() {
         clearTimeout(postConnectDataTimer);
         postConnectDataTimer = setTimeout(() => {
             if (isConnected) {
-                log('⚠️ Cihazdan 10 saniye veri gelmedi — uçuş modunda olabilir', 'warning');
-                handleDisconnect();
+                log('⚠️ 10 saniye veri gelmedi — ESP uçuş modunda', 'warning');
+                showFlightModeWarning();
+                handleDisconnect(true);
             }
         }, 10000);
 
@@ -222,8 +234,9 @@ function disconnectSerial() {
 
 /**
  * @brief Bağlantı kesildiğinde portları ve UI'ı temizler
+ * @param {boolean} skipWarning - true ise kopuş modalı gösterilmez (çağıran zaten gösterdi)
  */
-function handleDisconnect() {
+function handleDisconnect(skipWarning = false) {
     const wasUnexpected = isConnected && !userInitiatedDisconnect;
     isConnected = false;
     userInitiatedDisconnect = false;
@@ -244,14 +257,14 @@ function handleDisconnect() {
     updateConnectionStatus();
     log('🔌 Bağlantı kesildi', 'warning');
 
-    // Beklenmedik bağlantı kesilmesi → restart mi yoksa beklenmedik kopma mı?
     if (wasUnexpected) {
         if (pendingReconnect) {
             pendingReconnect = false;
             clearTimeout(pendingReconnectTimer);
             attemptAutoReconnect();
-        } else {
-            showFlightModeWarning();
+        } else if (!skipWarning) {
+            // Ani kopuş (USB çekildi vb.) — sadece log, büyük modal gösterme
+            log('⚠️ Beklenmedik bağlantı kopması', 'warning');
         }
     }
 }
@@ -263,8 +276,20 @@ function setPendingReconnect() {
     pendingReconnect = true;
     clearTimeout(pendingReconnectTimer);
     pendingReconnectTimer = setTimeout(() => {
-        pendingReconnect = false; // Restart gelmedi (örn. protokol değişmedi)
+        pendingReconnect = false;
     }, 6000);
+}
+
+/**
+ * @brief ESP.restart() sonrası yeniden bağlanma akışını başlatır.
+ * USB-serial köprüsü (CP2102/CH340) restart'ta bağlı kaldığı için
+ * disconnect eventi gelmez — JS bağlantıyı kendisi keser.
+ */
+function initiateReconnect(delayMs = 400) {
+    setPendingReconnect();
+    setTimeout(() => {
+        if (isConnected) handleDisconnect(); // wasUnexpected=true → attemptAutoReconnect()
+    }, delayMs);
 }
 
 /**
@@ -303,8 +328,9 @@ async function attemptAutoReconnect() {
             clearTimeout(postConnectDataTimer);
             postConnectDataTimer = setTimeout(() => {
                 if (isConnected) {
-                    log('⚠️ Yeniden bağlantıda veri gelmedi — uçuş modunda olabilir', 'warning');
-                    handleDisconnect();
+                    log('⚠️ Yeniden bağlantıda veri gelmedi — ESP uçuş moduna geçmiş', 'warning');
+                    showFlightModeWarning();
+                    handleDisconnect(true);
                 }
             }, 10000);
 
@@ -385,16 +411,14 @@ function hideReconnectOverlay() {
 function showFlightModeWarning() {
     if (typeof showModal !== 'function') return;
     showModal(
-        '⚠️ Bağlantı Kesildi',
+        '✈️ ESP Uçuş Modunda',
         `<div style="line-height:1.7">
-            <p><strong>Cihaz bağlantısı beklenmedik şekilde kesildi.</strong></p>
-            <p>Ayar kaydettiyseniz cihaz yeniden başlamış ve <strong>uçuş moduna</strong> geçmiş olabilir.
-               Uçuş modunda konfiguratör kullanılamaz.</p>
+            <p>ESP yanıt vermiyor — konfiguratör bağlantısı kurulmadan <strong>uçuş moduna</strong> geçmiş.</p>
             <hr style="border-color:#ffffff30">
             <p class="mb-1"><strong>Yeniden bağlanmak için:</strong></p>
             <ol class="text-start mb-0" style="padding-left:1.2em">
-                <li>USB fişini çıkarın</li>
-                <li>Varsa batarya fişini de çıkarın ve geri takın</li>
+                <li>USB kablosunu çıkarın</li>
+                <li>Varsa batarya fişini de çıkarıp takın</li>
                 <li>USB'yi tekrar takın</li>
                 <li><strong>10 saniye içinde</strong> "Porta Bağlan" butonuna tıklayın</li>
             </ol>
@@ -469,6 +493,10 @@ function handleStandardJsonData(data) {
         const isSystemReady = sensors.gyro && sensors.accel;
         // Herhangi bir sensör eksik mi?
         const hasMissingSensor = !sensors.gyro || !sensors.accel || !sensors.baro || !sensors.gps;
+
+        // GPS donanım durumunu global'e yaz — flight modes disabled/enabled için kaynak
+        window.gpsAvailable = !!sensors.gps;
+        if (typeof updateNavModesGpsState === 'function') updateNavModesGpsState(!!sensors.gps);
 
         if (isSystemReady) {
             if (hasMissingSensor) {
@@ -750,11 +778,21 @@ function handleStatusResponse(command, result, data) {
             }
             break;
             
+        case 'PINS_SAVE':
+            if (result === 'completed') {
+                log('✅ Pin ayarları kaydedildi, cihaz yeniden başlatılıyor...', 'success');
+                showModal('Pin Kaydedildi', 'Pin ayarları başarıyla kaydedildi.\nCihaz yeniden başlatılıyor — bağlantı otomatik kurulacak.', 'success');
+                initiateReconnect();
+            } else {
+                log(`❌ Pin kayıt hatası: ${result}`, 'error');
+                showModal('Hata', `Pin kayıt sırasında hata: ${result}`, 'error');
+            }
+            break;
+
         case 'OUTPUT_SAVE':
             if (result === 'completed') {
                 log('✅ Çıkış ayarları kaydedildi, cihaz yeniden başlatılıyor...', 'success');
-                // Pin değişimi → her zaman restart → otomatik yeniden bağlan
-                setPendingReconnect();
+                initiateReconnect();
             } else {
                 log(`❌ Çıkış kayıt hatası: ${result}`, 'error');
                 showModal('Hata', `Kayıt sırasında hata oluştu: ${result}`, 'error');
@@ -764,14 +802,14 @@ function handleStatusResponse(command, result, data) {
         case 'CFG_RESET':
             if (result === 'completed') {
                 log('✅ Fabrika ayarlarına sıfırlandı, cihaz yeniden başlatılıyor...', 'success');
-                setPendingReconnect();
+                initiateReconnect();
             }
             break;
 
         case 'SAVE_SENSOR_ALIGN':
             if (result === 'completed') {
                 log('✅ Sensör hizalaması kaydedildi, cihaz yeniden başlatılıyor...', 'success');
-                setPendingReconnect();
+                initiateReconnect();
             } else {
                 log(`❌ Sensör hizalama hatası: ${result}`, 'error');
                 showModal('Hata', `Kayıt sırasında hata oluştu: ${result}`, 'error');

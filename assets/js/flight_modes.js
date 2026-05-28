@@ -20,25 +20,25 @@
  */
 const modeDefinitions = [
     // --- GÜVENLİK (SAFETY) ---
-    { key: 'arm', name: 'ARM (Motor Kilidi)', cat: 'safety', defaultMin: 1800, defaultMax: 2100, defaultCh: 5 },
+    { key: 'arm',         name: 'ARM (Motor Kilidi)',           cat: 'safety', colorRgb: '220,38,38',   defaultMin: 1800, defaultMax: 2100, defaultCh: 5 },
 
     // --- UÇUŞ MODLARI (FLIGHT MODES) - Genelde 3'lü Switch ---
-    { key: 'manual', name: 'MANUAL (Passthrough)', cat: 'flight', defaultMin: 900, defaultMax: 1300, defaultCh: 0 },
-    { key: 'angle', name: 'ANGLE (Stabilize)', cat: 'flight', defaultMin: 1301, defaultMax: 1700, defaultCh: 0 },
-    { key: 'horizon', name: 'HORIZON', cat: 'flight', defaultMin: 1701, defaultMax: 2100, defaultCh: 0 },
-    { key: 'acro', name: 'ACRO (Rate)', cat: 'flight', defaultMin: 900, defaultMax: 900, defaultCh: 0 },
+    { key: 'manual',      name: 'MANUAL (Passthrough)',         cat: 'flight', colorRgb: '100,116,139', defaultMin: 900,  defaultMax: 1300, defaultCh: 0 },
+    { key: 'angle',       name: 'ANGLE (Stabilize)',            cat: 'flight', colorRgb: '14,165,233',  defaultMin: 1301, defaultMax: 1700, defaultCh: 0 },
+    { key: 'horizon',     name: 'HORIZON',                      cat: 'flight', colorRgb: '56,189,248',  defaultMin: 1701, defaultMax: 2100, defaultCh: 0 },
+    { key: 'acro',        name: 'ACRO (Rate)',                  cat: 'flight', colorRgb: '249,115,22',  defaultMin: 900,  defaultMax: 900,  defaultCh: 0 },
 
     // --- NAVİGASYON (NAV MODES) - Yüksek Öncelik ---
-    { key: 'rth', name: 'RTH (Eve Dön)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
-    { key: 'waypoint', name: 'WAYPOINT', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
-    { key: 'land_assist', name: 'LAND ASSIST (İniş Asistanı)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
-    { key: 'gcs', name: 'GCS KONTROL (Yer İstasyonu)', cat: 'nav', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'rth',         name: 'RTH (Eve Dön)',                cat: 'nav',    requiresGps: true,  colorRgb: '16,185,129',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'waypoint',    name: 'WAYPOINT',                     cat: 'nav',    requiresGps: true,  colorRgb: '0,161,38',    defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'land_assist', name: 'LAND ASSIST (İniş Asistanı)', cat: 'nav',    requiresGps: true,  colorRgb: '234,179,8',   defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'gcs',         name: 'GCS KONTROL (Yer İstasyonu)', cat: 'nav',    requiresGps: true,  colorRgb: '168,85,247',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'cruise',      name: 'CRUISE',                       cat: 'nav',    requiresGps: false, colorRgb: '99,102,241',  defaultMin: 1500, defaultMax: 1700, defaultCh: 0 },
+    { key: 'althold',     name: 'ALTITUDE HOLD',                cat: 'nav',    requiresGps: false, colorRgb: '6,182,212',   defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
 
     // --- ASİSTANLAR (ASSIST) - Eklenebilir ---
-    { key: 'cruise', name: 'CRUISE', cat: 'assist', defaultMin: 1500, defaultMax: 1700, defaultCh: 0 },
-    { key: 'althold', name: 'ALTITUDE HOLD', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
-    { key: 'autotune', name: 'AUTO TUNE', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
-    { key: 'flaperon', name: 'FLAPERON', cat: 'assist', defaultMin: 1800, defaultMax: 2100, defaultCh: 0 }
+    { key: 'autotune',    name: 'AUTO TUNE',                    cat: 'assist', colorRgb: '244,63,94',   defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'flaperon',    name: 'FLAPERON',                     cat: 'assist', colorRgb: '251,146,60',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 }
 ];
 
 // ============================================================================
@@ -127,10 +127,10 @@ function renderModesPage() {
     wrapper.innerHTML = '';
 
     const categories = {
-        'safety': { title: '⚠️ Güvenlik & Sistem', icon: 'bi-shield-check' },
-        'nav': { title: '🛰️ Navigasyon & Otonom & GCS', icon: 'bi-geo-alt' },
-        'flight': { title: '✈️ Temel Uçuş Modları', icon: 'bi-joystick' },
-        'assist': { title: '🛠️ Asistanlar', icon: 'bi-magic' }
+        'safety': { title: '⚠️ Güvenlik & Sistem',          icon: 'bi-shield-check' },
+        'flight': { title: '✈️ Temel Uçuş Modları',          icon: 'bi-joystick'    },
+        'nav':    { title: '🛰️ Navigasyon & Otonom & GCS',   icon: 'bi-geo-alt'     },
+        'assist': { title: '🛠️ Asistanlar',                  icon: 'bi-magic'       }
     };
 
     Object.keys(categories).forEach(catKey => {
@@ -138,8 +138,9 @@ function renderModesPage() {
         const catModes = modeDefinitions.filter(m => m.cat === catKey);
         if (catModes.length === 0) return;
 
-        let html = `<div class="col-12"><div class="panel4 mb-1">`;
+        let html = `<div class="col-12"><div class="panel4 mb-1 mode-cat-${catKey}">`;
         html += `<div class="mode-category-title"><i class="bi ${catConfig.icon}"></i> ${catConfig.title}</div>`;
+        html += `<div class="row g-3">`;
 
         catModes.forEach(def => {
             const savedData = activeFlightModes[def.key] || {};
@@ -150,18 +151,18 @@ function renderModesPage() {
             const max = savedData.max !== undefined ? savedData.max : def.defaultMax;
 
             html += `
+            <div class="col-12 col-sm-6">
             <div class="mode-card panel4" id="card-${def.key}" data-key="${def.key}">
                 <div class="mode-header-row">
                     <span class="mode-name">${def.name}</span>
                     <select class="mode-channel-select" id="ch-${def.key}" onchange="updateModeUI('${def.key}')">
                         <option value="0" ${channel === 0 ? 'selected' : ''}>DEVRE DIŞI</option>
-                        
-                        ${Array.from({length: 12}, (_, i) => { 
-                            const chNum = i + 5; // Kanal 5'ten başla (AUX 1)
-                            const auxNum = i + 1; 
+
+                        ${Array.from({length: 12}, (_, i) => {
+                            const chNum = i + 5;
                             return `<option value="${chNum}" ${chNum === channel ? 'selected' : ''}>CH ${chNum}</option>`;
                         }).join('')}
-                        
+
                     </select>
                 </div>
 
@@ -178,19 +179,52 @@ function renderModesPage() {
                     <span id="label-${def.key}">Aralık: ${min} - ${max}</span>
                     <span>2100</span>
                 </div>
+            </div>
             </div>`;
         });
 
-        html += `</div></div>`;
+        html += `</div></div></div>`;
         wrapper.innerHTML += html;
     });
 
     // UI'ı güncelle
     modeDefinitions.forEach(def => updateModeUI(def.key));
+
+    // GPS durumu zaten biliniyorsa uygula
+    if (typeof window.gpsAvailable !== 'undefined') {
+        updateNavModesGpsState(window.gpsAvailable);
+    }
 }
 
 // Global erişim için
 window.renderModesPage = renderModesPage;
+
+// ============================================================================
+// GPS DURUM FONKSİYONU
+// ============================================================================
+
+/**
+ * @brief GPS yoksa requiresGps:true olan nav modlarını disabled yapar
+ * @param {boolean} hasGps - GPS fix var mı?
+ */
+function updateNavModesGpsState(hasGps) {
+    window.gpsAvailable = hasGps;
+    modeDefinitions.filter(m => m.requiresGps).forEach(def => {
+        const card    = document.getElementById(`card-${def.key}`);
+        const chSel   = document.getElementById(`ch-${def.key}`);
+        const minSldr = document.getElementById(`min-${def.key}`);
+        const maxSldr = document.getElementById(`max-${def.key}`);
+        if (!card) return;
+        if (hasGps) {
+            card.classList.remove('mode-card-disabled');
+            [chSel, minSldr, maxSldr].forEach(el => { if (el) el.disabled = false; });
+        } else {
+            card.classList.add('mode-card-disabled');
+            [chSel, minSldr, maxSldr].forEach(el => { if (el) el.disabled = true; });
+        }
+    });
+}
+window.updateNavModesGpsState = updateNavModesGpsState;
 
 // ============================================================================
 // UI GÜNCELLEME FONKSİYONLARI

@@ -48,13 +48,13 @@
        .panel3 → En iç içerik kartı
        Değiştirmek için sadece bu değişkenleri güncelleyin.
     ========================================= */
-    --bg-panel:   rgba(8, 47, 102, 0.9);    /* Dış: koyu lacivert */
-    --bg-panel-2: rgba(16, 17, 48, 0.9);     /* Orta: biraz açık çelik mavi */
-    --bg-panel-3: rgba(13, 29, 81, 0.9);   /* İç: hafif aydınlık çelik mavi */
-    --bg-panel-pin: rgba(5, 50, 48, 0.92); /* Pin paneli: koyu teal — donanım bağlantısı */
+    --bg-panel:   rgba(12, 115, 150, 0.9);    /* Dış: koyu lacivert */
+    --bg-panel-2: rgba(85, 88, 141, 0.9);    /* Orta: biraz açık çelik mavi */
+    --bg-panel-3:rgba(85, 88, 141, 0.9);   /* İç: hafif aydınlık çelik mavi */
+    --bg-panel-pin: rgba(255, 193, 117, 0.92); /* Pin paneli: color5 şeftali — donanım bağlantısı */
     --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
 
-    --bg-panel-solid: #dbe0e8;
+    --bg-panel-solid:;  
     --bg-input: rgba(10, 20, 35, 0.85);      /* Input: koyu şeffaf */
     --bg-hover: rgba(255, 255, 255, 0.06);
     
@@ -154,9 +154,17 @@
     box-sizing: border-box;
 }
 
+/* Input alanlarında seçim/düzenleme serbest */
+input, textarea, select, [contenteditable] {
+    user-select: text;
+    -webkit-user-select: text;
+}
+
 body {
     margin: 0;
     padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
     background-color: var(--bg-body);
     background-image: var(--bg-body-gradient);
     color: var(--text-primary);
@@ -267,11 +275,81 @@ a:hover {
 /* Pin bağlantı panelleri — tüm sayfalarda tutarlı donanım rengi */
 .pin-panel {
     background: var(--bg-panel-pin) !important;
-    border-color: rgba(20, 180, 160, 0.35) !important;
+    border-color: rgba(253, 57, 83, 0.40) !important;
 }
 .pin-panel .t-baslik,
 .pin-panel .panel-title { color: #5dd8cc !important; }
 .pin-panel .port-label  { color: #8ee8e0 !important; }
+
+/* === PIN AKORDEON PANELLERİ === */
+.pin-acc-wrap {
+    background: var(--bg-panel-pin);
+    border: 1px solid rgba(253, 57, 83, 0.40);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.pin-acc-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--bg-panel-pin);
+}
+.pin-acc-header:hover { filter: brightness(1.08); }
+.pin-acc-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #0d1f2d;
+}
+.pin-acc-chevron {
+    color: #0d1f2d;
+    font-size: 0.9rem;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+}
+.pin-acc-header.open .pin-acc-chevron { transform: rotate(180deg); }
+.pin-acc-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.pin-badge {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #0d1f2d;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 3px;
+    padding: 1px 5px;
+}
+.pin-badge.disabled { opacity: 0.5; }
+.pin-acc-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.2s ease;
+    padding: 0 14px;
+    background: rgba(8, 22, 32, 0.97);
+}
+.pin-acc-body.open {
+    max-height: 700px;
+    padding: 12px 14px;
+}
+.pin-reboot-warning {
+    background: rgba(253, 57, 83, 0.15);
+    border: 1px solid rgba(253, 57, 83, 0.35);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    color: #fde68a;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+}
+.pin-reboot-warning i { margin-right: 6px; }
+.pin-acc-body .port-label { color: #8ee8e0 !important; font-size: 0.78rem; }
+.pin-acc-body .text-info  { color: #5dd8cc !important; font-size: 0.68rem !important; }
 
 /* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
 .panel4 {
@@ -2310,10 +2388,6 @@ label.small.text-muted,
     margin: 0 auto;
     padding: 20px 22px !important;
     border-radius: 18px;
-    background:
-        radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 32%),
-        linear-gradient(145deg, rgba(14, 32, 92, 0.96), rgba(19, 35, 96, 0.92)) !important;
-    border: 1px solid rgba(123, 172, 255, 0.18) !important;
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
 }
 
@@ -2360,29 +2434,20 @@ label.small.text-muted,
     gap: 6px;
     min-height: 104px;
     padding: 16px 18px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    background: var(--bg-panel-2);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
     color: #eff6ff !important;
     text-decoration: none;
-    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .prompt-link-tile:hover {
     transform: translateY(-2px);
-    border-color: rgba(143, 220, 255, 0.28);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
-}
-
-.prompt-link-doc {
-    background: linear-gradient(145deg, rgba(255, 107, 107, 0.16), rgba(255, 107, 107, 0.08));
-}
-
-.prompt-link-guide {
-    background: linear-gradient(145deg, rgba(16, 185, 129, 0.18), rgba(56, 189, 248, 0.08));
-}
-
-.prompt-link-video {
-    background: linear-gradient(145deg, rgba(77, 124, 255, 0.16), rgba(56, 189, 248, 0.08));
+    border-color: var(--border-default);
+    box-shadow: var(--shadow-sm);
 }
 
 .prompt-link-label {
