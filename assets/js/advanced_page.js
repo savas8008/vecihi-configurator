@@ -11,7 +11,8 @@
 
 let advancedConfig = {
     filters: { 
-        gyro_lpf_beta: 0.2, 
+        gyro_lpf_hz: 40.0, 
+        acc_lpf_hz: 10.0,
         rpm_min_freq: 100, 
         rpm_max_freq: 400, 
         rpm_bw_percent: 0.2 
@@ -189,7 +190,8 @@ function updateAdvancedUI() {
     // --- Filters ---
     if (advancedConfig.filters) {
         const f = advancedConfig.filters;
-        setVal("inp_gyro_beta", f.gyro_lpf_beta);
+        setVal("inp_gyro_hz", f.gyro_lpf_hz);
+        setVal("inp_acc_lpf_hz", f.acc_lpf_hz);
         setVal("inp_rpm_min_freq", f.rpm_min_freq);
         setVal("inp_rpm_max_freq", f.rpm_max_freq);
         setVal("inp_rpm_bw_percent", f.rpm_bw_percent);
@@ -375,7 +377,8 @@ function saveAdvancedConfig() {
 
     // -------- Filters --------
     const filters = {};
-    setIf(filters, "gyro_lpf_beta", num("inp_gyro_beta"));
+    setIf(filters, "gyro_lpf_hz", num("inp_gyro_hz"));
+    setIf(filters, "acc_lpf_hz", num("inp_acc_lpf_hz"));
     setIf(filters, "rpm_min_freq", num("inp_rpm_min_freq"));
     setIf(filters, "rpm_max_freq", num("inp_rpm_max_freq"));
     setIf(filters, "rpm_bw_percent", num("inp_rpm_bw_percent"));
@@ -581,7 +584,7 @@ function toggleWpSection(bodyId) {
 }
 
 /**
- * @brief Kamikaze varsayılan değerlerini döndür (HTML input'larından)
+ * @brief Kamikaze varsayılan değerlerini döndür (HTML input'lardan)
  */
 function getKamikazeDefaults() {
     const getNum = (id, def) => { const el = document.getElementById(id); return el ? (parseFloat(el.value) || def) : def; };
@@ -620,7 +623,7 @@ window.toggleWpSection = toggleWpSection;
 window.applyKamikazeDefaults = applyKamikazeDefaults;
 window.getKamikazeDefaults = getKamikazeDefaults;
 
-// advancedConfig'i dışarıdan erişilebilir yap
+// advancedConfig'i dışardan erişilebilir yap
 window.advancedConfig = advancedConfig;
 
 function initThrottleUI() {
