@@ -473,6 +473,13 @@ function saveMixerConfig() {
         return (isNaN(v) || v < -200 || v > 200) ? def : v;
     };
 
+    for (let i = 1; i <= 4; i++) {
+        const checkbox = _$(`revServo${i}`);
+        if (servoValues[`servo${i}`] && checkbox) {
+            servoValues[`servo${i}`].reverse = checkbox.checked;
+        }
+    }
+
     const payload = {
         aircraft_type: selectedAircraft,
         mixer: {
@@ -480,7 +487,8 @@ function saveMixerConfig() {
             pitch_mix:    getMixVal('mixPitch', 100),
             yaw_mix:      getMixVal('mixYaw', 100),
             throttle_mix: getMixVal('mixThrottle', 100),
-        }
+        },
+        servo_values: servoValues,
     };
     _log('📤 Mikser ayarları gönderiliyor...', 'info');
     if (typeof sendCommand === 'function') {

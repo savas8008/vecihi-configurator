@@ -257,7 +257,6 @@ function savePageData(page) {
             return;
 
         case 'mixer':
-            savePinsConfig();
             saveMixerConfig();
             resetSaveButton(btn, 2000);
             return;

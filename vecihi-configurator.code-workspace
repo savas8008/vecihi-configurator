@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "vecihi",
+			"path": "../vecihi"
+		}
+	],
+	"settings": {}
+}
