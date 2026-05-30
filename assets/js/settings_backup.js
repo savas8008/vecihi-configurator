@@ -310,13 +310,14 @@ function _flattenConfig(s) {
         if (o.flaperon_offset !== undefined) push('out.flaperon_offset', o.flaperon_offset);
     }
 
-    // --- GELİŞMİŞ ---
+    // --- GELİŞMEŞ ---
     if (s.advanced) {
         const a = s.advanced;
 
         if (a.filters) {
             const f = a.filters;
-            push('adv.filters.gyro_lpf_beta',  f.gyro_lpf_beta);
+            push('adv.filters.gyro_lpf_hz',    f.gyro_lpf_hz);
+            push('adv.filters.acc_lpf_hz',     f.acc_lpf_hz);
             push('adv.filters.rpm_min_freq',   f.rpm_min_freq);
             push('adv.filters.rpm_max_freq',   f.rpm_max_freq);
             push('adv.filters.rpm_bw_percent', f.rpm_bw_percent);
