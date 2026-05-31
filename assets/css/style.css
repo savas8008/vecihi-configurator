@@ -399,7 +399,7 @@ a:hover {
 .panel4 .form-control,
 .panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
 .panel4 .form-control:focus,
-.panel4 .form-select:focus  { background-color: var(--bg-input) !important; color: var(--text-primary) !important; border-color: var(--color-primary) !important; }
+.panel4 .form-select:focus  { background-color: #ffffff !important; color: #111111 !important; border-color: var(--color-primary) !important; }
 
 /* PID kutuları — panel4 metin renkleri */
 .panel4 .pid-label          { color: #333333 !important; }
@@ -1725,8 +1725,7 @@ input[type="range"]::-moz-range-thumb {
     }
 
     #connectionPrompt {
-        padding: 1rem 0;
-        align-items: stretch !important;
+        padding: 0;
     }
 
     #connectionPrompt .inner-row {
@@ -1851,7 +1850,7 @@ input[type="range"]::-moz-range-thumb {
     }
 
     #connectionPrompt {
-        padding: 0.75rem 0;
+        padding: 0;
     }
 
     #connectionPrompt .inner-row {
@@ -2134,10 +2133,8 @@ label.small.text-muted,
 
 /* Bağlantı Penceresi Garantisi */
 #connectionPrompt {
-    display: flex !important; /* Varsayılan olarak göster */
-    align-items: center !important;
-    justify-content: center !important;
-    padding: var(--spacing-xl) 0;
+    display: block !important;
+    padding: 0;
 }
 
 #connectionPrompt .prompt-card {
@@ -2743,4 +2740,234 @@ label.small.text-muted,
     box-shadow: 0 0 22px rgba(251, 191, 36, 0.65), 0 4px 14px rgba(0,0,0,0.3);
     transform: translateY(-1px);
     color: #1f2937 !important;
+}
+
+/* ============================================
+   OFFLINE SIDEBAR SECTION LABEL
+   ============================================ */
+
+.sidebar-section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #475569;
+    text-transform: uppercase;
+    padding: 14px 8px 4px;
+    list-style: none;
+    user-select: none;
+}
+
+/* Offline sayfalar: tam panel içinde padding ile */
+.page-offline {
+    padding: 8px 4px;
+}
+
+/* ============================================
+   KML CONVERTER
+   ============================================ */
+
+.kml-converter-card {
+    border-top: 2px solid rgba(74, 222, 128, 0.25);
+}
+
+.kml-icon-box {
+    background: rgba(74, 222, 128, 0.12) !important;
+    border: 1.5px solid rgba(74, 222, 128, 0.25);
+}
+
+/* Dosya bırakma alanı */
+.kml-drop-zone {
+    border: 2px dashed rgba(74, 222, 128, 0.35);
+    border-radius: 14px;
+    padding: 36px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    background: rgba(74, 222, 128, 0.04);
+    margin-top: 16px;
+}
+
+.kml-drop-zone:hover,
+.kml-drop-hover {
+    background: rgba(74, 222, 128, 0.10) !important;
+    border-color: rgba(74, 222, 128, 0.65) !important;
+}
+
+.kml-drop-icon {
+    font-size: 2.4rem;
+    color: rgba(74, 222, 128, 0.7);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.kml-drop-text {
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    margin: 0 0 4px;
+    font-weight: 500;
+}
+
+.kml-drop-hint {
+    color: #64748b;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+/* Hata kutusu */
+.kml-error-box {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #fca5a5;
+    font-size: 0.88rem;
+    margin-top: 14px;
+}
+
+/* Harita önizleme */
+.kml-map-preview {
+    height: 320px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 16px;
+    border: 1.5px solid rgba(255,255,255,0.08);
+}
+
+/* İstatistik grid */
+.kml-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.kml-stat-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.kml-stat-label {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.kml-stat-val {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Mod renk açıklaması */
+.kml-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.kml-leg-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    background: rgba(255,255,255,0.05);
+    padding: 3px 9px 3px 6px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.kml-leg-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Eylem butonları */
+.kml-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.kml-btn-download {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #fff !important;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.35);
+}
+.kml-btn-download:hover {
+    background: linear-gradient(135deg, #1e40af, #1d4ed8);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(37,99,235,0.5);
+}
+
+.kml-btn-earth {
+    background: linear-gradient(135deg, #15803d, #16a34a);
+    color: #fff !important;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.35);
+}
+.kml-btn-earth:hover {
+    background: linear-gradient(135deg, #166534, #15803d);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(22,163,74,0.5);
+}
+
+.kml-btn-reset {
+    background: rgba(255,255,255,0.07);
+    color: #94a3b8 !important;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    transition: all 0.18s;
+}
+.kml-btn-reset:hover {
+    background: rgba(255,255,255,0.12);
+    color: #e2e8f0 !important;
+}
+
+/* Google Earth ipucu */
+.kml-ge-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+    background: rgba(14, 165, 233, 0.10);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 0.84rem;
+    color: #7dd3fc;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 575px) {
+    .kml-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .kml-map-preview { height: 240px; }
+    .kml-actions { flex-direction: column; }
+    .kml-btn-download,
+    .kml-btn-earth,
+    .kml-btn-reset { width: 100%; text-align: center; }
 }

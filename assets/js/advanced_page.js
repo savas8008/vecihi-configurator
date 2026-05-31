@@ -10,16 +10,19 @@
 // === GLOBAL DEĞİŞKENLER ===
 
 let advancedConfig = {
-    filters: { 
-        gyro_lpf_beta: 0.2, 
-        rpm_min_freq: 100, 
-        rpm_max_freq: 400, 
-        rpm_bw_percent: 0.2 
+    filters: {
+        gyro_lpf_hz: 60,
+        rpm_filter_enabled: true,
+        gyro_lpf_enabled: true,
+        rpm_min_freq: 100,
+        rpm_max_freq: 400,
+        rpm_bw_percent: 0.2
     },
-    mahony: { 
-        kp: 2.0, 
-        ki: 0.05, 
-        centrifugal_fade: 20.0 
+    mahony: {
+        kp: 2.0,
+        ki: 0.05,
+        accel_lpf_hz: 3.0,
+        centrifugal_fade: 20.0
     },
     nav: { 
         // Temel Ayarlar
@@ -189,7 +192,9 @@ function updateAdvancedUI() {
     // --- Filters ---
     if (advancedConfig.filters) {
         const f = advancedConfig.filters;
-        setVal("inp_gyro_beta", f.gyro_lpf_beta);
+        setChk("inp_gyro_lpf_enabled", f.gyro_lpf_enabled);
+        setVal("inp_gyro_lpf_hz", f.gyro_lpf_hz);
+        setChk("inp_rpm_filter_enabled", f.rpm_filter_enabled);
         setVal("inp_rpm_min_freq", f.rpm_min_freq);
         setVal("inp_rpm_max_freq", f.rpm_max_freq);
         setVal("inp_rpm_bw_percent", f.rpm_bw_percent);
@@ -199,6 +204,7 @@ function updateAdvancedUI() {
     if (advancedConfig.mahony) {
         setVal("inp_mahony_kp", advancedConfig.mahony.kp);
         setVal("inp_mahony_ki", advancedConfig.mahony.ki);
+        setVal("inp_accel_lpf_hz", advancedConfig.mahony.accel_lpf_hz);
     }
 
     // --- Nav ---
@@ -375,7 +381,9 @@ function saveAdvancedConfig() {
 
     // -------- Filters --------
     const filters = {};
-    setIf(filters, "gyro_lpf_beta", num("inp_gyro_beta"));
+    setIf(filters, "gyro_lpf_enabled", bool("inp_gyro_lpf_enabled"));
+    setIf(filters, "gyro_lpf_hz", num("inp_gyro_lpf_hz"));
+    setIf(filters, "rpm_filter_enabled", bool("inp_rpm_filter_enabled"));
     setIf(filters, "rpm_min_freq", num("inp_rpm_min_freq"));
     setIf(filters, "rpm_max_freq", num("inp_rpm_max_freq"));
     setIf(filters, "rpm_bw_percent", num("inp_rpm_bw_percent"));
@@ -385,6 +393,7 @@ function saveAdvancedConfig() {
     const mahony = {};
     setIf(mahony, "kp", num("inp_mahony_kp"));
     setIf(mahony, "ki", num("inp_mahony_ki"));
+    setIf(mahony, "accel_lpf_hz", num("inp_accel_lpf_hz"));
     if (Object.keys(mahony).length) cfg.mahony = mahony;
 
     // -------- Nav --------

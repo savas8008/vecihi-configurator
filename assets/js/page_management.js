@@ -23,16 +23,27 @@ const loadingTimeouts = {};
  * @param {string} targetPage - Hedef sayfa adı
  */
 function changePage(targetPage) {
+    // "home" → bağlan ekranına dön (offline sayfa yok)
+    if (targetPage === 'home') {
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const homeLink = document.querySelector('.nav-link[data-page="home"]');
+        if (homeLink) homeLink.classList.add('active');
+        currentPage = '';
+        updateConnectionStatus();
+        return;
+    }
+
     // 1. UI Güncellemeleri
     document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    
+
     const activeLink = document.querySelector(`.nav-link[data-page="${targetPage}"]`);
     if (activeLink) activeLink.classList.add('active');
-    
-    const targetPageEl = $(targetPage);
+
+    const targetPageEl = $(targetPage + 'Page') || $(targetPage);
     if (targetPageEl) targetPageEl.classList.add('active');
-    
+
     currentPage = targetPage;
     updateConnectionStatus();
     
@@ -41,9 +52,15 @@ function changePage(targetPage) {
         managePageStreams(targetPage);
     }
 
-    // 3. Firmware sayfası bağlantısız da çalışır
+    // 3. Offline sayfa özel init'leri
     if (targetPage === 'firmware') {
         if (typeof initFirmwarePage === 'function') initFirmwarePage();
+    }
+    if (targetPage === 'kml') {
+        // Leaflet harita varsa invalidate
+        if (typeof _kmlMap !== 'undefined' && _kmlMap) {
+            setTimeout(() => _kmlMap.invalidateSize(), 150);
+        }
     }
 }
 
@@ -348,10 +365,13 @@ function updateConnectionStatus() {
         connected = true;
     }
 
+    // Offline sayfalar: bağlantısız da çalışır
+    const OFFLINE_PAGES = new Set(['kml', 'firmware', 'docs']);
+    const offlinePageActive = OFFLINE_PAGES.has(currentPage);
+
     // 2. Bağlantı durumu değişince otomatik sayfa yönlendir
-    // Firmware sayfası sadece kullanıcı tıkladığında görünmeli.
-    if (connected && currentPage === 'firmware') {
-        changePage('calibration');
+    if (connected && offlinePageActive) {
+        changePage('sensors');
         return;
     }
     if (connected && !currentPage) {
@@ -371,26 +391,15 @@ function updateConnectionStatus() {
     const btnDisconnect = el('btnDisconnect');
     if (btnDisconnect) btnDisconnect.classList.toggle('d-none', !connected);
     
-    // Connection Prompt: Firmware sayfasındayken veya bağlıyken gizle
+    // Connection Prompt: bağlantısız + offline sayfa seçili değilken göster
     const prompt = el('connectionPrompt');
     if (prompt) {
-        if (connected || currentPage === 'firmware') {
+        if (connected || offlinePageActive) {
             prompt.classList.add('d-none');
             prompt.style.setProperty('display', 'none', 'important');
         } else {
             prompt.classList.remove('d-none');
             prompt.style.setProperty('display', 'flex', 'important');
-        }
-    }
-
-    const helpPanel = el('connectionHelpPanel');
-    if (helpPanel) {
-        if (connected) {
-            helpPanel.classList.add('d-none');
-            helpPanel.style.setProperty('display', 'none', 'important');
-        } else {
-            helpPanel.classList.remove('d-none');
-            helpPanel.style.removeProperty('display');
         }
     }
 
@@ -403,15 +412,29 @@ function updateConnectionStatus() {
     const connStatus = el('connectionStatus');
     if (connStatus) connStatus.textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
 
-    // Navigasyon menüsü: Bağlantı durumuna göre göster/gizle
-    // - Bağlantı yok: sadece Firmware sekmesi görünür
-    // - Bağlı: Firmware gizli, diğer tüm sekmeler görünür
+    // Navigasyon menüsü: online↔offline görünürlük
     document.querySelectorAll('.nav-link').forEach(nav => {
         const navPage = nav.getAttribute('data-page');
-        if (navPage === 'firmware') {
-            // Firmware: yalnızca bağlantı yokken görünür
+        const isOfflineNav = nav.closest('.nav-offline') !== null
+                          || ['kml','firmware','docs'].includes(navPage);
+
+        if (isOfflineNav) {
+            // Offline öğeler: sadece bağlantısız iken
             nav.style.display = connected ? 'none' : '';
             if (!connected) {
+                nav.style.opacity = '1';
+                nav.style.pointerEvents = 'auto';
+                nav.style.cursor = 'pointer';
+                const isActive = navPage === currentPage
+                              || (navPage === 'home' && currentPage === '');
+                nav.classList.toggle('active', isActive);
+            } else {
+                nav.classList.remove('active');
+            }
+        } else {
+            // Online öğeler: sadece bağlıyken
+            nav.style.display = connected ? '' : 'none';
+            if (connected) {
                 nav.style.opacity = '1';
                 nav.style.pointerEvents = 'auto';
                 nav.style.cursor = 'pointer';
@@ -420,43 +443,40 @@ function updateConnectionStatus() {
             } else {
                 nav.classList.remove('active');
             }
-        } else {
-            // Diğer sekmeler: yalnızca bağlıyken görünür
-            nav.style.display = connected ? '' : 'none';
-            if (connected) {
-                nav.style.opacity = '1';
-                nav.style.pointerEvents = 'auto';
-                nav.style.cursor = 'pointer';
-                if (navPage === currentPage) nav.classList.add('active');
-            } else {
-                nav.classList.remove('active');
-            }
         }
     });
 
-    // Sol menü: bağlantı yokken tamamen gizle
-    const sidebarCol = document.querySelector('.sidebar')?.closest('.col-lg-2');
+    // Sol menü sütunu: her zaman görünür (bağlı/değil)
+    const sidebarCol = document.querySelector('.sidebar')?.closest('[id="sidebarCol"]')
+                    || document.querySelector('.sidebar')?.closest('.col-lg-2');
     if (sidebarCol) {
-        sidebarCol.style.display = connected ? '' : 'none';
+        sidebarCol.style.display = '';
     }
 
-    // Ana içerik sütunu: bağlantı yokken tüm genişliği al ve ortala
+    // Ana içerik sütunu: sidebar her zaman görünür olduğundan genişliği değiştirme
     const mainCol = document.querySelector('.col-lg-10.col-md-9');
     if (mainCol) {
-        if (!connected) {
-            mainCol.style.flex = '0 0 100%';
-            mainCol.style.maxWidth = '100%';
-            mainCol.style.margin = '0 auto';
-        } else {
-            mainCol.style.flex = '';
-            mainCol.style.maxWidth = '';
-            mainCol.style.margin = '';
-        }
+        mainCol.style.flex = '';
+        mainCol.style.maxWidth = '';
+        mainCol.style.margin = '';
     }
 
     // Sayfa görünürlüğü
     document.querySelectorAll('.page').forEach(page => {
+        const isOfflinePg = page.classList.contains('page-offline');
+
         if (!connected) {
+            // Bağlantısız: sadece aktif offline sayfayı göster
+            if (isOfflinePg && page.classList.contains('active')) {
+                page.style.display = 'block';
+            } else {
+                page.style.display = 'none';
+            }
+            return;
+        }
+
+        // Bağlı: offline sayfalar gizli, aktif online sayfa görünür
+        if (isOfflinePg) {
             page.style.display = 'none';
             return;
         }

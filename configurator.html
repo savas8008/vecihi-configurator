@@ -42,6 +42,7 @@
 <script src="assets/js/flight_modes.js"></script>
 <script src="assets/js/outputs_page.js"></script>
 <script src="assets/js/settings_backup.js"></script>
+<script src="assets/js/kml_converter.js"></script>
     <link rel="stylesheet" href="assets/css/style.css"> 
     <style>
     /* OSD ve diÄŸer Ã¶zel stiller */
@@ -138,9 +139,6 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="d-flex align-items-center justify-content-md-end gap-3">
-                        <button class="btn btn-ground-control" id="btnGroundControl" type="button" title="Yer kontrol sayfasını yeni sekmede aç">
-                            <i class="bi bi-broadcast-pin me-1"></i> Yer Kontrol
-                        </button>
                         <div class="connection-status"  style="background-color: rgb(251, 251, 251);" id="connectionStatusBox">
                             <span class="status-indicator status-off" id="statusIndicator"></span>
                             <span class="status-icon"><img src="assets/icons/usb.png" alt="USB bağlantısı" width="30" height="30"></span>
@@ -186,27 +184,52 @@
     </a>
 </li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> Loglar</a></li>
+
+                        <!-- BAĞLANTISIZ ARAÇLAR — bağlıyken JS ile gizlenir -->
+                        <li class="nav-item nav-offline"><a class="nav-link active" href="#" data-page="home"><i class="bi bi-usb-plug me-2"></i> Konfiguratör</a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="firmware"><i class="bi bi-cpu me-2"></i> Firmware</a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link" id="btnGroundControlOffline" href="#" onclick="window.open('elrs_backpack.html','_blank');return false;"><i class="bi bi-broadcast-pin me-2"></i> Yer Kontrol</a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="kml"><i class="bi bi-globe2 me-2"></i> Log → KML</a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="docs"><i class="bi bi-book me-2"></i> Dokümanlar</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="col-lg-10 col-md-9">
+
+                <!-- Bağlantı kartı — sadece bağlantısız + offline sayfa seçili değilken -->
                 <div id="connectionPrompt" class="connection-prompt">
-                    <div class="row gx-3 gy-3 justify-content-center inner-row">
-                        <div class="col-md-5">
-                            <div class="panel panel2 prompt-card h-100 firmware-preview">
-                                <div class="text-center mb-3">
-                                    <img src="assets/icons/firmware.png" alt="Firmware" width="80" height="80" class="mb-4">
+                    <div class="panel text-center prompt-card configurator-entry-card" style="max-width:420px;margin:0 auto;">
+                        <img src="assets/icons/configurator.png" alt="Configurator" width="80" height="80" class="d-block mx-auto mb-4">
+                        <h2 class="gradient-text mb-3">Konfiguratöre Giriş</h2>
+                        <p class="prompt-description">Cihazınıza enerji verdikten sonra
+                            <b style="color:red;">ilk 10 saniye içinde</b> seri porta bağlayın.
+                            Aksi takdirde uçuş moduna geçer.</p>
+                        <button class="btn btn-connect btn-lg w-100" id="btnConnectPrompt">
+                            <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ======= OFFLINE SAYFA: Firmware ======= -->
+                <div id="firmwarePage" class="page page-offline">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-lg-7">
+                            <div class="panel prompt-card text-center configurator-entry-card">
+                                <div class="text-center mb-4">
+                                    <img src="assets/icons/firmware.png" alt="Firmware" width="72" height="72" class="mb-3">
                                     <h2 class="text-white mb-0">Firmware Güncelleme</h2>
+                                    <p class="text-muted small mt-1">ESP32 üzerine Vecihi firmware yükler</p>
                                 </div>
-                                <div class="d-flex flex-column gap-20 mt-3">
-                                    <div class="d-flex flex-column align-items-start">
-                                        <div class="text-muted">Versiyon:</div>
+                                <div class="d-flex flex-column gap-20">
+                                    <div>
+                                        <div class="text-muted small">Mevcut versiyon:</div>
                                         <span id="firmwareVersionPreview" class="badge bg-secondary firmware-version">Yükleniyor...</span>
-                                        <small class="text-muted">Derleme tarihi: <span id="firmwareBuildDatePreview" class="firmware-build-date">—</span></small>
+                                        <small class="text-muted ms-2">Derleme: <span id="firmwareBuildDatePreview" class="firmware-build-date">—</span></small>
                                     </div>
                                     <div class="alert alert-warning small mb-0">
-                                        Flash işlemi için önce seri bağlantıyı kesin.
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Flash işlemi için önce seri bağlantıyı kesin ve tarayıcı sekmesini yenileyin.
                                     </div>
                                     <div class="text-center">
                                         <esp-web-install-button manifest="https://savas8008.github.io/vecihi-public/manifest.json">
@@ -218,54 +241,87 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-5">
-                            <div class="panel text-center prompt-card h-100 configurator-entry-card">
-                                <img src="assets/icons/configurator.png" alt="Configurator" width="80" height="80" class="d-block mx-auto mb-4">
-                                <h2 class="gradient-text mb-3">Konfiguratöre Giriş</h2>
-                                <p class="prompt-description">Uygulamayı kullanmak için lütfen cihazınıza enerji verdikten sonra <b style="color: red;">ilk 10 saniye içerisinde </b>  seri porta bağlayın. Aksi takdirde uçuş moduna geçecektir.</p>
-                                <button class="btn btn-connect btn-lg" id="btnConnectPrompt">
-                                    <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                <div class="row justify-content-center mt-4" id="connectionHelpPanel">
-                    <div class="col-12 col-lg-8">
-                        <div class="panel prompt-links-card">
-                            <div class="prompt-links-header">
-                                <div class="prompt-links-icon">
-                                    <i class="bi bi-journal-richtext"></i>
-                                </div>
-                                <div>
-                                    <h3 class="prompt-links-title mb-1">Hızlı Başlangıç Kaynakları</h3>
-                                    <p class="prompt-links-subtitle mb-0">Dokümantasyon ve örnek videolara buradan hızlıca ulaşabilirsiniz.</p>
-                                </div>
-                            </div>
-                    <div class="prompt-link-grid">
-    <a class="prompt-link-tile prompt-link-guide" href="https://github.com/savas8008/vecihi-configurator/blob/main/docs/WIRING.md" target="_blank">
-        <span class="prompt-link-label"><i class="bi bi-usb-symbol me-2"></i>Bağlantı Kılavuzu</span>
-        <span class="prompt-link-caption">Kablolama ve bağlantı şemasını aç</span>
-    </a>
-    
-    <a class="prompt-link-tile prompt-link-doc" href="https://github.com/savas8008/vecihi-configurator/blob/main/README.md" target="_blank">
-        <span class="prompt-link-label"><i class="bi bi-book me-2"></i>Dokümantasyon</span>
-        <span class="prompt-link-caption">Kurulum ve kullanım adımlarını aç</span>
-    </a>
 
-    <div class="prompt-link-tile prompt-link-video" style="cursor: default;">
-        <span class="prompt-link-label"><i class="bi bi-play-circle-fill me-2"></i>Demo 1 & Demo 2</span>
-        <div class="mt-2">
-            <a href="https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn" target="_blank" class="text-white me-3" style="text-decoration: none;">
-                <i class="bi bi-play-btn me-1"></i> İzle 1
-            </a>
-            <a href="https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf" target="_blank" class="text-white" style="text-decoration: none;">
-                <i class="bi bi-play-btn me-1"></i> İzle 2
-            </a>
-        </div>
-        <span class="prompt-link-caption">Kullanım ve ekran anlatım videoları</span>
-    </div>
-</div>
+                <!-- ======= OFFLINE SAYFA: KML Dönüştürücü ======= -->
+                <div id="kmlPage" class="page page-offline">
+                    <div class="panel kml-converter-card">
+
+                        <div class="prompt-links-header">
+                            <div class="prompt-links-icon kml-icon-box">
+                                <i class="bi bi-globe2" style="color:#4ade80;font-size:1.4rem;"></i>
+                            </div>
+                            <div>
+                                <h3 class="prompt-links-title mb-1">EdgeTX Log → KML Dönüştürücü</h3>
+                                <p class="prompt-links-subtitle mb-0">EdgeTX CSV log kaydını Google Earth'e aktarın — bağlantı gerekmez.</p>
+                            </div>
+                        </div>
+
+                        <div id="kmlError" class="kml-error-box" style="display:none;"></div>
+
+                        <div id="kmlDropZone" class="kml-drop-zone">
+                            <i class="bi bi-cloud-upload kml-drop-icon"></i>
+                            <p class="kml-drop-text">CSV dosyasını buraya sürükleyin veya tıklayarak seçin</p>
+                            <p class="kml-drop-hint">EdgeTX / OpenTX log formatı (.csv)</p>
+                            <input type="file" id="kmlFileInput" accept=".csv" style="display:none;">
+                        </div>
+
+                        <div id="kmlResult" style="display:none;">
+                            <div id="kmlMapPreview" class="kml-map-preview"></div>
+                            <div class="kml-stats-grid">
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-calendar3 me-1"></i>Tarih</span><span class="kml-stat-val" id="kmlStatDate">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-clock me-1"></i>Süre</span><span class="kml-stat-val" id="kmlStatDur">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-arrow-up me-1"></i>Maks. İrtifa</span><span class="kml-stat-val" id="kmlStatAlt">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-speedometer2 me-1"></i>Maks. Hız</span><span class="kml-stat-val" id="kmlStatSpd">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-geo me-1"></i>Toplam Mesafe</span><span class="kml-stat-val" id="kmlStatDist">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-reception-4 me-1"></i>GPS Noktası</span><span class="kml-stat-val" id="kmlStatGps">—</span></div>
+                            </div>
+                            <div id="kmlModeLegend" class="kml-legend"></div>
+                            <div class="kml-actions">
+                                <button id="btnKmlDownload" class="btn kml-btn-download"><i class="bi bi-download me-2"></i>KML İndir</button>
+                                <button id="btnKmlGoogleEarth" class="btn kml-btn-earth"><i class="bi bi-globe2 me-2"></i>Google Earth'te Aç</button>
+                                <button id="btnKmlReset" class="btn kml-btn-reset"><i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla</button>
+                            </div>
+                            <div id="kmlGEHint" class="kml-ge-hint" style="display:none;">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <span>KML dosyası indirildi. Google Earth Web açıldığında
+                                <strong>Dosya → İçe Aktar</strong> veya dosyayı sürükle-bırak ile yükleyin.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ======= OFFLINE SAYFA: Dokümanlar ======= -->
+                <div id="docsPage" class="page page-offline">
+                    <div class="panel prompt-links-card">
+                        <div class="prompt-links-header">
+                            <div class="prompt-links-icon">
+                                <i class="bi bi-journal-richtext"></i>
+                            </div>
+                            <div>
+                                <h3 class="prompt-links-title mb-1">Dokümanlar &amp; Kaynaklar</h3>
+                                <p class="prompt-links-subtitle mb-0">Kablolama, kurulum ve kullanım rehberleri.</p>
+                            </div>
+                        </div>
+                        <div class="prompt-link-grid">
+                            <a class="prompt-link-tile prompt-link-guide" href="https://github.com/savas8008/vecihi-configurator/blob/main/docs/WIRING.md" target="_blank">
+                                <span class="prompt-link-label"><i class="bi bi-usb-symbol me-2"></i>Bağlantı Kılavuzu</span>
+                                <span class="prompt-link-caption">Kablolama ve bağlantı şemasını aç</span>
+                            </a>
+                            <a class="prompt-link-tile prompt-link-doc" href="https://github.com/savas8008/vecihi-configurator/blob/main/README.md" target="_blank">
+                                <span class="prompt-link-label"><i class="bi bi-book me-2"></i>README / Kurulum</span>
+                                <span class="prompt-link-caption">Kurulum ve kullanım adımlarını aç</span>
+                            </a>
+                            <div class="prompt-link-tile prompt-link-video" style="cursor:default;">
+                                <span class="prompt-link-label"><i class="bi bi-play-circle-fill me-2"></i>Demo Videoları</span>
+                                <div class="mt-2">
+                                    <a href="https://youtu.be/1s9Xik4eENg?si=8jYlLcgN0ntrSXTn" target="_blank" class="text-white me-3" style="text-decoration:none;"><i class="bi bi-play-btn me-1"></i>İzle 1</a>
+                                    <a href="https://youtu.be/17r8pNz4jtk?si=Dn37ZPJg04LwtnFf" target="_blank" class="text-white" style="text-decoration:none;"><i class="bi bi-play-btn me-1"></i>İzle 2</a>
+                                </div>
+                                <span class="prompt-link-caption">Kullanım ve ekran anlatım videoları</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1826,9 +1882,19 @@
                             <!-- Gyro & IMU Filtreleri -->
                             <div class="col-md-3 border-end border-secondary">
                                 <h6 class="text-muted border-bottom border-secondary pb-1">Gyro & IMU</h6>
+                                <div class="mb-2 d-flex align-items-center justify-content-between">
+                                    <label class="form-check-label small">Gyro LPF Aktif</label>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="inp_gyro_lpf_enabled" checked>
+                                    </div>
+                                </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Gyro LPF</label>
-                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_gyro_beta" step="0.01" value="0.2"></div>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Gyro LPF (Hz)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_gyro_lpf_hz" min="0" max="500" step="1" value="60"></div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Accel LPF (Hz)</label>
+                                    <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_accel_lpf_hz" min="0" max="50" step="0.5" value="3"></div>
                                 </div>
                                 <div class="mb-2 row">
                                     <label class="col-sm-7 col-form-label col-form-label-sm">Mahony Kp</label>
@@ -1843,6 +1909,12 @@
                             <!-- RPM Filtresi -->
                             <div class="col-md-3 border-end border-secondary">
                                 <h6 class="text-muted border-bottom border-secondary pb-1">RPM Filtresi</h6>
+                                <div class="mb-2 d-flex align-items-center justify-content-between">
+                                    <label class="form-check-label small">RPM Filtresi Aktif</label>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="inp_rpm_filter_enabled" checked>
+                                    </div>
+                                </div>
                                 <div class="mb-2 row">
                                     <label class="col-sm-7 col-form-label col-form-label-sm">Min Frekans (Hz)</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_rpm_min_freq" min="50" max="200" step="10" value="100"></div>
@@ -2372,23 +2444,23 @@ function switchAdvTab(tabId, btn) {
                                 <div class="accordion-body pt-1 pb-2 px-0">
                                     <div class="input-group input-group-sm mb-1">
                                         <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="GPS, Barometre, Pusula verileri">SENSÖRLER (GPS/BARO)</span>
-                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_sensor_stream')">AÇ</button>
-                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_sensor_stream')">KAPAT</button>
+                                        <button class="btn btn-success btn-sm" onclick="sendQuickCommand('start_sensor_stream')">AÇ</button>
+                                        <button class="btn btn-danger btn-sm" onclick="sendQuickCommand('stop_sensor_stream')">KAPAT</button>
                                     </div>
                                     <div class="input-group input-group-sm mb-1">
                                         <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Jiroskop ve İvmeölçer ham verileri">IMU (JİRO/İVME)</span>
-                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_gyro_stream')">AÇ</button>
-                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_gyro_stream')">KAPAT</button>
+                                        <button class="btn btn-success btn-sm" onclick="sendQuickCommand('start_gyro_stream')">AÇ</button>
+                                        <button class="btn btn-danger btn-sm" onclick="sendQuickCommand('stop_gyro_stream')">KAPAT</button>
                                     </div>
                                     <div class="input-group input-group-sm mb-1">
                                         <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Uçak duruş açısı (Quaternion & Euler)">3D DURUŞ (QUAT/EULER)</span>
-                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_quaternion_stream')">AÇ</button>
-                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_quaternion_stream')">KAPAT</button>
+                                        <button class="btn btn-success btn-sm" onclick="sendQuickCommand('start_quaternion_stream')">AÇ</button>
+                                        <button class="btn btn-danger btn-sm" onclick="sendQuickCommand('stop_quaternion_stream')">KAPAT</button>
                                     </div>
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Kumandadan gelen kanal sinyalleri">ALICI &amp; KANALLAR</span>
-                                        <button class="btn btn-outline-success" onclick="sendQuickCommand('start_receiver_stream')">AÇ</button>
-                                        <button class="btn btn-outline-danger" onclick="sendQuickCommand('stop_receiver_stream')">KAPAT</button>
+                                        <button class="btn btn-success btn-sm" onclick="sendQuickCommand('start_receiver_stream')">AÇ</button>
+                                        <button class="btn btn-danger btn-sm" onclick="sendQuickCommand('stop_receiver_stream')">KAPAT</button>
                                     </div>
                                 </div>
                             </div>
@@ -2479,9 +2551,8 @@ function switchAdvTab(tabId, btn) {
                             </div>
                         </div>
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-warning" id="btnLogClear" title="Ekranda görünen logları temizle"><i class="bi bi-eraser"></i> Temizle</button>
-                            <button class="btn btn-outline-danger" id="btnLogClearAll" title="Geçmişi tamamen sil ve sıfırla"><i class="bi bi-trash"></i> Geçmişi Sil</button>
-                            <button class="btn btn-outline-success" id="btnLogExport" title="Logları dosyaya kaydet"><i class="bi bi-download"></i> Kaydet</button>
+                            <button class="btn btn-danger" id="btnLogClearAll" title="Tüm logları ve istatistikleri sıfırla"><i class="bi bi-trash"></i> Temizle</button>
+                            <button class="btn btn-success" id="btnLogExport" title="Logları dosyaya kaydet"><i class="bi bi-download"></i> Kaydet</button>
                         </div>
                     </div>
 
@@ -3215,7 +3286,6 @@ function switchAdvTab(tabId, btn) {
         }
 
         $('btnSendCommand').addEventListener('click', sendCommandFromInput);
-        $('btnLogClear').addEventListener('click', clearLogs);
         $('btnLogClearAll').addEventListener('click', clearAllLogs);
         $('btnLogExport').addEventListener('click', exportLogs);
         $('logLevelFilter').addEventListener('change', filterLogs);
