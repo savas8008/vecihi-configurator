@@ -39,7 +39,9 @@ const osdElementMapping = {
     'prev_sats':         'sat',
     'prev_lat':          'lat',
     'prev_lon':          'lon',
-    'prev_gcode':        'gcode'
+    'prev_gcode':        'gcode',
+    'prev_battery_cap':  'cap',
+    'prev_cell_voltage': 'cellv'
 };
 
 // JSON Key -> HTML ID (ters eşleştirme)
@@ -66,7 +68,9 @@ const osdToggleMapping = {
     'sat':   'osd_show_sats',
     'lat':   'osd_show_lat',
     'lon':   'osd_show_lon',
-    'gcode': 'osd_show_gcode'
+    'gcode': 'osd_show_gcode',
+    'cap':   'osd_show_cap',
+    'cellv': 'osd_show_cellv'
 };
 
 // ============================================================================

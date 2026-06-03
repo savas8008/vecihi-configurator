@@ -2203,7 +2203,15 @@ function switchAdvTab(tabId, btn) {
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_wind" checked data-target="prev_wind">
         <label class="form-check-label small" for="osd_show_wind">Rüzgar Bilgisi</label>
     </div>
-    
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_cap" data-target="prev_battery_cap">
+        <label class="form-check-label small" for="osd_show_cap">Pil Kapasitesi (mAh)</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_cellv" data-target="prev_cell_voltage">
+        <label class="form-check-label small" for="osd_show_cellv">Hücre Voltajı (V/hücre)</label>
+    </div>
+
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_msg" checked data-target="prev_sys_msg">
         <label class="form-check-label small" for="osd_show_msg">Sistem Mesajları</label>
@@ -2263,6 +2271,10 @@ function switchAdvTab(tabId, btn) {
     <div id="prev_altitude" class="osd-draggable position-absolute" style="top: 10%; left: 84%;">ALT: 154m</div>
 
     <div id="prev_vario" class="osd-draggable position-absolute" style="top: 15%; left: 84%;">+1.2m/s</div>
+
+    <div id="prev_battery_cap" class="osd-draggable position-absolute" style="top: 20%; left: 84%; display: none;">&#x26A1;2187</div>
+
+    <div id="prev_cell_voltage" class="osd-draggable position-absolute" style="top: 25%; left: 84%; display: none;">&#x26A1;4S3.85</div>
 
     <div id="prev_home_dir" class="osd-draggable position-absolute text-center" style="top: 5%; left: 44%;">
       Home:  <i class="bi bi-arrow-down"></i> 450m
