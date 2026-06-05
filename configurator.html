@@ -1994,6 +1994,20 @@
                                            min="1" max="50" step="0.1" value="11.0">
                                 </div>
                             </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına DOLU voltaj (%100). LiPo için 4.2V. OSD pil göstergesi bu değere göre hesaplar.">Hücre Max (V) <small class="text-muted">%100</small></label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control form-control-sm" id="inp_bat_cell_max"
+                                           min="3.5" max="4.5" step="0.05" value="4.2">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına BOŞ voltaj (%0). LiPo için ~3.0-3.3V. OSD pil göstergesi bu değere göre hesaplar.">Hücre Min (V) <small class="text-muted">%0</small></label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control form-control-sm" id="inp_bat_cell_min"
+                                           min="2.0" max="4.0" step="0.05" value="3.0">
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-8">
                             <div class="alert alert-dark py-2 px-3 small mb-0">
