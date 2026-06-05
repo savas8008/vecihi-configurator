@@ -2211,6 +2211,10 @@ function switchAdvTab(tabId, btn) {
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_cellv" data-target="prev_cell_voltage">
         <label class="form-check-label small" for="osd_show_cellv">Hücre Voltajı (V/hücre)</label>
     </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_amp" data-target="prev_current_amps">
+        <label class="form-check-label small" for="osd_show_amp">Anlık Akım (A)</label>
+    </div>
 
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_msg" checked data-target="prev_sys_msg">
@@ -2275,6 +2279,8 @@ function switchAdvTab(tabId, btn) {
     <div id="prev_battery_cap" class="osd-draggable position-absolute" style="top: 20%; left: 84%; display: none;">&#x26A1;2187</div>
 
     <div id="prev_cell_voltage" class="osd-draggable position-absolute" style="top: 25%; left: 84%; display: none;">&#x26A1;4S3.85</div>
+
+    <div id="prev_current_amps" class="osd-draggable position-absolute" style="top: 30%; left: 84%; display: none;">&#x26A1;12.5A</div>
 
     <div id="prev_home_dir" class="osd-draggable position-absolute text-center" style="top: 5%; left: 44%;">
       Home:  <i class="bi bi-arrow-down"></i> 450m
