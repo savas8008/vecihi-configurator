@@ -569,9 +569,32 @@ function updateAdvDisplay(key) {
     }
 }
 
-/**
- * @brief GPS ayarları bölümünü göster/gizle
- */
+function computeVoltageCalib() {
+    const shown  = parseFloat(document.getElementById('inp_calib_volt_shown').value);
+    const actual = parseFloat(document.getElementById('inp_calib_volt_actual').value);
+    const curScale = parseFloat(document.getElementById('inp_bat_adc_scale').value) || 11.0;
+    if (!Number.isFinite(shown) || !Number.isFinite(actual) || shown <= 0 || actual <= 0) {
+        alert('Lütfen her iki voltaj alanını da geçerli bir değerle doldurun.');
+        return;
+    }
+    const newScale = Math.round(curScale * (actual / shown) * 1000) / 1000;
+    document.getElementById('inp_bat_adc_scale').value = newScale.toFixed(3);
+}
+window.computeVoltageCalib = computeVoltageCalib;
+
+function computeCurrentCalib() {
+    const reported = parseFloat(document.getElementById('inp_calib_reported_mah').value);
+    const actual   = parseFloat(document.getElementById('inp_calib_actual_mah').value);
+    const curCalib = parseFloat(document.getElementById('inp_vc_calib').value) || 1.0;
+    if (!Number.isFinite(reported) || !Number.isFinite(actual) || reported <= 0 || actual <= 0) {
+        alert('Lütfen her iki mAh alanını da geçerli bir değerle doldurun.');
+        return;
+    }
+    const newCalib = Math.round(curCalib * (actual / reported) * 1000) / 1000;
+    document.getElementById('inp_vc_calib').value = newCalib.toFixed(3);
+}
+window.computeCurrentCalib = computeCurrentCalib;
+
 function updateFlaperonSliderColor(slider) {
     const val = parseFloat(slider.value);
     const min = parseFloat(slider.min);

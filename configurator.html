@@ -946,7 +946,7 @@
       <span class="pin-acc-title"><i class="bi bi-plug"></i> Çıkış Pinleri</span>
       <span class="pin-acc-badges" id="motorServoPinBadges"></span>
       <span class="ms-auto d-flex align-items-center gap-2">
-        <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#recommendedPinsModal" onclick="event.stopPropagation()">
+        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#recommendedPinsModal" onclick="event.stopPropagation()">
           <i class="bi bi-info-circle me-1"></i> Tavsiye
         </button>
         <i class="bi bi-chevron-down pin-acc-chevron"></i>
@@ -2152,6 +2152,74 @@
                         </div>
                     </div>
 
+                    <hr class="border-secondary my-3">
+
+                    <!-- Kalibrasyon Hesaplayıcılar -->
+                    <div class="col-12 mb-2">
+                        <h6 class="text-muted border-bottom border-secondary pb-1">
+                            <i class="bi bi-calculator me-1"></i> Kalibrasyon Hesaplayıcılar
+                        </h6>
+                    </div>
+                    <div class="row g-3 mb-2">
+
+                        <!-- Panel 1: Voltaj -->
+                        <div class="col-md-6">
+                            <div class="border border-secondary rounded p-3 h-100">
+                                <div class="fw-semibold small mb-2 text-info"><i class="bi bi-plug me-1"></i> Voltaj Kalibrasyonu</div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Telemetride görünen (V)</label>
+                                    <div class="col-sm-5">
+                                        <input type="number" class="form-control form-control-sm" id="inp_calib_volt_shown"
+                                               step="0.1" min="0.1" max="60">
+                                    </div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Gerçekte ölçülen (V)</label>
+                                    <div class="col-sm-5">
+                                        <input type="number" class="form-control form-control-sm" id="inp_calib_volt_actual"
+                                               step="0.1" min="0.1" max="60">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-info w-100 mt-1"
+                                        onclick="computeVoltageCalib()">
+                                    <i class="bi bi-arrow-repeat me-1"></i> Ölçeği Hesapla ve Uygula
+                                </button>
+                                <div class="text-muted mt-2" style="font-size:0.72rem;">
+                                    Multimetre ile ölçülen gerçek voltajı gir. <code>yeni_ölçek = mevcut × (gerçek ÷ gösterilen)</code> — sonuç <em>Ölçek Faktörü</em> alanına yazılır.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Kapasite (mAh) -->
+                        <div class="col-md-6">
+                            <div class="border border-secondary rounded p-3 h-100">
+                                <div class="fw-semibold small mb-2 text-info"><i class="bi bi-battery-charging me-1"></i> Kapasite Kalibrasyonu</div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Tahmin edilen tüketim (mAh)</label>
+                                    <div class="col-sm-5">
+                                        <input type="number" class="form-control form-control-sm" id="inp_calib_reported_mah"
+                                               step="10" min="1" max="50000">
+                                    </div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-7 col-form-label col-form-label-sm">Gerçek tüketim (mAh)</label>
+                                    <div class="col-sm-5">
+                                        <input type="number" class="form-control form-control-sm" id="inp_calib_actual_mah"
+                                               step="10" min="1" max="50000">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-info w-100 mt-1"
+                                        onclick="computeCurrentCalib()">
+                                    <i class="bi bi-arrow-repeat me-1"></i> Kalibrasyonu Hesapla ve Uygula
+                                </button>
+                                <div class="text-muted mt-2" style="font-size:0.72rem;">
+                                    Şarj cihazının yüklediği mAh'ı gir. <code>yeni_calib = mevcut × (gerçek ÷ tahmin)</code> — sonuç <em>Kalibrasyon</em> alanına yazılır.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
 
@@ -2579,12 +2647,12 @@ function switchAdvTab(tabId, btn) {
                             <div id="accPages" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
                                 <div class="accordion-body pt-1 pb-2 px-0">
                                     <div class="d-flex flex-wrap gap-1">
-                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('advanced_page_data')" title="Gelişmiş ayarları oku">GELİŞMİŞ</button>
-                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('pid_page_data')" title="PID ayarlarını oku">PID</button>
-                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('calibration_page_data')" title="Kalibrasyon verisini oku">KALİB.</button>
-                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('outputs_page_data')" title="Çıkış ayarlarını oku">ÇIKIŞLAR</button>
-                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('modes_page_data')" title="Uçuş modlarını oku">MODLAR</button>
-                                        <button class="btn btn-outline-info btn-sm flex-grow-1" onclick="sendQuickCommand('transmitter_page_data')" title="Alıcı ayarlarını oku">ALICI</button>
+                                        <button class="btn btn-info btn-sm flex-grow-1" onclick="sendQuickCommand('advanced_page_data')" title="Gelişmiş ayarları oku">GELİŞMİŞ</button>
+                                        <button class="btn btn-info btn-sm flex-grow-1" onclick="sendQuickCommand('pid_page_data')" title="PID ayarlarını oku">PID</button>
+                                        <button class="btn btn-info btn-sm flex-grow-1" onclick="sendQuickCommand('calibration_page_data')" title="Kalibrasyon verisini oku">KALİB.</button>
+                                        <button class="btn btn-info btn-sm flex-grow-1" onclick="sendQuickCommand('outputs_page_data')" title="Çıkış ayarlarını oku">ÇIKIŞLAR</button>
+                                        <button class="btn btn-info btn-sm flex-grow-1" onclick="sendQuickCommand('modes_page_data')" title="Uçuş modlarını oku">MODLAR</button>
+                                        <button class="btn btn-info btn-sm flex-grow-1" onclick="sendQuickCommand('transmitter_page_data')" title="Alıcı ayarlarını oku">ALICI</button>
                                     </div>
                                 </div>
                             </div>
