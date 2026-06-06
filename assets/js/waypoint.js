@@ -11,7 +11,7 @@
 let wpMap = null;          // Leaflet harita nesnesi
 let wpMarkers = [];        // Harita üzerindeki waypoint markerları
 let wpPolyline = null;     // Waypoint rotası çizgisi
-let waypoints = [];        // [{lat, lon, alt, task, speed_mode, throttle, target_spd, kamikaze}, ...]
+let waypoints = [];        // [{lat, lon, alt, task, speed_mode, throttle, target_spd}, ...]
 let homeMarker = null;     // Home konumu markeri
 let _pendingWaypointData = null; // Harita hazır olmadan önce gelen FC verisi
 const MAX_WP = 16;
@@ -34,18 +34,11 @@ const WP_SPEED_MODES = [
     { value: 2, label: 'Hava Hızı',    disabled: true },
 ];
 
-// Boş kamikaze config — varsa şablon input'larından, yoksa sabit varsayılanlar
-function defaultKamikaze() {
-    if (typeof getKamikazeDefaults === 'function') return getKamikazeDefaults();
-    return { dive_mode: 0, dive_angle: 45, alt_offset: 0, trigger_alt: 15, mission_servo: 0 };
-}
-
 // Boş waypoint oluştur
 function newWaypoint(lat, lon, alt) {
     return {
         lat, lon, alt,
-        task: 0, speed_mode: 0, throttle: 0, target_spd: 0,
-        kamikaze: defaultKamikaze()
+        task: 0, speed_mode: 0, throttle: 0, target_spd: 0
     };
 }
 
@@ -328,27 +321,13 @@ function uploadWaypoints() {
     if (!window.isConnected || !window.isConnected()) { log('Önce cihaza bağlanın', 'warning'); return; }
     if (waypoints.length === 0) { log('Önce waypoint ekleyin', 'warning'); return; }
 
-    // Kamikaze ayarlarını kutucuktan al (tüm KM WP'ler aynı ayarı kullanır)
-    const kmDefaults = defaultKamikaze();
-
-    // Her WP için uygun alanları hazırla; kamikaze alanları yalnızca task==5'te gönder
-    const serialized = waypoints.map(wp => {
-        const obj = {
-            lat: wp.lat, lon: wp.lon, alt: wp.alt,
-            task: wp.task || 0,
-            spd_mode: wp.speed_mode || 0,
-            thr: wp.throttle || 0,
-            target_spd: wp.target_spd || 0
-        };
-        if (wp.task === 5) {
-            obj.km_mode        = 0;                           // GPS Tabanlı
-            obj.km_angle       = kmDefaults.dive_angle  || 45;
-            obj.km_alt_offset  = kmDefaults.alt_offset  || 0;
-            obj.km_trigger_alt = kmDefaults.trigger_alt || 15;
-            obj.km_servo       = kmDefaults.mission_servo|| 0;
-        }
-        return obj;
-    });
+    const serialized = waypoints.map(wp => ({
+        lat: wp.lat, lon: wp.lon, alt: wp.alt,
+        task: wp.task || 0,
+        spd_mode: wp.speed_mode || 0,
+        thr: wp.throttle || 0,
+        target_spd: wp.target_spd || 0
+    }));
 
     const payload = JSON.stringify({ waypoints: serialized });
     sendCommand('UPLOAD_WAYPOINTS ' + payload);
@@ -376,26 +355,15 @@ function stopWaypointMission() {
  * Sadece harita hazırsa çağrılabilir.
  */
 function _applyWaypointData(data) {
-    waypoints = data.points.map(p => {
-        const km = defaultKamikaze();
-        if (p.task === 5) {
-            if (p.km_mode        !== undefined) km.dive_mode     = p.km_mode;
-            if (p.km_angle       !== undefined) km.dive_angle    = p.km_angle;
-            if (p.km_alt_offset  !== undefined) km.alt_offset    = p.km_alt_offset;
-            if (p.km_trigger_alt !== undefined) km.trigger_alt   = p.km_trigger_alt;
-            if (p.km_servo       !== undefined) km.mission_servo = p.km_servo;
-        }
-        return {
-            lat:        p.lat,
-            lon:        p.lon,
-            alt:        p.alt        !== undefined ? p.alt        : 50,
-            task:       p.task       !== undefined ? p.task       : 0,
-            speed_mode: p.spd_mode   !== undefined ? p.spd_mode   : 0,
-            throttle:   p.thr        !== undefined ? p.thr        : 0,
-            target_spd: p.target_spd !== undefined ? p.target_spd : 0,
-            kamikaze: km
-        };
-    });
+    waypoints = data.points.map(p => ({
+        lat:        p.lat,
+        lon:        p.lon,
+        alt:        p.alt        !== undefined ? p.alt        : 50,
+        task:       p.task       !== undefined ? p.task       : 0,
+        speed_mode: p.spd_mode   !== undefined ? p.spd_mode   : 0,
+        throttle:   p.thr        !== undefined ? p.thr        : 0,
+        target_spd: p.target_spd !== undefined ? p.target_spd : 0
+    }));
     renderWaypointList();
     renderMapMarkers();
     if (wpMap && waypoints.length > 0) {

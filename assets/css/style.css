@@ -350,6 +350,16 @@ a:hover {
 .pin-reboot-warning i { margin-right: 6px; }
 .pin-acc-body .port-label { color: #8ee8e0 !important; font-size: 0.78rem; }
 .pin-acc-body .text-info  { color: #5dd8cc !important; font-size: 0.68rem !important; }
+.pin-box {
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 6px;
+    padding: 8px 10px;
+    height: 100%;
+}
+.pin-acc-body .pin-select {
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    border-radius: 5px !important;
+}
 
 /* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
 .panel4 {
@@ -2247,7 +2257,7 @@ label.small.text-muted,
 .container-fluid { padding-left: 8px !important; padding-right: 8px !important; }
 
 /* Bootstrap spacing sıfırlama */
-.py-3 { padding-top: 4px !important; padding-bottom: 4px !important; }
+.py-3 { padding-top: 4px !important; padding-bottom: 40px !important; }
 .py-4 { padding-top: 6px !important; padding-bottom: 6px !important; }
 .px-3 { padding-left: 8px !important; padding-right: 8px !important; }
 .p-3  { padding: 8px !important; }

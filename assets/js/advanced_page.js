@@ -166,6 +166,16 @@ function handleAdvancedPageData(data) {
         advancedConfig.battery = Object.assign({}, advancedConfig.battery, data.battery);
     }
 
+    // 12) Kamikaze
+    if (data.kamikaze) {
+        advancedConfig.kamikaze = Object.assign({}, advancedConfig.kamikaze, data.kamikaze);
+        const setElVal = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v; };
+        setElVal('km_def_dive_angle',    data.kamikaze.dive_angle);
+        setElVal('km_def_alt_offset',    data.kamikaze.alt_offset);
+        setElVal('km_def_trigger_alt',   data.kamikaze.trigger_alt);
+        setElVal('km_def_mission_servo', data.kamikaze.mission_servo);
+    }
+
     updateAdvancedUI();
 }
 
@@ -515,6 +525,15 @@ function saveAdvancedConfig() {
     setIf(la, "manual_runway_hdg", num("inp_la_manual_runway_hdg"));
     if (Object.keys(la).length) cfg.land_assist = la;
 
+    // -------- Kamikaze --------
+    const km = {};
+    setIf(km, "dive_mode",     0);
+    setIf(km, "dive_angle",    num("km_def_dive_angle"));
+    setIf(km, "alt_offset",    num("km_def_alt_offset"));
+    setIf(km, "trigger_alt",   num("km_def_trigger_alt"));
+    setIf(km, "mission_servo", selInt("km_def_mission_servo"));
+    if (Object.keys(km).length) cfg.kamikaze = km;
+
     console.log("[ADV] SAVE payload =", cfg);
     sendCommand(`SAVE_ADVANCED_CONFIG ${JSON.stringify(cfg)}`);
 }
@@ -589,36 +608,6 @@ function toggleWpSection(bodyId) {
     if (chevron) chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
 }
 
-/**
- * @brief Kamikaze varsayılan değerlerini döndür (HTML input'larından)
- */
-function getKamikazeDefaults() {
-    const getNum = (id, def) => { const el = document.getElementById(id); return el ? (parseFloat(el.value) || def) : def; };
-    const getInt = (id, def) => { const el = document.getElementById(id); return el ? (parseInt(el.value, 10) || def) : def; };
-    return {
-        dive_mode:     0,
-        dive_angle:    getNum('km_def_dive_angle', 45),
-        alt_offset:    getNum('km_def_alt_offset', 0),
-        trigger_alt:   getNum('km_def_trigger_alt', 15),
-        mission_servo: getInt('km_def_mission_servo', 0)
-    };
-}
-
-/**
- * @brief Listedeki tüm Kamikaze waypoint'lere şablon değerlerini uygula
- */
-function applyKamikazeDefaults() {
-    if (typeof waypoints === 'undefined') return;
-    const def = getKamikazeDefaults();
-    let count = 0;
-    waypoints.forEach(wp => {
-        if (wp.task === 5) { wp.kamikaze = Object.assign({}, wp.kamikaze, def); count++; }
-    });
-    if (typeof renderWaypointList === 'function') renderWaypointList();
-    if (count > 0) { if (typeof log === 'function') log(`${count} Kamikaze WP güncellendi`, 'info'); }
-    else { if (typeof log === 'function') log('Listede Kamikaze WP bulunamadı', 'warning'); }
-}
-
 // === DIŞA AKTARILAN FONKSİYONLAR ===
 window.handleAdvancedPageData = handleAdvancedPageData;
 window.updateAdvancedUI = updateAdvancedUI;
@@ -626,8 +615,6 @@ window.saveAdvancedConfig = saveAdvancedConfig;
 window.updateAdvDisplay = updateAdvDisplay;
 window.toggleGpsSettings = toggleGpsSettings;
 window.toggleWpSection = toggleWpSection;
-window.applyKamikazeDefaults = applyKamikazeDefaults;
-window.getKamikazeDefaults = getKamikazeDefaults;
 
 // advancedConfig'i dışarıdan erişilebilir yap
 window.advancedConfig = advancedConfig;

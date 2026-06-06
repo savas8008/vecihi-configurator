@@ -753,6 +753,16 @@ function handleStatusResponse(command, result, data) {
             }
             break;
 
+        case 'MIXER_SAVE':
+            if (result === 'completed') {
+                log('✅ Mikser ayarları kaydedildi.', 'success');
+                showModal('Başarılı', 'Mikser ve yardımcı çıkış ayarları başarıyla kaydedildi.', 'success');
+            } else {
+                log(`❌ Mikser kayıt hatası: ${result}`, 'error');
+                showModal('Hata', `Kayıt sırasında hata oluştu: ${result}`, 'error');
+            }
+            break;
+
         case 'OUTPUT_SAVE':
             if (result === 'completed') {
                 log('✅ Çıkış ayarları kaydedildi, cihaz yeniden başlatılıyor...', 'success');
@@ -780,10 +790,26 @@ function handleStatusResponse(command, result, data) {
             }
             break;
             
-        case 'SAVE_ADVANCED_CONFIG':
+        case 'UPLOAD_WAYPOINTS':
+            if (result && result.includes('yuklendi')) {
+                log(`✅ ${result}`, 'success');
+                showModal('Başarılı', `Waypoint listesi FC\'ye yüklendi ve kaydedildi.`, 'success');
+            } else {
+                log(`❌ Waypoint yükleme hatası: ${result}`, 'error');
+                showModal('Hata', `Waypoint yüklenemedi: ${result}`, 'error');
+            }
+            break;
+
+        case 'SAVE_ADVANCED_CONFIG': {
+            const isWpPage = (typeof currentPage !== 'undefined' && currentPage === 'waypoint');
             if (result === 'completed') {
-                log('✅ Gelişmiş ayarlar ve filtreler kaydedildi.', 'success');
-                showModal('Başarılı', 'Gelişmiş sistem ayarları başarıyla kaydedildi.', 'success');
+                if (isWpPage) {
+                    log('✅ WP parametreleri kaydedildi.', 'success');
+                    showModal('Başarılı', 'Waypoint parametreleri başarıyla kaydedildi.', 'success');
+                } else {
+                    log('✅ Gelişmiş ayarlar ve filtreler kaydedildi.', 'success');
+                    showModal('Başarılı', 'Gelişmiş sistem ayarları başarıyla kaydedildi.', 'success');
+                }
             } else {
                 log(`❌ Kayıt hatası: ${result}`, 'error');
                 showModal('Hata', `Kayıt sırasında hata oluştu: ${result}`, 'error');
@@ -795,6 +821,7 @@ function handleStatusResponse(command, result, data) {
                 saveBtnAdv.disabled = false;
             }
             break;
+        }
             
         case 'OSD_SAVE':
             if (result === 'completed') {

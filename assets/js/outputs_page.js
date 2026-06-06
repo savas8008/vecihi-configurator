@@ -98,6 +98,10 @@ function handleOutputsPageData(data) {
         if (scaleEl && pinConfig.adc_voltage_scale != null) {
             scaleEl.value = pinConfig.adc_voltage_scale;
         }
+
+        // Yardımcı çıkışlar
+        setVal('aux1Pin', pinConfig.aux1 ?? -1);
+        setVal('aux2Pin', pinConfig.aux2 ?? -1);
         // Sensors sayfasındaki pin göstergesi
         const batPinEl = document.getElementById('sens-bat-pin');
         if (batPinEl) {
@@ -343,6 +347,18 @@ function handleMixerPageData(data) {
     setMix('mixPitch',    data.pitch_mix);
     setMix('mixYaw',      data.yaw_mix);
     setMix('mixThrottle', data.throttle_mix);
+
+    if (data.aux) {
+        const setAux = (rcChId, pinId, auxData) => {
+            if (!auxData) return;
+            const rcEl  = document.getElementById(rcChId);
+            const pinEl = document.getElementById(pinId);
+            if (rcEl  && auxData.rc_ch !== undefined) rcEl.value  = auxData.rc_ch;
+            if (pinEl && auxData.pin   !== undefined) pinEl.value = auxData.pin;
+        };
+        setAux('aux1RcCh', 'aux1Pin', data.aux.aux1);
+        setAux('aux2RcCh', 'aux2Pin', data.aux.aux2);
+    }
 }
 
 // ============================================================================
@@ -447,6 +463,8 @@ function savePinsConfig() {
         i2c_scl:     getPin('i2cSclPin',  pinConfig.i2c_scl  ?? -1),
         i2c_sda:     getPin('i2cSdaPin',  pinConfig.i2c_sda  ?? -1),
         adc_voltage: pinConfig.adc_voltage ?? -1,
+        aux1:        getPin('aux1Pin', pinConfig.aux1 ?? -1),
+        aux2:        getPin('aux2Pin', pinConfig.aux2 ?? -1),
     };
 
     if (pinConfig.adc_voltage_scale != null) pins.adc_voltage_scale = pinConfig.adc_voltage_scale;
@@ -480,6 +498,11 @@ function saveMixerConfig() {
         }
     }
 
+    const getAuxRcCh = (id) => {
+        const el = document.getElementById(id);
+        return el ? parseInt(el.value) : -1;
+    };
+
     const payload = {
         aircraft_type: selectedAircraft,
         mixer: {
@@ -489,6 +512,10 @@ function saveMixerConfig() {
             throttle_mix: getMixVal('mixThrottle', 100),
         },
         servo_values: servoValues,
+        aux: {
+            aux1: { rc_ch: getAuxRcCh('aux1RcCh') },
+            aux2: { rc_ch: getAuxRcCh('aux2RcCh') },
+        },
     };
     _log('📤 Mikser ayarları gönderiliyor...', 'info');
     if (typeof sendCommand === 'function') {
@@ -637,6 +664,7 @@ function updatePinSummaries() {
         ['M1', 'motor1Pin'], ['M2', 'motor2Pin'],
         ['S1', 'servo1Pin'], ['S2', 'servo2Pin'],
         ['S3', 'servo3Pin'], ['S4', 'servo4Pin'],
+        ['AUX1', 'aux1Pin'], ['AUX2', 'aux2Pin'],
     ]);
 
     setBadges('i2cPinBadges', [

@@ -59,7 +59,10 @@ function populatePinSelectors() {
         'i2cSclPin', 'i2cSdaPin',
 
         // ADC
-        'adcVoltagePin'
+        'adcVoltagePin',
+
+        // Yardımcı çıkışlar
+        'aux1Pin', 'aux2Pin'
     ];
 
     selects.forEach(id => { 

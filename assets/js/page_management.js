@@ -210,12 +210,14 @@ function showPageLoading(pageKey) {
     const saveBtn = document.getElementById('btnSave' + pageKey.charAt(0).toUpperCase() + pageKey.slice(1));
     if (saveBtn) saveBtn.disabled = true;
 
-    // Güvenlik: 8 saniye içinde veri gelmezse overlay'i temizle
+    // Güvenlik: 8 saniye içinde veri gelmezse overlay'i ve disabled durumunu temizle
     clearTimeout(loadingTimeouts[pageKey]);
     loadingTimeouts[pageKey] = setTimeout(() => {
         const stale = document.getElementById('loadingOverlay-' + pageKey);
         if (stale) {
             stale.remove();
+            const btn = document.getElementById('btnSave' + pageKey.charAt(0).toUpperCase() + pageKey.slice(1));
+            if (btn) btn.disabled = false;
             if (typeof log === 'function') {
                 log(`⚠️ ${pageKey} sayfası veri zaman aşımı — Yeniden bağlanmayı deneyin`, 'warning');
             }
