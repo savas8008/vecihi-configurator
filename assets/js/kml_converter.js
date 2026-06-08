@@ -32,6 +32,7 @@ function kmlSafeId(str) {
     return (str || 'UNKNOWN').replace(/[^a-zA-Z0-9]/g, '_');
 }
 
+
 // ============================================================
 //  CSV PARSE
 // ============================================================
@@ -329,12 +330,28 @@ ${coordXml}
 // ============================================================
 
 let _kmlMap = null;
+let _kmlPolylinesByMode = {};  // { 'CRUISE': [L.polyline, ...], ... }
+let _kmlActiveFilter    = null; // null = tümü, 'MODE_NAME' = sadece o mod
+
+// Cetvel araç state'i
+let _rulerActive  = false;
+let _rulerPoints  = [];    // [LatLng, LatLng] — en fazla 2 nokta
+let _rulerMarkers = [];    // L.circleMarker[]
+let _rulerLine    = null;  // L.polyline — iki nokta arası çizgi
+let _rulerPopup   = null;  // L.popup — mesafe etiketi
 
 function renderKmlLeafletMap(gpsRecs) {
     const container = document.getElementById('kmlMapPreview');
     if (!container) return;
 
     if (_kmlMap) { _kmlMap.remove(); _kmlMap = null; }
+    _kmlPolylinesByMode = {};
+    _kmlActiveFilter    = null;
+    _rulerActive  = false;
+    _rulerPoints  = [];
+    _rulerMarkers = [];
+    _rulerLine    = null;
+    _rulerPopup   = null;
 
     _kmlMap = L.map(container, { zoomControl: true });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -349,9 +366,11 @@ function renderKmlLeafletMap(gpsRecs) {
         if (seg.recs.length < 2) continue;
         const s = kmlModeStyle(seg.mode);
         const lls = seg.recs.map(r => [r._lat, r._lon]);
-        L.polyline(lls, { color: s.css, weight: 3, opacity: 0.9 })
-         .bindPopup(`<b>${seg.mode}</b>`)
-         .addTo(_kmlMap);
+        const pl = L.polyline(lls, { color: s.css, weight: 3, opacity: 0.9 })
+            .bindPopup(`<b>${seg.mode}</b>`)
+            .addTo(_kmlMap);
+        if (!_kmlPolylinesByMode[seg.mode]) _kmlPolylinesByMode[seg.mode] = [];
+        _kmlPolylinesByMode[seg.mode].push(pl);
         lls.forEach(ll => bounds.push(ll));
     }
 
@@ -368,6 +387,149 @@ function renderKmlLeafletMap(gpsRecs) {
      .bindPopup(`🛬 İniş<br/>${lr._time}`).addTo(_kmlMap);
 
     if (bounds.length) _kmlMap.fitBounds(bounds, { padding: [16, 16] });
+
+    // ── Harita altı araç çubuğu ────────────────────────────────────
+    document.getElementById('kmlMapToolbar')?.remove();
+    const toolbar = document.createElement('div');
+    toolbar.id = 'kmlMapToolbar';
+    toolbar.className = 'kml-map-toolbar';
+
+    const addToolbarBtn = (id, icon, label, onClick) => {
+        const btn = document.createElement('button');
+        btn.className = 'kml-toolbar-btn';
+        btn.id = id;
+        btn.innerHTML = `<i class="bi ${icon}"></i> ${label}`;
+        btn.addEventListener('click', e => { e.stopPropagation(); onClick(); });
+        toolbar.appendChild(btn);
+    };
+
+    addToolbarBtn('kmlRulerBtn', 'bi-rulers', 'Mesafe Ölç', toggleKmlRuler);
+
+    document.getElementById('kmlMapWrapper').insertAdjacentElement('afterend', toolbar);
+
+    // ── Cetvel harita click handler ────────────────────────────────
+    _kmlMap.on('click', e => {
+        if (!_rulerActive) return;
+
+        // Tamamlanmış ölçüm varsa temizle, yeni ölçüme başla
+        if (_rulerPoints.length === 2) clearKmlRuler();
+
+        _rulerPoints.push(e.latlng);
+
+        const dot = L.circleMarker(e.latlng, {
+            radius: 5, color: '#fff', fillColor: '#f59e0b',
+            fillOpacity: 1, weight: 2, interactive: false
+        }).addTo(_kmlMap);
+        _rulerMarkers.push(dot);
+
+        if (_rulerPoints.length === 2) {
+            // Çizgi
+            _rulerLine = L.polyline(_rulerPoints, {
+                color: '#f59e0b', weight: 2, dashArray: '7 5',
+                opacity: 0.9, interactive: false
+            }).addTo(_kmlMap);
+
+            // Mesafe hesapla
+            const [p0, p1] = _rulerPoints;
+            const dist = haversineM(p0.lat, p0.lng, p1.lat, p1.lng);
+            const label = dist >= 1000
+                ? `${(dist / 1000).toFixed(3)} km`
+                : `${dist.toFixed(1)} m`;
+
+            // Popup — orta noktada
+            const mid = L.latLng(
+                (_rulerPoints[0].lat + _rulerPoints[1].lat) / 2,
+                (_rulerPoints[0].lng + _rulerPoints[1].lng) / 2
+            );
+            _rulerPopup = L.popup({
+                className: 'kml-ruler-popup',
+                closeButton: true,
+                autoClose: false,
+                closeOnClick: false,
+            })
+                .setLatLng(mid)
+                .setContent(`<span class="kml-ruler-label">📏 ${label}</span>`)
+                .openOn(_kmlMap);
+        }
+    });
+}
+
+// ── Tam ekran genişlet/küçült ──────────────────────────────────────────────
+function toggleKmlMapExpand() {
+    const el = document.getElementById('kmlMapWrapper');
+    if (!el) return;
+    const expanded = el.classList.toggle('kml-map-expanded');
+
+    // Toolbar'daki genişlet butonunu güncelle
+    const btn = document.getElementById('kmlExpandBtn');
+    if (btn) {
+        btn.innerHTML = expanded
+            ? `<i class="bi bi-fullscreen-exit"></i> Küçült`
+            : `<i class="bi bi-arrows-fullscreen"></i> Genişlet`;
+    }
+
+    // Tam ekrandayken body'ye sabit kapat butonu ekle (her zaman görünür)
+    document.getElementById('kmlMapCloseBtn')?.remove();
+    if (expanded) {
+        const closeBtn = document.createElement('button');
+        closeBtn.id = 'kmlMapCloseBtn';
+        closeBtn.className = 'kml-map-close-btn';
+        closeBtn.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+        closeBtn.title = 'Küçült (Esc)';
+        closeBtn.addEventListener('click', toggleKmlMapExpand);
+        document.body.appendChild(closeBtn);
+    }
+
+    if (_kmlMap) setTimeout(() => _kmlMap.invalidateSize(), 60);
+}
+
+// ── Cetvel: temizle ────────────────────────────────────────────────────────
+function clearKmlRuler() {
+    _rulerPoints = [];
+    _rulerMarkers.forEach(m => { if (_kmlMap) _kmlMap.removeLayer(m); });
+    _rulerMarkers = [];
+    if (_rulerLine  && _kmlMap) { _kmlMap.removeLayer(_rulerLine);  _rulerLine  = null; }
+    if (_rulerPopup && _kmlMap) { _kmlMap.removeLayer(_rulerPopup); _rulerPopup = null; }
+}
+
+// ── Cetvel: aç/kapat ───────────────────────────────────────────────────────
+function toggleKmlRuler() {
+    _rulerActive = !_rulerActive;
+    const btn = document.getElementById('kmlRulerBtn');
+    if (btn) btn.classList.toggle('kml-map-ctrl-active', _rulerActive);
+    if (_kmlMap) _kmlMap.getContainer().style.cursor = _rulerActive ? 'crosshair' : '';
+    if (!_rulerActive) clearKmlRuler();
+}
+
+// Rozete tıklanınca çağrılır. Aynı moda tekrar tıklamak filtreyi kaldırır.
+function setKmlModeFilter(mode) {
+    if (_kmlActiveFilter === mode) mode = null;
+    _kmlActiveFilter = mode;
+
+    // Polyline görünürlüğü
+    for (const [m, pls] of Object.entries(_kmlPolylinesByMode)) {
+        const show = !mode || m === mode;
+        pls.forEach(pl => pl.setStyle({
+            opacity: show ? 0.9 : 0.12,
+            weight:  show ? 3   : 1,
+        }));
+    }
+
+    // Badge stilleri
+    document.querySelectorAll('#kmlModeLegend .kml-leg-item').forEach(el => {
+        const elMode = el.dataset.mode;
+        if (elMode === '__all__') {
+            el.classList.toggle('kml-leg-active', !mode);
+        } else if (!mode) {
+            el.classList.remove('kml-leg-active', 'kml-leg-dimmed');
+        } else if (elMode === mode) {
+            el.classList.add('kml-leg-active');
+            el.classList.remove('kml-leg-dimmed');
+        } else {
+            el.classList.add('kml-leg-dimmed');
+            el.classList.remove('kml-leg-active');
+        }
+    });
 }
 
 // ============================================================
@@ -457,13 +619,27 @@ function renderKmlResult(gpsRecs, stats) {
     document.getElementById('kmlStatDist').textContent  = stats.distKm.toFixed(2) + ' km';
     document.getElementById('kmlStatGps').textContent   = stats.gpsCount;
 
-    // Mod açıklaması
+    // Mod rozet filtresi — "Tümü" + her mod
     const legendEl = document.getElementById('kmlModeLegend');
     if (legendEl) {
-        legendEl.innerHTML = stats.modes.map(m => {
+        const allBadge = `<span class="kml-leg-item kml-leg-active" data-mode="__all__"
+            onclick="setKmlModeFilter(null)" title="Tüm modları göster">
+            <span class="kml-leg-dot" style="background:conic-gradient(#ff5555,#5555ff,#55ff55,#ff5555)"></span>Tümü</span>`;
+        const modeBadges = stats.modes.map(m => {
             const s = kmlModeStyle(m);
-            return `<span class="kml-leg-item"><span class="kml-leg-dot" style="background:${s.css}"></span>${m}</span>`;
+            return `<span class="kml-leg-item" data-mode="${m}"
+                onclick="setKmlModeFilter('${m}')" title="${m} modunu filtrele">
+                <span class="kml-leg-dot" style="background:${s.css}"></span>${m}</span>`;
         }).join('');
+        legendEl.innerHTML = allBadge + modeBadges;
+    }
+
+    // Drop zone'u gizle, boşalan alanı haritaya ekle
+    const dropZone = document.getElementById('kmlDropZone');
+    if (dropZone) {
+        const dzH = Math.round(dropZone.getBoundingClientRect().height);
+        dropZone.style.display = 'none';
+        document.getElementById('kmlMapPreview').style.height = (480 + dzH) + 'px';
     }
 
     const res = document.getElementById('kmlResult');
@@ -474,12 +650,24 @@ function renderKmlResult(gpsRecs, stats) {
 }
 
 function resetKmlConverter() {
-    _kmlBlob = null;
-    _kmlFilename = 'vecihi-flight.kml';
-    document.getElementById('kmlResult').style.display  = 'none';
-    document.getElementById('kmlError').style.display   = 'none';
-    document.getElementById('kmlGEHint').style.display  = 'none';
-    document.getElementById('kmlFileInput').value       = '';
+    _kmlBlob             = null;
+    _kmlFilename         = 'vecihi-flight.kml';
+    _kmlPolylinesByMode  = {};
+    _kmlActiveFilter     = null;
+    _rulerActive         = false;
+    _rulerPoints         = [];
+    _rulerMarkers        = [];
+    _rulerLine           = null;
+    _rulerPopup          = null;
+    document.getElementById('kmlMapWrapper')?.classList.remove('kml-map-expanded');
+    document.getElementById('kmlMapToolbar')?.remove();
+    document.getElementById('kmlMapCloseBtn')?.remove();
+    document.getElementById('kmlMapPreview').style.height = '';
+    document.getElementById('kmlDropZone').style.display  = '';
+    document.getElementById('kmlResult').style.display    = 'none';
+    document.getElementById('kmlError').style.display     = 'none';
+    document.getElementById('kmlGEHint').style.display    = 'none';
+    document.getElementById('kmlFileInput').value         = '';
     if (_kmlMap) { _kmlMap.remove(); _kmlMap = null; }
 }
 
@@ -516,6 +704,14 @@ function initKmlConverter() {
     document.getElementById('btnKmlDownload')?.addEventListener('click', downloadKml);
     document.getElementById('btnKmlGoogleEarth')?.addEventListener('click', openInGoogleEarth);
     document.getElementById('btnKmlReset')?.addEventListener('click', resetKmlConverter);
+
+    // Esc → tam ekrandan çık
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            const el = document.getElementById('kmlMapWrapper');
+            if (el?.classList.contains('kml-map-expanded')) toggleKmlMapExpand();
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initKmlConverter);

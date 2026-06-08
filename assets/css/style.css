@@ -2834,12 +2834,18 @@ label.small.text-muted,
     margin-top: 14px;
 }
 
+/* Harita wrapper — butonlar burada, Leaflet container'ın dışında */
+.kml-map-wrapper {
+    position: relative;
+    margin-top: 16px;
+}
+
 /* Harita önizleme */
 .kml-map-preview {
-    height: 320px;
+    position: relative;
+    height: 480px;
     border-radius: 12px;
     overflow: hidden;
-    margin-top: 16px;
     border: 1.5px solid rgba(255,255,255,0.08);
 }
 
@@ -2892,6 +2898,25 @@ label.small.text-muted,
     padding: 3px 9px 3px 6px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s, border-color 0.15s, opacity 0.2s;
+}
+
+.kml-leg-item:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.28);
+}
+
+.kml-leg-item.kml-leg-active {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.45);
+    color: #fff;
+    font-weight: 600;
+}
+
+.kml-leg-item.kml-leg-dimmed {
+    opacity: 0.3;
 }
 
 .kml-leg-dot {
@@ -2899,6 +2924,103 @@ label.small.text-muted,
     height: 9px;
     border-radius: 50%;
     flex-shrink: 0;
+}
+
+/* Harita tam ekran — wrapper fixed, preview içinde doldurur */
+.kml-map-wrapper.kml-map-expanded {
+    position: fixed !important;
+    top: 0; left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999;
+    border-radius: 0 !important;
+    margin: 0 !important;
+}
+.kml-map-wrapper.kml-map-expanded .kml-map-preview {
+    height: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+}
+
+/* Harita alt araç çubuğu */
+.kml-map-toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 8px 0 4px;
+}
+
+.kml-toolbar-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    color: #94a3b8;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.kml-toolbar-btn:hover {
+    background: rgba(51, 65, 85, 0.95);
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+.kml-toolbar-btn.kml-map-ctrl-active {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+/* Tam ekran kapat butonu — body'ye eklenir, her zaman görünür */
+.kml-map-close-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(10, 18, 32, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 16px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+}
+.kml-map-close-btn:hover {
+    background: rgba(30, 41, 59, 0.98);
+    color: #fff;
+}
+
+/* Cetvel popup */
+.kml-ruler-popup .leaflet-popup-content-wrapper {
+    background: rgba(10, 18, 32, 0.88);
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    padding: 0;
+}
+.kml-ruler-popup .leaflet-popup-content {
+    margin: 8px 14px;
+}
+.kml-ruler-popup .leaflet-popup-tip-container {
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4));
+}
+.kml-ruler-popup .leaflet-popup-tip {
+    background: #f59e0b;
+}
+.kml-ruler-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fde68a;
+    white-space: nowrap;
 }
 
 /* Eylem butonları */
@@ -2975,7 +3097,7 @@ label.small.text-muted,
 /* Responsive */
 @media (max-width: 575px) {
     .kml-stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .kml-map-preview { height: 240px; }
+    .kml-map-preview { height: 300px; }
     .kml-actions { flex-direction: column; }
     .kml-btn-download,
     .kml-btn-earth,
