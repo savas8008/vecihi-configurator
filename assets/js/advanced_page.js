@@ -86,8 +86,10 @@ let advancedConfig = {
     },
     // Batarya Donanımı
     battery: {
-        adc_pin:   -1,
-        adc_scale: 11.0
+        adc_pin:    -1,
+        adc_scale:  11.0,
+        cell_min_v: 3.0,
+        cell_max_v: 4.2
     },
     // İniş Asistanı Ayarları
     land_assist: {
@@ -327,8 +329,10 @@ function updateAdvancedUI() {
     // --- Batarya Donanımı ---
     if (advancedConfig.battery) {
         const b = advancedConfig.battery;
-        setVal("adcVoltagePin",   b.adc_pin);
+        setVal("adcVoltagePin",     b.adc_pin);
         setVal("inp_bat_adc_scale", b.adc_scale);
+        setVal("inp_cell_min_v",    b.cell_min_v);
+        setVal("inp_cell_max_v",    b.cell_max_v);
     }
 
     // --- Landing Assist ---
@@ -507,8 +511,10 @@ function saveAdvancedConfig() {
 
     // -------- Batarya Donanımı --------
     const bat = {};
-    setIf(bat, "adc_pin",   int("adcVoltagePin"));
-    setIf(bat, "adc_scale", num("inp_bat_adc_scale"));
+    setIf(bat, "adc_pin",    int("adcVoltagePin"));
+    setIf(bat, "adc_scale",  num("inp_bat_adc_scale"));
+    setIf(bat, "cell_min_v", num("inp_cell_min_v"));
+    setIf(bat, "cell_max_v", num("inp_cell_max_v"));
     if (Object.keys(bat).length) cfg.battery = bat;
 
     // -------- Landing Assist --------

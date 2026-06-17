@@ -2096,6 +2096,44 @@
 
                     <hr class="border-secondary my-3">
 
+                    <!-- Hücre Voltaj Limitleri -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-muted border-bottom border-secondary pb-1">
+                                <i class="bi bi-battery me-1"></i> Hücre Voltaj Limitleri <small class="text-muted">(OSD Pil Simgesi)</small>
+                            </h6>
+                        </div>
+                        <div class="col-md-4 border-end border-secondary">
+                            <div class="mb-2 row">
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına boş voltaj — pil simgesi bu eşiğin altında boş görünür">Boş Hücre Voltajı <small class="text-muted">(V)</small></label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control form-control-sm" id="inp_cell_min_v"
+                                           min="2.0" max="4.0" step="0.05" value="3.0">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına dolu voltaj — pil simgesi bu eşikte dolu görünür">Dolu Hücre Voltajı <small class="text-muted">(V)</small></label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control form-control-sm" id="inp_cell_max_v"
+                                           min="3.5" max="4.5" step="0.05" value="4.2">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="alert alert-dark py-2 px-3 small mb-0">
+                                <strong>OSD Pil Simgesi Hesabı:</strong>
+                                <div class="mt-1">
+                                    Simge doluluk oranı = <code>(hücre_voltajı − boş) ÷ (dolu − boş)</code><br>
+                                    Tipik LiPo: Boş = <strong>3.0V</strong>, Dolu = <strong>4.2V</strong><br>
+                                    LiHV piller için: Boş = <strong>3.0V</strong>, Dolu = <strong>4.35V</strong><br>
+                                    <span class="text-warning">⚠ Boş voltajı gerçek hücre voltajının üstünde ayarlamak simgenin hep boş görünmesine yol açar.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-secondary my-3">
+
                     <!-- Sanal Akım Sensörü -->
                     <div class="row mb-4">
                         <div class="col-12">
