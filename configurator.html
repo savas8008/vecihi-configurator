@@ -45,7 +45,51 @@
 <script src="assets/js/kml_converter.js"></script>
     <link rel="stylesheet" href="assets/css/style.css"> 
     <style>
-    /* OSD ve diÄŸer Ã¶zel stiller */
+    /* ===== DONANIM DURUM BARI (header içi, sağa yaslanmış) ===== */
+    .hw-status-bar {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        height: 100%;
+        padding: 0;
+        margin-right: 6px;
+    }
+    .hw-status-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 0 9px;
+        height: 100%;
+        color: #4b5563;
+        border-right: 1px solid rgba(255,255,255,0.06);
+        transition: color 0.25s;
+        cursor: default;
+        user-select: none;
+        white-space: nowrap;
+    }
+    .hw-status-item:first-child { border-left: 1px solid rgba(255,255,255,0.06); }
+    .hw-status-item::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #374151;
+        flex-shrink: 0;
+        transition: background 0.25s, box-shadow 0.25s;
+    }
+    .hw-status-item::after { content: attr(data-label); }
+    .hw-status-item.hw-ok   { color: #d1d5db; }
+    .hw-status-item.hw-ok::before   { background: #22c55e; box-shadow: 0 0 5px #22c55e88; }
+    .hw-status-item.hw-err  { color: #d1d5db; }
+    .hw-status-item.hw-err::before  { background: #ef4444; box-shadow: 0 0 5px #ef444488; }
+    .hw-status-item.hw-warn { color: #d1d5db; }
+    .hw-status-item.hw-warn::before { background: #f59e0b; box-shadow: 0 0 5px #f59e0b88; }
+
+    /* OSD ve diğer özel stiller */
     /* Kısayollar accordion dark theme uyumu */
     #shortcutsAccordion .accordion-item {
         border-left: none;
@@ -129,28 +173,42 @@
 </head>
 <body>
     
-    <header class="dashboard-header py-3 panel2" >
-      <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1 class="h3 mb-0 gradient-text">
-                        <img src="assets/icons/xflight.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom"> Vecihi Configurator
-                    </h1>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <div class="d-flex align-items-center justify-content-md-end gap-3">
-                        <div class="connection-status"  style="background-color: rgb(251, 251, 251);" id="connectionStatusBox">
-                            <span class="status-indicator status-off" id="statusIndicator"></span>
-                            <span class="status-icon"><img src="assets/icons/usb.png" alt="USB bağlantısı" width="30" height="30"></span>
-                            <span id="connectionStatus" class="visually-hidden">Bağlantı Yok</span>
-                        </div>
-                        <button class="btn btn-disconnect d-none" id="btnDisconnect">
-                            <i class="bi bi-usb-plug-fill me-1"></i> Bağlantıyı Kes
-                        </button>
-                    </div>
-                </div>
+    <header style="background:#0a0f1a;border-bottom:1px solid #1a2535;margin-bottom:6px;">
+      <div class="container-fluid px-3">
+        <div class="d-flex align-items-center justify-content-between" style="height:46px;">
+
+          <!-- SOL: Logo + Başlık -->
+          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <img src="assets/icons/xflight.png" alt="XFlight" width="28" height="28">
+            <span class="gradient-text" style="font-size:0.95rem;font-weight:700;letter-spacing:-0.5px;white-space:nowrap;">Vecihi Configurator</span>
+          </div>
+
+          <!-- SAĞ: HW İkonlar + Bağlantı -->
+          <div class="d-flex align-items-center gap-2 flex-shrink-0" style="height:100%;">
+
+            <!-- Donanım Durum İkonları -->
+            <div id="hwStatusBar" class="hw-status-bar d-none">
+              <span class="hw-status-item" id="hw-gyro"     data-label="GYRO"  title="Jiroskop (MPU6050)"></span>
+              <span class="hw-status-item" id="hw-accel"    data-label="ACCEL" title="İvmeölçer (MPU6050)"></span>
+              <span class="hw-status-item" id="hw-baro"     data-label="BARO"  title="Barometre"></span>
+              <span class="hw-status-item" id="hw-gps"      data-label="GPS"   title="GPS"></span>
+              <span class="hw-status-item" id="hw-pitot"    data-label="PITOT" title="Pitot Tüpü (MS4525DO)"></span>
+              <span class="hw-status-item" id="hw-receiver" data-label="RADIO" title="RC Alıcı"></span>
             </div>
+
+            <!-- Bağlantı Durumu -->
+            <div class="connection-status" style="background-color:rgb(251,251,251);" id="connectionStatusBox">
+              <span class="status-indicator status-off" id="statusIndicator"></span>
+              <span class="status-icon"><img src="assets/icons/usb.png" alt="USB" width="26" height="26"></span>
+              <span id="connectionStatus" class="visually-hidden">Bağlantı Yok</span>
+            </div>
+            <button class="btn btn-disconnect d-none" id="btnDisconnect">
+              <i class="bi bi-usb-plug-fill me-1"></i> Bağlantıyı Kes
+            </button>
+
+          </div>
         </div>
+      </div>
     </header>
 
     <div class="container-fluid py-3 ">
@@ -395,33 +453,40 @@
                 <span id="gps-fix-badge" class="badge bg-danger">NO FIX</span>
               </div>
 
-              <div class="row g-3 text-center">
-                <div class="col-6">
+              <div class="row g-2 text-center">
+                <!-- Sol: UYDU SAYISI + ENLEM/BOYLAM -->
+                <div class="col-6 d-flex flex-column gap-2">
                   <div class="p-2 border border-secondary rounded">
                     <small class="text-muted d-block">UYDU SAYISI</small>
-                        <img src="assets/icons/satellite.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
-                        <br>
-
+                    <img src="assets/icons/satellite.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+                    <br>
                     <span id="gps-sats" class="fs-4 fw-bold text-white">0</span>
                   </div>
+                  <div class="text-start mt-1">
+                    <div class="input-group input-group-sm mb-1">
+                      <span class="input-group-text bg-dark text-muted border-secondary">ENLEM</span>
+                      <input type="text" class="form-control bg-dark text-white border-secondary" id="gps-lat" readonly value="--">
+                    </div>
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text bg-dark text-muted border-secondary">BOYLAM</span>
+                      <input type="text" class="form-control bg-dark text-white border-secondary" id="gps-lon" readonly value="--">
+                    </div>
+                  </div>
                 </div>
-                <div class="col-6">
+                <!-- Sağ: YER HIZI + HAVA HIZI -->
+                <div class="col-6 d-flex flex-column gap-2">
                   <div class="p-2 border border-secondary rounded">
-                    <small class="text-muted d-block">HIZ (km/h)</small>
-
-                                     <img src="assets/icons/speed.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
-<br>
+                    <small class="text-muted d-block">YER HIZI (km/h)</small>
+                    <img src="assets/icons/speed.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+                    <br>
                     <span id="gps-speed" class="fs-4 fw-bold text-info">0</span>
                   </div>
-                </div>
-                <div class="col-12">
-                  <div class="input-group input-group-sm mb-1">
-                    <span class="input-group-text bg-dark text-muted border-secondary">ENLEM</span>
-                    <input type="text" class="form-control bg-dark text-white border-secondary" id="gps-lat" readonly value="--">
-                  </div>
-                  <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-dark text-muted border-secondary">BOYLAM</span>
-                    <input type="text" class="form-control bg-dark text-white border-secondary" id="gps-lon" readonly value="--">
+                  <div class="p-2 border border-secondary rounded">
+                    <small class="text-muted d-block">HAVA HIZI (km/h)</small>
+                    <img src="assets/icons/speed.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
+                    <br>
+                    <span id="sens-airspeed" class="fs-4 fw-bold text-warning">--</span>
+                    <span id="sens-airspeed-src" class="badge bg-secondary ms-1" style="font-size:0.65rem;">-</span>
                   </div>
                 </div>
               </div>
@@ -1737,6 +1802,9 @@
             <button class="adv-tab" data-tab="adv-tab-5" data-cat="safety" onclick="switchAdvTab('adv-tab-5',this)">
                 <i class="bi bi-battery-half"></i> Batarya
             </button>
+            <button class="adv-tab" data-tab="adv-tab-pitot" data-cat="pitot" onclick="switchAdvTab('adv-tab-pitot',this)">
+                <i class="bi bi-wind"></i> Pitot Tüpü
+            </button>
         </div>
 
         <!-- Tab İçerikleri -->
@@ -2263,15 +2331,34 @@
                 </div>
             </div>
 
+            <!-- ==================== PİTOT TÜPÜ ==================== -->
+            <div id="adv-tab-pitot" class="adv-tab-pane">
+                <div class="panel4">
+                    <div class="mode-category-title"><i class="bi bi-wind"></i> MS4525DO Pitot Tüpü</div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small">Pitot Sensörü</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="pitotEnabled">
+                                <label class="form-check-label" for="pitotEnabled">Etkin</label>
+                            </div>
+                            <small class="text-muted d-block mt-1">Devre dışıyken hava hızı GPS bazlı (sanal) hesaplanır.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small">Ölçek (Scale)</label>
+                            <input type="number" class="form-control form-control-sm bg-dark text-white border-secondary" id="pitotScale" min="0.5" max="2.0" step="0.01" value="1.00">
+                            <small class="text-muted d-block mt-1">Varsayılan: 1.00 · Tüp açısı veya uzunluk farkı için ince ayar.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div><!-- /adv-tab-content -->
 
     </div>
     <button type="button" class="btn btn-warning shadow-sm mt-2" id="btnSaveAdvanced">
         <i class="bi bi-save2 me-2"></i> Tercihleri Kaydet
     </button>
-    <br>
-    <br>
-    <br>
 </div>
 
 <script>
@@ -2353,6 +2440,10 @@ function switchAdvTab(tabId, btn) {
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_spd" checked data-target="prev_speed">
         <label class="form-check-label small" for="osd_show_spd">Hız (Ground Speed)</label>
+    </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_air" data-target="prev_airspeed">
+        <label class="form-check-label small" for="osd_show_air">Hava Hızı (Airspeed)</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_rssi" checked data-target="prev_rssi">
@@ -2457,7 +2548,9 @@ function switchAdvTab(tabId, btn) {
     </div>
 
     <div id="prev_speed" class="osd-draggable position-absolute" style="top: 5%; left: 2%;">SPD: 45km/h</div>
-    
+
+    <div id="prev_airspeed" class="osd-draggable position-absolute" style="top: 15%; left: 2%;">AIR: 42km/h</div>
+
     <div id="prev_rssi" class="osd-draggable position-absolute" style="top: 10%; left: 2%;">RSSI: 99%</div>
 
     <div id="prev_flight_mode" class="osd-draggable position-absolute" style="top: 90%; left: 2%;">STAB</div>

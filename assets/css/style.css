@@ -14,64 +14,64 @@
    1. MERKEZI DEĞİŞKENLER (THEME TOKENS)
    ============================================ */
 :root {
-    /* --- ANA RENKLER --- */
-    --color-brand-blue: #38bdf8;        /* Sky-400 — aviation mavi */
-    --color-brand-blue-rgb: 56, 189, 248;
+    /* --- ANA RENKLER — Slate / Indigo Teması --- */
+    --color-brand-blue: #818cf8;        /* Indigo-400 */
+    --color-brand-blue-rgb: 129, 140, 248;
 
-    --color-primary: #000102;           /* Sky Blue */
-    --color-primary-hover: #abccdc;     /* Darker Blue */
-    --color-primary-glow: rgba(14, 165, 233, 0.3);
-    
-    --color-secondary: #94a3b8;         /* Slate 400 */
+    --color-primary: #818cf8;           /* Indigo accent */
+    --color-primary-hover: #6366f1;     /* Indigo-500 */
+    --color-primary-glow: rgba(99, 102, 241, 0.3);
+
+    --color-secondary: #94a3b8;         /* Slate-400 */
     --color-secondary-hover: #64748b;
-    
+
     /* --- DURUM RENKLERİ --- */
-    --color-success: #10b981;           /* Yeşil - Armed, OK */
-    --color-success-glow: rgba(16, 185, 129, 0.4);
-    
-    --color-warning: #f59e0b;           /* Amber - Dikkat */
-    --color-warning-glow: rgba(245, 158, 11, 0.4);
-    
-    --color-danger: #ef4444;            /* Kırmızı - Hata, Disarmed */
-    --color-danger-glow: rgba(239, 68, 68, 0.4);
-    
-    --color-info: #0ea5e9;              /* Açık mavi - Bilgi */
-    
+    --color-success: #4ade80;           /* Green-400 */
+    --color-success-glow: rgba(74, 222, 128, 0.3);
+
+    --color-warning: #fb923c;           /* Orange-400 */
+    --color-warning-glow: rgba(251, 146, 60, 0.3);
+
+    --color-danger: #f87171;            /* Red-400 */
+    --color-danger-glow: rgba(248, 113, 113, 0.3);
+
+    --color-info: #818cf8;              /* Indigo — bilgi rengi */
+
     /* --- ARKAPLAN RENKLERİ --- */
-    --bg-body: #c0cfe3;
-    --bg-body-gradient: linear-gradient(160deg, #0a111c 0%, #0f1e30 50%, #0a1628 100%);
+    --bg-body: #0f172a;
+    --bg-body-gradient: none;
 
     /* =========================================
-       PANEL HİYERARŞİSİ  (koyu aviation teması)
+       PANEL HİYERARŞİSİ  (Slate/Indigo teması)
        .panel  → Sayfa bölümü dış kap
        .panel2 → İç grup/kart
        .panel3 → En iç içerik kartı
        Değiştirmek için sadece bu değişkenleri güncelleyin.
     ========================================= */
-    --bg-panel:   rgba(12, 115, 150, 0.9);    /* Dış: koyu lacivert */
-    --bg-panel-2: rgba(85, 88, 141, 0.9);    /* Orta: biraz açık çelik mavi */
-    --bg-panel-3:rgba(85, 88, 141, 0.9);   /* İç: hafif aydınlık çelik mavi */
-    --bg-panel-pin: rgba(255, 193, 117, 0.92); /* Pin paneli: color5 şeftali — donanım bağlantısı */
+    --bg-panel:   rgba(30, 41, 59, 0.95);   /* slate-800 */
+    --bg-panel-2: rgba(41, 53, 72, 0.95);   /* slate-700/800 arası */
+    --bg-panel-3: rgba(15, 23, 42, 0.97);   /* slate-950 */
+    --bg-panel-pin: rgba(255, 193, 117, 0.92); /* Pin paneli: donanım bağlantısı */
     --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
 
-    --bg-panel-solid:;  
-    --bg-input: rgba(10, 20, 35, 0.85);      /* Input: koyu şeffaf */
-    --bg-hover: rgba(255, 255, 255, 0.06);
-    
-    --bg-terminal: #060e18;             /* Log/Terminal arkası */
-    --bg-3d-canvas: #080f1a;            /* 3D Sahne arkası — derin koyu */
-    
+    --bg-panel-solid: #1e293b;
+    --bg-input: rgba(15, 23, 42, 0.85);      /* Input: koyu şeffaf */
+    --bg-hover: rgba(255, 255, 255, 0.05);
+
+    --bg-terminal: #0a0f1a;             /* Log/Terminal arkası */
+    --bg-3d-canvas: #0f172a;            /* 3D Sahne arkası */
+
     /* --- KENARLIK RENKLERİ --- */
-    --border-default: rgba(255, 255, 255, 0.09);
-    --border-light:   rgba(255, 255, 255, 0.04);
+    --border-default: rgba(51, 65, 85, 0.8);    /* slate-700 */
+    --border-light:   rgba(51, 65, 85, 0.4);
     --border-focus: var(--color-primary);
 
     /* --- METİN RENKLERİ --- */
-    --text-primary:   #dce8f5;          /* Ana metin — açık mavi-beyaz */
-    --text-secondary: #ffffff;          /* İkincil metin — çelik mavi-gri */
-    --text-muted:     #4d708f;          /* Soluk metin */
-    --text-inverse:   #0d1520;          /* Ters metin (koyu arka plana karşı) */
-    --text-value:     #03212a;          /* Değer rengi (emerald yeşil) */
+    --text-primary:   #e2e8f0;          /* slate-200 */
+    --text-secondary: #cbd5e1;          /* slate-300 */
+    --text-muted:     #94a3b8;          /* slate-400 */
+    --text-inverse:   #0f172a;          /* ters metin (açık arka plan için) */
+    --text-value:     #4ade80;          /* sensör değerleri — yeşil */
 
     /* =========================================
        MERKEZİ METİN TİPOGRAFİ SİSTEMİ
@@ -94,7 +94,7 @@
     /* t-aciklama: Yardım metni, talimatlar */
     --t-aciklama-size:   var(--font-size-sm);
     --t-aciklama-weight: 500;
-    --t-aciklama-color:  #c8dff0;
+    --t-aciklama-color:  #94a3b8;
     --t-aciklama-style:  normal;
 
     /* t-deger: Sensör/ölçüm değerleri */
@@ -102,13 +102,13 @@
     --t-deger-weight: 400;
     --t-deger-color:  var(--text-value);
     --t-deger-style:  normal;
-    
+
     /* --- HUD & DATA RENKLERİ --- */
-    --hud-green: #20d297;               /* Klasik HUD yeşili */
+    --hud-green: #4ade80;               /* HUD yeşili */
     --hud-amber: #fbbf24;               /* Canlı imleç sarısı */
-    --data-x: #ff6b6b;                  /* X ekseni (kırmızı) */
-    --data-y: #51cf66;                  /* Y ekseni (yeşil) */
-    --data-z: #339af0;                  /* Z ekseni (mavi) */
+    --data-x: #f87171;                  /* X ekseni (kırmızı) */
+    --data-y: #4ade80;                  /* Y ekseni (yeşil) */
+    --data-z: #818cf8;                  /* Z ekseni (indigo) */
     
     /* --- BOYUTLAR --- */
     --radius-xs: 2px;
@@ -182,10 +182,10 @@ body {
     height: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #1e293b;
 }
 ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #334155;
     border-radius: var(--radius-xs);
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -553,7 +553,7 @@ a:hover {
 .dashboard-header {
     background: var(--bg-panel);
     border-bottom: 1px solid var(--border-default);
-    padding: 4px 0;
+    padding: 0;
     margin-bottom: 6px;
 }
 
@@ -635,7 +635,7 @@ a:hover {
 
 .sidebar .nav-link.active {
     color: var(--color-primary);
-    background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), transparent);
+    background: linear-gradient(90deg, rgba(129, 140, 248, 0.15), transparent);
     border-color: transparent;
     border-left: 3px solid var(--color-primary);
 }
@@ -743,10 +743,10 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(14, 165, 233, 0.1);
+    background: rgba(129, 140, 248, 0.1);
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--radius-sm);
-    border: 1px solid rgba(14, 165, 233, 0.3);
+    border: 1px solid rgba(129, 140, 248, 0.3);
     margin-top: var(--spacing-md);
 }
 
@@ -2077,7 +2077,7 @@ label.small.text-muted,
     transform: translateY(-1px);
 }
 .aircraft-card.active {
-    background: rgba(14,165,233,0.30);
+    background: rgba(99, 102, 241, 0.20);
     border-color: var(--color-primary);
     box-shadow: 0 0 14px var(--color-primary-glow);
 }
@@ -2089,10 +2089,10 @@ label.small.text-muted,
 .cal-step { border: 1px solid var(--border-default) !important; }
 .cal-step:hover:not(.disabled) {
     border-color: var(--color-primary) !important;
-    background: rgba(14,165,233,0.07) !important;
+    background: rgba(99, 102, 241, 0.07) !important;
 }
-.cal-step.active  { border-color: var(--color-primary) !important; background: rgba(14,165,233,0.08) !important; }
-.cal-step.completed { border-color: var(--color-success) !important; background: rgba(16,185,129,0.07) !important; }
+.cal-step.active  { border-color: var(--color-primary) !important; background: rgba(99, 102, 241, 0.08) !important; }
+.cal-step.completed { border-color: var(--color-success) !important; background: rgba(74, 222, 128, 0.07) !important; }
 .cal-step-icon { color: var(--text-muted) !important; }
 .cal-step.active .cal-step-icon { color: var(--color-primary) !important; }
 .cal-step.completed .cal-step-icon { color: var(--color-success) !important; }
@@ -2109,7 +2109,7 @@ label.small.text-muted,
 .btn-danger  { background: var(--color-danger); color: #fff !important; border: none; }
 .btn-danger:hover  { background: #dc2626; transform: translateY(-1px); }
 .btn-primary { background: var(--color-brand-blue); color: #fff !important; border: none; }
-.btn-primary:hover { background: #c92020; transform: translateY(-1px); }
+.btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-1px); }
 
 /* Accordion - Loglar sayfası kısayollar */
 .accordion-item {
@@ -2121,7 +2121,7 @@ label.small.text-muted,
     color: var(--text-primary) !important;
 }
 .accordion-button:not(.collapsed) {
-    background: rgba(14,165,233,0.08) !important;
+    background: rgba(99, 102, 241, 0.08) !important;
     color: var(--color-primary) !important;
     box-shadow: none !important;
 }
@@ -2133,8 +2133,8 @@ label.small.text-muted,
 .text-success.h5, h3.text-success { color: var(--text-primary) !important; font-size: var(--font-size-md) !important; }
 
 /* Tab menüsü - tercihler */
-.adv-tab { background: rgba(50, 85, 125, 0.70); border-color: rgba(255,255,255,0.14); color: #c8dff0; }
-.adv-tab:hover { background: rgba(60, 100, 145, 0.80); color: #ffffff; }
+.adv-tab { background: rgba(30, 41, 59, 0.80); border-color: rgba(51,65,85,0.6); color: #94a3b8; }
+.adv-tab:hover { background: rgba(41, 53, 72, 0.90); color: #e2e8f0; }
 .adv-tab.active { background: #e8eaec; color: #111111; border-color: rgba(0,0,0,0.20); border-bottom-color: transparent; }
 
 /* h5/h6 card header renkleri */
@@ -2611,8 +2611,8 @@ label.small.text-muted,
 }
 
 .adv-tab {
-    background: rgba(50, 85, 125, 0.70);
-    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(30, 41, 59, 0.80);
+    border: 1px solid rgba(51, 65, 85, 0.6);
     border-bottom: none;
     color: #c8dff0;
     padding: 5px 14px;
@@ -2628,8 +2628,8 @@ label.small.text-muted,
 }
 
 .adv-tab:hover {
-    background: rgba(60, 100, 145, 0.80);
-    color: #ffffff;
+    background: rgba(41, 53, 72, 0.90);
+    color: #e2e8f0;
 }
 
 .adv-tab.active {
@@ -2723,8 +2723,8 @@ label.small.text-muted,
    stylesheet sonunda olduğu için her durumda kazanır.
    ============================================ */
 .cal-step.panel4                       { background: #e8eaec !important; }
-.cal-step.panel4:hover:not(.disabled)  { background: rgba(14,165,233,0.10) !important; }
-.cal-step.panel4.active                { background: rgba(14,165,233,0.12) !important; }
+.cal-step.panel4:hover:not(.disabled)  { background: rgba(99, 102, 241, 0.10) !important; }
+.cal-step.panel4.active                { background: rgba(99, 102, 241, 0.12) !important; }
 .cal-step.panel4.completed             { background: rgba(16,185,129,0.12) !important; }
 
 /* ============================================

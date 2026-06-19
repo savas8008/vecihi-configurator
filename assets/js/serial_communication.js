@@ -271,6 +271,13 @@ async function handleDisconnect(skipWarning = false) {
 
     updateConnectionStatus();
     log('🔌 Bağlantı kesildi', 'warning');
+    var hwBar = document.getElementById('hwStatusBar');
+    if (hwBar) {
+        hwBar.classList.add('d-none');
+        hwBar.querySelectorAll('.hw-status-item').forEach(function(el) {
+            el.classList.remove('hw-ok', 'hw-err', 'hw-warn');
+        });
+    }
 
     if (wasUnexpected) {
         if (pendingReconnect) {
@@ -453,6 +460,29 @@ function handleStandardJsonData(data) {
     if (data.stream_data && data.stream_data.type === 'init_status') {
         const sensors = data.stream_data.data;
 
+        // --- DONANIM DURUM BARI: init_status'tan ilk 4 sensörü doldur ---
+        (function() {
+            var map = {
+                'hw-gyro':  { ok: !!sensors.gyro,     critical: true },
+                'hw-accel': { ok: !!sensors.accel,    critical: true },
+                'hw-baro':  { ok: !!sensors.baro,     critical: false },
+                'hw-gps':   { ok: !!sensors.gps,      critical: false }
+            };
+            Object.keys(map).forEach(function(id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.classList.remove('hw-ok', 'hw-err', 'hw-warn');
+                el.classList.add(map[id].ok ? 'hw-ok' : (map[id].critical ? 'hw-err' : 'hw-warn'));
+            });
+            // pitot ve receiver init'te bilinmiyor → gri (sınıf yok)
+            ['hw-pitot', 'hw-receiver'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.remove('hw-ok', 'hw-err', 'hw-warn');
+            });
+            var bar = document.getElementById('hwStatusBar');
+            if (bar) bar.classList.remove('d-none');
+        })();
+
         // Kritik sensörler (Gyro ve Accel) çalışıyor mu?
         const isSystemReady = sensors.gyro && sensors.accel;
         // Herhangi bir sensör eksik mi?
@@ -558,6 +588,11 @@ function handleStandardJsonData(data) {
                         GPS
                         <span class="badge ${sensors.gps ? 'bg-success' : 'bg-warning text-dark'} rounded-pill">${sensors.gps ? 'OK' : 'BAĞLI DEĞİL'}</span>
                     </li>
+                    ${sensors.pitot !== undefined ? `
+                    <li class="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center">
+                        Pitot Tüpü (MS4525DO)
+                        <span class="badge ${sensors.pitot ? 'bg-success' : 'bg-secondary'} rounded-pill">${sensors.pitot ? 'OK' : 'BAĞLI DEĞİL'}</span>
+                    </li>` : ''}
                 `;
             }
 
@@ -634,8 +669,11 @@ function handlePageData(pageType, pageData) {
         case 'osd': 
             if (typeof handleOSDPageData === 'function') handleOSDPageData(pageData); 
             break;
-        case 'advanced': 
-            if (typeof handleAdvancedPageData === 'function') handleAdvancedPageData(pageData); 
+        case 'advanced':
+            if (typeof handleAdvancedPageData === 'function') handleAdvancedPageData(pageData);
+            break;
+        case 'pitot':
+            if (typeof handlePitotPageData === 'function') handlePitotPageData(pageData);
             break;
         case 'waypoints':
             if (typeof handleWaypointData === 'function') handleWaypointData(pageData);

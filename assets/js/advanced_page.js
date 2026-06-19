@@ -178,6 +178,14 @@ function handleAdvancedPageData(data) {
         setElVal('km_def_mission_servo', data.kamikaze.mission_servo);
     }
 
+    // 13) Pitot
+    if (data.pitot) {
+        const enEl = document.getElementById('pitotEnabled');
+        const scEl = document.getElementById('pitotScale');
+        if (enEl) enEl.checked = !!data.pitot.enabled;
+        if (scEl && data.pitot.scale !== undefined) scEl.value = data.pitot.scale.toFixed(2);
+    }
+
     updateAdvancedUI();
 }
 
@@ -540,6 +548,15 @@ function saveAdvancedConfig() {
     setIf(km, "mission_servo", selInt("km_def_mission_servo"));
     if (Object.keys(km).length) cfg.kamikaze = km;
 
+    const enEl = document.getElementById('pitotEnabled');
+    const scEl = document.getElementById('pitotScale');
+    if (enEl || scEl) {
+        cfg.pitot = {
+            enabled: enEl ? enEl.checked : false,
+            scale:   scEl ? parseFloat(scEl.value) : 1.0
+        };
+    }
+
     console.log("[ADV] SAVE payload =", cfg);
     sendCommand(`SAVE_ADVANCED_CONFIG ${JSON.stringify(cfg)}`);
 }
@@ -637,6 +654,28 @@ function toggleWpSection(bodyId) {
     if (chevron) chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
 }
 
+// === PİTOT TÜPÜ FONKSİYONLARI ===
+function handlePitotPageData(data) {
+    var el = function(id) { return document.getElementById(id); };
+    if (!data) return;
+    var enabled = el('pitotEnabled');
+    var scale   = el('pitotScale');
+    if (enabled) enabled.checked = !!data.enabled;
+    if (scale)   scale.value     = (data.scale !== undefined) ? data.scale.toFixed(2) : '1.00';
+}
+
+function savePitotConfig() {
+    var enabled = document.getElementById('pitotEnabled');
+    var scale   = document.getElementById('pitotScale');
+    if (!enabled || !scale) return;
+    var payload = JSON.stringify({
+        command: 'SAVE_PITOT_CONFIG',
+        enabled: enabled.checked,
+        scale:   parseFloat(scale.value)
+    });
+    if (typeof sendCommand === 'function') sendCommand(payload);
+}
+
 // === DIŞA AKTARILAN FONKSİYONLAR ===
 window.handleAdvancedPageData = handleAdvancedPageData;
 window.updateAdvancedUI = updateAdvancedUI;
@@ -644,6 +683,8 @@ window.saveAdvancedConfig = saveAdvancedConfig;
 window.updateAdvDisplay = updateAdvDisplay;
 window.toggleGpsSettings = toggleGpsSettings;
 window.toggleWpSection = toggleWpSection;
+window.handlePitotPageData = handlePitotPageData;
+window.savePitotConfig = savePitotConfig;
 
 // advancedConfig'i dışarıdan erişilebilir yap
 window.advancedConfig = advancedConfig;

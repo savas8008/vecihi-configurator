@@ -436,6 +436,55 @@
             }
         }
 
+        // --- Donanım Durum Barı ---
+        if (data.hw) {
+            var hwMap = {
+                'hw-gyro':     { ok: data.hw.gyro,     critical: true },
+                'hw-accel':    { ok: data.hw.accel,    critical: true },
+                'hw-baro':     { ok: data.hw.baro,     critical: false },
+                'hw-gps':      { ok: data.hw.gps,      critical: false },
+                'hw-pitot':    { ok: data.hw.pitot,    critical: false },
+                'hw-receiver': { ok: data.hw.receiver, critical: false }
+            };
+            Object.keys(hwMap).forEach(function(id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                var state = hwMap[id];
+                el.classList.remove('hw-ok', 'hw-err', 'hw-warn');
+                if (state.ok) {
+                    el.classList.add('hw-ok');
+                } else {
+                    el.classList.add(state.critical ? 'hw-err' : 'hw-warn');
+                }
+            });
+            var bar = document.getElementById('hwStatusBar');
+            if (bar) bar.classList.remove('d-none');
+        }
+
+        // --- Hava Hızı ---
+        var sensAirspeed = document.getElementById('sens-airspeed');
+        var sensAirspeedSrc = document.getElementById('sens-airspeed-src');
+        if (sensAirspeed) {
+            if (data.airspeed !== undefined && data.airspeed_src !== 'none') {
+                sensAirspeed.textContent = (data.airspeed * 3.6).toFixed(1);
+            } else {
+                sensAirspeed.textContent = '--';
+            }
+        }
+        if (sensAirspeedSrc) {
+            var src = data.airspeed_src || 'none';
+            if (src === 'pitot') {
+                sensAirspeedSrc.textContent = 'PITOT';
+                sensAirspeedSrc.className = 'badge bg-success ms-1';
+            } else if (src === 'virtual') {
+                sensAirspeedSrc.textContent = 'VİRTÜEL';
+                sensAirspeedSrc.className = 'badge bg-info ms-1';
+            } else {
+                sensAirspeedSrc.textContent = '-';
+                sensAirspeedSrc.className = 'badge bg-secondary ms-1';
+            }
+        }
+
         // --- Harita Güncelleme ---
         if (data.lat && data.lon && data.lat !== 0 && data.lon !== 0) {
             updateMapPosition(data.lat, data.lon, data.heading);

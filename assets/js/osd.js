@@ -42,7 +42,8 @@ const osdElementMapping = {
     'prev_gcode':        'gcode',
     'prev_battery_cap':  'cap',
     'prev_cell_voltage': 'cellv',
-    'prev_current_amps': 'amp'
+    'prev_current_amps': 'amp',
+    'prev_airspeed':     'air'
 };
 
 // JSON Key -> HTML ID (ters eşleştirme)
@@ -72,7 +73,8 @@ const osdToggleMapping = {
     'gcode': 'osd_show_gcode',
     'cap':   'osd_show_cap',
     'cellv': 'osd_show_cellv',
-    'amp':   'osd_show_amp'
+    'amp':   'osd_show_amp',
+    'air':   'osd_show_air'
 };
 
 // ============================================================================
