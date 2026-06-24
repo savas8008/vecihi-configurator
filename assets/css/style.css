@@ -1455,17 +1455,13 @@ input[type="range"]::-moz-range-thumb {
 
 .btn-disconnect {
     background: linear-gradient(135deg, #dc2626, #ef4444);
-    color: #ffffff;
-    font-weight: 700;
-    padding: 6px 18px;
-    font-size: var(--font-size-sm);
+    padding: 5px 8px;
     border-radius: var(--radius-sm);
     box-shadow: 0 0 14px rgba(239, 68, 68, 0.45), 0 2px 8px rgba(0,0,0,0.3);
     border: 1.5px solid rgba(239, 68, 68, 0.55);
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
     cursor: pointer;
     transition: all var(--transition-fast);
+    line-height: 1;
 }
 .btn-disconnect:hover {
     background: linear-gradient(135deg, #b91c1c, #dc2626);
@@ -1786,7 +1782,7 @@ input[type="range"]::-moz-range-thumb {
 
     .dashboard-header .btn-ground-control,
     .dashboard-header .btn-disconnect {
-        width: 100%;
+        width: auto;
     }
     
     .save-button-container {
@@ -1856,7 +1852,7 @@ input[type="range"]::-moz-range-thumb {
     }
 
     .dashboard-header .btn-disconnect {
-        width: 100%;
+        width: auto;
     }
 
     #connectionPrompt {

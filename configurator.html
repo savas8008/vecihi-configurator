@@ -39,6 +39,9 @@
 
 <script src="assets/js/page_management.js"></script>
 <script src="assets/js/main.js"></script>
+<script src="assets/locales/tr.js"></script>
+<script src="assets/locales/en.js"></script>
+<script src="assets/js/i18n.js"></script>
 <script src="assets/js/flight_modes.js"></script>
 <script src="assets/js/outputs_page.js"></script>
 <script src="assets/js/settings_backup.js"></script>
@@ -200,10 +203,10 @@
             <div class="connection-status" style="background-color:rgb(251,251,251);" id="connectionStatusBox">
               <span class="status-indicator status-off" id="statusIndicator"></span>
               <span class="status-icon"><img src="assets/icons/usb.png" alt="USB" width="26" height="26"></span>
-              <span id="connectionStatus" class="visually-hidden">Bağlantı Yok</span>
+              <span id="connectionStatus" class="visually-hidden" data-i18n="header.connection_none">Bağlantı Yok</span>
             </div>
-            <button class="btn btn-disconnect d-none" id="btnDisconnect">
-              <i class="bi bi-usb-plug-fill me-1"></i> Bağlantıyı Kes
+            <button class="btn btn-disconnect d-none" id="btnDisconnect" data-i18n-title="header.disconnect" title="Bağlantıyı Kes">
+              <img src="assets/icons/disconnected.png" alt="Disconnect" width="26" height="26">
             </button>
 
           </div>
@@ -216,39 +219,39 @@
             <div class="col-lg-2 col-md-3 mb-3">
                 <div class="sidebar rounded p-3">
                     <ul class="nav flex-column">
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="sensors"><i class="bi bi-radar me-2"></i> Sensörler</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> Kalibrasyon</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="mixer"><i class="bi bi-sliders me-2"></i> Mikser</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="gps"><i class="bi bi-geo-alt me-2"></i> Navigasyon & GPS</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="transmitter"><i class="bi bi-controller me-2"></i> Kumanda</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i> Uçuş Modları</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="pid"><i class="bi bi-graph-up me-2"></i> PID</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="sensors"><i class="bi bi-radar me-2"></i> <span data-i18n="nav.sensors">Sensörler</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> <span data-i18n="nav.calibration">Kalibrasyon</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="mixer"><i class="bi bi-sliders me-2"></i> <span data-i18n="nav.mixer">Mikser</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="gps"><i class="bi bi-geo-alt me-2"></i> <span data-i18n="nav.gps">Navigasyon & GPS</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="transmitter"><i class="bi bi-controller me-2"></i> <span data-i18n="nav.transmitter">Kumanda</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i> <span data-i18n="nav.modes">Uçuş Modları</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="pid"><i class="bi bi-graph-up me-2"></i> <span data-i18n="nav.pid">PID</span></a></li>
 						<li class="nav-item">
 
 </li>
 						<li class="nav-item">
     <a class="nav-link" href="#" data-page="advanced">
-        <i class="bi bi-sliders me-2"></i> Tercihler
+        <i class="bi bi-sliders me-2"></i> <span data-i18n="nav.advanced">Tercihler</span>
     </a>
 </li>
 <li class="nav-item">
     <a class="nav-link" href="#" data-page="osd">
-        <i class="bi bi-aspect-ratio me-2"></i> OSD
+        <i class="bi bi-aspect-ratio me-2"></i> <span data-i18n="nav.osd">OSD</span>
     </a>
 </li>
                         <li class="nav-item">
     <a class="nav-link" href="#" data-page="waypoint">
-        <i class="bi bi-map me-2"></i> Waypoint
+        <i class="bi bi-map me-2"></i> <span data-i18n="nav.waypoint">Waypoint</span>
     </a>
 </li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> Loglar</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> <span data-i18n="nav.logs">Loglar</span></a></li>
 
                         <!-- BAĞLANTISIZ ARAÇLAR — bağlıyken JS ile gizlenir -->
-                        <li class="nav-item nav-offline"><a class="nav-link active" href="#" data-page="home"><i class="bi bi-usb-plug me-2"></i> Konfiguratör</a></li>
-                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="firmware"><i class="bi bi-cpu me-2"></i> Firmware</a></li>
-                        <li class="nav-item nav-offline"><a class="nav-link" id="btnGroundControlOffline" href="#" onclick="window.open('elrs_backpack.html','_blank');return false;"><i class="bi bi-broadcast-pin me-2"></i> Yer Kontrol</a></li>
-                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="kml"><i class="bi bi-globe2 me-2"></i> Log → KML</a></li>
-                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="docs"><i class="bi bi-book me-2"></i> Dokümanlar</a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link active" href="#" data-page="home"><i class="bi bi-usb-plug me-2"></i> <span data-i18n="nav.home">Konfiguratör</span></a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="firmware"><i class="bi bi-cpu me-2"></i> <span data-i18n="nav.firmware">Firmware</span></a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link" id="btnGroundControlOffline" href="#" onclick="window.open('elrs_backpack.html','_blank');return false;"><i class="bi bi-broadcast-pin me-2"></i> <span data-i18n="nav.ground_control">Yer Kontrol</span></a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="kml"><i class="bi bi-globe2 me-2"></i> <span data-i18n="nav.kml">Log → KML</span></a></li>
+                        <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="docs"><i class="bi bi-book me-2"></i> <span data-i18n="nav.docs">Dokümanlar</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -259,10 +262,9 @@
                 <div id="connectionPrompt" class="connection-prompt">
                     <div class="panel text-center prompt-card configurator-entry-card" style="max-width:420px;margin:0 auto;">
                         <img src="assets/icons/configurator.png" alt="Configurator" width="80" height="80" class="d-block mx-auto mb-4">
-                        <h2 class="gradient-text mb-3">Konfiguratöre Giriş</h2>
-                        <p class="prompt-description">Cihazınıza enerji verdikten sonra
-                            <b style="color:red;">ilk 10 saniye içinde</b> seri porta bağlayın.
-                            Aksi takdirde uçuş moduna geçer.</p>
+                        <h2 class="gradient-text mb-3" data-i18n="connection.title">Konfiguratöre Giriş</h2>
+                        <p class="prompt-description"><span data-i18n="connection.description">Cihazınıza enerji verdikten sonra</span>
+                            <b style="color:red;" data-i18n="connection.description_bold">ilk 10 saniye içinde</b> <span data-i18n="connection.description_end">seri porta bağlayın. Aksi takdirde uçuş moduna geçer.</span></p>
                         <button class="btn btn-connect btn-lg w-100" id="btnConnectPrompt">
                             <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
                         </button>
@@ -276,18 +278,18 @@
                             <div class="panel prompt-card text-center configurator-entry-card">
                                 <div class="text-center mb-4">
                                     <img src="assets/icons/firmware.png" alt="Firmware" width="72" height="72" class="mb-3">
-                                    <h2 class="text-white mb-0">Firmware Güncelleme</h2>
-                                    <p class="text-muted small mt-1">ESP32 üzerine Vecihi firmware yükler</p>
+                                    <h2 class="text-white mb-0" data-i18n="firmware.title">Firmware Güncelleme</h2>
+                                    <p class="text-muted small mt-1" data-i18n="firmware.subtitle">ESP32 üzerine Vecihi firmware yükler</p>
                                 </div>
                                 <div class="d-flex flex-column gap-20">
                                     <div>
-                                        <div class="text-muted small">Mevcut versiyon:</div>
-                                        <span id="firmwareVersionPreview" class="badge bg-secondary firmware-version">Yükleniyor...</span>
-                                        <small class="text-muted ms-2">Derleme: <span id="firmwareBuildDatePreview" class="firmware-build-date">—</span></small>
+                                        <div class="text-muted small" data-i18n="firmware.current_version">Mevcut versiyon:</div>
+                                        <span id="firmwareVersionPreview" class="badge bg-secondary firmware-version" data-i18n="firmware.loading">Yükleniyor...</span>
+                                        <small class="text-muted ms-2"><span data-i18n="firmware.build_date">Derleme:</span> <span id="firmwareBuildDatePreview" class="firmware-build-date">—</span></small>
                                     </div>
                                     <div class="alert alert-warning small mb-0">
                                         <i class="bi bi-exclamation-triangle me-1"></i>
-                                        Flash işlemi için önce seri bağlantıyı kesin ve tarayıcı sekmesini yenileyin.
+                                        <span data-i18n="firmware.flash_warning">Flash işlemi için önce seri bağlantıyı kesin ve tarayıcı sekmesini yenileyin.</span>
                                     </div>
                                     <div class="text-center">
                                         <esp-web-install-button manifest="https://savas8008.github.io/vecihi-public/manifest.json">
@@ -311,8 +313,8 @@
                                 <i class="bi bi-globe2" style="color:#4ade80;font-size:1.4rem;"></i>
                             </div>
                             <div>
-                                <h3 class="prompt-links-title mb-1">EdgeTX Log → KML Dönüştürücü</h3>
-                                <p class="prompt-links-subtitle mb-0">EdgeTX CSV log kaydını Google Earth'e aktarın — bağlantı gerekmez.</p>
+                                <h3 class="prompt-links-title mb-1" data-i18n="kml.title">EdgeTX Log → KML Dönüştürücü</h3>
+                                <p class="prompt-links-subtitle mb-0" data-i18n="kml.subtitle">EdgeTX CSV log kaydını Google Earth'e aktarın — bağlantı gerekmez.</p>
                             </div>
                         </div>
 
@@ -320,8 +322,8 @@
 
                         <div id="kmlDropZone" class="kml-drop-zone">
                             <i class="bi bi-cloud-upload kml-drop-icon"></i>
-                            <p class="kml-drop-text">CSV dosyasını buraya sürükleyin veya tıklayarak seçin</p>
-                            <p class="kml-drop-hint">EdgeTX / OpenTX log formatı (.csv)</p>
+                            <p class="kml-drop-text" data-i18n="kml.drop_text">CSV dosyasını buraya sürükleyin veya tıklayarak seçin</p>
+                            <p class="kml-drop-hint" data-i18n="kml.drop_hint">EdgeTX / OpenTX log formatı (.csv)</p>
                             <input type="file" id="kmlFileInput" accept=".csv" style="display:none;">
                         </div>
 
@@ -330,18 +332,18 @@
                                 <div id="kmlMapPreview" class="kml-map-preview"></div>
                             </div>
                             <div class="kml-stats-grid">
-                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-calendar3 me-1"></i>Tarih</span><span class="kml-stat-val" id="kmlStatDate">—</span></div>
-                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-clock me-1"></i>Süre</span><span class="kml-stat-val" id="kmlStatDur">—</span></div>
-                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-arrow-up me-1"></i>Maks. İrtifa</span><span class="kml-stat-val" id="kmlStatAlt">—</span></div>
-                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-speedometer2 me-1"></i>Maks. Hız</span><span class="kml-stat-val" id="kmlStatSpd">—</span></div>
-                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-geo me-1"></i>Toplam Mesafe</span><span class="kml-stat-val" id="kmlStatDist">—</span></div>
-                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-reception-4 me-1"></i>GPS Noktası</span><span class="kml-stat-val" id="kmlStatGps">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-calendar3 me-1"></i><span data-i18n="kml.stat_date">Tarih</span></span><span class="kml-stat-val" id="kmlStatDate">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-clock me-1"></i><span data-i18n="kml.stat_duration">Süre</span></span><span class="kml-stat-val" id="kmlStatDur">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-arrow-up me-1"></i><span data-i18n="kml.stat_alt">Maks. İrtifa</span></span><span class="kml-stat-val" id="kmlStatAlt">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-speedometer2 me-1"></i><span data-i18n="kml.stat_speed">Maks. Hız</span></span><span class="kml-stat-val" id="kmlStatSpd">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-geo me-1"></i><span data-i18n="kml.stat_dist">Toplam Mesafe</span></span><span class="kml-stat-val" id="kmlStatDist">—</span></div>
+                                <div class="kml-stat-card"><span class="kml-stat-label"><i class="bi bi-reception-4 me-1"></i><span data-i18n="kml.stat_gps">GPS Noktası</span></span><span class="kml-stat-val" id="kmlStatGps">—</span></div>
                             </div>
                             <div id="kmlModeLegend" class="kml-legend"></div>
                             <div class="kml-actions">
-                                <button id="btnKmlDownload" class="btn kml-btn-download"><i class="bi bi-download me-2"></i>KML İndir</button>
-                                <button id="btnKmlGoogleEarth" class="btn kml-btn-earth"><i class="bi bi-globe2 me-2"></i>Google Earth'te Aç</button>
-                                <button id="btnKmlReset" class="btn kml-btn-reset"><i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla</button>
+                                <button id="btnKmlDownload" class="btn kml-btn-download"><i class="bi bi-download me-2"></i> KML İndir</button>
+                                <button id="btnKmlGoogleEarth" class="btn kml-btn-earth"><i class="bi bi-globe2 me-2"></i> Google Earth'te Aç</button>
+                                <button id="btnKmlReset" class="btn kml-btn-reset"><i class="bi bi-arrow-counterclockwise me-1"></i> Sıfırla</button>
                             </div>
                             <div id="kmlGEHint" class="kml-ge-hint" style="display:none;">
                                 <i class="bi bi-info-circle me-2"></i>
@@ -361,28 +363,28 @@
                                 <i class="bi bi-journal-richtext"></i>
                             </div>
                             <div>
-                                <h3 class="prompt-links-title mb-1">Dokümanlar &amp; Kaynaklar</h3>
-                                <p class="prompt-links-subtitle mb-0">Kablolama, kurulum ve kullanım rehberleri.</p>
+                                <h3 class="prompt-links-title mb-1" data-i18n="docs.title">Dokümanlar &amp; Kaynaklar</h3>
+                                <p class="prompt-links-subtitle mb-0" data-i18n="docs.subtitle">Kablolama, kurulum ve kullanım rehberleri.</p>
                             </div>
                         </div>
                         <div class="prompt-link-grid">
                             <a class="prompt-link-tile prompt-link-guide" href="https://github.com/savas8008/vecihi-configurator/blob/main/docs/WIRING.md" target="_blank">
-                                <span class="prompt-link-label"><i class="bi bi-usb-symbol me-2"></i>Bağlantı Kılavuzu</span>
-                                <span class="prompt-link-caption">Kablolama ve bağlantı şemasını aç</span>
+                                <span class="prompt-link-label"><i class="bi bi-usb-symbol me-2"></i><span data-i18n="docs.wiring_label">Bağlantı Kılavuzu</span></span>
+                                <span class="prompt-link-caption" data-i18n="docs.wiring_caption">Kablolama ve bağlantı şemasını aç</span>
                             </a>
                             <a class="prompt-link-tile prompt-link-doc" href="https://github.com/savas8008/vecihi-configurator/blob/main/README.md" target="_blank">
-                                <span class="prompt-link-label"><i class="bi bi-book me-2"></i>README / Kurulum</span>
-                                <span class="prompt-link-caption">Kurulum ve kullanım adımlarını aç</span>
+                                <span class="prompt-link-label"><i class="bi bi-book me-2"></i><span data-i18n="docs.readme_label">README / Kurulum</span></span>
+                                <span class="prompt-link-caption" data-i18n="docs.readme_caption">Kurulum ve kullanım adımlarını aç</span>
                             </a>
                             <div class="prompt-link-tile prompt-link-video" style="cursor:default;">
-                                <span class="prompt-link-label"><i class="bi bi-play-circle-fill me-2"></i>Demo Videoları</span>
+                                <span class="prompt-link-label"><i class="bi bi-play-circle-fill me-2"></i><span data-i18n="docs.video_label">Demo Videoları</span></span>
                                 <div class="mt-2">
-                                    <a href="https://www.youtube.com/watch?v=dASDT7wnlD4&list=PLen9iybnpUbWeFLUECIH69gd5UmlFv4lw" target="_blank" class="text-white" style="text-decoration:none;"><i class="bi bi-collection-play me-1"></i>Oynatma Listesi</a>
+                                    <a href="https://www.youtube.com/watch?v=dASDT7wnlD4&list=PLen9iybnpUbWeFLUECIH69gd5UmlFv4lw" target="_blank" class="text-white" style="text-decoration:none;"><i class="bi bi-collection-play me-1"></i><span data-i18n="docs.video_playlist">Oynatma Listesi</span></a>
                                 </div>
-                                <span class="prompt-link-caption">Kullanım ve ekran anlatım videoları</span>
+                                <span class="prompt-link-caption" data-i18n="docs.video_caption">Kullanım ve ekran anlatım videoları</span>
                             </div>
                             <div class="prompt-link-tile prompt-link-hw" style="cursor:default;">
-                                <span class="prompt-link-label"><i class="bi bi-cpu me-2"></i>Donanım / PCB</span>
+                                <span class="prompt-link-label"><i class="bi bi-cpu me-2"></i><span data-i18n="docs.hw_label">Donanım / PCB</span></span>
                                 <div class="mt-2 d-flex flex-column gap-1">
                                     <a href="https://github.com/savas8008/vecihi-configurator/raw/main/Vecihi%20PCB/Fzz/Untitled%20Sketch.fzz" target="_blank" class="text-white" style="text-decoration:none;"><i class="bi bi-download me-1"></i>Fritzing (.fzz)</a>
                                     <a href="https://github.com/savas8008/vecihi-configurator/tree/main/Vecihi%20PCB/Gerber" target="_blank" class="text-white" style="text-decoration:none;"><i class="bi bi-download me-1"></i>Gerber Dosyaları</a>
@@ -402,7 +404,7 @@
     <div class="col-lg-6">
       <div class="panel3 p-3">
         <div class="d-flex align-items-center mb-2 baslik">
-          <div class="fw-semibold">Kalibrasyon Görünümü</div>
+          <div class="fw-semibold" data-i18n="sensors.cal_view">Kalibrasyon Görünümü</div>
         </div>
 
         <div id="3d-canvas-container"
@@ -437,7 +439,7 @@
               <div class="hud-divider"></div>
 
               <div class="mode-section">
-                <span class="mode-label">UÇUŞ MODU</span>
+                <span class="mode-label" data-i18n="sensors.flight_mode">UÇUŞ MODU</span>
                 <strong id="flight-mode-display" class="mode-val">--</strong>
               </div>
 
@@ -451,13 +453,13 @@
     <!-- SAĞ: Canlı Sensör Verileri + Harita -->
     <div class="col-lg-6">
       <div class="panel">
-        <h2 class="panel-title"><i class="bi bi-radar"></i> Canlı Sensör Verileri</h2>
+        <h2 class="panel-title"><i class="bi bi-radar"></i> <span data-i18n="sensors.title">Canlı Sensör Verileri</span></h2>
 
         <div class="row">
           <div class="col-md-6 mb-4">
             <div class="panel3 h-100">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="h5 text-warning mb-0"><i class="bi bi-geo-alt-fill"></i> GPS Durumu</h3>
+                <h3 class="h5 text-warning mb-0"><i class="bi bi-geo-alt-fill"></i> <span data-i18n="sensors.gps_title">GPS Durumu</span></h3>
                 <span id="gps-fix-badge" class="badge bg-danger">NO FIX</span>
               </div>
 
@@ -465,18 +467,18 @@
                 <!-- Sol: UYDU SAYISI + ENLEM/BOYLAM -->
                 <div class="col-6 d-flex flex-column gap-2">
                   <div class="p-2 border border-secondary rounded">
-                    <small class="text-muted d-block">UYDU SAYISI</small>
+                    <small class="text-muted d-block" data-i18n="sensors.gps_sats">UYDU SAYISI</small>
                     <img src="assets/icons/satellite.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
                     <br>
                     <span id="gps-sats" class="fs-4 fw-bold text-white">0</span>
                   </div>
                   <div class="text-start mt-1">
                     <div class="input-group input-group-sm mb-1">
-                      <span class="input-group-text bg-dark text-muted border-secondary">ENLEM</span>
+                      <span class="input-group-text bg-dark text-muted border-secondary" data-i18n="sensors.gps_lat">ENLEM</span>
                       <input type="text" class="form-control bg-dark text-white border-secondary" id="gps-lat" readonly value="--">
                     </div>
                     <div class="input-group input-group-sm">
-                      <span class="input-group-text bg-dark text-muted border-secondary">BOYLAM</span>
+                      <span class="input-group-text bg-dark text-muted border-secondary" data-i18n="sensors.gps_lon">BOYLAM</span>
                       <input type="text" class="form-control bg-dark text-white border-secondary" id="gps-lon" readonly value="--">
                     </div>
                   </div>
@@ -484,13 +486,13 @@
                 <!-- Sağ: YER HIZI + HAVA HIZI -->
                 <div class="col-6 d-flex flex-column gap-2">
                   <div class="p-2 border border-secondary rounded">
-                    <small class="text-muted d-block">YER HIZI (km/h)</small>
+                    <small class="text-muted d-block" data-i18n="sensors.gps_speed">YER HIZI (km/h)</small>
                     <img src="assets/icons/speed.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
                     <br>
                     <span id="gps-speed" class="fs-4 fw-bold text-info">0</span>
                   </div>
                   <div class="p-2 border border-secondary rounded">
-                    <small class="text-muted d-block">HAVA HIZI (km/h)</small>
+                    <small class="text-muted d-block" data-i18n="sensors.gps_airspeed">HAVA HIZI (km/h)</small>
                     <img src="assets/icons/speed.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
                     <br>
                     <span id="sens-airspeed" class="fs-4 fw-bold text-warning">--</span>
@@ -504,12 +506,12 @@
 
           <div class="col-md-6 mb-4">
             <div class="panel3 h-100">
-              <h3 class="h5 text-info mb-3"><i class="bi bi-cloud-arrow-up"></i> İrtifa &amp; Pusula</h3>
+              <h3 class="h5 text-info mb-3"><i class="bi bi-cloud-arrow-up"></i> <span data-i18n="sensors.alt_title">İrtifa &amp; Pusula</span></h3>
 
               <div class="row g-3">
                 <div class="col-6">
                   <div class="text-center p-3 border border-secondary rounded h-100">
-                    <div class="text-muted small">İRTİFA</div>
+                    <div class="text-muted small" data-i18n="sensors.altitude">İRTİFA</div>
 
                  <img src="assets/icons/barometer.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
                     <div class="fs-3 fw-bold"><span id="sens-alt">0.0</span> m</div>
@@ -517,7 +519,7 @@
                 </div>
                 <div class="col-6">
                   <div class="text-center p-3 border border-secondary rounded h-100">
-                  <div class="text-muted small">VARİO</div>
+                  <div class="text-muted small" data-i18n="sensors.vario">VARİO</div>
                
                  <img src="assets/icons/parachute.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
 
@@ -532,18 +534,18 @@
 
           <!-- Batarya Voltajı -->
           <div class="panel3 mt-2">
-            <h3 class="h5 mb-2"><i class="bi bi-battery-half"></i> Batarya</h3>
+            <h3 class="h5 mb-2"><i class="bi bi-battery-half"></i> <span data-i18n="sensors.battery_title">Batarya</span></h3>
             <div class="row g-2">
               <div class="col-6">
                 <div class="text-center p-3 border border-secondary rounded h-100">
-                  <div class="text-muted small">VOLTAJ</div>
+                  <div class="text-muted small" data-i18n="sensors.voltage">VOLTAJ</div>
                   <div class="fs-4 fw-bold text-success" id="sens-bat">--</div>
                   <div class="text-muted small">Volt</div>
                 </div>
               </div>
               <div class="col-6">
                 <div class="text-center p-3 border border-secondary rounded h-100">
-                  <div class="text-muted small">ADC PIN</div>
+                  <div class="text-muted small" data-i18n="sensors.adc_pin">ADC PIN</div>
                   <div class="fs-4 fw-bold text-info" id="sens-bat-pin">--</div>
                   <div class="text-muted small">GPIO</div>
                 </div>
@@ -555,7 +557,7 @@
 
         <!-- Konum Haritası - Sensörler panelinin altında -->
         <div class="panel3 mt-2">
-          <h3 class="h5 mb-1"><i class="bi bi-map"></i> Konum</h3>
+          <h3 class="h5 mb-1"><i class="bi bi-map"></i> <span data-i18n="sensors.map_title">Konum</span></h3>
           <div id="map-container" style="width:100%; height:240px; border-radius:4px; border:1px solid #444; z-index:1;"></div>
         </div>
 
@@ -565,11 +567,11 @@
     <!-- EN ALT: MCU & Sistem (tam genişlik) -->
     <div class="col-12 mb-3">
       <div class="panel3">
-        <h3 class="h5 text-danger mb-3"><i class="bi bi-cpu"></i> MCU &amp; Sistem Durumu</h3>
+        <h3 class="h5 text-danger mb-3"><i class="bi bi-cpu"></i> <span data-i18n="sensors.mcu_title">MCU &amp; Sistem Durumu</span></h3>
         <div class="row g-3 text-center">
           <div class="col-md-3 col-6">
             <div class="p-2 border border-secondary rounded">
-              <small class="text-muted d-block">CORE 1 (LOOP)</small>
+              <small class="text-muted d-block" data-i18n="sensors.core1">CORE 1 (LOOP)</small>
              <img src="assets/icons/core01.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
              <br>
     <span id="sys-hz" class="fs-4 fw-bold text-white">0</span> <small class="text-muted">Hz</small>
@@ -577,7 +579,7 @@
           </div>
           <div class="col-md-3 col-6">
             <div class="p-2 border border-secondary rounded">
-              <small class="text-muted d-block">CORE 0 (SYS)</small>            
+              <small class="text-muted d-block" data-i18n="sensors.core0">CORE 0 (SYS)</small>            
                 <img src="assets/icons/core01.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
 <br>
   <span id="sys-hz0" class="fs-4 fw-bold text-info">0</span> <small class="text-muted">Hz</small>
@@ -585,7 +587,7 @@
           </div>
           <div class="col-md-3 col-6">
             <div class="p-2 border border-secondary rounded">
-              <small class="text-muted d-block">SICAKLIK</small>
+              <small class="text-muted d-block" data-i18n="sensors.temperature">SICAKLIK</small>
                                 <img src="assets/icons/thermometer.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
 <br>
               <span id="sys-temp" class="fs-4 fw-bold text-warning">--</span> <small class="text-muted">°C</small>
@@ -593,7 +595,7 @@
           </div>
           <div class="col-md-3 col-6">
             <div class="p-2 border border-secondary rounded">
-              <small class="text-muted d-block">BOŞ RAM</small>
+              <small class="text-muted d-block" data-i18n="sensors.free_ram">BOŞ RAM</small>
                                 <img src="assets/icons/ram-memory.png" alt="XFlight" width="40" height="40" class="me-2 align-text-bottom">
 <br>
               <span id="sys-ram" class="fs-4 fw-bold text-info">--</span> <small class="text-muted">KB</small>
@@ -621,15 +623,15 @@
         <div class="pin-box">
           <label class="port-label d-block mb-1">SCL</label>
           <select class="form-select form-select-sm pin-select" id="i2cSclPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 22</small>
+          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="calibration.gpio_scl_hint">Tavsiye: GPIO 22</span></small>
         </div>
         <div class="pin-box">
           <label class="port-label d-block mb-1">SDA</label>
           <select class="form-select form-select-sm pin-select" id="i2cSdaPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 21</small>
+          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="calibration.gpio_sda_hint">Tavsiye: GPIO 21</span></small>
         </div>
         <button class="btn btn-warning btn-sm" onclick="saveI2CPins()">
-          <i class="bi bi-save me-1"></i> I2C Pinlerini Kaydet
+          <i class="bi bi-save me-1"></i> <span data-i18n="calibration.pin_save">I2C Pinlerini Kaydet</span>
         </button>
       </div>
       <div class="pin-reboot-warning">
@@ -647,8 +649,8 @@
 
     <div class="col-lg-8">
       <div class="panel3 p-2">
-        <div class="t-baslik mb-1">Pozisyon Kalibrasyonu (6 Yüz)</div>
-        <div class="t-aciklama mb-2">Her adımda uçağı konumlandırıp tıklayın</div>
+        <div class="t-baslik mb-1" data-i18n="calibration.pose_title">Pozisyon Kalibrasyonu (6 Yüz)</div>
+        <div class="t-aciklama mb-2" data-i18n="calibration.pose_hint">Her adımda uçağı konumlandırıp tıklayın</div>
 
         <div class="cal-steps-container cal-steps-6 mb-0" style="background-color:rgb(242, 244, 242) ;" >
 
@@ -659,7 +661,7 @@
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer" ><span class="t-aciklama step-label">Düz (tekerlekler aşağıda)</span></div>
+            <div class="cal-step-footer" ><span class="t-aciklama step-label" data-i18n="calibration.pose_zp">Düz (tekerlekler aşağıda)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
@@ -670,7 +672,7 @@
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="t-aciklama step-label">Ters (tekerlekler havada)</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label" data-i18n="calibration.pose_zn">Ters (tekerlekler havada)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
@@ -681,7 +683,7 @@
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="t-aciklama step-label">Burun yukarı (dik)</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label" data-i18n="calibration.pose_xp">Burun yukarı (dik)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
@@ -692,7 +694,7 @@
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="t-aciklama step-label">Burun aşağı (dik)</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label" data-i18n="calibration.pose_xn">Burun aşağı (dik)</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
@@ -703,7 +705,7 @@
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="t-aciklama step-label">Sol kanat yukarı</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label" data-i18n="calibration.pose_yp">Sol kanat yukarı</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
@@ -714,7 +716,7 @@
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="t-aciklama step-label">Sağ kanat yukarı</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label" data-i18n="calibration.pose_yn">Sağ kanat yukarı</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
 
@@ -725,7 +727,7 @@
     <!-- Mevcut Kalibrasyon Değerleri -->
     <div class="col-lg-4">
       <div class="panel4 p-3 h-100">
-        <div class="t-alt-baslik mb-2">Mevcut Kalibrasyon Değerleri</div>
+        <div class="t-alt-baslik mb-2" data-i18n="calibration.current_values">Mevcut Kalibrasyon Değerleri</div>
         <div class="row g-2">
           <div class="col-6">
             <div class="t-alt-baslik">ACC Bias</div>
@@ -754,7 +756,7 @@
 
     <div class="col-lg-6">
       <div class="panel3 p-2">
-        <div class="t-alt-baslik mb-2">Gyro Kalibrasyonu</div>
+        <div class="t-alt-baslik mb-2" data-i18n="calibration.gyro_title">Gyro Kalibrasyonu</div>
         <div class="cal-steps-container mb-0">
           <div class="cal-step panel4" data-target="#btn-pose-gy">
             <div class="cal-step-body">
@@ -763,7 +765,7 @@
                 <span class="cal-val-ax">--</span><span class="cal-val-ay">--</span><span class="cal-val-az">--</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="t-aciklama step-label">Cihazı tamamen hareketsiz tutun ve tıklayın.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label" data-i18n="calibration.gyro_hint">Cihazı tamamen hareketsiz tutun ve tıklayın.</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
         </div>
@@ -772,7 +774,7 @@
 
     <div class="col-lg-6">
       <div class="panel3 p-2">
-        <div class="t-alt-baslik mb-2">Hard Kalibrasyon (Level)</div>
+        <div class="t-alt-baslik mb-2" data-i18n="calibration.level_title">Hard Kalibrasyon (Level)</div>
         <div class="cal-steps-container mb-0">
           <div class="cal-step panel4" data-target="#btn-pose-level">
             <div class="cal-step-body">
@@ -783,7 +785,7 @@
                 <span class="cal-val-az">ROLL</span>
               </div>
             </div>
-            <div class="cal-step-footer"><span class="t-aciklama step-label">Cihazı düz konuma alıp 2sn bekleyin, sonra tıklayın.</span></div>
+            <div class="cal-step-footer"><span class="t-aciklama step-label" data-i18n="calibration.level_hint">Cihazı düz konuma alıp 2sn bekleyin, sonra tıklayın.</span></div>
             <div class="cal-step-done"><i class="bi bi-check-circle-fill"></i></div>
           </div>
         </div>
@@ -798,20 +800,20 @@
       <i class="bi bi-save2 me-1"></i> Kalibrasyonu Kaydet
     </button>
     <button type="button" class="btn btn-danger btn-md" onclick="sendQuickCommand('CALIB_RESET')">
-      <i class="bi bi-arrow-counterclockwise me-1"></i> Kalibrasyonu Sıfırla
+      <i class="bi bi-arrow-counterclockwise me-1"></i> <span data-i18n="calibration.btn_reset">Kalibrasyonu Sıfırla</span>
     </button>
   </div>
 
   <!-- Sensör Yönelimi -->
   <div class="panel3 p-3 mb-0">
-    <div class="t-baslik mb-1">Sensör Yönelimi (Board Alignment)</div>
-    <div class="t-aciklama mb-2">Uçuş kontrol kartının gövde içindeki montaj yönünü seçin. Değiştirildiğinde kalibrasyon sıfırlanır.</div>
+    <div class="t-baslik mb-1" data-i18n="calibration.align_title">Sensör Yönelimi (Board Alignment)</div>
+    <div class="t-aciklama mb-2" data-i18n="calibration.align_desc">Uçuş kontrol kartının gövde içindeki montaj yönünü seçin. Değiştirildiğinde kalibrasyon sıfırlanır.</div>
     <div class="d-flex align-items-center gap-2">
       <select class="form-select form-select-sm" id="sensorAlignSelect" style="max-width:220px;" onchange="selectAlignOption(parseInt(this.value))">
         <!-- JS tarafından doldurulur -->
       </select>
       <button class="btn btn-warning btn-md" id="btnSaveAlign" onclick="saveSensorAlign()" disabled>
-        <i class="bi bi-save me-1"></i> Yönelimi Kaydet
+        <i class="bi bi-save me-1"></i> <span data-i18n="calibration.align_save">Yönelimi Kaydet</span>
       </button>
     </div>
   </div>
@@ -835,16 +837,16 @@
         <div class="pin-box">
           <label class="port-label d-block mb-1">TX (ESP → GPS)</label>
           <select class="form-select form-select-sm pin-select" id="gpsTxPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 5</small>
+          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="gps.gpio_tx_hint">Tavsiye: GPIO 5</span></small>
         </div>
         <div class="pin-box">
           <label class="port-label d-block mb-1">RX (GPS → ESP)</label>
           <select class="form-select form-select-sm pin-select" id="gpsRxPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 18</small>
+          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="gps.gpio_rx_hint">Tavsiye: GPIO 18</span></small>
         </div>
       </div>
       <button class="btn btn-warning btn-sm mt-2" onclick="saveGpsPinsOnly()">
-        <i class="bi bi-save me-1"></i> GPS Pinlerini Kaydet
+        <i class="bi bi-save me-1"></i> <span data-i18n="gps.pin_save">GPS Pinlerini Kaydet</span>
       </button>
       <div class="pin-reboot-warning">
         <i class="bi bi-arrow-repeat"></i>
@@ -862,22 +864,22 @@
     <!-- GPS Donanım & Güvenlik -->
     <div class="col-md-5">
       <div class="panel2 h-100 p-3">
-        <h2 class="panel-title"><i class="bi bi-reception-4"></i> GPS Donanım</h2>
+        <h2 class="panel-title"><i class="bi bi-reception-4"></i> <span data-i18n="gps.hw_title">GPS Donanım</span></h2>
         <div class="form-check form-switch mb-3">
           <input class="form-check-input" type="checkbox" id="inp_has_gps" onchange="toggleGpsSettings()">
-          <label class="form-check-label" for="inp_has_gps">GPS Modülü Aktif</label>
+          <label class="form-check-label" for="inp_has_gps" data-i18n="gps.hw_active">GPS Modülü Aktif</label>
         </div>
         <div id="gps_hardware_settings">
           <div class="input-group input-group-sm mb-2">
-            <span class="input-group-text bg-secondary text-light border-0" style="min-width:90px;">Protokol</span>
+            <span class="input-group-text bg-secondary text-light border-0" style="min-width:90px;" data-i18n="gps.hw_protocol">Protokol</span>
             <select class="form-select form-select-sm" id="inp_gps_proto">
-              <option value="0">Otomatik (Önerilen)</option>
-              <option value="1">UBX Legacy (NEO-6M)</option>
-              <option value="2">UBX PVT (NEO-7+)</option>
+              <option value="0" data-i18n="gps.hw_proto_auto">Otomatik (Önerilen)</option>
+              <option value="1" data-i18n="gps.hw_proto_ubx6">UBX Legacy (NEO-6M)</option>
+              <option value="2" data-i18n="gps.hw_proto_ubx7">UBX PVT (NEO-7+)</option>
             </select>
           </div>
           <div class="input-group input-group-sm mb-3">
-            <span class="input-group-text bg-secondary text-light border-0" style="min-width:90px;">Mag Yönü</span>
+            <span class="input-group-text bg-secondary text-light border-0" style="min-width:90px;" data-i18n="gps.hw_mag_align">Mag Yönü</span>
             <select class="form-select form-select-sm" id="inp_mag_align">
               <option value="0">CW 0°</option>
               <option value="1">CW 90°</option>
@@ -886,15 +888,15 @@
             </select>
           </div>
           <div class="mb-2 row">
-            <label class="col-7 col-form-label col-form-label-sm text-warning">Min Uydu</label>
+            <label class="col-7 col-form-label col-form-label-sm text-warning" data-i18n="gps.hw_min_sats">Min Uydu</label>
             <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_gps_min_sats" min="4" max="12" step="1" value="6"></div>
           </div>
           <div class="mb-2 row">
-            <label class="col-7 col-form-label col-form-label-sm text-warning">Min Fix Tipi</label>
+            <label class="col-7 col-form-label col-form-label-sm text-warning" data-i18n="gps.hw_min_fix">Min Fix Tipi</label>
             <div class="col-5">
               <select class="form-select form-select-sm" id="inp_gps_min_fix_type">
-                <option value="2">2D Fix</option>
-                <option value="3" selected>3D Fix</option>
+                <option value="2" data-i18n="gps.hw_fix_2d">2D Fix</option>
+                <option value="3" selected data-i18n="gps.hw_fix_3d">3D Fix</option>
               </select>
             </div>
           </div>
@@ -907,20 +909,20 @@
       <div class="panel2 h-100 p-3">
         <h2 class="panel-title"><i class="bi bi-house-door"></i> RTH (Eve Dönüş)</h2>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm">RTH İrtifası (m)</label>
+          <label class="col-7 col-form-label col-form-label-sm" data-i18n="gps.rth_alt">RTH İrtifası (m)</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_rth_alt" value="60"></div>
         </div>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm">RTH Yarıçapı (m)</label>
+          <label class="col-7 col-form-label col-form-label-sm" data-i18n="gps.rth_radius">RTH Yarıçapı (m)</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_radius" value="60"></div>
         </div>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm text-danger">Geofence (m) <small class="text-muted">0=Yok</small></label>
+          <label class="col-7 col-form-label col-form-label-sm text-danger"><span data-i18n="gps.rth_geofence">Geofence (m)</span> <small class="text-muted" data-i18n="gps.rth_geofence_hint">0=Yok</small></label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dist" placeholder="0=Yok" value="0"></div>
         </div>
         <div class="form-check form-switch mt-2">
           <input class="form-check-input" type="checkbox" id="inp_nav_climb_first">
-          <label class="form-check-label small" for="inp_nav_climb_first">Eve Dönerken Önce Yüksel</label>
+          <label class="form-check-label small" for="inp_nav_climb_first" data-i18n="gps.rth_climb_first">Eve Dönerken Önce Yüksel</label>
         </div>
       </div>
     </div>
@@ -932,17 +934,17 @@
     <!-- Otopilot Açı Limitleri -->
     <div class="col-md-3">
       <div class="panel2 h-100 p-3">
-        <h2 class="panel-title"><i class="bi bi-arrow-left-right"></i> Açı Limitleri</h2>
+        <h2 class="panel-title"><i class="bi bi-arrow-left-right"></i> <span data-i18n="gps.angle_title">Açı Limitleri</span></h2>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm">Max Roll (°)</label>
+          <label class="col-7 col-form-label col-form-label-sm" data-i18n="gps.angle_max_roll">Max Roll (°)</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_bank_roll" min="10" max="60" value="45"></div>
         </div>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm">Max Tırmanma (°)</label>
+          <label class="col-7 col-form-label col-form-label-sm" data-i18n="gps.angle_max_climb">Max Tırmanma (°)</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_climb" value="20"></div>
         </div>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm">Max Dalış (°)</label>
+          <label class="col-7 col-form-label col-form-label-sm" data-i18n="gps.angle_max_dive">Max Dalış (°)</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dive" value="15"></div>
         </div>
       </div>
@@ -951,25 +953,25 @@
     <!-- Nav Gaz Ayarları -->
     <div class="col-md-5">
       <div class="panel2 h-100 p-3">
-        <h2 class="panel-title"><i class="bi bi-speedometer2"></i> Gaz (Throttle) Ayarları</h2>
+        <h2 class="panel-title"><i class="bi bi-speedometer2"></i> <span data-i18n="gps.throttle_title">Gaz (Throttle) Ayarları</span></h2>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm text-danger">Nav Min Gaz</label>
+          <label class="col-7 col-form-label col-form-label-sm text-danger" data-i18n="gps.throttle_min">Nav Min Gaz</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_min_throttle" min="1000" max="1500" step="10" value="1100"></div>
         </div>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm">Alçalma Gazı</label>
+          <label class="col-7 col-form-label col-form-label-sm" data-i18n="gps.throttle_descend">Alçalma Gazı</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_descend" min="1000" max="1800" step="10" value="1100"></div>
         </div>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm text-info">Seyir Gazı</label>
+          <label class="col-7 col-form-label col-form-label-sm text-info" data-i18n="gps.throttle_cruise">Seyir Gazı</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_cruise" min="1200" max="1900" step="10" value="1650"></div>
         </div>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm">Tırmanma Gazı</label>
+          <label class="col-7 col-form-label col-form-label-sm" data-i18n="gps.throttle_climb">Tırmanma Gazı</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_climb" min="1300" max="2000" step="10" value="1700"></div>
         </div>
         <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm text-danger">Nav Max Gaz</label>
+          <label class="col-7 col-form-label col-form-label-sm text-danger" data-i18n="gps.throttle_max">Nav Max Gaz</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_throttle" min="1500" max="2000" step="10" value="1900"></div>
         </div>
       </div>
@@ -978,8 +980,8 @@
     <!-- L1 Navigasyon + Pitch→Gaz -->
     <div class="col-md-4">
       <div class="panel2 h-100 p-3">
-        <h2 class="panel-title"><i class="bi bi-bezier2"></i> L1 Navigasyon</h2>
-        <p class="text-muted small mb-3">Rota takip algoritması parametreleri.</p>
+        <h2 class="panel-title"><i class="bi bi-bezier2"></i> <span data-i18n="gps.l1_title">L1 Navigasyon</span></h2>
+        <p class="text-muted small mb-3" data-i18n="gps.l1_desc">Rota takip algoritması parametreleri.</p>
         <div class="mb-2 row">
           <label class="col-7 col-form-label col-form-label-sm">
             L1 Periyodu (sn)
@@ -1075,19 +1077,19 @@
           <div class="pin-box">
             <label class="port-label d-block mb-1">AUX 1</label>
             <select class="form-select form-select-sm pin-select" id="aux1Pin"></select>
-            <small class="text-muted mt-1 d-block">Yardımcı çıkış 1</small>
+            <small class="text-muted mt-1 d-block" data-i18n="mixer.aux_hint1">Yardımcı çıkış 1</small>
           </div>
         </div>
         <div class="col-6 col-md-4 col-lg-2">
           <div class="pin-box">
             <label class="port-label d-block mb-1">AUX 2</label>
             <select class="form-select form-select-sm pin-select" id="aux2Pin"></select>
-            <small class="text-muted mt-1 d-block">Yardımcı çıkış 2</small>
+            <small class="text-muted mt-1 d-block" data-i18n="mixer.aux_hint2">Yardımcı çıkış 2</small>
           </div>
         </div>
       </div>
       <button class="btn btn-warning btn-sm mt-2" onclick="savePinsConfig()">
-        <i class="bi bi-save me-1"></i> Çıkış Pinlerini Kaydet
+        <i class="bi bi-save me-1"></i> <span data-i18n="mixer.pin_save">Çıkış Pinlerini Kaydet</span>
       </button>
       <div class="pin-reboot-warning">
         <i class="bi bi-arrow-repeat"></i>
@@ -1201,9 +1203,9 @@
           <div class="d-flex justify-content-between w-100"><small>1k</small><small>2k</small></div>
           <div class="form-check mt-1">
             <input class="form-check-input" type="checkbox" id="safetyCheck">
-            <label class="form-check-label small" for="safetyCheck">Pervane yok</label>
+            <label class="form-check-label small" for="safetyCheck" data-i18n="mixer.no_prop">Pervane yok</label>
           </div>
-          <div class="safety-warning small" id="safetyWarning">⚠️ Onay gerekiyor</div>
+          <div class="safety-warning small" id="safetyWarning" data-i18n="mixer.safety_warning">⚠️ Onay gerekiyor</div>
         </div>
       </div>
 
@@ -1211,8 +1213,8 @@
   </div>
   <!-- 2) PANEL: Yardımcı Çıkışlar (Aux) -->
   <div class="panel mb-4">
-    <h2 class="panel-title"><i class="bi bi-broadcast-pin"></i> Yardımcı Çıkışlar</h2>
-    <p class="text-muted small mb-3">
+    <h2 class="panel-title"><i class="bi bi-broadcast-pin"></i> <span data-i18n="mixer.aux_title">Yardımcı Çıkışlar</span></h2>
+    <p class="text-muted small mb-3" data-i18n="mixer.aux_desc">
       Her yardımcı çıkış, seçilen RC kanalını doğrudan belirlenen GPIO pinine iletir (uçuş mikseri dışında). Kamera gimbal, iniş takımı, ışık veya ilave motor için kullanabilirsiniz.
     </p>
     <div class="row g-3">
@@ -1221,13 +1223,13 @@
           <div class="output-title mb-3">AUX 1</div>
           <div class="row g-2">
             <div class="col-12">
-              <label class="port-label d-block mb-1">RC Kanalı</label>
+              <label class="port-label d-block mb-1" data-i18n="mixer.rc_channel">RC Kanalı</label>
               <select class="form-select form-select-sm" id="aux1RcCh">
-                <option value="-1">Devre Dışı</option>
-                <option value="0">Kanal 1 (Roll)</option>
-                <option value="1">Kanal 2 (Pitch)</option>
-                <option value="2">Kanal 3 (Throttle)</option>
-                <option value="3">Kanal 4 (Yaw)</option>
+                <option value="-1" data-i18n="mixer.ch_disabled">Devre Dışı</option>
+                <option value="0" data-i18n="mixer.ch_1_roll">Kanal 1 (Roll)</option>
+                <option value="1" data-i18n="mixer.ch_2_pitch">Kanal 2 (Pitch)</option>
+                <option value="2" data-i18n="mixer.ch_3_throttle">Kanal 3 (Throttle)</option>
+                <option value="3" data-i18n="mixer.ch_4_yaw">Kanal 4 (Yaw)</option>
                 <option value="4">Kanal 5</option>
                 <option value="5">Kanal 6</option>
                 <option value="6">Kanal 7</option>
@@ -1250,13 +1252,13 @@
           <div class="output-title mb-3">AUX 2</div>
           <div class="row g-2">
             <div class="col-12">
-              <label class="port-label d-block mb-1">RC Kanalı</label>
+              <label class="port-label d-block mb-1" data-i18n="mixer.rc_channel">RC Kanalı</label>
               <select class="form-select form-select-sm" id="aux2RcCh">
-                <option value="-1">Devre Dışı</option>
-                <option value="0">Kanal 1 (Roll)</option>
-                <option value="1">Kanal 2 (Pitch)</option>
-                <option value="2">Kanal 3 (Throttle)</option>
-                <option value="3">Kanal 4 (Yaw)</option>
+                <option value="-1" data-i18n="mixer.ch_disabled">Devre Dışı</option>
+                <option value="0" data-i18n="mixer.ch_1_roll">Kanal 1 (Roll)</option>
+                <option value="1" data-i18n="mixer.ch_2_pitch">Kanal 2 (Pitch)</option>
+                <option value="2" data-i18n="mixer.ch_3_throttle">Kanal 3 (Throttle)</option>
+                <option value="3" data-i18n="mixer.ch_4_yaw">Kanal 4 (Yaw)</option>
                 <option value="4">Kanal 5</option>
                 <option value="5">Kanal 6</option>
                 <option value="6">Kanal 7</option>
@@ -1279,14 +1281,14 @@
 
   <!-- 3) PANEL: Uçak Tipi Seçimi -->
   <div class="panel mb-4">
-    <h2 class="panel-title"><i class="bi bi-airplane"></i> Uçak Tipi Seçimi</h2>
+    <h2 class="panel-title"><i class="bi bi-airplane"></i> <span data-i18n="mixer.aircraft_title">Uçak Tipi Seçimi</span></h2>
 
     <div class="row g-3">
       <div class="col-6 col-lg-3">
         <div class="panel4">
           <div class="aircraft-card active" data-aircraft-type="v-tail">
             <div class="mixer-title">V-TAIL</div>
-            <div class="mixer-description">V şeklinde kuyruk yapısı</div>
+            <div class="mixer-description" data-i18n="mixer.vtail_desc">V şeklinde kuyruk yapısı</div>
           </div>
         </div>
       </div>
@@ -1295,7 +1297,7 @@
         <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="t-tail">
             <div class="mixer-title">T-TAIL</div>
-            <div class="mixer-description">T şeklinde kuyruk yapısı</div>
+            <div class="mixer-description" data-i18n="mixer.ttail_desc">T şeklinde kuyruk yapısı</div>
           </div>
         </div>
       </div>
@@ -1303,8 +1305,8 @@
       <div class="col-6 col-lg-3">
         <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="no-ruder">
-            <div class="mixer-title">RUDERSIZ</div>
-            <div class="mixer-description">Ruder olmadan</div>
+            <div class="mixer-title" data-i18n="mixer.noruder_title">RUDERSIZ</div>
+            <div class="mixer-description" data-i18n="mixer.noruder_desc">Ruder olmadan</div>
           </div>
         </div>
       </div>
@@ -1313,7 +1315,7 @@
         <div class="panel4">
           <div class="aircraft-card" data-aircraft-type="delta">
             <div class="mixer-title">DELTA</div>
-            <div class="mixer-description">Delta kanat</div>
+            <div class="mixer-description" data-i18n="mixer.delta_desc">Delta kanat</div>
           </div>
         </div>
       </div>
@@ -1322,8 +1324,8 @@
 
   <!-- 4) PANEL: Mikser Kazançları -->
   <div class="panel mb-4">
-    <h2 class="panel-title"><i class="bi bi-sliders"></i> Mikser Kazançları</h2>
-    <p class="text-muted small mb-3">
+    <h2 class="panel-title"><i class="bi bi-sliders"></i> <span data-i18n="mixer.gains_title">Mikser Kazançları</span></h2>
+    <p class="text-muted small mb-3" data-i18n="mixer.gains_desc">
       Her eksen için mikser oranını ayarlayın. <strong>100 = normal</strong>, <strong>-100 = ters</strong>, <strong>50 = %50 güç</strong>.
       Yaw tersleniyorsa Yaw değerini negatif yapın (örn: -100).
     </p>
@@ -1383,7 +1385,7 @@
           <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 16</small>
         </div>
         <button class="btn btn-warning btn-sm" onclick="saveRxPins()">
-          <i class="bi bi-save me-1"></i> Alıcı Pinlerini Kaydet
+          <i class="bi bi-save me-1"></i> <span data-i18n="transmitter.pin_save">Alıcı Pinlerini Kaydet</span>
         </button>
       </div>
       <div class="pin-reboot-warning">
@@ -1399,10 +1401,10 @@
         <div class="row">
             <div class="col-md-5">
                 <div class="panel4 h-100">
-                    <h3 class="h5 mb-3 text-info"><i class="bi bi-sliders"></i> Konfigürasyon</h3>
+                    <h3 class="h5 mb-3 text-info"><i class="bi bi-sliders"></i> <span data-i18n="transmitter.config_title">Konfigürasyon</span></h3>
 
                     <div class="mb-4">
-                        <label class="form-label small" style="color:#555;">HABERLEŞME PROTOKOLÜ</label>
+                        <label class="form-label small" style="color:#555;" data-i18n="transmitter.protocol_label">HABERLEŞME PROTOKOLÜ</label>
                         <div class="input-group">
                             <span class="input-group-text border-secondary" style="background:#dde0e4;color:#333;"><i class="bi bi-broadcast"></i></span>
                             <select class="form-select" id="protocolSelect">
@@ -1414,7 +1416,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label small" style="color:#555;">KANAL SIRALAMASI (CHANNEL MAP)</label>
+                        <label class="form-label small" style="color:#555;" data-i18n="transmitter.ch_map_label">KANAL SIRALAMASI (CHANNEL MAP)</label>
                         <div class="p-3 rounded" style="background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.15)">
                             <div class="row g-2">
                                 <div class="col-6">
@@ -1471,11 +1473,11 @@
                                 </div>
                             </div>
                         </div>
-                        <small style="font-size: 0.75rem;color:#666;">Her eksene istediğiniz fiziksel alıcı kanalını atayın</small>
+                        <small style="font-size: 0.75rem;color:#666;" data-i18n="transmitter.ch_map_hint">Her eksene istediğiniz fiziksel alıcı kanalını atayın</small>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small" style="color:#555;">KANAL TERSLEME (REVERSE)</label>
+                        <label class="form-label small" style="color:#555;" data-i18n="transmitter.ch_reverse_label">KANAL TERSLEME (REVERSE)</label>
                         <div class="p-3 rounded" style="background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.15)">
                             <div class="row g-2">
                                 <div class="col-6">
@@ -1515,14 +1517,14 @@
             <div class="col-md-7">
                 <div class="panel3 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="h5 mb-0 text-success"><i class="bi bi-bar-chart"></i> Canlı Kanal Değerleri</h3>
+                        <h3 class="h5 mb-0 text-success"><i class="bi bi-bar-chart"></i> <span data-i18n="transmitter.live_title">Canlı Kanal Değerleri</span></h3>
               
                     </div>
                     
                     <div id="transmitterChannelValues" class="pe-2" style="max-height: 500px; overflow-y: auto;">
                         <div class="text-center text-muted py-5">
                             <div class="spinner-border text-primary mb-3" role="status"></div>
-                            <p>Veri bekleniyor... Bağlantıyı kontrol edin.</p>
+                            <p data-i18n="transmitter.waiting">Veri bekleniyor... Bağlantıyı kontrol edin.</p>
                         </div>
                     </div>
                 </div>
@@ -1532,7 +1534,7 @@
 
     <!-- Stick Komutları info ikonu -->
     <span data-bs-toggle="modal" data-bs-target="#stickCmdsModal" style="cursor:pointer; color:#f59e0b; font-size:0.85rem; user-select:none;" title="Stick komutlarını göster">
-        <i class="bi bi-info-circle me-1"></i>Kumanda Stick Komutları
+        <i class="bi bi-info-circle me-1"></i><span data-i18n="transmitter.stick_cmds_link">Kumanda Stick Komutları</span>
     </span>
 
 </div>
@@ -1542,7 +1544,7 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content bg-dark text-light border-secondary">
       <div class="modal-header border-secondary">
-        <h5 class="modal-title" id="stickCmdsModalLabel"><i class="bi bi-joystick me-2"></i>Kumanda Stick Komutları</h5>
+        <h5 class="modal-title" id="stickCmdsModalLabel"><i class="bi bi-joystick me-2"></i><span data-i18n="transmitter.stick_modal_title">Kumanda Stick Komutları</span></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
@@ -1645,7 +1647,7 @@
         </div><!-- /row -->
       </div><!-- /modal-body -->
       <div class="modal-footer border-secondary">
-        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" data-i18n="modal.btn_close">Kapat</button>
       </div>
     </div>
   </div>
@@ -1736,7 +1738,7 @@
                     <div class="pid-parameter">
                         <div class="pid-label"><span class="pid-name">Strength (P)</span><span class="pid-value" id="levelPValue"></span></div>
                         <input type="range" class="pid-slider" min="0" max="20" step="0.5" value="" id="levelPSlider">
-                        <small class="text-muted d-block mt-2">Uçağın kendini düzeltme sertliği.</small>
+                        <small class="text-muted d-block mt-2" data-i18n="pid.level_desc">Uçağın kendini düzeltme sertliği.</small>
                     </div>
                 </div>
              </div>
@@ -1750,7 +1752,7 @@
                     <div class="pid-parameter">
                         <div class="pid-label"><span class="pid-name">TPA</span><span class="pid-value" id="tpaValue"></span></div>
                         <input type="range" class="pid-slider" min="0" max="100" step="1" value="" id="tpaPSlider">
-                        <small class="text-muted d-block mt-2"> throttle veya pitot tüpü varsa hava hızı arttıkça PIFF kazancını yüzde bazında düşürür.</small>
+                        <small class="text-muted d-block mt-2" data-i18n="pid.tpa_desc"> throttle veya pitot tüpü varsa hava hızı arttıkça PIFF kazancını yüzde bazında düşürür.</small>
                     </div>
                 </div>
              </div>
@@ -1780,11 +1782,11 @@
         <div class="pin-box">
           <label class="port-label d-block mb-1">ADC GPIO Pin</label>
           <select class="form-select form-select-sm pin-select" id="adcVoltagePin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 34, 35 veya 36 (giriş-only)</small>
+          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="advanced.adc_pin_hint">Tavsiye: GPIO 34, 35 veya 36 (giriş-only)</span></small>
         </div>
       </div>
       <button class="btn btn-warning btn-sm mt-2" onclick="saveAdcPins()">
-        <i class="bi bi-save me-1"></i> ADC Pinlerini Kaydet
+        <i class="bi bi-save me-1"></i> <span data-i18n="advanced.bat_pin_save">ADC Pinlerini Kaydet</span>
       </button>
       <div class="pin-reboot-warning">
         <i class="bi bi-arrow-repeat"></i>
@@ -1799,19 +1801,19 @@
         <!-- Tab Menü -->
         <div class="adv-tabs" id="advTabBar">
             <button class="adv-tab active" data-tab="adv-tab-1" data-cat="flight" onclick="switchAdvTab('adv-tab-1',this)">
-                <i class="bi bi-airplane-engines"></i> Uçuş Limitleri
+                <i class="bi bi-airplane-engines"></i> <span data-i18n="advanced.tab_flight">Uçuş Limitleri</span>
             </button>
             <button class="adv-tab" data-tab="adv-tab-3" data-cat="nav" onclick="switchAdvTab('adv-tab-3',this)">
-                <i class="bi bi-arrow-bar-up"></i> İrtifa
+                <i class="bi bi-arrow-bar-up"></i> <span data-i18n="advanced.tab_alt">İrtifa</span>
             </button>
             <button class="adv-tab" data-tab="adv-tab-4" data-cat="assist" onclick="switchAdvTab('adv-tab-4',this)">
-                <i class="bi bi-cpu"></i> Donanım & Filtreler
+                <i class="bi bi-cpu"></i> <span data-i18n="advanced.tab_hw">Donanım & Filtreler</span>
             </button>
             <button class="adv-tab" data-tab="adv-tab-5" data-cat="safety" onclick="switchAdvTab('adv-tab-5',this)">
-                <i class="bi bi-battery-half"></i> Batarya
+                <i class="bi bi-battery-half"></i> <span data-i18n="advanced.tab_battery">Batarya</span>
             </button>
             <button class="adv-tab" data-tab="adv-tab-pitot" data-cat="pitot" onclick="switchAdvTab('adv-tab-pitot',this)">
-                <i class="bi bi-wind"></i> Pitot Tüpü
+                <i class="bi bi-wind"></i> <span data-i18n="advanced.tab_pitot">Pitot Tüpü</span>
             </button>
         </div>
 
@@ -1821,21 +1823,21 @@
             <!-- ==================== 1. UÇUŞ LİMİTLERİ & AUTO LAUNCH ==================== -->
             <div id="adv-tab-1" class="adv-tab-pane active">
                 <div class="panel4 mode-cat-flight">
-                    <div class="mode-category-title"><i class="bi bi-airplane-engines"></i> Uçuş Limitleri & Auto Launch</div>
+                    <div class="mode-category-title"><i class="bi bi-airplane-engines"></i> <span data-i18n="advanced.flight_section">Uçuş Limitleri & Auto Launch</span></div>
                     <div>
                         <div class="row">
                             <!-- Angle Mod Limitleri -->
                             <div class="col-md-4 border-end border-secondary">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Angle Mod Limitleri</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.angle_limits">Angle Mod Limitleri</h6>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">Max Roll Açısı (°)</label>
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.angle_max_roll">Max Roll Açısı (°)</label>
                                     <div class="col-sm-4">
                                         <input type="number" class="form-control form-control-sm" id="inp_ang_lim_roll" min="10" max="80" step="1" value="45">
                                     </div>
                                 </div>
 																<hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">Max Pitch Açısı (°)</label>
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.angle_max_pitch">Max Pitch Açısı (°)</label>
                                     <div class="col-sm-4">
                                         <input type="number" class="form-control form-control-sm" id="inp_ang_lim_pitch" min="10" max="60" step="1" value="45">
                                     </div>
@@ -1844,18 +1846,18 @@
                             
                             <!-- Otomatik Kalkış -->
                             <div class="col-md-4 border-end border-secondary">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Otomatik Kalkış (Auto Launch)</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.launch_section">Otomatik Kalkış (Auto Launch)</h6>
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox" id="inp_auto_launch_on_arm" checked>
-                                    <label class="form-check-label small" for="inp_auto_launch_on_arm">Her arm sonrasında otomatik kalkış moduna geç</label>
+                                    <label class="form-check-label small" for="inp_auto_launch_on_arm" data-i18n="advanced.launch_auto_on_arm">Her arm sonrasında otomatik kalkış moduna geç</label>
                                 </div>
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox" id="inp_disarm_on_landing" checked>
-                                    <label class="form-check-label small" for="inp_disarm_on_landing">İniş sonrasında otomatik disarm</label>
+                                    <label class="form-check-label small" for="inp_disarm_on_landing" data-i18n="advanced.launch_disarm_on_land">İniş sonrasında otomatik disarm</label>
                                 </div>
                                 <hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.launch_acc_threshold">
                                         Fırlatma Eşiği (G)
                                         <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Kalkışı tetiklemek için gereken ivme"></i>
                                     </label>
@@ -1865,35 +1867,35 @@
                                 </div>
 																<hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">Kalkış Gazı (PWM)</label>
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.launch_throttle">Kalkış Gazı (PWM)</label>
                                     <div class="col-sm-4">
                                         <input type="number" class="form-control form-control-sm" id="inp_launch_throttle" min="1000" max="2000" step="10" value="1700">
                                     </div>
                                 </div>
 																<hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">Auto Launch max süresi (saniye)</label>
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.launch_max_time">Auto Launch max süresi (saniye)</label>
                                     <div class="col-sm-4">
                                         <input type="number" class="form-control form-control-sm" id="inp_launch_time"  step="100" value="20000">
                                     </div>
                                 </div>
 																<hr>
 																                                <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">Auto Launch max Yüksekliği (metre)</label>
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.launch_max_alt">Auto Launch max Yüksekliği (metre)</label>
                                     <div class="col-sm-4">
                                         <input type="number" class="form-control form-control-sm" id="inp_launch_altitude" min="0" max="200" step="1" value="50">
                                     </div>
                                 </div>
 																<hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">Kalkış Açısı (°)</label>
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.launch_angle">Kalkış Açısı (°)</label>
                                     <div class="col-sm-4">
                                         <input type="number" class="form-control form-control-sm" id="inp_launch_angle" min="0" max="45" step="1" value="20">
                                     </div>
                                 </div>
 								<hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.launch_spool_time">
                                        Fırlatma ile motorun çalışması arasındaki süre (ms)
                                         <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Fırlatma öncesi motor ısınma süresi"></i>
                                     </label>
@@ -1903,7 +1905,7 @@
                                 </div>
 								<hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.stick_cancel_thr">
                                         Stick İptal Eşiği (PWM)
                                         <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Merkezden stick sapması bu değeri aşarsa Auto Launch veya otomatik iniş iptal edilir (pilot devralır)"></i>
                                     </label>
@@ -1913,7 +1915,7 @@
                                 </div>
 								<hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.thr_cancel_thr">
                                         Gaz İptal Eşiği (PWM)
                                         <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Gaz bu değeri aşarsa otomatik iniş iptal edilir (pilot devralır)"></i>
                                     </label>
@@ -1925,9 +1927,9 @@
 
                             <!-- Stall Koruması -->
                             <div class="col-md-4">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Stall Koruması</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.stall_section">Stall Koruması</h6>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.stall_speed">
                                         Stall Hızı (km/h)
                                         <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Bu hızın altında stall koruması devreye girer"></i>
                                     </label>
@@ -1937,7 +1939,7 @@
                                 </div>
 																<hr>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.stall_pitch_drop">
                                         Pitch Düşürme (°)
                                         <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Stall'da burun ne kadar düşürülsün"></i>
                                     </label>
@@ -1950,9 +1952,9 @@
                         <!-- Flaperon Droop -->
                         <div class="row mt-3 border-top border-secondary pt-3">
                             <div class="col-md-6">
-                                <h6 class="text-muted border-bottom border-secondary pb-1"><i class="bi bi-arrows-collapse me-1"></i>Flaperon Droop</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1"><i class="bi bi-arrows-collapse me-1"></i><span data-i18n="advanced.flaperon_section">Flaperon Droop</span></h6>
                                 <div class="d-flex align-items-center gap-2">
-                                    <label class="form-label mb-0 text-nowrap small">Droop Miktarı (µs)</label>
+                                    <label class="form-label mb-0 text-nowrap small" data-i18n="advanced.flaperon_amount">Droop Miktarı (µs)</label>
                                     <input type="range" class="form-range flaperon-range" id="flaperonOffsetSlider" min="-500" max="500" step="10" value="150" oninput="document.getElementById('flaperonOffsetValue').textContent=this.value; updateFlaperonSliderColor(this);">
                                     <span class="badge bg-secondary" id="flaperonOffsetValue">150</span>
                                 </div>
@@ -1973,37 +1975,37 @@
             <!-- ==================== 3. İRTİFA ==================== -->
             <div id="adv-tab-3" class="adv-tab-pane">
                 <div class="panel4 mode-cat-nav">
-                    <div class="mode-category-title"><i class="bi bi-arrow-bar-up"></i> İrtifa Tahmini</div>
+                    <div class="mode-category-title"><i class="bi bi-arrow-bar-up"></i> <span data-i18n="advanced.alt_section">İrtifa Tahmini</span></div>
                     <div>
                         <div class="row">
                             <div class="col-md-4 border-end border-secondary">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Sensör Kaynağı</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.alt_sensor_source">Sensör Kaynağı</h6>
                                 <div class="form-check form-switch mt-3">
                                     <input class="form-check-input" type="checkbox" id="inp_alt_has_baro" checked>
-                                    <label class="form-check-label" for="inp_alt_has_baro">Barometre Kullan</label>
+                                    <label class="form-check-label" for="inp_alt_has_baro" data-i18n="advanced.alt_use_baro">Barometre Kullan</label>
                                 </div>
                             </div>
                             <div class="col-md-8">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Kalman Filtre Katsayıları</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.alt_kalman">Kalman Filtre Katsayıları</h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label small">Baro Pozisyon (P)</label>
+                                        <label class="form-label small" data-i18n="advanced.alt_baro_p">Baro Pozisyon (P)</label>
                                         <input type="number" class="form-control form-control-sm" id="inp_alt_w_z_baro_p" min="0.0" max="5.0" step="0.1" value="1.5">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small">Baro Hız (V)</label>
+                                        <label class="form-label small" data-i18n="advanced.alt_baro_v">Baro Hız (V)</label>
                                         <input type="number" class="form-control form-control-sm" id="inp_alt_w_z_baro_v" min="0.0" max="10.0" step="0.1" value="4.0">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="small text-muted">ACC Bias</label>
+                                        <label class="small text-muted" data-i18n="advanced.alt_acc_bias">ACC Bias</label>
                                         <input type="number" class="form-control form-control-sm" id="inp_alt_w_z_acc_bias" step="0.005" value="0.05">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="small text-muted">ACC Deadzone</label>
+                                        <label class="small text-muted" data-i18n="advanced.alt_acc_deadzone">ACC Deadzone</label>
                                         <input type="number" class="form-control form-control-sm" id="inp_alt_acc_deadzone" step="0.05" value="0.35">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="small text-muted">ACC LPF</label>
+                                        <label class="small text-muted" data-i18n="advanced.alt_acc_lpf">ACC LPF</label>
                                         <input type="number" class="form-control form-control-sm" id="inp_alt_acc_lpf" step="0.01" value="0.15">
                                     </div>
                                 </div>
@@ -2016,14 +2018,14 @@
             <!-- ==================== 4. DONANIM, SENSÖR & FİLTRELER ==================== -->
             <div id="adv-tab-4" class="adv-tab-pane">
                 <div class="panel4 mode-cat-assist">
-                    <div class="mode-category-title"><i class="bi bi-cpu"></i> Donanım, Sensör & Filtreler</div>
+                    <div class="mode-category-title"><i class="bi bi-cpu"></i> <span data-i18n="advanced.hw_section">Donanım, Sensör & Filtreler</span></div>
                     <div>
                         <div class="row mb-4">
                             <!-- ESC Protokolü -->
                             <div class="col-md-3 border-end border-secondary">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">ESC Protokolü</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.esc_section">ESC Protokolü</h6>
                                 <div class="mb-3">
-                                    <label class="form-label small">ESC Hızı</label>
+                                    <label class="form-label small" data-i18n="advanced.esc_hz_label">ESC Hızı</label>
                                     <select class="form-select form-select-sm" id="inp_esc_hz">
                                         <option value="50">PWM (50Hz - Analog)</option>
                                         <option value="400">FastPWM (400Hz)</option>
@@ -2032,7 +2034,7 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small">Servo Hızı</label>
+                                    <label class="form-label small" data-i18n="advanced.servo_hz_label">Servo Hızı</label>
                                     <select class="form-select form-select-sm" id="inp_servo_hz">
                                         <option value="50">50Hz (Analog)</option>
                                         <option value="160">160Hz (Dijital)</option>
@@ -2044,63 +2046,63 @@
 
                             <!-- Gyro & IMU Filtreleri -->
                             <div class="col-md-3 border-end border-secondary">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Gyro & IMU</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.gyro_section">Gyro & IMU</h6>
                                 <div class="mb-2 d-flex align-items-center justify-content-between">
-                                    <label class="form-check-label small">Gyro LPF Aktif</label>
+                                    <label class="form-check-label small" data-i18n="advanced.gyro_lpf_active">Gyro LPF Aktif</label>
                                     <div class="form-check form-switch mb-0">
                                         <input class="form-check-input" type="checkbox" id="inp_gyro_lpf_enabled" checked>
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Gyro LPF (Hz)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.gyro_lpf_hz">Gyro LPF (Hz)</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_gyro_lpf_hz" min="0" max="500" step="1" value="60"></div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Accel LPF (Hz)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.accel_lpf_hz">Accel LPF (Hz)</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_accel_lpf_hz" min="0" max="50" step="0.5" value="3"></div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Mahony Kp</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.mahony_kp">Mahony Kp</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_mahony_kp" step="0.1" value="2.0"></div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Mahony Ki</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.mahony_ki">Mahony Ki</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_mahony_ki" step="0.001" value="0.05"></div>
                                 </div>
                             </div>
 
                             <!-- RPM Filtresi -->
                             <div class="col-md-3 border-end border-secondary">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">RPM Filtresi</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.rpm_section">RPM Filtresi</h6>
                                 <div class="mb-2 d-flex align-items-center justify-content-between">
-                                    <label class="form-check-label small">RPM Filtresi Aktif</label>
+                                    <label class="form-check-label small" data-i18n="advanced.rpm_active">RPM Filtresi Aktif</label>
                                     <div class="form-check form-switch mb-0">
                                         <input class="form-check-input" type="checkbox" id="inp_rpm_filter_enabled" checked>
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Min Frekans (Hz)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.rpm_min_freq">Min Frekans (Hz)</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_rpm_min_freq" min="50" max="200" step="10" value="100"></div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Max Frekans (Hz)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.rpm_max_freq">Max Frekans (Hz)</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_rpm_max_freq" min="200" max="800" step="10" value="400"></div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Bandwidth (%)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.rpm_bw">Bandwidth (%)</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_rpm_bw_percent" min="0.1" max="0.5" step="0.05" value="0.2"></div>
                                 </div>
                             </div>
 
                             <!-- Kart Hizalama (Trim) -->
                             <div class="col-md-3">
-                                <h6 class="text-muted border-bottom border-secondary pb-1">Kart Hizalama (Trim)</h6>
+                                <h6 class="text-muted border-bottom border-secondary pb-1" data-i18n="advanced.trim_section">Kart Hizalama (Trim)</h6>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Roll Trim (°)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.trim_roll">Roll Trim (°)</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_trim_roll" step="0.1" value="0.0"></div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Pitch Trim (°)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.trim_pitch">Pitch Trim (°)</label>
                                     <div class="col-sm-5"><input type="number" class="form-control form-control-sm" id="inp_trim_pitch" step="0.1" value="0.0"></div>
                                 </div>
                             </div>
@@ -2111,10 +2113,10 @@
                         <!-- Grafikler -->
                         <div class="row">
                              <div class="col-12 text-center mb-3">
-                                 <h6 class="text-info"><i class="bi bi-activity"></i> Gerçek Zamanlı Sensör Verileri</h6>
+                                 <h6 class="text-info"><i class="bi bi-activity"></i> <span data-i18n="advanced.realtime_section">Gerçek Zamanlı Sensör Verileri</span></h6>
                                  <div class="form-check form-switch d-inline-block">
                                     <input class="form-check-input" type="checkbox" id="toggleGraphs"  onchange="toggleGraphStream(this.checked)">
-                                    <label class="form-check-label text-muted small" for="toggleGraphs">Veri Akışını Başlat</label>
+                                    <label class="form-check-label text-muted small" for="toggleGraphs" data-i18n="advanced.stream_start">Veri Akışını Başlat</label>
                                 </div>
                              </div>
                             <div class="col-md-6">
@@ -2137,21 +2139,21 @@
             <!-- ==================== 5. BATARYA ==================== -->
             <div id="adv-tab-5" class="adv-tab-pane">
                 <div class="panel4 mode-cat-safety">
-                    <div class="mode-category-title"><i class="bi bi-battery-half"></i> Batarya</div>
+                    <div class="mode-category-title"><i class="bi bi-battery-half"></i> <span data-i18n="advanced.bat_section">Batarya</span></div>
 
                     <!-- Voltaj Ölçümü -->
                     <div class="row mb-4">
                         <div class="col-12">
                             <h6 class="text-muted border-bottom border-secondary pb-1">
-                                <i class="bi bi-plug me-1"></i> Voltaj Ölçümü (ADC)
+                                <i class="bi bi-plug me-1"></i> <span data-i18n="advanced.bat_voltage_section">Voltaj Ölçümü (ADC)</span>
                             </h6>
                         </div>
                         <div class="col-md-4 border-end border-secondary">
                             <div class="mb-2">
-                                <small class="text-info"><i class="bi bi-info-circle me-1"></i>ADC GPIO pin ayarı sayfanın üstündedir.</small>
+                                <small class="text-info"><i class="bi bi-info-circle me-1"></i><span data-i18n="advanced.bat_adc_hint">ADC GPIO pin ayarı sayfanın üstündedir.</span></small>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Gerilim bölücü oranı = (R1+R2)/R2. Örn: 100kΩ+10kΩ → 11.0">Ölçek Faktörü <small class="text-muted">(R1+R2)/R2</small></label>
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Gerilim bölücü oranı = (R1+R2)/R2. Örn: 100kΩ+10kΩ → 11.0" data-i18n="advanced.bat_scale">Ölçek Faktörü <small class="text-muted">(R1+R2)/R2</small></label>
                                 <div class="col-sm-5">
                                     <input type="number" class="form-control form-control-sm" id="inp_bat_adc_scale"
                                            min="1" max="50" step="0.1" value="11.0">
@@ -2176,19 +2178,19 @@
                     <div class="row mb-4">
                         <div class="col-12">
                             <h6 class="text-muted border-bottom border-secondary pb-1">
-                                <i class="bi bi-battery me-1"></i> Hücre Voltaj Limitleri <small class="text-muted">(OSD Pil Simgesi)</small>
+                                <i class="bi bi-battery me-1"></i> <span data-i18n="advanced.bat_cell_section">Hücre Voltaj Limitleri</span> <small class="text-muted" data-i18n="advanced.bat_cell_section_hint">(OSD Pil Simgesi)</small>
                             </h6>
                         </div>
                         <div class="col-md-4 border-end border-secondary">
                             <div class="mb-2 row">
-                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına boş voltaj — pil simgesi bu eşiğin altında boş görünür">Boş Hücre Voltajı <small class="text-muted">(V)</small></label>
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına boş voltaj — pil simgesi bu eşiğin altında boş görünür" data-i18n="advanced.bat_cell_min">Boş Hücre Voltajı <small class="text-muted">(V)</small></label>
                                 <div class="col-sm-5">
                                     <input type="number" class="form-control form-control-sm" id="inp_cell_min_v"
                                            min="2.0" max="4.0" step="0.05" value="3.0">
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına dolu voltaj — pil simgesi bu eşikte dolu görünür">Dolu Hücre Voltajı <small class="text-muted">(V)</small></label>
+                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına dolu voltaj — pil simgesi bu eşikte dolu görünür" data-i18n="advanced.bat_cell_max">Dolu Hücre Voltajı <small class="text-muted">(V)</small></label>
                                 <div class="col-sm-5">
                                     <input type="number" class="form-control form-control-sm" id="inp_cell_max_v"
                                            min="3.5" max="4.5" step="0.05" value="4.2">
@@ -2214,21 +2216,21 @@
                     <div class="row mb-4">
                         <div class="col-12">
                             <h6 class="text-muted border-bottom border-secondary pb-1">
-                                <i class="bi bi-lightning-charge me-1"></i> Sanal Akım Sensörü
+                                <i class="bi bi-lightning-charge me-1"></i> <span data-i18n="advanced.bat_virtual_section">Sanal Akım Sensörü</span>
                             </h6>
                         </div>
 
                         <!-- Sol: Max & Boşta Akım -->
                         <div class="col-md-3 border-end border-secondary">
                             <div class="mb-2 row">
-                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Tam gazda motor + tüm elektroniklerin toplam çektiği akım (A)">Max Akım (A)</label>
+                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Tam gazda motor + tüm elektroniklerin toplam çektiği akım (A)" data-i18n="advanced.bat_max_current">Max Akım (A)</label>
                                 <div class="col-sm-4">
                                     <input type="number" class="form-control form-control-sm" id="inp_vc_scale"
                                            step="0.5" min="1" max="200" value="30.0">
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Gaz sıfırken alıcı + servo + ESP32 toplam boşta akım (A)">Boşta Akım (A)</label>
+                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Gaz sıfırken alıcı + servo + ESP32 toplam boşta akım (A)" data-i18n="advanced.bat_idle_current">Boşta Akım (A)</label>
                                 <div class="col-sm-4">
                                     <input type="number" class="form-control form-control-sm" id="inp_vc_idle"
                                            step="0.1" min="0" max="10" value="0.5">
@@ -2239,14 +2241,14 @@
                         <!-- Orta: Kalibrasyon & Kapasite -->
                         <div class="col-md-3 border-end border-secondary">
                             <div class="mb-2 row">
-                                <label class="col-sm-8 col-form-label col-form-label-sm" title="İlk uçuş sonrası ince ayar: gerçek_tüketim / tahmin_tüketim">Kalibrasyon</label>
+                                <label class="col-sm-8 col-form-label col-form-label-sm" title="İlk uçuş sonrası ince ayar: gerçek_tüketim / tahmin_tüketim" data-i18n="advanced.bat_calibration">Kalibrasyon</label>
                                 <div class="col-sm-4">
                                     <input type="number" class="form-control form-control-sm" id="inp_vc_calib"
                                            step="0.01" min="0.5" max="2.0" value="1.0">
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Pilin toplam kapasitesi — kumandada Bat% göstergesi bu değere göre hesaplanır">Kapasite (mAh)</label>
+                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Pilin toplam kapasitesi — kumandada Bat% göstergesi bu değere göre hesaplanır" data-i18n="advanced.bat_capacity">Kapasite (mAh)</label>
                                 <div class="col-sm-4">
                                     <input type="number" class="form-control form-control-sm" id="inp_vc_cap_mah"
                                            step="100" min="100" max="20000" value="2200">
@@ -2273,7 +2275,7 @@
                     <!-- Kalibrasyon Hesaplayıcılar -->
                     <div class="col-12 mb-2">
                         <h6 class="text-muted border-bottom border-secondary pb-1">
-                            <i class="bi bi-calculator me-1"></i> Kalibrasyon Hesaplayıcılar
+                            <i class="bi bi-calculator me-1"></i> <span data-i18n="advanced.bat_calc_section">Kalibrasyon Hesaplayıcılar</span>
                         </h6>
                     </div>
                     <div class="row g-3 mb-2">
@@ -2281,16 +2283,16 @@
                         <!-- Panel 1: Voltaj -->
                         <div class="col-md-6">
                             <div class="border border-secondary rounded p-3 h-100">
-                                <div class="fw-semibold small mb-2 text-info"><i class="bi bi-plug me-1"></i> Voltaj Kalibrasyonu</div>
+                                <div class="fw-semibold small mb-2 text-info"><i class="bi bi-plug me-1"></i> <span data-i18n="advanced.volt_calc_title">Voltaj Kalibrasyonu</span></div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Telemetride görünen (V)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.volt_calc_shown">Telemetride görünen (V)</label>
                                     <div class="col-sm-5">
                                         <input type="number" class="form-control form-control-sm" id="inp_calib_volt_shown"
                                                step="0.1" min="0.1" max="60">
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Gerçekte ölçülen (V)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.volt_calc_actual">Gerçekte ölçülen (V)</label>
                                     <div class="col-sm-5">
                                         <input type="number" class="form-control form-control-sm" id="inp_calib_volt_actual"
                                                step="0.1" min="0.1" max="60">
@@ -2298,7 +2300,7 @@
                                 </div>
                                 <button type="button" class="btn btn-sm btn-info w-100 mt-1"
                                         onclick="computeVoltageCalib()">
-                                    <i class="bi bi-arrow-repeat me-1"></i> Ölçeği Hesapla ve Uygula
+                                    <i class="bi bi-arrow-repeat me-1"></i> <span data-i18n="advanced.volt_calc_btn">Ölçeği Hesapla ve Uygula</span>
                                 </button>
                                 <div class="text-muted mt-2" style="font-size:0.72rem;">
                                     Multimetre ile ölçülen gerçek voltajı gir. <code>yeni_ölçek = mevcut × (gerçek ÷ gösterilen)</code> — sonuç <em>Ölçek Faktörü</em> alanına yazılır.
@@ -2309,16 +2311,16 @@
                         <!-- Panel 2: Kapasite (mAh) -->
                         <div class="col-md-6">
                             <div class="border border-secondary rounded p-3 h-100">
-                                <div class="fw-semibold small mb-2 text-info"><i class="bi bi-battery-charging me-1"></i> Kapasite Kalibrasyonu</div>
+                                <div class="fw-semibold small mb-2 text-info"><i class="bi bi-battery-charging me-1"></i> <span data-i18n="advanced.mah_calc_title">Kapasite Kalibrasyonu</span></div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Tahmin edilen tüketim (mAh)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.mah_calc_reported">Tahmin edilen tüketim (mAh)</label>
                                     <div class="col-sm-5">
                                         <input type="number" class="form-control form-control-sm" id="inp_calib_reported_mah"
                                                step="10" min="1" max="50000">
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm">Gerçek tüketim (mAh)</label>
+                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.mah_calc_actual">Gerçek tüketim (mAh)</label>
                                     <div class="col-sm-5">
                                         <input type="number" class="form-control form-control-sm" id="inp_calib_actual_mah"
                                                step="10" min="1" max="50000">
@@ -2326,7 +2328,7 @@
                                 </div>
                                 <button type="button" class="btn btn-sm btn-info w-100 mt-1"
                                         onclick="computeCurrentCalib()">
-                                    <i class="bi bi-arrow-repeat me-1"></i> Kalibrasyonu Hesapla ve Uygula
+                                    <i class="bi bi-arrow-repeat me-1"></i> <span data-i18n="advanced.mah_calc_btn">Kalibrasyonu Hesapla ve Uygula</span>
                                 </button>
                                 <div class="text-muted mt-2" style="font-size:0.72rem;">
                                     Şarj cihazının yüklediği mAh'ı gir. <code>yeni_calib = mevcut × (gerçek ÷ tahmin)</code> — sonuç <em>Kalibrasyon</em> alanına yazılır.
@@ -2342,20 +2344,20 @@
             <!-- ==================== PİTOT TÜPÜ ==================== -->
             <div id="adv-tab-pitot" class="adv-tab-pane">
                 <div class="panel4">
-                    <div class="mode-category-title"><i class="bi bi-wind"></i> MS4525DO Pitot Tüpü</div>
+                    <div class="mode-category-title"><i class="bi bi-wind"></i> <span data-i18n="advanced.pitot_section">MS4525DO Pitot Tüpü</span></div>
                     <div class="row g-3 mt-1">
                         <div class="col-md-4">
-                            <label class="form-label text-muted small">Pitot Sensörü</label>
+                            <label class="form-label text-muted small" data-i18n="advanced.pitot_sensor_label">Pitot Sensörü</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="pitotEnabled">
-                                <label class="form-check-label" for="pitotEnabled">Etkin</label>
+                                <label class="form-check-label" for="pitotEnabled" data-i18n="advanced.pitot_enabled">Etkin</label>
                             </div>
-                            <small class="text-muted d-block mt-1">Devre dışıyken hava hızı GPS bazlı (sanal) hesaplanır.</small>
+                            <small class="text-muted d-block mt-1" data-i18n="advanced.pitot_disabled_hint">Devre dışıyken hava hızı GPS bazlı (sanal) hesaplanır.</small>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label text-muted small">Ölçek (Scale)</label>
+                            <label class="form-label text-muted small" data-i18n="advanced.pitot_scale_label">Ölçek (Scale)</label>
                             <input type="number" class="form-control form-control-sm bg-dark text-white border-secondary" id="pitotScale" min="0.5" max="2.0" step="0.01" value="1.00">
-                            <small class="text-muted d-block mt-1">Varsayılan: 1.00 · Tüp açısı veya uzunluk farkı için ince ayar.</small>
+                            <small class="text-muted d-block mt-1" data-i18n="advanced.pitot_scale_hint">Varsayılan: 1.00 · Tüp açısı veya uzunluk farkı için ince ayar.</small>
                         </div>
                     </div>
                 </div>
@@ -2399,7 +2401,7 @@ function switchAdvTab(tabId, btn) {
                     <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 16</small>
                 </div>
                 <button class="btn btn-warning btn-sm" onclick="saveOsdPins()">
-                    <i class="bi bi-save me-1"></i> OSD Pinlerini Kaydet
+                    <i class="bi bi-save me-1"></i> <span data-i18n="osd.pin_save">OSD Pinlerini Kaydet</span>
                 </button>
             </div>
             <div class="pin-reboot-warning">
@@ -2412,19 +2414,18 @@ function switchAdvTab(tabId, btn) {
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
             <div>
                 <h2 class="panel-title mb-0"><i class="bi bi-aspect-ratio me-2 text-info"></i>OSD Tasarımcı</h2>
-                <small class="text-muted">Ekran öğelerini ve sistem bilgilerini özelleştirin</small>
+                <small class="text-muted" data-i18n="osd.page_subtitle">Ekran öğelerini ve sistem bilgilerini özelleştirin</small>
             </div>
             <div class="form-check form-switch fs-5">
                 <input class="form-check-input" type="checkbox" id="osd_enabled" checked>
-                <label class="form-check-label text-light" for="osd_enabled">OSD Aktif</label>
+                <label class="form-check-label text-light" for="osd_enabled" data-i18n="osd.osd_active">OSD Aktif</label>
             </div>
         </div>
 
         <div class="alert alert-warning d-flex align-items-start gap-2 mb-4" role="alert">
             <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
             <div>
-                <strong>Önemli:</strong> OSD sembollerinin doğru görüntülenebilmesi için gözlüğünüzde <strong>INAV</strong> fontu seçili olmalıdır.
-                Aksi takdirde ekranda anlamsız semboller ve karakterler görünecektir.
+                <strong data-i18n="osd.font_warning_title">Önemli:</strong> <span data-i18n="osd.font_warning">OSD sembollerinin doğru görüntülenebilmesi için gözlüğünüzde</span> <strong data-i18n="osd.font_warning_bold">INAV</strong> <span data-i18n="osd.font_warning_end">fontu seçili olmalıdır. Aksi takdirde ekranda anlamsız semboller ve karakterler görünecektir.</span>
             </div>
         </div>
 
@@ -2434,111 +2435,111 @@ function switchAdvTab(tabId, btn) {
                     <div class="col-md-4">
                         <div class="panel4 p-3 h-100">
                             <h6 class="text-info border-bottom pb-2 mb-3" style="border-color:rgba(0,0,0,0.15)!important;">
-                                <i class="bi bi-list-check me-2"></i>Ekran Öğeleri
+                                <i class="bi bi-list-check me-2"></i><span data-i18n="osd.elements_title">Ekran Öğeleri</span>
                             </h6>
                     <div class="osd-element-list" style="max-height: 450px; overflow-y: auto;">
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_arm" checked data-target="prev_arm_status">
-        <label class="form-check-label small" for="osd_show_arm">Arm Durumu</label>
+        <label class="form-check-label small" for="osd_show_arm" data-i18n="osd.el_arm_status">Arm Durumu</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_mode" checked data-target="prev_flight_mode">
-        <label class="form-check-label small" for="osd_show_mode">Uçuş Modu</label>
+        <label class="form-check-label small" for="osd_show_mode" data-i18n="osd.el_flight_mode">Uçuş Modu</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_spd" checked data-target="prev_speed">
-        <label class="form-check-label small" for="osd_show_spd">Hız (Ground Speed)</label>
+        <label class="form-check-label small" for="osd_show_spd" data-i18n="osd.el_speed">Hız (Ground Speed)</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_air" data-target="prev_airspeed">
-        <label class="form-check-label small" for="osd_show_air">Hava Hızı (Airspeed)</label>
+        <label class="form-check-label small" for="osd_show_air" data-i18n="osd.el_airspeed">Hava Hızı (Airspeed)</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_rssi" checked data-target="prev_rssi">
-        <label class="form-check-label small" for="osd_show_rssi">RSSI (Sinyal Gücü)</label>
+        <label class="form-check-label small" for="osd_show_rssi" data-i18n="osd.el_rssi">RSSI (Sinyal Gücü)</label>
     </div>
 
     <hr class="my-2 border-secondary">
 
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_bat" checked data-target="prev_battery">
-        <label class="form-check-label small" for="osd_show_bat">Pil Voltajı</label>
+        <label class="form-check-label small" for="osd_show_bat" data-i18n="osd.el_battery">Pil Voltajı</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_alt" checked data-target="prev_altitude">
-        <label class="form-check-label small" for="osd_show_alt">İrtifa</label>
+        <label class="form-check-label small" for="osd_show_alt" data-i18n="osd.el_altitude">İrtifa</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_vario" checked data-target="prev_vario">
-        <label class="form-check-label small" for="osd_show_vario">Vario (Dikey Hız)</label>
+        <label class="form-check-label small" for="osd_show_vario" data-i18n="osd.el_vario">Vario (Dikey Hız)</label>
     </div>
 
     <hr class="my-2 border-secondary">
 
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_horizon" checked data-target="prev_horizon">
-        <label class="form-check-label small" for="osd_show_horizon">Yapay Ufuk</label>
+        <label class="form-check-label small" for="osd_show_horizon" data-i18n="osd.el_horizon">Yapay Ufuk</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_home" checked data-target="prev_home_dir">
-        <label class="form-check-label small" for="osd_show_home">Home Bilgisi</label>
+        <label class="form-check-label small" for="osd_show_home" data-i18n="osd.el_home">Home Bilgisi</label>
     </div>
 
     <hr class="my-2 border-secondary">
 
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_thr" checked data-target="prev_throttle">
-        <label class="form-check-label small" for="osd_show_thr">Gaz (Throttle)</label>
+        <label class="form-check-label small" for="osd_show_thr" data-i18n="osd.el_throttle">Gaz (Throttle)</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_wind" checked data-target="prev_wind">
-        <label class="form-check-label small" for="osd_show_wind">Rüzgar Bilgisi</label>
+        <label class="form-check-label small" for="osd_show_wind" data-i18n="osd.el_wind">Rüzgar Bilgisi</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_cap" data-target="prev_battery_cap">
-        <label class="form-check-label small" for="osd_show_cap">Pil Kapasitesi (mAh)</label>
+        <label class="form-check-label small" for="osd_show_cap" data-i18n="osd.el_battery_cap">Pil Kapasitesi (mAh)</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_cellv" data-target="prev_cell_voltage">
-        <label class="form-check-label small" for="osd_show_cellv">Hücre Voltajı (V/hücre)</label>
+        <label class="form-check-label small" for="osd_show_cellv" data-i18n="osd.el_cell_voltage">Hücre Voltajı (V/hücre)</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_amp" data-target="prev_current_amps">
-        <label class="form-check-label small" for="osd_show_amp">Anlık Akım (A)</label>
+        <label class="form-check-label small" for="osd_show_amp" data-i18n="osd.el_current">Anlık Akım (A)</label>
     </div>
 
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_msg" checked data-target="prev_sys_msg">
-        <label class="form-check-label small" for="osd_show_msg">Sistem Mesajları</label>
+        <label class="form-check-label small" for="osd_show_msg" data-i18n="osd.el_sys_msg">Sistem Mesajları</label>
     </div>
 
     <hr class="my-2 border-secondary">
 <div class="form-check form-switch mb-2">
     <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_sats" checked data-target="prev_sats">
-    <label class="form-check-label small" for="osd_show_sats">Uydu Sayısı</label>
+    <label class="form-check-label small" for="osd_show_sats" data-i18n="osd.el_sats">Uydu Sayısı</label>
   
 
 </div>
     <hr class="my-2 border-secondary">
 <div class="form-check form-switch mb-2">
     <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_lat" checked data-target="prev_lat">
-    <label class="form-check-label small" for="osd_show_lat">GPS Enlem (Lat)</label>
+    <label class="form-check-label small" for="osd_show_lat" data-i18n="osd.el_lat">GPS Enlem (Lat)</label>
 </div>
     <hr class="my-2 border-secondary">
 <div class="form-check form-switch mb-2">
     <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_lon" checked data-target="prev_lon">
-    <label class="form-check-label small" for="osd_show_lon">GPS Boylam (Lon)</label>
+    <label class="form-check-label small" for="osd_show_lon" data-i18n="osd.el_lon">GPS Boylam (Lon)</label>
 </div>
 
  <hr class="my-2 border-secondary">
 
 <div class="form-check form-switch">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_gcode" checked data-target="prev_gcode">
-        <label class="form-check-label small text-warning" for="osd_show_gcode">Google Plus Code</label>
+        <label class="form-check-label small text-warning" for="osd_show_gcode" data-i18n="osd.el_gcode">Google Plus Code</label>
     </div>
     <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_timer" checked data-target="prev_timer">
-        <label class="form-check-label small" for="osd_show_timer">Uçuş Süresi</label>
+        <label class="form-check-label small" for="osd_show_timer" data-i18n="osd.el_timer">Uçuş Süresi</label>
     </div>
 </div>
                         </div>
@@ -2611,7 +2612,7 @@ function switchAdvTab(tabId, btn) {
     <div id="prev_timer" class="osd-draggable position-absolute" style="top: 90%; left: 84%;">fly time 04:20</div>
 </div>
                             <div class="bg-dark p-2 text-center small text-secondary">
-                                <i class="bi bi-arrows-move me-1"></i> Önizleme Ekranı (50x20 Karakter Izgarası)
+                                <i class="bi bi-arrows-move me-1"></i> <span data-i18n="osd.preview_hint">Önizleme Ekranı (50x20 Karakter Izgarası)</span>
                             </div>
                         </div>
                     </div>
@@ -2621,11 +2622,11 @@ function switchAdvTab(tabId, btn) {
             <div class="col-lg-4">
                 <div class="panel4 p-3 h-100">
                     <h6 class="text-warning border-bottom pb-2 mb-3" style="border-color:rgba(0,0,0,0.15)!important;">
-                        <i class="bi bi-gear-fill me-2"></i>Sistem & Görüntü Ayarları
+                        <i class="bi bi-gear-fill me-2"></i><span data-i18n="osd.settings_title">Sistem & Görüntü Ayarları</span>
                     </h6>
 
                     <div class="mb-3">
-                        <label class="form-label small">Ekran Oranı</label>
+                        <label class="form-label small" data-i18n="osd.screen_ratio">Ekran Oranı</label>
                         <select class="form-select form-select-sm" id="osd_video_format">
                             <option value="0">16:4</option>
                             <option value="1">4:3</option>
@@ -2633,38 +2634,38 @@ function switchAdvTab(tabId, btn) {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">Pilot Adı (Callsign)</label>
+                        <label class="form-label small" data-i18n="osd.pilot_name">Pilot Adı (Callsign)</label>
                         <input type="text" class="form-control form-control-sm" id="osd_pilot_name" placeholder="">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">Hava Aracı Adı</label>
+                        <label class="form-label small" data-i18n="osd.craft_name">Hava Aracı Adı</label>
                         <input type="text" class="form-control form-control-sm" id="osd_craft_name" placeholder="">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">Ölçü Birimi</label>
+                        <label class="form-label small" data-i18n="osd.units">Ölçü Birimi</label>
                         <div class="btn-group w-100" role="group">
                             <input type="radio" class="btn-check" name="osd_units" id="unit_metric" checked>
-                            <label class="btn btn-outline-secondary btn-sm" for="unit_metric">Metrik (m, km/h)</label>
+                            <label class="btn btn-outline-secondary btn-sm" for="unit_metric" data-i18n="osd.units_metric">Metrik (m, km/h)</label>
                             <input type="radio" class="btn-check" name="osd_units" id="unit_imperial">
-                            <label class="btn btn-outline-secondary btn-sm" for="unit_imperial">Imperial (ft, mph)</label>
+                            <label class="btn btn-outline-secondary btn-sm" for="unit_imperial" data-i18n="osd.units_imperial">Imperial (ft, mph)</label>
                         </div>
                     </div>
 
                     <div class="row g-2 mb-4">
                         <div class="col-6">
-                            <label class="form-label small">Düşük Voltaj (V)</label>
+                            <label class="form-label small" data-i18n="osd.low_voltage">Düşük Voltaj (V)</label>
                             <input type="number" step="0.1" class="form-control form-control-sm" id="osd_low_bat" value="10.8">
                         </div>
                         <div class="col-6">
-                            <label class="form-label small">Mesafe Uyarısı (m)</label>
+                            <label class="form-label small" data-i18n="osd.max_dist">Mesafe Uyarısı (m)</label>
                             <input type="number" class="form-control form-control-sm" id="osd_max_dist" value="1000">
                         </div>
                     </div>
 
                     <button type="button" class="btn btn-warning w-100 shadow-sm mt-auto" id="btnSaveOSD">
-                        <i class="bi bi-cloud-upload me-2 "></i>Ayarları Cihaza Kaydet
+                        <i class="bi bi-cloud-upload me-2 "></i> Ayarları Cihaza Kaydet
                     </button>
                 </div>
             </div>
@@ -2692,13 +2693,13 @@ function switchAdvTab(tabId, btn) {
 		
 <div id="logs" class="page">
     <div class="panel panel2">
-        <h2 class="panel-title"><i class="bi bi-terminal"></i> Komut Konsolu & Sistem Logları</h2>
+        <h2 class="panel-title"><i class="bi bi-terminal"></i> <span data-i18n="logs.page_title">Komut Konsolu & Sistem Logları</span></h2>
         <div class="row">
 
             <!-- ============ SOL: KISAYOLLAR ============ -->
             <div class="col-md-4">
                 <div class="panel">
-                    <h3 class="h5 mb-3"><i class="bi bi-lightning-charge"></i> Kısayollar</h3>
+                    <h3 class="h5 mb-3"><i class="bi bi-lightning-charge"></i> <span data-i18n="logs.shortcuts_title">Kısayollar</span></h3>
 
                     <div class="accordion accordion-flush" id="shortcutsAccordion">
 
@@ -2707,7 +2708,7 @@ function switchAdvTab(tabId, btn) {
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#accSistem">
-                                    <i class="bi bi-gear me-2 text-danger"></i> Sistem &amp; Konfigürasyon
+                                    <i class="bi bi-gear me-2 text-danger"></i> <span data-i18n="logs.acc_system">Sistem &amp; Konfigürasyon</span>
                                 </button>
                             </h2>
                             <div id="accSistem" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
@@ -2726,7 +2727,7 @@ function switchAdvTab(tabId, btn) {
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#accKalib">
-                                    <i class="bi bi-crosshair me-2 text-warning"></i> Kalibrasyon İşlemleri
+                                    <i class="bi bi-crosshair me-2 text-warning"></i> <span data-i18n="logs.acc_calibration">Kalibrasyon İşlemleri</span>
                                 </button>
                             </h2>
                             <div id="accKalib" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
@@ -2748,28 +2749,28 @@ function switchAdvTab(tabId, btn) {
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#accStream">
-                                    <i class="bi bi-broadcast me-2 text-success"></i> Canlı Veri Akışları
+                                    <i class="bi bi-broadcast me-2 text-success"></i> <span data-i18n="logs.acc_streams">Canlı Veri Akışları</span>
                                 </button>
                             </h2>
                             <div id="accStream" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
                                 <div class="accordion-body pt-1 pb-2 px-0">
                                     <div class="input-group input-group-sm mb-1">
-                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="GPS, Barometre, Pusula verileri">SENSÖRLER (GPS/BARO)</span>
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="GPS, Barometre, Pusula verileri" data-i18n="logs.stream_sensors">SENSÖRLER (GPS/BARO)</span>
                                         <button class="btn btn-success btn-sm" onclick="sendQuickCommand('start_sensor_stream')">AÇ</button>
                                         <button class="btn btn-danger btn-sm" onclick="sendQuickCommand('stop_sensor_stream')">KAPAT</button>
                                     </div>
                                     <div class="input-group input-group-sm mb-1">
-                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Jiroskop ve İvmeölçer ham verileri">IMU (JİRO/İVME)</span>
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Jiroskop ve İvmeölçer ham verileri" data-i18n="logs.stream_imu">IMU (JİRO/İVME)</span>
                                         <button class="btn btn-success btn-sm" onclick="sendQuickCommand('start_gyro_stream')">AÇ</button>
                                         <button class="btn btn-danger btn-sm" onclick="sendQuickCommand('stop_gyro_stream')">KAPAT</button>
                                     </div>
                                     <div class="input-group input-group-sm mb-1">
-                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Uçak duruş açısı (Quaternion & Euler)">3D DURUŞ (QUAT/EULER)</span>
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Uçak duruş açısı (Quaternion & Euler)" data-i18n="logs.stream_3d">3D DURUŞ (QUAT/EULER)</span>
                                         <button class="btn btn-success btn-sm" onclick="sendQuickCommand('start_quaternion_stream')">AÇ</button>
                                         <button class="btn btn-danger btn-sm" onclick="sendQuickCommand('stop_quaternion_stream')">KAPAT</button>
                                     </div>
                                     <div class="input-group input-group-sm">
-                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Kumandadan gelen kanal sinyalleri">ALICI &amp; KANALLAR</span>
+                                        <span class="input-group-text bg-dark border-secondary text-light" style="width:55%" title="Kumandadan gelen kanal sinyalleri" data-i18n="logs.stream_receiver">ALICI &amp; KANALLAR</span>
                                         <button class="btn btn-success btn-sm" onclick="sendQuickCommand('start_receiver_stream')">AÇ</button>
                                         <button class="btn btn-danger btn-sm" onclick="sendQuickCommand('stop_receiver_stream')">KAPAT</button>
                                     </div>
@@ -2782,7 +2783,7 @@ function switchAdvTab(tabId, btn) {
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#accPages">
-                                    <i class="bi bi-arrow-clockwise me-2 text-info"></i> Sayfa Verilerini Güncelle
+                                    <i class="bi bi-arrow-clockwise me-2 text-info"></i> <span data-i18n="logs.acc_pages">Sayfa Verilerini Güncelle</span>
                                 </button>
                             </h2>
                             <div id="accPages" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
@@ -2804,7 +2805,7 @@ function switchAdvTab(tabId, btn) {
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed bg-transparent text-light py-2 small fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#accBackup">
-                                    <i class="bi bi-archive me-2 text-primary"></i> Ayar Yedekleme
+                                    <i class="bi bi-archive me-2 text-primary"></i> <span data-i18n="logs.acc_backup">Ayar Yedekleme</span>
                                 </button>
                             </h2>
                             <div id="accBackup" class="accordion-collapse collapse" data-bs-parent="#shortcutsAccordion">
@@ -2839,13 +2840,13 @@ function switchAdvTab(tabId, btn) {
                             <button class="btn btn-outline-secondary" type="button" id="btnClearSearch"><i class="bi bi-x"></i></button>
                         </div>
                         <select class="form-select form-select-sm" id="logLevelFilter" style="max-width:180px">
-                            <option value="all">Tüm Kayıtlar</option>
-                            <option value="info">Bilgi (Info)</option>
-                            <option value="success">Başarılı</option>
-                            <option value="warning">Uyarılar</option>
-                            <option value="error">Hatalar</option>
-                            <option value="command">Giden Komutlar</option>
-                            <option value="receive">Gelen Veri</option>
+                            <option value="all" data-i18n="logs.filter_all">Tüm Kayıtlar</option>
+                            <option value="info" data-i18n="logs.filter_info">Bilgi (Info)</option>
+                            <option value="success" data-i18n="logs.filter_success">Başarılı</option>
+                            <option value="warning" data-i18n="logs.filter_warning">Uyarılar</option>
+                            <option value="error" data-i18n="logs.filter_error">Hatalar</option>
+                            <option value="command" data-i18n="logs.filter_command">Giden Komutlar</option>
+                            <option value="receive" data-i18n="logs.filter_receive">Gelen Veri</option>
                         </select>
                     </div>
 
@@ -2854,11 +2855,11 @@ function switchAdvTab(tabId, btn) {
                             <span class="badge bg-primary" id="logCount">0 satır</span>
                             <div class="form-check form-switch mb-0">
                                 <input class="form-check-input" type="checkbox" id="autoScroll" checked>
-                                <label class="form-check-label small" for="autoScroll">Oto. Kaydır</label>
+                                <label class="form-check-label small" for="autoScroll" data-i18n="logs.auto_scroll">Oto. Kaydır</label>
                             </div>
                             <div class="form-check form-switch mb-0">
                                 <input class="form-check-input" type="checkbox" id="pauseLogs">
-                                <label class="form-check-label small" for="pauseLogs">Akışı Durdur</label>
+                                <label class="form-check-label small" for="pauseLogs" data-i18n="logs.pause">Akışı Durdur</label>
                             </div>
                         </div>
                         <div class="btn-group btn-group-sm">
@@ -2868,7 +2869,7 @@ function switchAdvTab(tabId, btn) {
                     </div>
 
                     <!-- ── Log başlığı ── -->
-                    <h3 class="h5 mb-2"><i class="bi bi-terminal"></i> Sistem Kayıtları (Logs)</h3>
+                    <h3 class="h5 mb-2"><i class="bi bi-terminal"></i> <span data-i18n="logs.log_title">Sistem Kayıtları (Logs)</span></h3>
 
                     <!-- ── Log Ekranı ── -->
                     <div class="log-container" id="logContainer">
@@ -2878,7 +2879,7 @@ function switchAdvTab(tabId, btn) {
 
                     <!-- ── ALT: Manuel Komut Girişi ── -->
                     <div class="mt-3">
-                        <label class="form-label small text-muted">MANUEL KOMUT GİRİŞİ</label>
+                        <label class="form-label small text-muted" data-i18n="logs.cmd_label">MANUEL KOMUT GİRİŞİ</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="commandInput" placeholder="Örn: CAL_GYRO yazıp gönderin..." onkeypress="handleCommandKeypress(event)">
                             <button class="btn btn-primary" type="button" id="btnSendCommand" title="Komutu Gönder"><i class="bi bi-send"></i></button>
@@ -2888,24 +2889,24 @@ function switchAdvTab(tabId, btn) {
 
                 <!-- ── İstatistikler ── -->
                 <div class="panel">
-                    <h3 class="h5 mb-3"><i class="bi bi-graph-up"></i> İletişim İstatistikleri</h3>
+                    <h3 class="h5 mb-3"><i class="bi bi-graph-up"></i> <span data-i18n="logs.stats_title">İletişim İstatistikleri</span></h3>
                     <div class="row text-center">
                         <div class="col-4">
                             <div class="system-stat">
                                 <div class="stat-value" id="statTotalLogs">0</div>
-                                <div class="stat-label">Toplam Satır</div>
+                                <div class="stat-label" data-i18n="logs.stat_total">Toplam Satır</div>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="system-stat">
                                 <div class="stat-value" id="statCommandsSent">0</div>
-                                <div class="stat-label">Giden Komut</div>
+                                <div class="stat-label" data-i18n="logs.stat_commands">Giden Komut</div>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="system-stat">
                                 <div class="stat-value" id="statErrors">0</div>
-                                <div class="stat-label">Hata Sayısı</div>
+                                <div class="stat-label" data-i18n="logs.stat_errors">Hata Sayısı</div>
                             </div>
                         </div>
                     </div>
@@ -2933,7 +2934,7 @@ function switchAdvTab(tabId, btn) {
 <!-- ==================== WAYPOINT MİSYON SAYFASI ==================== -->
 <div id="waypoint" class="page">
     <div class="panel p-3">
-        <h2 class="panel-title"><i class="bi bi-map"></i> Waypoint Misyon Planlayıcı</h2>
+        <h2 class="panel-title"><i class="bi bi-map"></i> <span data-i18n="waypoint.page_title">Waypoint Misyon Planlayıcı</span></h2>
 
         <!-- ===== HARITA + WAYPOINT LİSTESİ ===== -->
         <div class="row">
@@ -2941,8 +2942,8 @@ function switchAdvTab(tabId, btn) {
             <div class="col-lg-8 mb-3">
                 <div class="panel2">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Harita</h5>
-                        <small class="text-muted">Haritaya tıklayarak waypoint ekleyin</small>
+                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> <span data-i18n="waypoint.map_title">Harita</span></h5>
+                        <small class="text-muted" data-i18n="waypoint.map_hint">Haritaya tıklayarak waypoint ekleyin</small>
                     </div>
                     <div id="wp-map" style="height: 450px; border-radius: 8px; border: 1px solid #333;"></div>
                 </div>
@@ -2952,13 +2953,13 @@ function switchAdvTab(tabId, btn) {
             <div class="col-lg-4 mb-3">
                 <!-- Misyon Kontrolleri -->
                 <div class="panel2 mb-3">
-                    <h5 class="mb-3"><i class="bi bi-cloud-upload"></i> FC'ye Yükle</h5>
+                    <h5 class="mb-3"><i class="bi bi-cloud-upload"></i> <span data-i18n="waypoint.upload_title">FC'ye Yükle</span></h5>
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" id="btnUploadWaypoints" onclick="uploadWaypoints()">
                             <i class="bi bi-cloud-upload me-2"></i> Waypoint'leri Kaydet
                         </button>
                         <button class="btn btn-outline-secondary btn-sm" onclick="clearAllWaypoints()">
-                            <i class="bi bi-trash me-2 warning"></i> Tüm Waypoint'leri Temizle
+                            <i class="bi bi-trash me-2 warning"></i> <span data-i18n="waypoint.btn_clear_all">Tüm Waypoint'leri Temizle</span>
                         </button>
                     </div>
                  
@@ -2968,15 +2969,15 @@ function switchAdvTab(tabId, btn) {
                 <!-- Waypoint Listesi -->
                 <div class="panel2">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="mb-0"><i class="bi bi-list-ol"></i> Waypoint Listesi</h5>
+                        <h5 class="mb-0"><i class="bi bi-list-ol"></i> <span data-i18n="waypoint.list_title">Waypoint Listesi</span></h5>
                         <span id="wp-count-badge" class="badge bg-secondary">0 / 16</span>
                     </div>
                     <div id="wp-list" style="max-height: 320px; overflow-y:auto;">
-                        <p class="text-muted text-center small mt-3">Henüz waypoint eklenmedi.<br>Haritaya tıklayın.</p>
+                        <p class="text-muted text-center small mt-3" data-i18n="waypoint.list_empty">Henüz waypoint eklenmedi.<br>Haritaya tıklayın.</p>
                     </div>
                     <!-- Manuel ekleme -->
                     <div class="mt-3 border-top pt-3">
-                        <small class="text-muted d-block mb-2">Manuel Ekle</small>
+                        <small class="text-muted d-block mb-2" data-i18n="waypoint.manual_add">Manuel Ekle</small>
                         <div class="input-group input-group-sm mb-1">
                             <span class="input-group-text">Lat</span>
                             <input type="number" step="0.0001" class="form-control" id="inp-wp-lat" placeholder="45.0000">
@@ -2990,7 +2991,7 @@ function switchAdvTab(tabId, btn) {
                             <input type="number" step="1" class="form-control" id="inp-wp-alt" placeholder="50" value="50">
                         </div>
                         <button class="btn btn-primary btn-sm w-100" onclick="addWaypointManual()">
-                            <i class="bi bi-plus-circle me-1"></i> Ekle
+                            <i class="bi bi-plus-circle me-1"></i> <span data-i18n="waypoint.btn_add">Ekle</span>
                         </button>
                     </div>
                 </div>
@@ -3003,7 +3004,7 @@ function switchAdvTab(tabId, btn) {
                 <div class="panel2" style="border-left:3px solid #dc3545;">
                     <div class="mb-3">
                         <h5 class="mb-0" style="color:#ff6b6b;">
-                            <i class="bi bi-bullseye me-1"></i> Kamikaze Görev Ayarları
+                            <i class="bi bi-bullseye me-1"></i> <span data-i18n="waypoint.kamikaze_title">Kamikaze Görev Ayarları</span>
                         </h5>
                     </div>
                     <div class="row g-3">
@@ -3012,13 +3013,13 @@ function switchAdvTab(tabId, btn) {
                             <div class="panel4 p-3">
                                 <div class="mb-1" style="color:#ff6b6b;font-weight:600;font-size:0.82em;letter-spacing:0.03em;">DALIŞ</div>
                                 <div class="mb-3">
-                                    <label class="form-label small mb-1">Dalış Açısı (°)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.dive_angle">Dalış Açısı (°)</label>
                                     <input type="number" class="form-control form-control-sm" id="km_def_dive_angle" min="5" max="90" step="1" value="45"
                                         title="Hedef üzerine dik dalış açısı. Açı belirlenince mesafe irtifaya göre otomatik hesaplanır.">
                                     <small class="text-muted" style="font-size:0.78em;">5° = sığ  —  90° = dik dik</small>
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small mb-1">Başlama İrtifa Farkı (m)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.dive_alt_offset">Başlama İrtifa Farkı (m)</label>
                                     <input type="number" class="form-control form-control-sm" id="km_def_alt_offset" step="1" value="0"
                                         title="WP irtifasına göre dalış başlangıç yükseklik farkı (m). 0 = WP irtifasından başla, negatif = daha alçaktan">
                                     <small class="text-muted" style="font-size:0.78em;">0 = WP irtifasından  —  negatif = daha alçak</small>
@@ -3030,13 +3031,13 @@ function switchAdvTab(tabId, btn) {
                             <div class="panel4 p-3">
                                 <div class="mb-1" style="color:#ffc107;font-weight:600;font-size:0.82em;letter-spacing:0.03em;">GÖREV SİSTEMİ</div>
                                 <div class="mb-3">
-                                    <label class="form-label small mb-1">Tetikleme İrtifası (m AGL)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.trigger_alt">Tetikleme İrtifası (m AGL)</label>
                                     <input type="number" class="form-control form-control-sm" id="km_def_trigger_alt" min="0" max="500" step="1" value="15"
                                         title="Uçak bu AGL irtifasına inince görev servosuna 2000 PWM sinyali verilir">
                                     <small class="text-muted" style="font-size:0.78em;">Bu irtifada servo tam gaz konumuna geçer</small>
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small mb-1">Görev Servosu</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.mission_servo">Görev Servosu</label>
                                     <select class="form-select form-select-sm" id="km_def_mission_servo">
                                         <option value="0">Devre Dışı</option>
                                         <option value="1">Servo 1</option>
@@ -3078,11 +3079,11 @@ function switchAdvTab(tabId, btn) {
             <div class="col-12">
                 <div class="panel2" style="border-left:3px solid #6f42c1;">
                     <h5 class="mb-3" style="color:#a78bfa;">
-                        <i class="bi bi-sliders me-1"></i> Misyon Genel Parametreleri
+                        <i class="bi bi-sliders me-1"></i> <span data-i18n="waypoint.mission_params_title">Misyon Genel Parametreleri</span>
                     </h5>
                     <div class="row g-2 align-items-end">
                         <div class="col-6 col-md-3">
-                            <label class="form-label small mb-1" style="color:#e0e0e0;">WP Yakalama Yarıçapı (m)</label>
+                            <label class="form-label small mb-1" style="color:#e0e0e0;" data-i18n="waypoint.wp_capture_radius">WP Yakalama Yarıçapı (m)</label>
                             <input type="number" class="form-control form-control-sm" id="inp_wp_capture_radius" min="5" max="200" step="5" value="25"
                                 title="Uçak bir waypoint'e bu mesafede girince o noktayı tamamlandı say ve sonrakine geç (metre)">
                             <small class="text-muted" style="font-size:0.78em;">Varsayılan: 25m</small>
@@ -3097,8 +3098,8 @@ function switchAdvTab(tabId, btn) {
             <div class="col-12">
                 <div class="panel2" style="border-left:3px solid #0dcaf0;">
                     <h5 class="mb-3" style="color:#0dcaf0;">
-                        <i class="bi bi-wind me-1"></i> İniş Asistan Ayarları
-                        <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#aaa;">Land Assist — Rüzgara Göre Otomatik Devre</small>
+                        <i class="bi bi-wind me-1"></i> <span data-i18n="waypoint.land_assist_title">İniş Asistan Ayarları</span>
+                        <small class="ms-2" style="font-size:0.7em;font-weight:400;color:#aaa;" data-i18n="waypoint.land_assist_subtitle">Land Assist — Rüzgara Göre Otomatik Devre</small>
                         <i class="bi bi-info-circle ms-2" style="font-size:0.75em;color:#aaa;cursor:help;" title="Land Assist: Eve dönüş loiteri ile rüzgar yönü tespit edilir → DOWNWIND WP → BASE_LEG WP → APPROACH WP → FLARE WP. Devre genişliği pist merkezinden yanal uzaklığı belirler. Alçalma açısı geometriden otomatik hesaplanır. Pilot stick veya gaz ile iptal edilir."></i>
                     </h5>
                     <div class="row g-3">
@@ -3108,14 +3109,14 @@ function switchAdvTab(tabId, btn) {
                             <div class="panel4 p-3">
                                 <div class="fw-bold mb-2" style="color:#0dcaf0;font-size:0.8em;"><i class="bi bi-arrow-down-right me-1"></i>Yaklaşma</div>
                                 <div class="mb-2">
-                                    <label class="form-label small mb-1">Yaklaşma İrtifası (m AGL)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.approach_alt">Yaklaşma İrtifası (m AGL)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_circuit_alt" min="20" max="300" step="5" value="50" title="Final yaklaşma başlangıç irtifası — AGL metre">
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small mb-1">Devre Yönü</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.circuit_dir">Devre Yönü</label>
                                     <select class="form-select form-select-sm" id="inp_la_loiter_dir" title="Sol devre veya sağ devre">
-                                        <option value="1">Sağ Devre</option>
-                                        <option value="-1">Sol Devre</option>
+                                        <option value="1" data-i18n="waypoint.circuit_right">Sağ Devre</option>
+                                        <option value="-1" data-i18n="waypoint.circuit_left">Sol Devre</option>
                                     </select>
                                 </div>
                             </div>
@@ -3126,12 +3127,12 @@ function switchAdvTab(tabId, btn) {
                             <div class="panel4 p-3">
                                 <div class="fw-bold mb-2" style="color:#17a2b8;font-size:0.8em;"><i class="bi bi-send me-1"></i>Son Yaklaşma (Final)</div>
                                 <div class="mb-2">
-                                    <label class="form-label small mb-1">Final Başlangıç Mesafesi (m)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.final_distance">Final Başlangıç Mesafesi (m)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_final_approach_distance" min="0" max="2000" step="10" value="250" title="Final waypoint, iniş noktasından kaç metre uzakta olsun? 0 = Otomatik (irtifa÷tan3°)">
                                     <small class="text-muted" style="font-size:0.78em;">0 = Otomatik (irtifa÷tan3°)</small>
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small mb-1">Devre Genişliği (m)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.circuit_width">Devre Genişliği (m)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_circuit_width" min="50" max="600" step="10" value="50" title="Pist merkezinden yanal uzaklık — downwind ve base leg için (m)">
                                 </div>
                             </div>
@@ -3142,15 +3143,15 @@ function switchAdvTab(tabId, btn) {
                             <div class="panel4 p-3">
                                 <div class="fw-bold mb-2" style="color:#ffc107;font-size:0.8em;"><i class="bi bi-arrow-down-circle me-1"></i>Flare & Gaz</div>
                                 <div class="mb-2">
-                                    <label class="form-label small mb-1">Flare Başlangıç İrtifası (m AGL)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.flare_alt">Flare Başlangıç İrtifası (m AGL)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_flare_alt" min="0.5" max="30.0" step="0.5" value="5.0" title="Bu irtifanın altında flare fazına girilir — pitch up ve gaz kesilir (AGL metre)">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small mb-1">Yaklaşma Gazı (PWM)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.approach_throttle">Yaklaşma Gazı (PWM)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_approach_throttle" min="1000" max="2000" step="10" value="1500" title="Final yaklaşma fazındaki gaz değeri (PWM 1000-2000)">
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small mb-1">Flare Gazı (PWM)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.flare_throttle">Flare Gazı (PWM)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_flare_throttle" min="1000" max="2000" step="10" value="1000" title="Flare fazındaki gaz değeri — genellikle rölanti (1000)">
                                 </div>
                             </div>
@@ -3161,11 +3162,11 @@ function switchAdvTab(tabId, btn) {
                             <div class="panel4 p-3">
                                 <div class="fw-bold mb-2" style="color:#fd7e14;font-size:0.8em;"><i class="bi bi-sign-turn-right me-1"></i>Pist</div>
                                 <div class="mb-2">
-                                    <label class="form-label small mb-1">Min Rüzgar Hızı (m/s)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.min_wind_speed">Min Rüzgar Hızı (m/s)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_min_wind_speed" min="0.5" max="20.0" step="0.5" value="2.0" title="Rüzgar yönünü pist başlığı olarak kullanmak için gereken minimum rüzgar hızı">
                                 </div>
                                 <div class="mb-0">
-                                    <label class="form-label small mb-1">Manuel Pist Başlığı (°)</label>
+                                    <label class="form-label small mb-1" data-i18n="waypoint.manual_runway_hdg">Manuel Pist Başlığı (°)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_manual_runway_hdg" min="0" max="359" step="1" value="0" title="Rüzgar yoksa kullanılacak varsayılan pist başlığı (0-359°)">
                                 </div>
                             </div>
@@ -3179,7 +3180,7 @@ function switchAdvTab(tabId, btn) {
         <!-- Tek Kaydet Butonu -->
         <div class="mt-3">
             <button class="btn btn-warning shadow-sm" onclick="saveAdvancedConfig()">
-                <i class="bi bi-save2 me-2"></i> WP Parametrelerini Kaydet
+                <i class="bi bi-save2 me-2"></i> <span data-i18n="waypoint.btn_save_wp">WP Parametrelerini Kaydet</span>
             </button>
         </div>
 
@@ -3195,13 +3196,13 @@ function switchAdvTab(tabId, btn) {
         <div class="modal-dialog">
             <div class="modal-content theme-modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmModalLabel">Onay</h5>
+                    <h5 class="modal-title" id="confirmModalLabel" data-i18n="modal.confirm_title">Onay</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="confirmModalBody"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-danger" id="confirmModalOkBtn">Devam Et</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="modal.btn_cancel">İptal</button>
+                    <button type="button" class="btn btn-danger" id="confirmModalOkBtn" data-i18n="modal.btn_confirm">Devam Et</button>
                 </div>
             </div>
         </div>
@@ -3211,12 +3212,12 @@ function switchAdvTab(tabId, btn) {
         <div class="modal-dialog">
             <div class="modal-content theme-modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="saveModalLabel">Kayıt Durumu</h5>
+                    <h5 class="modal-title" id="saveModalLabel" data-i18n="modal.save_title">Kayıt Durumu</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="saveModalBody"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="modal.btn_close">Kapat</button>
                 </div>
             </div>
         </div>
@@ -3228,9 +3229,9 @@ function switchAdvTab(tabId, btn) {
                 <div class="modal-header">
                     <div>
                         <h5 class="modal-title" id="recommendedPinsModalLabel">
-                            <i class="bi bi-diagram-3 me-2 text-info"></i>Tavsiye Edilen Pinler
+                            <i class="bi bi-diagram-3 me-2 text-info"></i><span data-i18n="modal.pins_title">Tavsiye Edilen Pinler</span>
                         </h5>
-                        <small class="text-muted">Aşağıdaki eşleşmeler paylaştığın görselden çıkarılmış öneri yerleşimidir.</small>
+                        <small class="text-muted" data-i18n="modal.pins_subtitle">Aşağıdaki eşleşmeler paylaştığın görselden çıkarılmış öneri yerleşimidir.</small>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -3240,14 +3241,14 @@ function switchAdvTab(tabId, btn) {
                             <i class="bi bi-lightning-charge-fill"></i>
                         </div>
                         <div>
-                            <strong>Önemli bağlantı notu</strong>
-                            <p class="mb-0">GPS, alıcı gibi RF bağlantıları ile IMU bileşenleri arasında besleme hattında mutlaka uygun kapasitör kullanın. Ani akım çekişi ve parazitler IMU verisini bozabilir, reset veya ölçüm kararsızlığı oluşturabilir.</p>
+                            <strong data-i18n="modal.pins_warning_title">Önemli bağlantı notu</strong>
+                            <p class="mb-0" data-i18n="modal.pins_warning_text">GPS, alıcı gibi RF bağlantıları ile IMU bileşenleri arasında besleme hattında mutlaka uygun kapasitör kullanın. Ani akım çekişi ve parazitler IMU verisini bozabilir, reset veya ölçüm kararsızlığı oluşturabilir.</p>
                         </div>
                     </div>
 
                     <div class="recommended-pins-grid">
                         <div class="recommended-pins-section">
-                            <h6><i class="bi bi-fan me-2"></i>Motor ve Servo Çıkışları</h6>
+                            <h6><i class="bi bi-fan me-2"></i><span data-i18n="modal.pins_motor_section">Motor ve Servo Çıkışları</span></h6>
                             <div class="recommended-pin-list">
                                 <div class="recommended-pin-item"><span>Motor 1</span><strong>GPIO 13</strong></div>
                                 <div class="recommended-pin-item"><span>Motor 2</span><strong>GPIO 13</strong></div>
@@ -3259,7 +3260,7 @@ function switchAdvTab(tabId, btn) {
                         </div>
 
                         <div class="recommended-pins-section">
-                            <h6><i class="bi bi-broadcast-pin me-2"></i>AUX Portları</h6>
+                            <h6><i class="bi bi-broadcast-pin me-2"></i><span data-i18n="modal.pins_aux_section">AUX Portları</span></h6>
                             <div class="recommended-pin-list">
                                 <div class="recommended-pin-item"><span>Alıcı TX</span><strong>GPIO 19</strong></div>
                                 <div class="recommended-pin-item"><span>Alıcı RX</span><strong>GPIO 21</strong></div>
@@ -3276,7 +3277,7 @@ function switchAdvTab(tabId, btn) {
                 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="modal.btn_close">Kapat</button>
                 </div>
             </div>
         </div>
