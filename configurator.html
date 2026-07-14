@@ -261,22 +261,24 @@
 
                 <!-- Bağlantı kartı — sadece bağlantısız + offline sayfa seçili değilken -->
                 <div id="connectionPrompt" class="connection-prompt">
-                    <div class="panel text-center prompt-card configurator-entry-card" style="max-width:420px;margin:0 auto;">
-                        <img src="assets/icons/configurator.png" alt="Configurator" width="80" height="80" class="d-block mx-auto mb-4">
-                        <h2 class="gradient-text mb-3" data-i18n="connection.title">Konfiguratöre Giriş</h2>
-                        <p class="prompt-description"><span data-i18n="connection.description">Cihazınıza enerji verdikten sonra</span>
-                            <b style="color:red;" data-i18n="connection.description_bold">ilk 10 saniye içinde</b> <span data-i18n="connection.description_end">seri porta bağlayın. Aksi takdirde uçuş moduna geçer.</span></p>
-                        <button class="btn btn-connect btn-lg w-100" id="btnConnectPrompt">
-                            <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
-                        </button>
-                    </div>
-
-                    <div class="news-panel" id="newsPanel" style="max-width:420px;margin:16px auto 0;">
-                        <div class="news-panel-header">
-                            <span data-i18n="ticker.label">Son Güncellemeler</span>
+                    <div class="connection-prompt-stack">
+                        <div class="panel text-center prompt-card configurator-entry-card" style="max-width:420px;margin:0;">
+                            <img src="assets/icons/configurator.png" alt="Configurator" width="80" height="80" class="d-block mx-auto mb-4">
+                            <h2 class="gradient-text mb-3" data-i18n="connection.title">Konfiguratöre Giriş</h2>
+                            <p class="prompt-description"><span data-i18n="connection.description">Cihazınıza enerji verdikten sonra</span>
+                                <b style="color:red;" data-i18n="connection.description_bold">ilk 10 saniye içinde</b> <span data-i18n="connection.description_end">seri porta bağlayın. Aksi takdirde uçuş moduna geçer.</span></p>
+                            <button class="btn btn-connect btn-lg w-100" id="btnConnectPrompt">
+                                <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
+                            </button>
                         </div>
-                        <div class="news-panel-viewport">
-                            <div class="news-panel-track" id="newsPanelTrack"></div>
+
+                        <div class="news-panel" id="newsPanel" style="max-width:420px;margin:16px 0 0;">
+                            <div class="news-panel-header">
+                                <span data-i18n="ticker.label">Son Güncellemeler</span>
+                            </div>
+                            <div class="news-panel-viewport">
+                                <div class="news-panel-track" id="newsPanelTrack"></div>
+                            </div>
                         </div>
                     </div>
                 </div>

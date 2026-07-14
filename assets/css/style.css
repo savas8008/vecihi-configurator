@@ -567,8 +567,19 @@ a:hover {
 /* ============================================
    4b. HABER PANELİ (Son Güncellemeler) — dikey akan liste
    ============================================ */
+/* Bağlantı kartı + haber paneli dikey dizilimi: üst context'te (row/col,
+   Bootstrap flex vb.) ne olursa olsun stack'i garanti eder — kart ve panel
+   birbirinin flex-stretch'inden etkilenmesin diye ayrı bir kapsayıcıdayız. */
+.connection-prompt-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100%;
+}
 .news-panel {
     display: none;
+    flex: 0 0 auto;
+    width: 100%;
     background: var(--bg-panel);
     border: 1px solid var(--border-default);
     border-radius: 10px;
