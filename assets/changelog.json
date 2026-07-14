@@ -1,0 +1,10 @@
+[
+  {
+    "date": "2026-07-14",
+    "items": [
+      "ESP32-S3 desteği eklendi — OSD ve yer istasyonu artık S3'te aynı anda çalışıyor",
+      "Baro/GPS bağlı değilken oluşan hatalı irtifa ve vario verisi düzeltildi",
+      "Sensörler ve Tercihler sayfalarındaki tekrarlayan başlıklar düzeltildi"
+    ]
+  }
+]

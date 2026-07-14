@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Read(//d/headtracker-alici/src/**)",
-      "Read(//d/headtracker-verici/**)"
+      "Read(//d/headtracker-verici/**)",
+      "Bash(ls -la \"D:/github/vecihi\" 2>&1 | head -50)",
+      "Read(//d/github/vecihi/**)"
     ],
     "additionalDirectories": [
       "d:\\headtracker-alici\\src",

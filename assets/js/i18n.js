@@ -115,18 +115,9 @@ const I18N = (() => {
     // Bağlantı kartı açıklaması — <b> içeren karmaşık yapı
     // -------------------------------------------------------------------------
     function applyConnectionPrompt() {
-        const h2 = document.querySelector('#connectionPrompt h2');
-        if (h2) h2.textContent = t('connection.title');
-
-        const desc = document.querySelector('#connectionPrompt .prompt-description');
-        if (desc) {
-            const b = desc.querySelector('b');
-            if (b) b.textContent = t('connection.description_bold');
-            const texts = Array.from(desc.childNodes).filter(n => n.nodeType === Node.TEXT_NODE);
-            if (texts[0]) texts[0].textContent = t('connection.description') + ' ';
-            if (texts[1]) texts[1].textContent = ' ' + t('connection.description_end');
-        }
-
+        // h2 (connection.title), .prompt-description içindeki span/b'ler
+        // (connection.description/_bold/_end) zaten kendi data-i18n
+        // attribute'larıyla applyDataAttrs() tarafından doğru çevriliyor.
         const btn = document.getElementById('btnConnectPrompt');
         if (btn) setTextKeepIcon(btn, t('connection.connect_btn'));
     }
@@ -173,13 +164,8 @@ const I18N = (() => {
         ['#docsPage .prompt-links-subtitle',                  'docs.subtitle'],
 
         // SENSÖRLER
-        ['#sensors .panel-title',                             'sensors.title'],
         ['#sensors .baslik .fw-semibold',                     'sensors.cal_view'],
         ['#sensors .mode-label',                              'sensors.flight_mode'],
-        ['#sensors h3.text-danger',                           'sensors.mcu_title'],
-        ['#sensors h3.text-warning',                          'sensors.gps_title'],
-        ['#sensors h3.text-info',                             'sensors.alt_title'],
-        ['#sensors .panel3 h3.h5.mb-2',                       'sensors.battery_title'],
         ['#map-container',                                    null], // sadece başlık
 
         // KALİBRASYON
@@ -215,11 +201,6 @@ const I18N = (() => {
         ['#advanced .panel-title',                            'advanced.page_title'],
         ['#advanced .pin-acc-title',                          'advanced.bat_pin_title'],
         ['#btnSaveAdvanced',                                  'advanced.btn_save'],
-        ['[data-tab="adv-tab-1"]',                            'advanced.tab_flight'],
-        ['[data-tab="adv-tab-3"]',                            'advanced.tab_alt'],
-        ['[data-tab="adv-tab-4"]',                            'advanced.tab_hw'],
-        ['[data-tab="adv-tab-5"]',                            'advanced.tab_battery'],
-        ['[data-tab="adv-tab-pitot"]',                        'advanced.tab_pitot'],
 
         // OSD
         ['#osd .panel-title',                                 'osd.page_title'],

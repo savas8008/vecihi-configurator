@@ -9,6 +9,10 @@ window.VECIHI_LOCALE_TR = {
     "hw_receiver_title": "RC Alıcı"
   },
 
+  "ticker": {
+    "label": "Son Güncellemeler"
+  },
+
   "nav": {
     "sensors": "Sensörler",
     "calibration": "Kalibrasyon",

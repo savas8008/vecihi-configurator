@@ -46,6 +46,7 @@
 <script src="assets/js/outputs_page.js"></script>
 <script src="assets/js/settings_backup.js"></script>
 <script src="assets/js/kml_converter.js"></script>
+<script src="assets/js/changelog.js"></script>
     <link rel="stylesheet" href="assets/css/style.css"> 
     <style>
     /* ===== DONANIM DURUM BARI (header içi, sağa yaslanmış) ===== */
@@ -268,6 +269,15 @@
                         <button class="btn btn-connect btn-lg w-100" id="btnConnectPrompt">
                             <i class="bi bi-usb-plug me-2"></i> Porta Bağlan
                         </button>
+                    </div>
+
+                    <div class="news-panel" id="newsPanel" style="max-width:420px;margin:16px auto 0;">
+                        <div class="news-panel-header">
+                            <span data-i18n="ticker.label">Son Güncellemeler</span>
+                        </div>
+                        <div class="news-panel-viewport">
+                            <div class="news-panel-track" id="newsPanelTrack"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -3479,13 +3489,14 @@ function switchAdvTab(tabId, btn) {
         // updateConnectionStatus() page_management.js'den kullanılır
 
         // Sensör sayfası otomatik açılmamalı.
-
-        setTimeout(() => {
-            log('🔄 İlk veriler isteniyor.', 'info');
-            initMap();
-            sendCommand('start_sensor_stream');
-            startQuaternionStream();
-        }, 500);
+        // NOT: Bağlantı kurulmadan/cihaz hazır olmadan çalışan, bağlantısız bir
+        // setTimeout ile start_sensor_stream + startQuaternionStream gönderimi
+        // buradan kaldırıldı — bu çağrılar zaten _openPort() içindeki bağlantı
+        // sonrası kademede (serial_communication.js) ve sayfa gezinmesinde
+        // (page_management.js) doğru şekilde tetikleniyor. Erken/tekrarlı bu
+        // çağrı, cihaz henüz setup() içindeyken komut göndererek "start_" gibi
+        // baştaki karakterlerin kaybolup "Bilinmeyen komut" hatası almasına
+        // (örn. "sensor_stream") yol açıyordu.
 
         function handleReceiverStream(data) {
             if (!Array.isArray(data)) return;

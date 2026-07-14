@@ -9,6 +9,10 @@ window.VECIHI_LOCALE_EN = {
     "hw_receiver_title": "RC Receiver"
   },
 
+  "ticker": {
+    "label": "Latest Updates"
+  },
+
   "nav": {
     "sensors": "Sensors",
     "calibration": "Calibration",
