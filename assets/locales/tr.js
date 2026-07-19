@@ -175,7 +175,11 @@ window.VECIHI_LOCALE_TR = {
 
     "rth_title": "RTH (Eve Dönüş)",
     "rth_alt": "RTH İrtifası (m)",
-    "rth_radius": "RTH Yarıçapı (m)",
+    "rth_radius": "Loiter Yarıçapı (m)",
+    "loiter_dir": "Loiter Yönü",
+    "loiter_dir_right": "Sağ (CW)",
+    "loiter_dir_left": "Sol (CCW)",
+    "loiter_shared_hint": "Yarıçap ve yön, RTH bekleme dairesi ile bağımsız LOITER modu arasında ortaktır.",
     "rth_geofence": "Geofence (m)",
     "rth_geofence_hint": "0=Yok",
     "rth_climb_first": "Eve Dönerken Önce Yüksel",
@@ -199,6 +203,13 @@ window.VECIHI_LOCALE_TR = {
     "l1_damping": "L1 Damping",
     "l1_pitch2thr": "Pitch → Gaz",
     "l1_pitch2thr_hint": "Her 1° pitch artışı için eklenen PWM gaz miktarı.",
+
+    "turn_assist_enabled": "Turn Assist Kullan (Koordineli Dönüş)",
+    "turn_assist_warning": "Kapalıyken hiçbir modda (RTH dahil) çalışmaz. Etkinleştirmeden önce yerde/düşük irtifada test edin.",
+    "turn_assist_ref_airspeed": "Referans Hız (m/s)",
+    "turn_assist_ref_airspeed_hint": "Pitot/sanal airspeed yoksa kullanılır. Önerilen: uçağınızın tipik seyir hızı, genelde 12-20 m/s. Varsayılan: 15 m/s.",
+    "turn_assist_yaw_gain": "Yaw Kazancı",
+    "turn_assist_yaw_gain_hint": "Önerilen başlangıç: 2.0 (teorik değer 1.0 gerçek uçuşta zayıf kalabiliyor). İhtiyaca göre kademeli artırın/azaltın. Aralık: 0.5-10.",
 
     "btn_save": "GPS & Nav Kaydet"
   },
@@ -335,6 +346,8 @@ window.VECIHI_LOCALE_TR = {
     "stall_pitch_drop": "Pitch Düşürme (°)",
     "stall_pitch_hint": "Stall'da burun ne kadar düşürülsün",
 
+    "turn_assist_section": "Turn Assist (Koordineli Dönüş)",
+
     "flaperon_section": "Flaperon Droop",
     "flaperon_amount": "Droop Miktarı (µs)",
     "flaperon_info_title": "Flaperon Droop Ayarı:",
@@ -453,6 +466,7 @@ window.VECIHI_LOCALE_TR = {
     "el_flight_mode": "Uçuş Modu",
     "el_speed": "Hız (Ground Speed)",
     "el_airspeed": "Hava Hızı (Airspeed)",
+    "el_airspeed_hint": "Son harf kaynağı gösterir: P=Pitot (gerçek sensör), V=Virtual (GPS tahmini), ----=veri yok.",
     "el_rssi": "RSSI (Sinyal Gücü)",
     "el_battery": "Pil Voltajı",
     "el_altitude": "İrtifa",

@@ -175,7 +175,11 @@ window.VECIHI_LOCALE_EN = {
 
     "rth_title": "RTH (Return to Home)",
     "rth_alt": "RTH Altitude (m)",
-    "rth_radius": "RTH Radius (m)",
+    "rth_radius": "Loiter Radius (m)",
+    "loiter_dir": "Loiter Direction",
+    "loiter_dir_right": "Right (CW)",
+    "loiter_dir_left": "Left (CCW)",
+    "loiter_shared_hint": "Radius and direction are shared between the RTH holding circle and the standalone LOITER mode.",
     "rth_geofence": "Geofence (m)",
     "rth_geofence_hint": "0=None",
     "rth_climb_first": "Climb First Before Returning Home",
@@ -199,6 +203,13 @@ window.VECIHI_LOCALE_EN = {
     "l1_damping": "L1 Damping",
     "l1_pitch2thr": "Pitch → Throttle",
     "l1_pitch2thr_hint": "PWM throttle added per 1° pitch increase.",
+
+    "turn_assist_enabled": "Use Turn Assist (Coordinated Turn)",
+    "turn_assist_warning": "Disabled by default in every mode, including RTH. Test on the ground / at low altitude before enabling.",
+    "turn_assist_ref_airspeed": "Reference Airspeed (m/s)",
+    "turn_assist_ref_airspeed_hint": "Used when no pitot/virtual airspeed is available. Recommended: your aircraft's typical cruise speed, usually 12-20 m/s. Default: 15 m/s.",
+    "turn_assist_yaw_gain": "Yaw Gain",
+    "turn_assist_yaw_gain_hint": "Recommended starting point: 2.0 (the theoretical value of 1.0 can feel too weak in real flight). Adjust gradually from there. Range: 0.5-10.",
 
     "btn_save": "Save GPS & Nav"
   },
@@ -335,6 +346,8 @@ window.VECIHI_LOCALE_EN = {
     "stall_pitch_drop": "Pitch Drop (°)",
     "stall_pitch_hint": "How much to drop the nose during stall",
 
+    "turn_assist_section": "Turn Assist (Coordinated Turn)",
+
     "flaperon_section": "Flaperon Droop",
     "flaperon_amount": "Droop Amount (µs)",
     "flaperon_info_title": "Flaperon Droop Setting:",
@@ -453,6 +466,7 @@ window.VECIHI_LOCALE_EN = {
     "el_flight_mode": "Flight Mode",
     "el_speed": "Speed (Ground Speed)",
     "el_airspeed": "Air Speed (Airspeed)",
+    "el_airspeed_hint": "Last character shows the source: P=Pitot (real sensor), V=Virtual (GPS estimate), ----=no data.",
     "el_rssi": "RSSI (Signal Strength)",
     "el_battery": "Battery Voltage",
     "el_altitude": "Altitude",

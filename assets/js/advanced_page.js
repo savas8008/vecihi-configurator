@@ -32,6 +32,7 @@ let advancedConfig = {
         
         // Navigasyon ve Stall
         rth_radius: 50,
+        loiter_direction: 1,
         stall_speed_kmh: 40.0,
         stall_pitch_drop: 3.0,
         climb_throttle: 1700,
@@ -262,6 +263,7 @@ function updateAdvancedUI() {
         // RTH
         setVal("inp_nav_rth_alt", n.rth_altitude);
         setVal("inp_nav_radius", n.rth_radius);
+        setVal("inp_nav_loiter_dir", n.loiter_direction);
         setVal("inp_nav_max_dist", n.max_distance);
         setChk("inp_nav_climb_first", n.climb_first);
 
@@ -284,6 +286,11 @@ function updateAdvancedUI() {
         // L1 navigasyon
         setVal("inp_nav_l1_period", n.l1_period);
         setVal("inp_nav_l1_damping", n.l1_damping);
+
+        // Turn Assist (Koordineli Dönüş)
+        setChk("inp_nav_turn_assist_enabled", n.turn_assist_enabled);
+        setVal("inp_nav_turn_assist_ref_airspeed", n.turn_assist_ref_airspeed_ms);
+        setVal("inp_nav_turn_assist_yaw_gain", n.turn_assist_yaw_gain);
     }
 
     // --- Altitude config ---
@@ -451,6 +458,7 @@ function saveAdvancedConfig() {
     // RTH & limits
     setIf(nav, "rth_altitude", int("inp_nav_rth_alt"));
     setIf(nav, "rth_radius", int("inp_nav_radius"));
+    setIf(nav, "loiter_direction", selInt("inp_nav_loiter_dir"));
     setIf(nav, "max_distance", int("inp_nav_max_dist"));
     setIf(nav, "climb_first", bool("inp_nav_climb_first"));
 
@@ -473,6 +481,11 @@ function saveAdvancedConfig() {
     // L1 navigasyon
     setIf(nav, "l1_period", int("inp_nav_l1_period"));
     setIf(nav, "l1_damping", num("inp_nav_l1_damping"));
+
+    // Turn Assist (Koordineli Dönüş)
+    setIf(nav, "turn_assist_enabled", bool("inp_nav_turn_assist_enabled"));
+    setIf(nav, "turn_assist_ref_airspeed_ms", num("inp_nav_turn_assist_ref_airspeed"));
+    setIf(nav, "turn_assist_yaw_gain", num("inp_nav_turn_assist_yaw_gain"));
 
     if (Object.keys(nav).length) cfg.nav = nav;
 

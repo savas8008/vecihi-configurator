@@ -167,7 +167,11 @@
 
     "rth_title": "RTH (Eve Dönüş)",
     "rth_alt": "RTH İrtifası (m)",
-    "rth_radius": "RTH Yarıçapı (m)",
+    "rth_radius": "Loiter Yarıçapı (m)",
+    "loiter_dir": "Loiter Yönü",
+    "loiter_dir_right": "Sağ (CW)",
+    "loiter_dir_left": "Sol (CCW)",
+    "loiter_shared_hint": "Yarıçap ve yön, RTH bekleme dairesi ile bağımsız LOITER modu arasında ortaktır.",
     "rth_geofence": "Geofence (m)",
     "rth_geofence_hint": "0=Yok",
     "rth_climb_first": "Eve Dönerken Önce Yüksel",

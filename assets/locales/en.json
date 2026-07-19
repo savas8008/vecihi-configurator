@@ -167,7 +167,11 @@
 
     "rth_title": "RTH (Return to Home)",
     "rth_alt": "RTH Altitude (m)",
-    "rth_radius": "RTH Radius (m)",
+    "rth_radius": "Loiter Radius (m)",
+    "loiter_dir": "Loiter Direction",
+    "loiter_dir_right": "Right (CW)",
+    "loiter_dir_left": "Left (CCW)",
+    "loiter_shared_hint": "Radius and direction are shared between the RTH holding circle and the standalone LOITER mode.",
     "rth_geofence": "Geofence (m)",
     "rth_geofence_hint": "0=None",
     "rth_climb_first": "Climb First Before Returning Home",

@@ -35,6 +35,7 @@ const modeDefinitions = [
     { key: 'gcs',         name: 'GCS KONTROL (Yer İstasyonu)', cat: 'nav',    requiresGps: true,  colorRgb: '168,85,247',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'cruise',      name: 'CRUISE',                       cat: 'nav',    requiresGps: false, colorRgb: '99,102,241',  defaultMin: 1500, defaultMax: 1700, defaultCh: 0 },
     { key: 'althold',     name: 'ALTITUDE HOLD',                cat: 'nav',    requiresGps: false, colorRgb: '6,182,212',   defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'loiter',      name: 'LOITER (Sabit Daire)',          cat: 'nav',    requiresGps: true,  colorRgb: '132,204,22',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
 
     // --- ASİSTANLAR (ASSIST) - Eklenebilir ---
     { key: 'autotune',    name: 'AUTO TUNE',                    cat: 'assist', colorRgb: '244,63,94',   defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },

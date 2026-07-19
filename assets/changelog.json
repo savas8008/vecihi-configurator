@@ -1,5 +1,16 @@
 [
   {
+    "date": "2026-07-19",
+    "items": [
+      "Turn Assist (koordineli dönüş) özelliği eklendi — Tercihler > Uçuş Limitleri'nden açılır, varsayılan kapalı, kapalıyken hiçbir modda (RTH dahil) etkisiz",
+      "OSD'de hava hızı artık kaynağını gösteriyor — P: Pitot, V: Sanal (GPS tahmini), ----: veri yok",
+      "GPS sinyali kesildiğinde bayat rüzgar/sanal hava hızı verisinin hâlâ geçerli görünmesine neden olan hata düzeltildi",
+      "LAND ASSIST'te esas bacak (base leg) aşamasında navigasyonun donup uçağın sabit banklı daireye kilitlenmesine neden olan hata düzeltildi",
+      "LOITER uçuş modu eklendi — mod aktive edildiği konum ve irtifada, RTH gerektirmeden sabit daire çizer (GPS gerekli)",
+      "Uçuş Modları sayfasına LOITER kartı eklendi; RTH panelindeki yarıçap/yön ayarları artık LOITER ile ortak olarak etiketlendi ve yön seçici eklendi"
+    ]
+  },
+  {
     "date": "2026-07-14",
     "items": [
       "ESP32-S3 desteği eklendi — OSD ve yer istasyonu artık S3'te aynı anda çalışıyor",
