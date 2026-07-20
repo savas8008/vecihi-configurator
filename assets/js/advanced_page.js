@@ -287,7 +287,11 @@ function updateAdvancedUI() {
         setVal("inp_nav_l1_period", n.l1_period);
         setVal("inp_nav_l1_damping", n.l1_damping);
 
-        // Turn Assist (Koordineli Dönüş)
+        // Dönüş Telafisi — Yükseklik (load factor, her zaman aktif)
+        setVal("inp_nav_turn_pitch_gain", n.turn_pitch_gain);
+        setVal("inp_nav_turn_throttle_gain", n.turn_throttle_gain);
+
+        // Dönüş Telafisi — Turn Assist (Koordineli Dönüş, opsiyonel)
         setChk("inp_nav_turn_assist_enabled", n.turn_assist_enabled);
         setVal("inp_nav_turn_assist_ref_airspeed", n.turn_assist_ref_airspeed_ms);
         setVal("inp_nav_turn_assist_yaw_gain", n.turn_assist_yaw_gain);
@@ -482,7 +486,11 @@ function saveAdvancedConfig() {
     setIf(nav, "l1_period", int("inp_nav_l1_period"));
     setIf(nav, "l1_damping", num("inp_nav_l1_damping"));
 
-    // Turn Assist (Koordineli Dönüş)
+    // Dönüş Telafisi — Yükseklik (load factor, her zaman aktif)
+    setIf(nav, "turn_pitch_gain", num("inp_nav_turn_pitch_gain"));
+    setIf(nav, "turn_throttle_gain", num("inp_nav_turn_throttle_gain"));
+
+    // Dönüş Telafisi — Turn Assist (Koordineli Dönüş, opsiyonel)
     setIf(nav, "turn_assist_enabled", bool("inp_nav_turn_assist_enabled"));
     setIf(nav, "turn_assist_ref_airspeed_ms", num("inp_nav_turn_assist_ref_airspeed"));
     setIf(nav, "turn_assist_yaw_gain", num("inp_nav_turn_assist_yaw_gain"));

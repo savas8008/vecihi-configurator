@@ -210,6 +210,10 @@ window.VECIHI_LOCALE_EN = {
     "turn_assist_ref_airspeed_hint": "Used when no pitot/virtual airspeed is available. Recommended: your aircraft's typical cruise speed, usually 12-20 m/s. Default: 15 m/s.",
     "turn_assist_yaw_gain": "Yaw Gain",
     "turn_assist_yaw_gain_hint": "Recommended starting point: 2.0 (the theoretical value of 1.0 can feel too weak in real flight). Adjust gradually from there. Range: 0.5-10.",
+    "turn_pitch_gain": "Pitch Gain (°/G)",
+    "turn_pitch_gain_hint": "Extra nose-up per 1G of excess load factor in a turn. Default: 15°.",
+    "turn_throttle_gain": "Throttle Gain (PWM/G)",
+    "turn_throttle_gain_hint": "Extra throttle per 1G of excess load factor in a turn. Default: 250 PWM.",
 
     "btn_save": "Save GPS & Nav"
   },
@@ -346,7 +350,9 @@ window.VECIHI_LOCALE_EN = {
     "stall_pitch_drop": "Pitch Drop (°)",
     "stall_pitch_hint": "How much to drop the nose during stall",
 
-    "turn_assist_section": "Turn Assist (Coordinated Turn)",
+    "turn_comp_section": "Turn Compensation (Load Factor + Coordinated Turn)",
+    "turn_comp_pitch_title": "Altitude Compensation (always active in RTH/WAYPOINT/LAND ASSIST)",
+    "turn_comp_yaw_title": "Turn Assist — Coordinated Turn (optional)",
 
     "flaperon_section": "Flaperon Droop",
     "flaperon_amount": "Droop Amount (µs)",
@@ -474,6 +480,7 @@ window.VECIHI_LOCALE_EN = {
     "el_horizon": "Artificial Horizon",
     "el_home": "Home Info",
     "el_throttle": "Throttle",
+    "el_throttle_slider": "Throttle Slider",
     "el_wind": "Wind Info",
     "el_battery_cap": "Battery Capacity (mAh)",
     "el_cell_voltage": "Cell Voltage (V/cell)",

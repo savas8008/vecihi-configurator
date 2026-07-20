@@ -43,7 +43,8 @@ const osdElementMapping = {
     'prev_battery_cap':  'cap',
     'prev_cell_voltage': 'cellv',
     'prev_current_amps': 'amp',
-    'prev_airspeed':     'air'
+    'prev_airspeed':     'air',
+    'prev_throttle2':    'thr2'
 };
 
 // JSON Key -> HTML ID (ters eşleştirme)
@@ -74,7 +75,8 @@ const osdToggleMapping = {
     'cap':   'osd_show_cap',
     'cellv': 'osd_show_cellv',
     'amp':   'osd_show_amp',
-    'air':   'osd_show_air'
+    'air':   'osd_show_air',
+    'thr2':  'osd_show_thr2'
 };
 
 // ============================================================================

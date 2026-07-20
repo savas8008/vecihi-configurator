@@ -1,5 +1,13 @@
 [
   {
+    "date": "2026-07-20",
+    "items": [
+      "OSD hava hızı göstergesinin başına 'AIR' font ikonu eklendi",
+      "OSD'ye yeni dikey gaz (throttle) göstergesi eklendi — 5 kutulu şerit, 200 PWM'lik dilimlerle 1000-2000 aralığını gösterir; Ekran Öğeleri'nde 'Gaz Göstergesi (Slider)' olarak ayrı ve varsayılan kapalı bir seçenek, mevcut yüzde göstergesinin yerini almaz",
+      "OSD'de 'ARMED' yazısı artık arm sonrası yalnızca ilk 5 saniye görünüyor, ardından otomatik temizleniyor — DISARMED durumu değişmeden her zaman gösterilmeye devam ediyor"
+    ]
+  },
+  {
     "date": "2026-07-19",
     "items": [
       "Turn Assist (koordineli dönüş) özelliği eklendi — Tercihler > Uçuş Limitleri'nden açılır, varsayılan kapalı, kapalıyken hiçbir modda (RTH dahil) etkisiz",

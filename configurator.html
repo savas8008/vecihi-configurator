@@ -1973,10 +1973,33 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Turn Assist -->
+                        <!-- Dönüş Telafisi (Load Factor + Koordineli Dönüş) — tek bölüm -->
                         <div class="row mt-3 border-top border-secondary pt-3">
-                            <div class="col-md-6">
-                                <h6 class="text-muted border-bottom border-secondary pb-1"><i class="bi bi-arrow-repeat me-1"></i><span data-i18n="advanced.turn_assist_section">Turn Assist (Koordineli Dönüş)</span></h6>
+                            <div class="col-md-8">
+                                <h6 class="text-muted border-bottom border-secondary pb-1"><i class="bi bi-arrow-repeat me-1"></i><span data-i18n="advanced.turn_comp_section">Dönüş Telafisi (Load Factor + Koordineli Dönüş)</span></h6>
+
+                                <div class="text-muted small mb-1" data-i18n="advanced.turn_comp_pitch_title">Yükseklik Telafisi (RTH/WAYPOINT/LAND ASSIST'te her zaman aktif)</div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        <span data-i18n="gps.turn_pitch_gain">Pitch Kazancı (°/G)</span>
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" data-i18n-title="gps.turn_pitch_gain_hint" title="Dönüşte fazladan her 1G için burun kaldırma miktarı. Varsayılan: 15°."></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_nav_turn_pitch_gain" min="0" max="40" step="0.5" value="15">
+                                    </div>
+                                </div>
+                                <div class="mb-2 row">
+                                    <label class="col-sm-8 col-form-label col-form-label-sm">
+                                        <span data-i18n="gps.turn_throttle_gain">Throttle Kazancı (PWM/G)</span>
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" data-i18n-title="gps.turn_throttle_gain_hint" title="Dönüşte fazladan her 1G için gaz takviyesi. Varsayılan: 250 PWM."></i>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control form-control-sm" id="inp_nav_turn_throttle_gain" min="0" max="600" step="10" value="250">
+                                    </div>
+                                </div>
+
+                                <hr class="border-secondary my-2">
+                                <div class="text-muted small mb-1" data-i18n="advanced.turn_comp_yaw_title">Turn Assist — Koordineli Dönüş (opsiyonel)</div>
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox" id="inp_nav_turn_assist_enabled">
                                     <label class="form-check-label small" for="inp_nav_turn_assist_enabled" data-i18n="gps.turn_assist_enabled">Turn Assist Kullan (Koordineli Dönüş)</label>
@@ -2549,6 +2572,10 @@ function switchAdvTab(tabId, btn) {
         <label class="form-check-label small" for="osd_show_thr" data-i18n="osd.el_throttle">Gaz (Throttle)</label>
     </div>
     <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_thr2" data-target="prev_throttle2">
+        <label class="form-check-label small" for="osd_show_thr2" data-i18n="osd.el_throttle_slider">Gaz Göstergesi (Slider)</label>
+    </div>
+    <div class="form-check form-switch mb-2">
         <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_wind" checked data-target="prev_wind">
         <label class="form-check-label small" for="osd_show_wind" data-i18n="osd.el_wind">Rüzgar Bilgisi</label>
     </div>
@@ -2653,6 +2680,8 @@ function switchAdvTab(tabId, btn) {
     <i class="bi bi-disc-fill me-1"></i>12
 </div>
     <div id="prev_throttle" class="osd-draggable position-absolute" style="top: 50%; left: 84%;">THR: 65%</div>
+
+    <div id="prev_throttle2" class="osd-draggable position-absolute" style="top: 60%; left: 84%; display: none;">THR2 ▮</div>
 
 <div id="prev_lat" class="osd-draggable position-absolute" style="top: 90%; left: 1%;">
     LAT: 37.1234

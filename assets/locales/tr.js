@@ -210,6 +210,10 @@ window.VECIHI_LOCALE_TR = {
     "turn_assist_ref_airspeed_hint": "Pitot/sanal airspeed yoksa kullanılır. Önerilen: uçağınızın tipik seyir hızı, genelde 12-20 m/s. Varsayılan: 15 m/s.",
     "turn_assist_yaw_gain": "Yaw Kazancı",
     "turn_assist_yaw_gain_hint": "Önerilen başlangıç: 2.0 (teorik değer 1.0 gerçek uçuşta zayıf kalabiliyor). İhtiyaca göre kademeli artırın/azaltın. Aralık: 0.5-10.",
+    "turn_pitch_gain": "Pitch Kazancı (°/G)",
+    "turn_pitch_gain_hint": "Dönüşte fazladan her 1G için burun kaldırma miktarı. Varsayılan: 15°.",
+    "turn_throttle_gain": "Throttle Kazancı (PWM/G)",
+    "turn_throttle_gain_hint": "Dönüşte fazladan her 1G için gaz takviyesi. Varsayılan: 250 PWM.",
 
     "btn_save": "GPS & Nav Kaydet"
   },
@@ -346,7 +350,9 @@ window.VECIHI_LOCALE_TR = {
     "stall_pitch_drop": "Pitch Düşürme (°)",
     "stall_pitch_hint": "Stall'da burun ne kadar düşürülsün",
 
-    "turn_assist_section": "Turn Assist (Koordineli Dönüş)",
+    "turn_comp_section": "Dönüş Telafisi (Load Factor + Koordineli Dönüş)",
+    "turn_comp_pitch_title": "Yükseklik Telafisi (RTH/WAYPOINT/LAND ASSIST'te her zaman aktif)",
+    "turn_comp_yaw_title": "Turn Assist — Koordineli Dönüş (opsiyonel)",
 
     "flaperon_section": "Flaperon Droop",
     "flaperon_amount": "Droop Miktarı (µs)",
@@ -474,6 +480,7 @@ window.VECIHI_LOCALE_TR = {
     "el_horizon": "Yapay Ufuk",
     "el_home": "Home Bilgisi",
     "el_throttle": "Gaz (Throttle)",
+    "el_throttle_slider": "Gaz Göstergesi (Slider)",
     "el_wind": "Rüzgar Bilgisi",
     "el_battery_cap": "Pil Kapasitesi (mAh)",
     "el_cell_voltage": "Hücre Voltajı (V/hücre)",

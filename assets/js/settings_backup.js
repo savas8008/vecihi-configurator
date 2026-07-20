@@ -379,6 +379,8 @@ function _flattenConfig(s) {
             push('adv.nav.l1_period',            n.l1_period);
             push('adv.nav.l1_damping',           n.l1_damping);
             push('adv.nav.l1_xtrack_i_gain',     n.l1_xtrack_i_gain);
+            push('adv.nav.turn_pitch_gain',      n.turn_pitch_gain);
+            push('adv.nav.turn_throttle_gain',   n.turn_throttle_gain);
             if (n.turn_assist_enabled !== undefined) push('adv.nav.turn_assist_enabled', n.turn_assist_enabled ? 1 : 0);
             push('adv.nav.turn_assist_ref_airspeed_ms', n.turn_assist_ref_airspeed_ms);
             push('adv.nav.turn_assist_yaw_gain', n.turn_assist_yaw_gain);
