@@ -19,6 +19,13 @@ let pendingReconnect = false;        // Restart sonrası otomatik yeniden bağla
 let pendingReconnectTimer = null;    // Timeout: restart gelmezse bayrağı temizle
 let postConnectDataTimer = null;     // Bağlantı sonrası veri gelmezse uçuş modu uyarısı
 
+// === FIRMWARE SÜRÜM UYUMLULUĞU ===
+// Bu configurator'ın konuştuğu firmware ana sürümü. Yalnızca MAJOR (ilk nokta öncesi)
+// kısmı karşılaştırılır — MINOR/PATCH değişiklikleri wire format'ı bozmadığı sürece
+// bu sabiti güncellemeye gerek yoktur.
+const COMPATIBLE_FIRMWARE_MAJOR = 1;
+let _versionWarningShown = false; // Bağlantı başına tek uyarı göster
+
 // === CFG_SET / CFG_COMMIT ACK MEKANİZMASI ===
 let _cfgPending = null; // { resolve, reject, timeout }
 
@@ -143,6 +150,7 @@ async function tryAutoConnect() {
  */
 async function _openPort(targetPort) {
     port = targetPort;
+    _versionWarningShown = false;
     await port.open({ baudRate: 115200 });
 
     reader = port.readable.getReader();
@@ -170,16 +178,13 @@ async function _openPort(targetPort) {
 
     setTimeout(() => {
         log('🔄 Veriler isteniyor...', 'info');
+        // Yalnızca ESP'yi USB moduna almak için tetikleyici karakter gönderiliyor.
+        // Diğer sayfa verileri ve stream başlatma, cihaz gerçekten hazır olduğunda
+        // (init_status mesajı — handleStandardJsonData) doğru zamanlamayla zaten
+        // isteniyor. Burada TEKRAR erken göndermek, cihaz henüz setup()
+        // içindeyken komut gönderip "start_" gibi baştaki karakterlerin UART'ta
+        // kaybolmasına ve "Bilinmeyen komut" hatasına (örn. sensor_stream) yol açıyordu.
         sendCommand('calibration_page_data'); // 'c' → ESP'yi USB moduna alır
-        setTimeout(() => sendCommand('advanced_page_data'), 200);
-        setTimeout(() => sendCommand('pid_page_data'), 400);
-        setTimeout(() => sendCommand('outputs_page_data'), 600);
-        setTimeout(() => sendCommand('transmitter_page_data'), 800);
-        setTimeout(() => sendCommand('modes_page_data'), 1000);
-        setTimeout(() => sendCommand('osd_page_data'), 1200);
-        setTimeout(() => {
-            if (typeof startQuaternionStream === 'function') startQuaternionStream();
-        }, 1600);
     }, 150);
 }
 
@@ -460,6 +465,27 @@ function handleStandardJsonData(data) {
     if (data.stream_data && data.stream_data.type === 'init_status') {
         const sensors = data.stream_data.data;
 
+        // --- SÜRÜM UYUMLULUK KONTROLÜ ---
+        // Cihaz her bağlantıda kendi firmware_version'ını bildirir; MAJOR kısmı
+        // bu configurator'ın desteklediğinden farklıysa kullanıcı uyarılır (bağlantı kesilmez).
+        if (sensors.firmware_version && !_versionWarningShown) {
+            const deviceMajor = parseInt(String(sensors.firmware_version).split('.')[0], 10);
+            if (!isNaN(deviceMajor) && deviceMajor !== COMPATIBLE_FIRMWARE_MAJOR) {
+                _versionWarningShown = true;
+                log(`⚠️ Sürüm uyumsuzluğu: cihaz v${sensors.firmware_version}, configurator v${COMPATIBLE_FIRMWARE_MAJOR}.x ile uyumlu`, 'warning');
+                if (typeof showModal === 'function') {
+                    showModal(
+                        'Sürüm Uyumsuzluğu',
+                        `<div class="text-center">
+                            <p>Bağlı cihaz <strong>firmware v${sensors.firmware_version}</strong> kullanıyor, bu configurator ise <strong>v${COMPATIBLE_FIRMWARE_MAJOR}.x</strong> ile uyumlu.</p>
+                            <p class="small">Devam edebilirsiniz ancak bazı ayarlar hatalı görünebilir veya kaydedilemeyebilir. Lütfen bu firmware sürümüne uygun configurator'ı kullanın.</p>
+                        </div>`,
+                        'warning'
+                    );
+                }
+            }
+        }
+
         // --- DONANIM DURUM BARI: init_status'tan ilk 4 sensörü doldur ---
         (function() {
             var map = {
@@ -674,6 +700,9 @@ function handlePageData(pageType, pageData) {
             break;
         case 'pitot':
             if (typeof handlePitotPageData === 'function') handlePitotPageData(pageData);
+            break;
+        case 'failsafe':
+            if (typeof handleFailsafePageData === 'function') handleFailsafePageData(pageData);
             break;
         case 'waypoints':
             if (typeof handleWaypointData === 'function') handleWaypointData(pageData);

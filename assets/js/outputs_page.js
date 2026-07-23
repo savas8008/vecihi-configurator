@@ -380,6 +380,14 @@ function saveGpsConfig() {
     _log('📤 GPS & Nav ayarları kaydediliyor...', 'info');
 }
 
+function resetNavConfig() {
+    if (!confirm('Tüm navigasyon/GPS/uçuş limitleri ayarları (L1, RTH, stall, dönüş telafisi, launch, vb.) fabrika değerlerine dönecek. PID/mikser/RC ayarları etkilenmez. Emin misiniz?')) {
+        return;
+    }
+    sendCommand('RESET_NAV_CONFIG');
+    _log('📤 Nav ayarları fabrika değerlerine sıfırlanıyor...', 'info');
+}
+
 function saveGpsPinsOnly() {
     const tx = parseInt(document.getElementById('gpsTxPin')?.value ?? -1);
     const rx = parseInt(document.getElementById('gpsRxPin')?.value ?? -1);
@@ -717,6 +725,7 @@ window.saveI2CPins = saveI2CPins;
 window.saveRxPins = saveRxPins;
 window.saveOsdPins = saveOsdPins;
 window.saveGpsConfig = saveGpsConfig;
+window.resetNavConfig = resetNavConfig;
 window.saveGpsPinsOnly = saveGpsPinsOnly;
 window.saveAdcPins = saveAdcPins;
 window.handlePwmStream = handlePwmStream;

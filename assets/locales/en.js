@@ -215,7 +215,8 @@ window.VECIHI_LOCALE_EN = {
     "turn_throttle_gain": "Throttle Gain (PWM/G)",
     "turn_throttle_gain_hint": "Extra throttle per 1G of excess load factor in a turn. Default: 250 PWM.",
 
-    "btn_save": "Save GPS & Nav"
+    "btn_save": "Save GPS & Nav",
+    "btn_reset_nav": "Reset Nav Settings"
   },
 
   "mixer": {

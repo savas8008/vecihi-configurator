@@ -11,7 +11,7 @@
 let currentPage = '';
 
 // Veri beklenen sayfalar (ESP'den page_data gelmeden kaydet engellenir)
-const DATA_PAGES = new Set(['calibration', 'mixer', 'gps', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint']);
+const DATA_PAGES = new Set(['calibration', 'mixer', 'gps', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint', 'failsafe']);
 
 // Loading timeout handle'ları (sayfa başına)
 const loadingTimeouts = {};
@@ -299,6 +299,11 @@ function savePageData(page) {
             saveAdvancedConfig();
             resetSaveButton(btn, 2000);
             return;
+
+        case 'failsafe':
+            saveFailsafeConfig();
+            resetSaveButton(btn, 2000);
+            return;
     }
 
     if (saveCommand && payload) {
@@ -341,7 +346,7 @@ function setupNavigationListeners() {
  * @brief Sayfa bazlı kaydet butonlarına event listener ekler
  */
 function setupSaveButtonListeners() {
-    const pages = ['Calibration', 'Mixer', 'Gps', 'Transmitter', 'Modes', 'PID', 'Advanced'];
+    const pages = ['Calibration', 'Mixer', 'Gps', 'Transmitter', 'Modes', 'PID', 'Advanced', 'Failsafe'];
     
     pages.forEach(page => {
         const btn = $('btnSave' + page);

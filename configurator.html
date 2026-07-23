@@ -35,6 +35,7 @@
 <script src="assets/js/osd.js"></script>
 <script src="assets/js/pid.js"></script>
 <script src="assets/js/advanced_page.js"></script>
+<script src="assets/js/failsafe_page.js"></script>
 <script src="assets/js/sensor_alignment.js"></script>
 
 <script src="assets/js/page_management.js"></script>
@@ -226,6 +227,7 @@
                         <li class="nav-item"><a class="nav-link" href="#" data-page="gps"><i class="bi bi-geo-alt me-2"></i> <span data-i18n="nav.gps">Navigasyon & GPS</span></a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="transmitter"><i class="bi bi-controller me-2"></i> <span data-i18n="nav.transmitter">Kumanda</span></a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="modes"><i class="bi bi-gear me-2"></i> <span data-i18n="nav.modes">Uçuş Modları</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="failsafe"><i class="bi bi-shield-exclamation me-2"></i> <span data-i18n="nav.failsafe">Failsafe</span></a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="pid"><i class="bi bi-graph-up me-2"></i> <span data-i18n="nav.pid">PID</span></a></li>
 						<li class="nav-item">
 
@@ -303,7 +305,15 @@
                                         <i class="bi bi-exclamation-triangle me-1"></i>
                                         <span data-i18n="firmware.flash_warning">Flash işlemi için önce seri bağlantıyı kesin ve tarayıcı sekmesini yenileyin.</span>
                                     </div>
-                                    <div class="text-center">
+                                    <div class="text-start">
+                                        <label for="firmwareVersionSelectOffline" class="form-label text-muted small mb-1">Yüklenecek Sürüm</label>
+                                        <select id="firmwareVersionSelectOffline" class="form-select firmware-version-select" disabled
+                                                data-flash-wrapper="firmwareFlashWrapperOffline"
+                                                onchange="if (typeof handleFirmwareVersionChange === 'function') handleFirmwareVersionChange(this)">
+                                            <option value="">Yükleniyor...</option>
+                                        </select>
+                                    </div>
+                                    <div id="firmwareFlashWrapperOffline" class="text-center">
                                         <esp-web-install-button manifest="https://savas8008.github.io/vecihi-public/manifest.json">
                                             <button slot="activate" class="btn btn-warning btn-lg w-100">
                                                 <i class="bi bi-cpu me-2"></i> Flash Başlat
@@ -1030,9 +1040,12 @@
   </div>
 
   <!-- Kaydet -->
-  <div class="mt-2">
+  <div class="mt-2 d-flex align-items-center gap-2">
     <button type="button" class="btn btn-warning shadow-sm" id="btnSaveGps">
       <i class="bi bi-save2 me-2"></i> GPS & Nav Kaydet
+    </button>
+    <button type="button" class="btn btn-outline-danger btn-sm" id="btnResetNavConfig" onclick="resetNavConfig()" title="Yalnızca navigasyon/GPS/uçuş limitleri ayarlarını fabrika değerlerine döndürür. PID/mikser/RC etkilenmez.">
+      <i class="bi bi-arrow-counterclockwise me-1"></i> <span data-i18n="gps.btn_reset_nav">Nav Ayarlarını Sıfırla</span>
     </button>
   </div>
 
@@ -1688,9 +1701,180 @@
         <br>
     <i class="bi bi-save2 me-2"></i> Modları Kaydet
 </button>
-        <br>      
+        <br>
           <br>
 </div>
+
+      <div id="failsafe" class="page">
+        <div class="panel">
+            <h2 class="panel-title"><i class="bi bi-shield-exclamation"></i> <span data-i18n="failsafe.title">Failsafe Ayarları</span></h2>
+            <p class="text-muted small mb-4" data-i18n="failsafe.intro">Sinyal kaybı, alan sınırı aşımı ve sensör tutarsızlığı durumlarında uçağın nasıl davranacağını buradan tanımlayın.</p>
+
+            <!-- ==================== RF FAILSAFE ==================== -->
+            <div class="panel2 p-3 mb-3">
+                <h2 class="panel-title"><span class="fs-card-icon fs-card-icon-rf"><i class="bi bi-broadcast-pin"></i></span> <span data-i18n="failsafe.rf_title">RF Failsafe (Sinyal Kaybı)</span></h2>
+                <p class="text-muted small" data-i18n="failsafe.rf_desc">Kumanda/alıcı sinyali kesildiğinde uygulanacak davranış. GPS mevcut olsa dahi aşağıdaki üç seçenekten biri seçilmelidir.</p>
+
+                <!-- ADIM 1: Kademe Zaman Çizelgesi -->
+                <div class="fs-step-head"><span class="fs-step-num">1</span> <span data-i18n="failsafe.rf_step1">Kopma Süresi Kademeleri</span></div>
+                <div class="panel4 p-3 mb-3">
+                    <div class="fs-timeline">
+                        <div class="fs-tl-node">
+                            <div class="fs-tl-icon fs-tl-danger"><i class="bi bi-wifi-off"></i></div>
+                            <div class="fs-tl-label" data-i18n="failsafe.rf_tl_lost">Sinyal Kesilir</div>
+                        </div>
+                        <div class="fs-tl-arrow">
+                            <input type="number" class="fs-tl-time-input" id="inp_rf_fs_short_ms" min="100" max="5000" step="50" value="500"> ms
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                        <div class="fs-tl-node">
+                            <div class="fs-tl-icon fs-tl-warning"><i class="bi bi-compass"></i></div>
+                            <div class="fs-tl-label" data-i18n="failsafe.rf_tl_short">Kısa Kademe<small data-i18n="failsafe.rf_tl_short_sub">Angle Self-Level</small></div>
+                        </div>
+                        <div class="fs-tl-arrow">
+                            <input type="number" class="fs-tl-time-input" id="inp_rf_fs_long_ms" min="500" max="30000" step="100" value="3000"> ms
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                        <div class="fs-tl-node">
+                            <div class="fs-tl-icon fs-tl-primary"><i class="bi bi-flag-fill"></i></div>
+                            <div class="fs-tl-label" data-i18n="failsafe.rf_tl_long">Uzun Kademe<small data-i18n="failsafe.rf_tl_long_sub">Seçili Mod Devrede</small></div>
+                        </div>
+                    </div>
+                    <hr class="my-3" style="border-color: rgba(0,0,0,0.12)">
+                    <div class="row g-2 small" style="color:#374151;">
+                        <div class="col-md-6"><i class="bi bi-info-circle me-1"></i> <span data-i18n="failsafe.rf_short_desc"><strong>Kısa kademe:</strong> uçak otomatik olarak Angle self-level (0°/0°) uygular ve son gaz değerini korur. Seçili mod henüz devreye girmez.</span></div>
+                        <div class="col-md-6"><i class="bi bi-info-circle me-1"></i> <span data-i18n="failsafe.rf_long_desc"><strong>Uzun kademe:</strong> kesinti bu süreyi aşarsa aşağıda seçilen failsafe modu devreye girer.</span></div>
+                    </div>
+                </div>
+
+                <!-- ADIM 2: Mod Seçimi -->
+                <div class="fs-step-head"><span class="fs-step-num">2</span> <span data-i18n="failsafe.rf_step2">Uzun Kademe Failsafe Modu</span></div>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <select class="form-select" id="sel_rf_fs_mode" onchange="updateRfFsModeUI()">
+                            <option value="rth" selected data-i18n="failsafe.rf_mode_rth">🏠 RTH (Eve Dönüş)</option>
+                            <option value="angle" data-i18n="failsafe.rf_mode_angle">🧭 Angle Modu (Sabit Açı)</option>
+                            <option value="fixed_pwm" data-i18n="failsafe.rf_mode_fixed_pwm">🎚 Sabit PWM (Failsafe Pozisyonu)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ADIM 3: Seçilen Moda Göre Parametreler -->
+                <div class="fs-step-head"><span class="fs-step-num">3</span> <span data-i18n="failsafe.rf_step3">Mod Parametreleri</span></div>
+
+                <!-- RTH seçiliyken gösterilen kart -->
+                <div class="panel4 p-3 fs-mode-card fs-mode-rth" id="rfFsRthInfo">
+                    <div class="fs-mode-card-title"><i class="bi bi-house-door"></i> <span data-i18n="failsafe.rf_mode_rth_title">RTH (Eve Dönüş)</span></div>
+                    <small class="text-muted d-block" data-i18n="failsafe.rf_rth_desc">RTH ayarları (irtifa, loiter yarıçapı vb.) <strong>Navigasyon &amp; GPS</strong> sayfasındaki RTH bölümünden yapılandırılır.</small>
+                    <small class="text-muted d-block mt-2" data-i18n="failsafe.rf_rth_fallback"><i class="bi bi-exclamation-triangle me-1"></i>GPS sağlıksızsa veya Home noktası ayarlı değilse, sistem güvenlik amacıyla otomatik olarak Angle moduna düşer.</small>
+                    <small class="text-muted d-block mt-2" data-i18n="failsafe.rf_rth_cancel"><i class="bi bi-hand-index-thumb me-1"></i>RF sinyali geri gelse dahi, pilot roll/pitch stick'i <strong>Gelişmiş Ayarlar → Uçuş Limitleri</strong> sayfasındaki <em>"Stick İptal Eşiği"</em> değerini aşacak şekilde hareket ettirmeden RTH iptal edilmez (Auto Launch/İniş Asistanı ile aynı eşik paylaşılır).</small>
+                </div>
+
+                <!-- Angle Modu (Sabit Açı) kartı -->
+                <div class="panel4 p-3 fs-mode-card fs-mode-angle" id="rfFsAngleBody" style="display:none;">
+                    <div class="fs-mode-card-title"><i class="bi bi-compass"></i> <span data-i18n="failsafe.rf_mode_angle_title">Angle Modu (Sabit Açı)</span></div>
+                    <small class="text-muted d-block mb-2" data-i18n="failsafe.rf_angle_desc">Uçak, aşağıda belirlenen hedef açılara kilitlenir (self-level) ve sabit gazla uçuşuna devam eder. Hafif bir dönüş açısı girerek kontrollü bir spiral alçalma da tanımlanabilir.</small>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <label class="form-label small mb-1" data-i18n="failsafe.rf_target_roll">Hedef Roll (°)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_rf_fs_angle_roll" min="-45" max="45" step="1" value="0">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small mb-1" data-i18n="failsafe.rf_target_pitch">Hedef Pitch (°)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_rf_fs_angle_pitch" min="-30" max="30" step="1" value="0">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small mb-1" data-i18n="failsafe.rf_throttle">Gaz (PWM)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_rf_fs_angle_throttle" min="1000" max="2000" step="10" value="1650">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sabit PWM (Failsafe Pozisyonu) kartı -->
+                <div class="panel4 p-3 fs-mode-card fs-mode-fixed" id="rfFsFixedPwmBody" style="display:none;">
+                    <div class="fs-mode-card-title"><i class="bi bi-sliders2"></i> <span data-i18n="failsafe.rf_mode_fixed_title">Sabit PWM (Failsafe Pozisyonu)</span></div>
+                    <small class="text-muted d-block mb-2" data-i18n="failsafe.rf_fixed_pwm_desc">Kontrol yüzeyleri ve gaz doğrudan aşağıdaki sabit PWM değerlerine ayarlanır (stabilizasyon yok, düz süzülme).</small>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <label class="form-label small mb-1" data-i18n="failsafe.rf_roll">Roll (PWM)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_rf_fs_roll" min="1000" max="2000" step="10" value="1500">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small mb-1" data-i18n="failsafe.rf_pitch">Pitch (PWM)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_rf_fs_pitch" min="1000" max="2000" step="10" value="1500">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small mb-1" data-i18n="failsafe.rf_throttle">Gaz (PWM)</label>
+                            <input type="number" class="form-control form-control-sm" id="inp_rf_fs_throttle" min="1000" max="2000" step="10" value="1000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <!-- ==================== GEOFENCE FAILSAFE ==================== -->
+                <div class="col-md-6">
+                    <div class="panel2 p-3 h-100">
+                        <h2 class="panel-title d-flex align-items-center justify-content-between">
+                            <span><span class="fs-card-icon fs-card-icon-geo"><i class="bi bi-pin-map"></i></span> <span data-i18n="failsafe.geofence_title">Geofence Failsafe</span></span>
+                            <span class="fs-status-badge fs-status-off" id="geofenceStatusBadge"><i class="bi bi-slash-circle"></i> <span data-i18n="failsafe.geofence_off">Pasif</span></span>
+                        </h2>
+                        <p class="text-muted small" data-i18n="failsafe.geofence_desc">Home noktasından izin verilen maksimum uzaklık.</p>
+                        <div class="mb-2 row align-items-center">
+                            <label class="col-7 col-form-label" data-i18n="failsafe.geofence_max_dist">Maks. Mesafe (m)</label>
+                            <div class="col-5"><input type="number" class="form-control" id="inp_geofence_max_dist" min="0" step="10" value="0" placeholder="0 = Sınır Yok" oninput="updateGeofenceBadge()"></div>
+                        </div>
+                        <small class="text-muted" data-i18n="failsafe.geofence_hint">0 girilirse geofence devre dışıdır. Örn. 1000 girilirse, uçak evden 1001 metre uzaklaştığı anda otomatik <strong>RTH</strong> tetiklenir (GPS ve Home noktası zaten mevcuttur).</small>
+                    </div>
+                </div>
+
+                <!-- ==================== SENSOR FAILSAFE ==================== -->
+                <div class="col-md-6">
+                    <div class="panel2 p-3 h-100">
+                        <h2 class="panel-title"><span class="fs-card-icon fs-card-icon-sensor"><i class="bi bi-cpu"></i></span> <span data-i18n="failsafe.sensor_title">Sensör Failsafe</span></h2>
+                        <p class="text-muted small" data-i18n="failsafe.sensor_desc">Sensör verisi tutarsızlıklarına karşı koruma.</p>
+                        <div class="mb-2 row align-items-center">
+                            <label class="col-7 col-form-label" data-i18n="failsafe.gps_glitch_dist">GPS Sıçrama Mesafesi (m)</label>
+                            <div class="col-5"><input type="number" class="form-control" id="inp_gps_glitch_dist" min="0" step="1" value="50"></div>
+                        </div>
+                        <small class="text-muted d-block mb-3" data-i18n="failsafe.gps_glitch_hint">Ardışık iki GPS okuması arasında bu mesafeden fazla ani bir sıçrama tespit edilirse, o örnek geçersiz sayılır ve reddedilir.</small>
+                        <div class="d-flex align-items-center gap-2 text-muted small">
+                            <i class="bi bi-hourglass-split"></i> <span data-i18n="failsafe.imu_soon">IMU Hata Algılama — yakında eklenecek</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-warning shadow-sm mt-3" id="btnSaveFailsafe">
+            <i class="bi bi-save2 me-2"></i> <span data-i18n="failsafe.save">Failsafe Ayarlarını Kaydet</span>
+        </button>
+        <br><br>
+      </div>
+
+      <script>
+          function updateRfFsModeUI() {
+              var mode = document.getElementById('sel_rf_fs_mode').value;
+              document.getElementById('rfFsRthInfo').style.display      = (mode === 'rth')       ? '' : 'none';
+              document.getElementById('rfFsAngleBody').style.display    = (mode === 'angle')     ? '' : 'none';
+              document.getElementById('rfFsFixedPwmBody').style.display = (mode === 'fixed_pwm') ? '' : 'none';
+          }
+          function updateGeofenceBadge() {
+              var badge = document.getElementById('geofenceStatusBadge');
+              var val = parseInt(document.getElementById('inp_geofence_max_dist').value, 10) || 0;
+              if (val > 0) {
+                  badge.className = 'fs-status-badge fs-status-on';
+                  badge.innerHTML = '<i class="bi bi-check-circle"></i> Aktif (' + val + ' m)';
+              } else {
+                  badge.className = 'fs-status-badge fs-status-off';
+                  badge.innerHTML = '<i class="bi bi-slash-circle"></i> Pasif';
+              }
+          }
+          document.addEventListener('DOMContentLoaded', function () {
+              updateRfFsModeUI();
+              updateGeofenceBadge();
+          });
+      </script>
 
       <div id="pid" class="page">
     <div class="panel">
@@ -1931,10 +2115,10 @@
                                 <div class="mb-2 row">
                                     <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.stick_cancel_thr">
                                         Stick İptal Eşiği (PWM)
-                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Merkezden stick sapması bu değeri aşarsa Auto Launch veya otomatik iniş iptal edilir (pilot devralır)"></i>
+                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Merkezden stick sapması bu değeri aşarsa Auto Launch, otomatik iniş veya RF Failsafe RTH iptal edilir (pilot devralır). Bu üç özellik aynı eşiği paylaşır."></i>
                                     </label>
                                     <div class="col-sm-4">
-                                        <input type="number" class="form-control form-control-sm" id="inp_la_stick_cancel_thr" min="50" max="500" step="10" value="100" title="Merkezden stick sapması bu değeri aşarsa Auto Launch veya otomatik iniş iptal edilir (pilot devralır)">
+                                        <input type="number" class="form-control form-control-sm" id="inp_la_stick_cancel_thr" min="50" max="500" step="10" value="100" title="Merkezden stick sapması bu değeri aşarsa Auto Launch, otomatik iniş veya RF Failsafe RTH iptal edilir (pilot devralır). Bu üç özellik aynı eşiği paylaşır.">
                                     </div>
                                 </div>
 								<hr>
@@ -3725,6 +3909,14 @@ function switchAdvTab(tabId, btn) {
 </i> Bağlantıyı Kes
                             </button>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="firmwareVersionSelect" class="form-label text-muted small mb-1">Yüklenecek Sürüm</label>
+                        <select id="firmwareVersionSelect" class="form-select firmware-version-select" disabled
+                                data-flash-wrapper="firmwareFlashWrapper"
+                                onchange="if (typeof handleFirmwareVersionChange === 'function') handleFirmwareVersionChange(this)">
+                            <option value="">Yükleniyor...</option>
+                        </select>
                     </div>
                     <div id="firmwareFlashWrapper" class="d-flex flex-column align-items-center mt-3">
                         <esp-web-install-button manifest="https://savas8008.github.io/vecihi-public/manifest.json">

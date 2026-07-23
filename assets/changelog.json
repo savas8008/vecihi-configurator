@@ -1,5 +1,21 @@
 [
   {
+    "date": "2026-07-23",
+    "items": [
+      "Yeni Failsafe sayfası eklendi — RF Failsafe (sinyal kaybı), Geofence ve Sensör Failsafe ayarları tek yerden yapılandırılıyor",
+      "RF Failsafe iki kademeli çalışıyor: kısa kopmada otomatik Angle self-level, uzun kopmada seçilen mod (RTH / Angle / Sabit PWM) devreye giriyor",
+      "RF sinyali geri geldiğinde RTH modundan çıkış artık bilinçli pilot onayı gerektiriyor (stick hareketi) — ani kontrol devrini önlüyor",
+      "Geofence: Home'dan izin verilen maksimum mesafe aşıldığında otomatik RTH tetikleniyor",
+      "GPS sıçrama (glitch) mesafesi artık Failsafe sayfasından ayarlanabiliyor"
+    ]
+  },
+  {
+    "date": "2026-07-22",
+    "items": [
+      "Firmware ve configurator arasında sürüm uyumluluğu kontrolü eklendi — uyumsuz bir sürüm bağlandığında kullanıcı uyarılıyor"
+    ]
+  },
+  {
     "date": "2026-07-20",
     "items": [
       "OSD hava hızı göstergesinin başına 'AIR' font ikonu eklendi",

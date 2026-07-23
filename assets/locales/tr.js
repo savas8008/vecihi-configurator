@@ -215,7 +215,8 @@ window.VECIHI_LOCALE_TR = {
     "turn_throttle_gain": "Throttle Kazancı (PWM/G)",
     "turn_throttle_gain_hint": "Dönüşte fazladan her 1G için gaz takviyesi. Varsayılan: 250 PWM.",
 
-    "btn_save": "GPS & Nav Kaydet"
+    "btn_save": "GPS & Nav Kaydet",
+    "btn_reset_nav": "Nav Ayarlarını Sıfırla"
   },
 
   "mixer": {
