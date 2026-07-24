@@ -598,15 +598,15 @@ a:hover {
 }
 .news-panel-viewport {
     height: 168px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
     mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
 }
-.news-panel-track {
-    animation: news-panel-scroll 18s linear infinite;
-}
-.news-panel:hover .news-panel-track { animation-play-state: paused; }
+.news-panel-viewport::-webkit-scrollbar { width: 5px; }
+.news-panel-viewport::-webkit-scrollbar-track { background: transparent; }
+.news-panel-viewport::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 4px; }
 .news-panel-item {
     display: flex;
     align-items: baseline;
@@ -630,11 +630,6 @@ a:hover {
     border-radius: 4px;
     padding: 2px 6px;
 }
-@keyframes news-panel-scroll {
-    from { transform: translateY(0); }
-    to   { transform: translateY(-50%); }
-}
-
 /* Bağlantı Durumu — header içi durum göstergesi */
 .connection-status {
     display: flex;

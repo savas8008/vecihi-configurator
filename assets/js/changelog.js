@@ -4,7 +4,7 @@
 /**
  * @file changelog.js
  * @brief Bağlantı ekranındaki küçük "Son Güncellemeler" panelini
- *        assets/changelog.json'dan doldurur (dikey, yukarı doğru akan liste).
+ *        assets/changelog.json'dan doldurur (dikey liste, kullanıcı elle kaydırır).
  * @description Elle güncellenen bir JSON dosyası — yeni bir madde eklemek için
  *              changelog.json'a { "date": "...", "items": [...] } ekleyin, HTML'e dokunmayın.
  */
@@ -39,8 +39,7 @@ async function loadChangelog() {
         const rows = buildNewsItemsHtml(entries);
         if (!rows.length) return;
 
-        // Kusursuz döngü için liste iki kez tekrarlanır (CSS %-50 translateY ile).
-        track.innerHTML = rows.join('') + rows.join('');
+        track.innerHTML = rows.join('');
 
         panel.style.display = 'block';
     } catch (err) {
