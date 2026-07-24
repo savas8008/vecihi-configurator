@@ -7,7 +7,7 @@
  * Web Serial API çalışmak için HTTPS veya localhost gerektirir.
  */
 
-const CACHE_NAME = 'vecihi-v2';
+const CACHE_NAME = 'vecihi-v3';
 
 // Önbelleğe alınacak statik dosyalar
 const STATIC_ASSETS = [
