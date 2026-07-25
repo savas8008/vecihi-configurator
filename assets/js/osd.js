@@ -44,7 +44,10 @@ const osdElementMapping = {
     'prev_cell_voltage': 'cellv',
     'prev_current_amps': 'amp',
     'prev_airspeed':     'air',
-    'prev_throttle2':    'thr2'
+    'prev_throttle2':    'thr2',
+    'prev_lq':           'lq',
+    'prev_snr':          'snr',
+    'prev_txpw':         'txpw'
 };
 
 // JSON Key -> HTML ID (ters eşleştirme)
@@ -76,7 +79,10 @@ const osdToggleMapping = {
     'cellv': 'osd_show_cellv',
     'amp':   'osd_show_amp',
     'air':   'osd_show_air',
-    'thr2':  'osd_show_thr2'
+    'thr2':  'osd_show_thr2',
+    'lq':    'osd_show_lq',
+    'snr':   'osd_show_snr',
+    'txpw':  'osd_show_txpw'
 };
 
 // ============================================================================

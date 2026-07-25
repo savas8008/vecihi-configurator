@@ -1,5 +1,11 @@
 [
   {
+    "date": "2026-07-24",
+    "items": [
+      "OSD'ye ELRS/CRSF sinyal telemetrisi eklendi — RSSI (dBm), Link Quality (LQ %), SNR (dB) ve TX Gücü (mW) artık ayrı ayrı gösterilebiliyor; bu değerler yalnızca CRSF/ELRS protokolünde doludur, SBUS'ta desteklenmez"
+    ]
+  },
+  {
     "date": "2026-07-23",
     "items": [
       "Yeni Failsafe sayfası eklendi — RF Failsafe (sinyal kaybı), Geofence ve Sensör Failsafe ayarları tek yerden yapılandırılıyor",
