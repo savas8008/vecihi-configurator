@@ -1,77 +1,202 @@
-﻿/* Copyright (c) 2024-2026 savas8008 - All Rights Reserved
+/* Copyright (c) 2024-2026 savas8008 - All Rights Reserved
    Bu dosyanın izinsiz kopyalanması, değiştirilmesi veya dağıtılması yasaktır. */
 
 /* ============================================
-   VECİHİ CONFIGURATOR - THEME SYSTEM
+   VECİHİ CONFIGURATOR - TASARIM SİSTEMİ
    ============================================
-   Flight Controller için profesyonel koyu tema
-   
-   Değiştirmek için sadece :root içindeki değişkenleri düzenleyin.
-   Tüm renkler ve boyutlar merkezi olarak yönetilir.
+
+   ÜÇ KATMANLI MİMARİ — nereyi değiştireceğinizi bilmek için:
+
+   KATMAN 1  PALET (§1a)      Ham renkler. Tema/renk paleti değiştirmek
+                              istediğinizde SADECE burayı düzenleyin.
+   KATMAN 2  YÜZEY SÖZLEŞMESİ Panel seviyeleri (§1c). Dört panelin de
+             (.panel/.panel2/ AYNI değişken adlarını kendi değerleriyle
+              .panel3/.panel4) doldurduğu ortak sözleşme. Bir panelin
+                              görünümünü değiştirmek = o bloğu düzenlemek.
+   KATMAN 3  BİLEŞENLER       Input, buton, kart, slider... Bunlar ASLA
+                              ham renk kullanmaz; yalnızca sözleşmeyi okur.
+
+   ALTIN KURAL: Bileşen kurallarına sabit renk (#hex / rgba) YAZMAYIN.
+   Bir bileşen panele göre renk değiştirmeli ise, sözleşme değişkenini
+   kullanın — panel kapsamı gerisini otomatik halleder. Bu sayede
+   ".panel4 .filanca { color: #111 !important }" türü yamalar gerekmez.
+
+   SIK YAPILAN İŞLER:
+   · Tüm inputların içi          → --field-bg          (§1b)
+   · Tüm input yazıları          → --field-text        (§1b) / .field-text sınıfı
+   · Tüm input kenarlıkları      → --field-border      (§1b)
+   · Bir panelin zemini/metni    → §1c ilgili panel bloğu
+   · Başlık/açıklama tipografisi → --t-* değişkenleri  (§1b)
    ============================================ */
 
 /* ============================================
-   1. MERKEZI DEĞİŞKENLER (THEME TOKENS)
+   1a. KATMAN 1 — HAM PALET
+   Renk paleti değişimi burada yapılır. Aşağıdaki
+   katmanlar yalnızca bu değişkenleri referans alır.
    ============================================ */
 :root {
-    /* --- ANA RENKLER — Slate / Indigo Teması --- */
-    --color-brand-blue: #818cf8;        /* Indigo-400 */
-    --color-brand-blue-rgb: 129, 140, 248;
+    /* Marka / vurgu */
+    --p-accent:          #818cf8;   /* Indigo-400 — koyu zemin için */
+    --p-accent-strong:   #6366f1;   /* Indigo-500 */
+    --p-accent-deep:     #4338ca;   /* Indigo-700 — AÇIK zemin için (kontrast) */
+    --p-accent-rgb:      129, 140, 248;
 
-    --color-primary: #818cf8;           /* Indigo accent */
-    --color-primary-hover: #6366f1;     /* Indigo-500 */
+    /* Durum renkleri */
+    --p-success:         #4ade80;
+    --p-warning:         #fb923c;
+    --p-danger:          #f87171;
+
+    /* Koyu yüzey rampası (koyudan açığa) */
+    --p-dark-0:          #0f172a;   /* en koyu — sayfa zemini */
+    --p-dark-1:          #1e293b;
+    --p-dark-2:          #293548;
+    --p-dark-3:          #334155;
+
+    /* Açık yüzey rampası (açıktan koyuya) */
+    --p-light-0:         #ffffff;
+    --p-light-1:         #e8eaec;
+    --p-light-2:         #cdd0d4;
+
+    /* Koyu zemin üstü metin */
+    --p-on-dark:         #e2e8f0;
+    --p-on-dark-soft:    #cbd5e1;
+    --p-on-dark-muted:   #94a3b8;
+    --p-on-dark-value:   #4ade80;
+
+    /* Açık zemin üstü metin */
+    --p-on-light:        #111111;
+    --p-on-light-soft:   #333333;
+    --p-on-light-muted:  #555555;
+    --p-on-light-value:  #1a6b2e;
+}
+
+/* ============================================
+   1b. KATMAN 2 — GENEL SÖZLEŞME (VARSAYILAN: KOYU)
+   :root koyu yüzey varsayılanını tanımlar; panel
+   seviyeleri (§1c) aynı adları kendi değerleriyle
+   yeniden tanımlayarak kapsam içinde devralır.
+   ============================================ */
+:root {
+    /* --- YÜZEY SÖZLEŞMESİ (her panel bunu doldurur) --- */
+    --surface:            var(--p-dark-1);            /* panelin kendi zemini */
+    --surface-sunken:     rgba(0, 0, 0, 0.35);        /* içine gömülü alan (değer kutusu, track) */
+    --surface-raised:     rgba(255, 255, 255, 0.05);  /* hover / yükseltilmiş alan */
+    --surface-border:     rgba(51, 65, 85, 0.8);
+    --surface-border-soft:rgba(51, 65, 85, 0.4);
+
+    --on-surface:         var(--p-on-dark);           /* birincil metin */
+    --on-surface-soft:    var(--p-on-dark-soft);      /* ikincil metin */
+    --on-surface-muted:   var(--p-on-dark-muted);     /* yardım metni */
+    --on-surface-value:   var(--p-on-dark-value);     /* ölçüm/veri metni */
+    /* Vurgu/durum renklerinin BU yüzeyde okunabilir tonu.
+       Açık panellerde parlak renkler "patladığı" için panel4
+       bunları koyu tonlara çeker (§1c). Renkli METİN yazan
+       her bileşen ham --color-* yerine bunları okumalıdır. */
+    --accent-on-surface:  var(--p-accent);
+    --success-on-surface: var(--p-success);
+    --warning-on-surface: var(--p-warning);
+    --danger-on-surface:  var(--p-danger);
+
+    /* --- FORM ALANI (INPUT) SÖZLEŞMESİ ---
+       "Tüm inputların içi aynı renk" burada yönetilir.
+       form-control, form-select, mode-channel-select, pin-select
+       ve input-group-text hepsi bu değişkenleri okur. */
+    --field-bg:           rgba(15, 23, 42, 0.85);
+    --field-text:         var(--on-surface);
+    --field-placeholder:  var(--on-surface-muted);
+    --field-border:       var(--surface-border);
+    --field-border-focus: var(--color-primary);
+    --field-focus-ring:   var(--color-primary-glow);
+    --field-addon-bg:     rgba(0, 0, 0, 0.06);   /* input-group-text zemini */
+    --field-addon-text:   var(--on-surface-soft);
+    --field-radius:       var(--radius-xs);
+    --field-pad-y:        2px;
+    --field-pad-x:        6px;
+    --field-font-size:    var(--font-size-sm);
+
+    /* --- KONTROL (SLIDER/TRACK) SÖZLEŞMESİ --- */
+    --control-track:        rgba(255, 255, 255, 0.10);
+    --control-track-border: rgba(255, 255, 255, 0.10);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
+    --control-fill:         rgba(var(--p-accent-rgb), 0.40);
+
+    /* --- ANA RENKLER — Slate / Indigo Teması --- */
+    --color-brand-blue: var(--p-accent);
+    --color-brand-blue-rgb: var(--p-accent-rgb);
+
+    --color-primary: var(--p-accent);
+    --color-primary-hover: var(--p-accent-strong);
     --color-primary-glow: rgba(99, 102, 241, 0.3);
 
-    --color-secondary: #94a3b8;         /* Slate-400 */
+    --color-secondary: var(--p-on-dark-muted);
     --color-secondary-hover: #64748b;
 
     /* --- DURUM RENKLERİ --- */
-    --color-success: #4ade80;           /* Green-400 */
+    --color-success: var(--p-success);
     --color-success-glow: rgba(74, 222, 128, 0.3);
 
-    --color-warning: #fb923c;           /* Orange-400 */
+    --color-warning: var(--p-warning);
     --color-warning-glow: rgba(251, 146, 60, 0.3);
 
-    --color-danger: #f87171;            /* Red-400 */
+    --color-danger: var(--p-danger);
     --color-danger-glow: rgba(248, 113, 113, 0.3);
 
-    --color-info: #818cf8;              /* Indigo — bilgi rengi */
+    --color-info: var(--p-accent);      /* bilgi rengi */
+
+    /* KISA TAKMA ADLAR — configurator.html içinde inline stillerde
+       (var(--primary), var(--success)...) kullanılıyor. Daha önce
+       tanımsızdılar ve sessizce etkisiz kalıyorlardı. */
+    --primary: var(--color-primary);
+    --success: var(--color-success);
+    --warning: var(--color-warning);
+    --danger:  var(--color-danger);
+    --info:    var(--color-info);
 
     /* --- ARKAPLAN RENKLERİ --- */
-    --bg-body: #0f172a;
+    --bg-body: var(--p-dark-0);
     --bg-body-gradient: none;
 
     /* =========================================
-       PANEL HİYERARŞİSİ  (Slate/Indigo teması)
-       .panel  → Sayfa bölümü dış kap
-       .panel2 → İç grup/kart
-       .panel3 → En iç içerik kartı
-       Değiştirmek için sadece bu değişkenleri güncelleyin.
+       PANEL ZEMİNLERİ
+       Panel seviyelerinin tam sözleşmesi §1c'dedir;
+       burada yalnızca zemin renkleri tanımlanır.
     ========================================= */
     --bg-panel:   rgba(30, 41, 59, 0.95);   /* slate-800 */
     --bg-panel-2: rgba(41, 53, 72, 0.95);   /* slate-700/800 arası */
     --bg-panel-3: rgba(15, 23, 42, 0.97);   /* slate-950 */
+    --bg-panel-4: var(--p-light-1);         /* açık içerik kartı */
     --bg-panel-pin: rgba(255, 193, 117, 0.92); /* Pin paneli: donanım bağlantısı */
-    --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
+    --cal-step-bg: var(--surface-sunken);    /* Cal-step varsayılan arka planı */
 
-    --bg-panel-solid: #1e293b;
-    --bg-input: rgba(15, 23, 42, 0.85);      /* Input: koyu şeffaf */
-    --bg-hover: rgba(255, 255, 255, 0.05);
+    --bg-panel-solid: var(--p-dark-1);
+    /* GERİYE UYUMLULUK: --bg-input artık --field-bg'nin takma adıdır.
+       Yeni kodda --field-bg kullanın. */
+    --bg-input: var(--field-bg);
+    --bg-hover: var(--surface-raised);
 
     --bg-terminal: #0a0f1a;             /* Log/Terminal arkası */
-    --bg-3d-canvas: #0f172a;            /* 3D Sahne arkası */
+    --bg-3d-canvas: var(--p-dark-0);    /* 3D Sahne arkası */
 
-    /* --- KENARLIK RENKLERİ --- */
-    --border-default: rgba(51, 65, 85, 0.8);    /* slate-700 */
-    --border-light:   rgba(51, 65, 85, 0.4);
+    /* --- TERMİNAL (panel sözleşmesinden bağımsız, CMD görünümü) --- */
+    --terminal-bg:          #0C0C0C;
+    --terminal-text:        #f0f0f0;
+    --terminal-text-muted:  #aaaaaa;
+    --terminal-border:      #555555;
+
+    /* --- KENARLIK RENKLERİ (sözleşme takma adları) --- */
+    --border-default: var(--surface-border);
+    --border-light:   var(--surface-border-soft);
     --border-focus: var(--color-primary);
 
-    /* --- METİN RENKLERİ --- */
-    --text-primary:   #e2e8f0;          /* slate-200 */
-    --text-secondary: #cbd5e1;          /* slate-300 */
-    --text-muted:     #94a3b8;          /* slate-400 */
-    --text-inverse:   #0f172a;          /* ters metin (açık arka plan için) */
-    --text-value:     #4ade80;          /* sensör değerleri — yeşil */
+    /* --- METİN RENKLERİ (sözleşme takma adları) ---
+       Eski kod bu adları kullanıyor; sözleşmeye bağlandılar ki
+       panel kapsamında --on-surface değişince bunlar da değişsin. */
+    --text-primary:   var(--on-surface);
+    --text-secondary: var(--on-surface-soft);
+    --text-muted:     var(--on-surface-muted);
+    --text-inverse:   var(--p-dark-0);  /* ters metin (açık arka plan için) */
+    --text-value:     var(--on-surface-value);
 
     /* =========================================
        MERKEZİ METİN TİPOGRAFİ SİSTEMİ
@@ -82,33 +207,39 @@
     /* t-baslik: Panel başlıkları, bölüm adları */
     --t-baslik-size:   var(--font-size-lg);
     --t-baslik-weight: 700;
-    --t-baslik-color:  var(--text-primary);
+    --t-baslik-color:  var(--on-surface);
     --t-baslik-style:  normal;
 
     /* t-alt-baslik: Grup başlıkları, alan adları */
     --t-alt-baslik-size:   var(--font-size-xl);
     --t-alt-baslik-weight: 700;
-    --t-alt-baslik-color:  var(--text-primary);
+    --t-alt-baslik-color:  var(--on-surface);
     --t-alt-baslik-style:  normal;
 
     /* t-aciklama: Yardım metni, talimatlar */
     --t-aciklama-size:   var(--font-size-sm);
     --t-aciklama-weight: 500;
-    --t-aciklama-color:  #94a3b8;
+    --t-aciklama-color:  var(--on-surface-muted);
     --t-aciklama-style:  normal;
 
     /* t-deger: Sensör/ölçüm değerleri */
     --t-deger-size:   var(--font-size-sm);
     --t-deger-weight: 400;
-    --t-deger-color:  var(--text-value);
+    --t-deger-color:  var(--on-surface-value);
     --t-deger-style:  normal;
 
+    /* t-etiket: Form alanı etiketleri (label, form-label) */
+    --t-etiket-size:   var(--font-size-sm);
+    --t-etiket-weight: 500;
+    --t-etiket-color:  var(--on-surface-soft);
+    --t-etiket-style:  normal;
+
     /* --- HUD & DATA RENKLERİ --- */
-    --hud-green: #4ade80;               /* HUD yeşili */
+    --hud-green: var(--p-success);      /* HUD yeşili */
     --hud-amber: #fbbf24;               /* Canlı imleç sarısı */
-    --data-x: #f87171;                  /* X ekseni (kırmızı) */
-    --data-y: #4ade80;                  /* Y ekseni (yeşil) */
-    --data-z: #818cf8;                  /* Z ekseni (indigo) */
+    --data-x: var(--p-danger);          /* X ekseni (kırmızı) */
+    --data-y: var(--p-success);         /* Y ekseni (yeşil) */
+    --data-z: var(--p-accent);          /* Z ekseni (indigo) */
     
     /* --- BOYUTLAR --- */
     --radius-xs: 2px;
@@ -145,6 +276,167 @@
     --transition-fast: 0.1s ease;
     --transition-normal: 0.15s ease;
     --transition-slow: 0.25s ease;
+}
+
+/* ============================================
+   1c. KATMAN 2 — PANEL SÖZLEŞMELERİ (4 PANEL, TEK YER)
+   ============================================
+   Dört panel de AYNI değişken adlarını doldurur. İçlerindeki
+   bileşenler hangi panelde olduklarını bilmez; yalnızca bu
+   değişkenleri okurlar. Bir panelin görünümünü değiştirmek
+   için SADECE ilgili bloğu düzenleyin — bileşenlere veya
+   ".panel4 .filanca { !important }" yamalarına dokunmayın.
+
+   Sözleşme alanları:
+     --surface / --surface-sunken / --surface-raised
+     --surface-border / --surface-border-soft
+     --on-surface / --on-surface-soft / --on-surface-muted / --on-surface-value
+     --field-*        (input ailesi)
+     --control-*      (slider/track ailesi)
+   ============================================ */
+
+/* --------------------------------------------
+   TÜRETİLMİŞ TAKMA ADLAR — her panel kapsamında yeniden çözülür
+   --------------------------------------------
+   ÖNEMLİ (CSS kuralı): "--field-text: var(--on-surface)" ifadesi,
+   BİLDİRİLDİĞİ elemandaki --on-surface değerine göre çözülür.
+   Yalnızca :root'ta bildirilseydi, .panel4 --on-surface'i koyuya
+   çevirdiğinde --field-text ESKİ (açık) değerinde kalırdı — açık
+   zeminde açık yazı = görünmez metin.
+   Bu blok türetilmiş adları her panel elemanında yeniden bildirir,
+   böylece panelin kendi sözleşmesine göre çözülürler.
+
+   Bu blok panel bloklarından ÖNCE gelmelidir: eşit özgüllükte
+   sonraki kazanır, böylece bir panel istediği adı (ör. panel4'ün
+   --field-border'ı) kendi bloğunda özelleştirebilir.
+   -------------------------------------------- */
+.panel, .panel2, .panel3, .panel4, .sidebar,
+.mode-card, .cal-step {
+    --field-text:         var(--on-surface);
+    --field-placeholder:  var(--on-surface-muted);
+    --field-border:       var(--surface-border);
+    --field-addon-text:   var(--on-surface-soft);
+
+    --text-primary:       var(--on-surface);
+    --text-secondary:     var(--on-surface-soft);
+    --text-muted:         var(--on-surface-muted);
+    --text-value:         var(--on-surface-value);
+
+    --t-baslik-color:     var(--on-surface);
+    --t-alt-baslik-color: var(--on-surface);
+    --t-aciklama-color:   var(--on-surface-muted);
+    --t-deger-color:      var(--on-surface-value);
+    --t-etiket-color:     var(--on-surface-soft);
+
+    --border-default:     var(--surface-border);
+    --border-light:       var(--surface-border-soft);
+    --bg-hover:           var(--surface-raised);
+    --bg-input:           var(--field-bg);
+    --cal-step-bg:        var(--surface-sunken);
+}
+
+/* PANEL 1 — Sayfa bölümü dış kabı (koyu) */
+.panel, .sidebar {
+    --accent-on-surface:   var(--p-accent);
+    --success-on-surface:  var(--p-success);
+    --warning-on-surface:  var(--p-warning);
+    --danger-on-surface:   var(--p-danger);
+    --surface:             var(--bg-panel);
+    --surface-sunken:      rgba(0, 0, 0, 0.30);
+    --surface-raised:      rgba(255, 255, 255, 0.05);
+    --surface-border:      rgba(51, 65, 85, 0.8);
+    --surface-border-soft: rgba(51, 65, 85, 0.4);
+
+    --on-surface:          var(--p-on-dark);
+    --on-surface-soft:     var(--p-on-dark-soft);
+    --on-surface-muted:    var(--p-on-dark-muted);
+    --on-surface-value:    var(--p-on-dark-value);
+
+    --field-bg:            rgba(15, 23, 42, 0.85);
+    --field-addon-bg:      rgba(0, 0, 0, 0.25);
+    --control-track:        rgba(255, 255, 255, 0.10);
+    --control-track-border: rgba(255, 255, 255, 0.10);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
+}
+
+/* PANEL 2 — İç grup/kart (koyu, bir ton açık) */
+.panel2 {
+    --accent-on-surface:   var(--p-accent);
+    --success-on-surface:  var(--p-success);
+    --warning-on-surface:  var(--p-warning);
+    --danger-on-surface:   var(--p-danger);
+    --surface:             var(--bg-panel-2);
+    --surface-sunken:      rgba(0, 0, 0, 0.32);
+    --surface-raised:      rgba(255, 255, 255, 0.06);
+    --surface-border:      rgba(51, 65, 85, 0.8);
+    --surface-border-soft: rgba(51, 65, 85, 0.4);
+
+    --on-surface:          var(--p-on-dark);
+    --on-surface-soft:     var(--p-on-dark-soft);
+    --on-surface-muted:    var(--p-on-dark-muted);
+    --on-surface-value:    var(--p-on-dark-value);
+
+    --field-bg:            rgba(15, 23, 42, 0.85);
+    --field-addon-bg:      rgba(0, 0, 0, 0.25);
+    --control-track:        rgba(255, 255, 255, 0.10);
+    --control-track-border: rgba(255, 255, 255, 0.10);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
+}
+
+/* PANEL 3 — En iç koyu içerik kartı */
+.panel3 {
+    --accent-on-surface:   var(--p-accent);
+    --success-on-surface:  var(--p-success);
+    --warning-on-surface:  var(--p-warning);
+    --danger-on-surface:   var(--p-danger);
+    --surface:             var(--bg-panel-3);
+    --surface-sunken:      rgba(0, 0, 0, 0.40);
+    --surface-raised:      rgba(255, 255, 255, 0.05);
+    --surface-border:      rgba(51, 65, 85, 0.8);
+    --surface-border-soft: rgba(51, 65, 85, 0.4);
+
+    --on-surface:          var(--p-on-dark);
+    --on-surface-soft:     var(--p-on-dark-soft);
+    --on-surface-muted:    var(--p-on-dark-muted);
+    --on-surface-value:    var(--p-on-dark-value);
+
+    --field-bg:            rgba(15, 23, 42, 0.85);
+    --field-addon-bg:      rgba(0, 0, 0, 0.25);
+    --control-track:        rgba(255, 255, 255, 0.10);
+    --control-track-border: rgba(255, 255, 255, 0.10);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
+}
+
+/* PANEL 4 — Açık içerik kartı (koyu zemin üstünde aydınlık ada)
+   Diğer üçüyle AYNI sözleşmeyi doldurur; tek farkı değerlerin
+   açık zemine göre seçilmiş olması. Bu yüzden içindeki hiçbir
+   bileşenin ayrıca override edilmesi gerekmez. */
+.panel4 {
+    --accent-on-surface:   var(--p-accent-deep);
+    --success-on-surface:  var(--p-on-light-value);
+    --warning-on-surface:  #a1560b;
+    --danger-on-surface:   #b91c1c;
+    --surface:             var(--bg-panel-4);
+    --surface-sunken:      rgba(0, 0, 0, 0.06);
+    --surface-raised:      rgba(0, 0, 0, 0.04);
+    --surface-border:      rgba(0, 0, 0, 0.13);
+    --surface-border-soft: rgba(0, 0, 0, 0.10);
+
+    --on-surface:          var(--p-on-light);
+    --on-surface-soft:     var(--p-on-light-soft);
+    --on-surface-muted:    var(--p-on-light-muted);
+    --on-surface-value:    var(--p-on-light-value);
+
+    --field-bg:            var(--p-light-0);
+    --field-border:        rgba(0, 0, 0, 0.22);
+    --field-addon-bg:      var(--p-light-2);
+    --control-track:        rgba(0, 0, 0, 0.18);
+    --control-track-border: rgba(0, 0, 0, 0.15);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
 }
 
 /* ============================================
@@ -267,10 +559,10 @@ a:hover {
     color: var(--text-primary);
 }
 
-/* Hiyerarşik arka planlar */
-.panel, .sidebar { background: var(--bg-panel);   }  /* Dış: teal */
-.panel2           { background: var(--bg-panel-2); }  /* Orta */
-.panel3           { background: var(--bg-panel-3); }  /* İç */
+/* Hiyerarşik arka planlar — hepsi kendi sözleşmesindeki --surface'i kullanır */
+.panel, .panel2, .panel3, .panel4, .sidebar {
+    background: var(--surface);
+}
 
 /* Pin bağlantı panelleri — tüm sayfalarda tutarlı donanım rengi */
 .pin-panel {
@@ -361,78 +653,15 @@ a:hover {
     border-radius: 5px !important;
 }
 
-/* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
-.panel4 {
-    background: #e8eaec !important;
-    color: #111111;
-    --border-default:       rgba(0, 0, 0, 0.13);
-    /* cal-step ve diğer bileşenlerin background değişkenini override et */
-    --cal-step-bg:          #e8eaec;
-    /* CSS değişkenlerini panel4 kapsamında koyu metne çevir */
-    --text-primary:         #111111;
-    --text-secondary:       #333333;
-    --t-baslik-color:       #111111;
-    --t-alt-baslik-color:   #111111;
-    --t-aciklama-color:     #444444;
-    --t-deger-color:        #1a6b2e;
-    --text-value:           #1a6b2e;
-}
-/* panel4 içindeki !important ile ayarlanan metin renkleri */
-.panel4 .step-label                         { color: #444444 !important; }
-.panel4 .cal-step-values                    { color: #111111 !important; background: rgba(0,0,0,0.06) !important; }
-/* Çift sınıf — .cal-step-icon { !important } (satır ~1621) kuralını özgüllükle yener */
-.cal-step.panel4 .cal-step-icon             { color: #666666 !important; }
-.cal-step.panel4.active  .cal-step-icon     { color: var(--color-primary) !important; }
-.cal-step.panel4.completed .cal-step-icon   { color: var(--color-success) !important; }
-.panel4 .cal-step-done i    { color: var(--color-success); }
-.panel4 .output-title       { color: #111111; }
-.panel4 .output-value       { color: #111111; }
-.panel4 .mixer-title        { color: #111111; }
-.panel4 .mixer-description  { color: #444444; }
-.panel4 small               { color: #555555 !important; }
-.panel4 .servo-value-label  { color: #333333; }
-.panel4 .servo-value-display { color: #111111; font-weight: 600; }
-.panel4 .form-check-label   { color: #333333 !important; }
-.panel4 .safety-warning     { color: #555555 !important; }
-.panel4 .port-label         { color: #444444 !important; }
-.panel4 .t-deger            { color: #1a6b2e !important; }
-.panel4 .mono               { color: #1a6b2e !important; }
-.panel4 .form-label         { color: #222222 !important; }
-.panel4 label               { color: #222222 !important; }
-.panel4 .text-muted         { color: #555555 !important; }
-.panel4 h6.text-muted       { color: #444444 !important; }
-.panel4 .border-secondary   { border-color: rgba(0,0,0,0.15) !important; }
-.panel4 .text-white         { color: #111111 !important; }
-.panel4 .input-group-text.bg-secondary { background: #cdd0d4 !important; color: #111 !important; border-color: rgba(0,0,0,0.2) !important; }
-.panel4 .output-display     { background: transparent !important; border-color: rgba(0,0,0,0.12) !important; }
-.panel4 .throttle-slider    { height: 120px !important; }
-.panel4 .form-control,
-.panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
-.panel4 .form-control:focus,
-.panel4 .form-select:focus  { background-color: #ffffff !important; color: #111111 !important; border-color: var(--color-primary) !important; }
-
-/* PID kutuları — panel4 metin renkleri */
-.panel4 .pid-label          { color: #333333 !important; }
-.panel4 .pid-value          { color: #111111 !important; }
-.panel4 .pid-unit           { color: #555555 !important; }
-/* pid-axis: axis başlığı kendi renklerini (primary/info/warning) korur */
-
-/* Mod kartları — panel4 metin ve kontrol renkleri */
-.mode-card.panel4           { background: #e8eaec !important; }
-.panel4 .mode-name          { color: #111111 !important; }
-.panel4 .mode-channel-select {
-    background: #ffffff !important;
-    color: #111111 !important;
-    border: 1px solid rgba(0,0,0,0.20) !important;
-}
-.panel4 .range-track-container {
-    background: rgba(0, 0, 0, 0.10) !important;
-    border: 1px solid rgba(0,0,0,0.15) !important;
-}
-.panel4 .mode-category-title {
-    color: #111111 !important;
-    border-bottom-color: rgba(0,0,0,0.15) !important;
-}
+/* ============================================
+   PANEL 4 — açık içerik kartı
+   Renk/metin sözleşmesi §1c'dedir. Buradaki eski 40 satırlık
+   ".panel4 .filanca { color: #xxx !important }" yama bloğu
+   KALDIRILDI: bileşenler artık sözleşme değişkenlerini okuduğu
+   için panel kapsamı yeterli. Aşağıda yalnızca panel4'e özgü
+   ÖLÇÜ (renk olmayan) istisnası kalır.
+   ============================================ */
+.panel4 .throttle-slider { height: 120px !important; }
 
 .panel-title {
     display: flex;
@@ -475,14 +704,14 @@ a:hover {
 }
 .page-loading-content {
     text-align: center;
-    color: #c8d6f0;
+    color: var(--p-on-dark-soft);
     padding: 32px;
 }
 .page-loading-content .spinner-border {
     width: 2.5rem;
     height: 2.5rem;
     border-width: 3px;
-    color: var(--primary, #4e8cff);
+    color: var(--primary, var(--p-accent));
 }
 .page-loading-content p {
     margin-top: 14px;
@@ -491,7 +720,7 @@ a:hover {
     font-weight: 500;
 }
 .page-loading-content small {
-    color: #7a90b8;
+    color: var(--p-on-dark-muted);
     font-size: 0.8rem;
 }
 
@@ -512,7 +741,7 @@ a:hover {
     border-radius: 12px;
     padding: 40px 48px;
     text-align: center;
-    color: #c8d6f0;
+    color: var(--p-on-dark-soft);
     max-width: 400px;
     width: 90%;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
@@ -521,23 +750,23 @@ a:hover {
     width: 3rem;
     height: 3rem;
     border-width: 3px;
-    color: #4e8cff;
+    color: var(--p-accent);
 }
 #reconnectOverlay h5 {
     margin: 16px 0 8px;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #e0eaff;
+    color: var(--p-on-dark);
 }
 #reconnectOverlay #reconnectStatus {
     font-size: 0.875rem;
-    color: #7a90b8;
+    color: var(--p-on-dark-muted);
     min-height: 1.4em;
 }
 #reconnectOverlay .reconnect-steps {
     margin-top: 20px;
     font-size: 0.8rem;
-    color: #5a70a0;
+    color: var(--p-on-dark-muted);
     line-height: 1.6;
     text-align: left;
 }
@@ -642,7 +871,7 @@ a:hover {
     font-family: var(--font-mono);
     font-size: var(--font-size-sm);
     font-weight: 600;
-    color: #dce8f5;
+    color: var(--p-on-dark);
     min-width: 150px;
     justify-content: center;
     letter-spacing: 0.3px;
@@ -890,13 +1119,14 @@ a:hover {
     color: var(--color-success);
 }
 .cal-step.active .cal-step-icon {
-    color: var(--color-primary);
+    color: var(--accent-on-surface);
 }
 
 .cal-step-values {
     font-family: var(--font-mono);
     font-size: var(--font-size-xs);
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--surface-sunken);
+    color: var(--on-surface);
     padding: var(--spacing-xs);
     border-radius: var(--radius-xs);
     margin-top: var(--spacing-xs);
@@ -936,13 +1166,13 @@ a:hover {
 }
 
 .aircraft-card h5 {
-    color: #ffffff;
+    color: var(--on-surface);
     font-weight: 700;
     margin-bottom: var(--spacing-xs);
 }
 
 .aircraft-card small {
-    color: #b0cfe8;
+    color: var(--on-surface-muted);
     font-size: var(--font-size-xs);
 }
 
@@ -977,8 +1207,8 @@ a:hover {
 
 /* Servo/Output Display */
 .output-display {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border-default);
+    background: var(--surface-sunken);
+    border: 1px solid var(--surface-border);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     text-align: center;
@@ -1007,7 +1237,7 @@ a:hover {
     font-family: var(--font-mono);
     font-size: var(--font-size-lg);
     font-weight: bold;
-    color: var(--color-primary);
+    color: var(--accent-on-surface);
     margin: var(--spacing-xs) 0;
 }
 
@@ -1091,8 +1321,8 @@ a:hover {
    9. UÇUŞ MODLARI
    ============================================ */
 .mode-card {
-    background: rgba(35, 65, 100, 0.75);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
@@ -1118,13 +1348,9 @@ a:hover {
     color: var(--text-primary);
 }
 
+/* Renk/kenarlık §12 form ailesinden gelir — burada yalnızca ölçü */
 .mode-channel-select {
     padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    background: var(--bg-input);
-    color: var(--text-primary);
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-xs);
     min-width: 120px;
 }
 
@@ -1133,18 +1359,18 @@ a:hover {
     position: relative;
     width: 100%;
     height: 36px;
-    background: rgba(10, 25, 50, 0.70);
+    background: var(--control-track);
     border-radius: 18px;
     margin: var(--spacing-lg) 0;
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255,255,255,0.10);
+    border: 1px solid var(--control-track-border);
 }
 
 .range-fill {
     position: absolute;
     height: 100%;
     top: 0;
-    background: rgba(59, 130, 246, 0.4);
+    background: var(--control-fill);
     border-radius: 18px;
     pointer-events: none;
     z-index: 1;
@@ -1204,8 +1430,8 @@ a:hover {
     -webkit-appearance: none;
     width: 24px;
     height: 36px;
-    background: var(--text-primary);
-    border: 1px solid var(--text-secondary);
+    background: var(--on-surface);
+    border: 1px solid var(--on-surface-soft);
     border-radius: var(--radius-xs);
     cursor: col-resize;
     box-shadow: var(--shadow-sm);
@@ -1215,26 +1441,27 @@ a:hover {
     pointer-events: auto;
     width: 24px;
     height: 36px;
-    background: var(--text-primary);
+    background: var(--on-surface);
     border: none;
     border-radius: var(--radius-xs);
     cursor: col-resize;
 }
 
 .mode-category-title {
-    color: #ffffff;
+    color: var(--on-surface);
+    border-bottom-color: var(--surface-border);
     font-size: var(--font-size-sm);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     padding-bottom: var(--spacing-sm);
     margin: var(--spacing-md) 0 var(--spacing-md);
-    border-bottom: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 1px solid var(--surface-border);
 }
 
 .mode-category-title i {
     margin-right: var(--spacing-sm);
-    color: var(--color-primary);
+    color: var(--accent-on-surface);
 }
 
 /* ============================================
@@ -1250,7 +1477,7 @@ a:hover {
 .pid-axis {
     font-size: var(--font-size-md);
     font-weight: 700;
-    color: var(--color-primary);
+    color: var(--accent-on-surface);
     text-transform: uppercase;
     margin-bottom: var(--spacing-md);
 }
@@ -1277,13 +1504,13 @@ a:hover {
     font-weight: bold;
 }
 
-/* Range Slider (Genel) */
+/* Range Slider (Genel) — renkler --control-* sözleşmesinden gelir */
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
     height: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--control-track);
     border-radius: 3px;
     outline: none;
 }
@@ -1293,10 +1520,10 @@ input[type="range"]::-webkit-slider-thumb {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--color-primary);
+    background: var(--control-thumb);
     cursor: pointer;
     box-shadow: 0 0 10px var(--color-primary-glow);
-    border: 2px solid #fff;
+    border: 2px solid var(--control-thumb-border);
     transition: transform var(--transition-fast);
 }
 
@@ -1308,47 +1535,50 @@ input[type="range"]::-moz-range-thumb {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--color-primary);
+    background: var(--control-thumb);
     cursor: pointer;
-    border: 2px solid #fff;
+    border: 2px solid var(--control-thumb-border);
 }
 
 /* ============================================
    11. LOG TERMİNAL
+   Terminal bilinçli olarak panel sözleşmesinden bağımsızdır
+   (her temada CMD görünümü korunur); yine de renkleri
+   --terminal-* değişkenlerinden okur.
    ============================================ */
 .log-container {
-    background: #0C0C0C;
-    color: #f0f0f0;
-    font-family: 'Consolas', 'Courier New', monospace;
+    background: var(--terminal-bg);
+    color: var(--terminal-text);
+    font-family: var(--font-mono);
     font-size: 12px;
     padding: 6px 8px;
     border-radius: var(--radius-xs);
     height: 280px;
     overflow-y: auto;
-    border: 1px solid #555;
+    border: 1px solid var(--terminal-border);
 }
 
 .log-entry {
     padding: 0;
     line-height: 1.5;
-    color: #f0f0f0;
+    color: var(--terminal-text);
     white-space: pre-wrap;
     word-break: break-all;
 }
 
 .log-time {
-    color: #aaaaaa;
+    color: var(--terminal-text-muted);
     margin-right: 4px;
     user-select: none;
 }
 
 /* Log Renkleri - CMD tarzı siyah/beyaz */
-.log-info    { color: #f0f0f0; }
-.log-success { color: #f0f0f0; }
-.log-warning { color: #f0f0f0; }
-.log-error   { color: #f0f0f0; }
-.log-command { color: #f0f0f0; }
-.log-receive { color: #f0f0f0; }
+.log-info    { color: var(--terminal-text); }
+.log-success { color: var(--terminal-text); }
+.log-warning { color: var(--terminal-text); }
+.log-error   { color: var(--terminal-text); }
+.log-command { color: var(--terminal-text); }
+.log-receive { color: var(--terminal-text); }
 .search-match {
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
@@ -1374,16 +1604,26 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================
-   12. FORM ELEMANLARI
+   12. FORM ELEMANLARI — TEK MERKEZ
+   ============================================
+   TÜM input benzeri kontroller (.form-control, .form-select,
+   .mode-channel-select, .pin-select, .field) burada tanımlanan
+   --field-* sözleşmesini okur. "Tüm inputların içi aynı renk"
+   istiyorsanız §1b'deki --field-bg'yi değiştirmeniz yeterli;
+   sadece bir panelde farklı olsun isterseniz §1c'de o panelin
+   bloğunda --field-bg'yi yeniden tanımlayın.
    ============================================ */
 .form-control,
-.form-select {
-    background-color: var(--bg-input) !important;
-    border: 1px solid var(--border-default) !important;
-    color: var(--text-primary) !important;
-    border-radius: var(--radius-xs) !important;
-    padding: 2px 6px;
-    font-size: var(--font-size-sm) !important;
+.form-select,
+.mode-channel-select,
+.pin-select,
+.field {
+    background-color: var(--field-bg) !important;
+    border: 1px solid var(--field-border) !important;
+    color: var(--field-text) !important;
+    border-radius: var(--field-radius) !important;
+    padding: var(--field-pad-y) var(--field-pad-x);
+    font-size: var(--field-font-size) !important;
     transition: all var(--transition-fast);
     height: auto;
     min-height: unset;
@@ -1391,16 +1631,29 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .form-control:focus,
-.form-select:focus {
-    background-color: var(--bg-input) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--color-primary) !important;
-    box-shadow: 0 0 0 3px var(--color-primary-glow) !important;
+.form-select:focus,
+.mode-channel-select:focus,
+.pin-select:focus,
+.field:focus {
+    background-color: var(--field-bg) !important;
+    color: var(--field-text) !important;
+    border-color: var(--field-border-focus) !important;
+    box-shadow: 0 0 0 3px var(--field-focus-ring) !important;
     outline: none;
 }
 
-.form-control::placeholder {
-    color: var(--text-muted) !important;
+.form-control::placeholder,
+.field::placeholder {
+    color: var(--field-placeholder) !important;
+}
+
+/* Input içindeki yazıyı tek sınıfla yönetmek için yardımcı sınıf.
+   Bir metnin "input yazısı" gibi görünmesini istediğinizde kullanın. */
+.field-text {
+    color:       var(--field-text);
+    font-size:   var(--field-font-size);
+    font-family: var(--font-sans);
+    line-height: 1.4;
 }
 
 /* Tarayıcı autofill beyaz arkaplan inject ediyor → kapat */
@@ -1408,15 +1661,19 @@ input[type="range"]::-moz-range-thumb {
 .form-control:-webkit-autofill:focus,
 .form-select:-webkit-autofill,
 .form-select:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
-    -webkit-text-fill-color: var(--text-primary) !important;
-    caret-color: var(--text-primary);
+    -webkit-box-shadow: 0 0 0 1000px var(--field-bg) inset !important;
+    -webkit-text-fill-color: var(--field-text) !important;
+    caret-color: var(--field-text);
 }
 
-.form-label {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
+/* Form etiketleri — .t-etiket ile aynı merkezden yönetilir */
+.form-label,
+.form-check-label,
+.t-etiket {
+    color:       var(--t-etiket-color);
+    font-size:   var(--t-etiket-size);
+    font-weight: var(--t-etiket-weight);
+    font-style:  var(--t-etiket-style);
     margin-bottom: var(--spacing-xs);
 }
 
@@ -2031,12 +2288,12 @@ label.small.text-muted,
 /* bg-black → panel */
 .bg-black { background: var(--bg-panel) !important; }
 
-/* bg-secondary input-group → tema rengi */
+/* bg-secondary input-group → form addon sözleşmesi */
 .input-group-text.bg-secondary,
 .bg-secondary.input-group-text {
-    background-color: rgba(0,0,0,0.07) !important;
-    color: var(--text-secondary) !important;
-    border-color: var(--border-default) !important;
+    background-color: var(--field-addon-bg) !important;
+    color: var(--field-addon-text) !important;
+    border-color: var(--field-border) !important;
 }
 
 /* text-white, text-light → tema metni */
@@ -2045,11 +2302,13 @@ label.small.text-muted,
 .text-muted  { color: var(--text-muted)     !important; }
 
 /* Renkli durum metinleri - sadece anlamlı yerlerde kalsın */
-/* text-info / text-success / text-warning / text-danger → tema renkleri */
-.text-info    { color: var(--color-info)    !important; }
-.text-success { color: var(--color-success) !important; }
-.text-warning { color: var(--color-warning) !important; }
-.text-danger  { color: var(--color-danger)  !important; }
+/* text-info / text-success / text-warning / text-danger → yüzeye
+   uyarlanmış durum renkleri. Ham --color-* yerine *-on-surface
+   kullanılır ki açık panelde (panel4) renkler "patlamasın". */
+.text-info    { color: var(--accent-on-surface)  !important; }
+.text-success { color: var(--success-on-surface) !important; }
+.text-warning { color: var(--warning-on-surface) !important; }
+.text-danger  { color: var(--danger-on-surface)  !important; }
 
 /* border-secondary → tema kenarlığı */
 .border-secondary { border-color: var(--border-default) !important; }
@@ -2094,23 +2353,23 @@ label.small.text-muted,
     color: var(--text-primary) !important;
 }
 
-/* Input group text - standart tema */
+/* Input group text - form addon sözleşmesi */
 .input-group-text {
-    background-color: rgba(0,0,0,0.06) !important;
-    color: var(--text-secondary) !important;
-    border-color: var(--border-default) !important;
-    padding: 2px 6px !important;
-    font-size: var(--font-size-sm) !important;
+    background-color: var(--field-addon-bg) !important;
+    color: var(--field-addon-text) !important;
+    border-color: var(--field-border) !important;
+    padding: var(--field-pad-y) var(--field-pad-x) !important;
+    font-size: var(--field-font-size) !important;
 }
 
-/* bg-dark form-control / form-select → tema inputu */
+/* bg-dark form-control / form-select → form sözleşmesi */
 .form-control.bg-dark,
 .form-select.bg-dark,
 .form-control[class*="bg-dark"],
 .form-select[class*="bg-dark"] {
-    background-color: var(--bg-input) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-default) !important;
+    background-color: var(--field-bg) !important;
+    color: var(--field-text) !important;
+    border-color: var(--field-border) !important;
 }
 
 /* bg-dark bg-opacity-25 border → tema */
@@ -2124,9 +2383,8 @@ label.small.text-muted,
     background: var(--bg-panel) !important;
     color: var(--text-primary) !important;
 }
-.osd-element-list .form-check-label { color: var(--text-primary) !important; }
-.panel4 .osd-element-list .form-check-label { color: #222222 !important; }
-.panel4 .osd-element-list hr { border-color: rgba(0,0,0,0.15) !important; }
+.osd-element-list .form-check-label { color: var(--on-surface) !important; }
+.osd-element-list hr { border-color: var(--surface-border); }
 
 /* Aircraft seçim kartları */
 .aircraft-card {
@@ -2156,7 +2414,7 @@ label.small.text-muted,
 .cal-step.active  { border-color: var(--color-primary) !important; background: rgba(99, 102, 241, 0.08) !important; }
 .cal-step.completed { border-color: var(--color-success) !important; background: rgba(74, 222, 128, 0.07) !important; }
 .cal-step-icon { color: var(--text-muted) !important; }
-.cal-step.active .cal-step-icon { color: var(--color-primary) !important; }
+.cal-step.active .cal-step-icon { color: var(--accent-on-surface) !important; }
 .cal-step.completed .cal-step-icon { color: var(--color-success) !important; }
 .step-label    { color: var(--text-secondary) !important; font-size: var(--font-size-xs) !important; }
 .cal-step-values { background: rgba(0,0,0,0.08) !important; color: var(--text-primary) !important; }
@@ -2411,24 +2669,21 @@ label.small.text-muted,
 #pid .row { margin-left: -6px !important; margin-right: -6px !important; }
 #pid .row + .row { margin-top: 12px !important; }
 
-/* PID slider — kalın ve siyah */
+/* PID slider — kalın gövde. Renkler --control-* sözleşmesinden
+   gelir; panel4 kendi bloğunda (§1c) açık zemine uygun değerleri
+   zaten tanımlıyor, burada yalnızca ölçü ayarı yapılır. */
 .panel4 input[type="range"]:not(.throttle-slider) {
     height: 10px !important;
-    background: #222 !important;
     border-radius: 5px !important;
 }
 .panel4 input[type="range"]:not(.throttle-slider)::-webkit-slider-thumb {
     width: 20px !important;
     height: 20px !important;
-    background: #111 !important;
-    border: 3px solid #555 !important;
     box-shadow: none !important;
 }
 .panel4 input[type="range"]:not(.throttle-slider)::-moz-range-thumb {
     width: 20px !important;
     height: 20px !important;
-    background: #111 !important;
-    border: 3px solid #555 !important;
 }
 
 /* Scrollbar daha ince */
@@ -2779,15 +3034,15 @@ label.small.text-muted,
 }
 
 /* ============================================
-   PANEL4 — KESİN BACKGROUND OVERRIDE (EN SON)
-   .panel4 !important tek sınıflı; sonradan gelen
-   çift sınıflı kurallar onu ezebilir. Bu blok
-   stylesheet sonunda olduğu için her durumda kazanır.
+   CAL-STEP durum zeminleri — panelden bağımsız
+   Vurgu renkleri saydam olduğu için hem koyu hem
+   açık panelde doğru okunur; ayrı panel4 bloğu
+   gerekmez (§1c sözleşmesi zemini zaten belirler).
    ============================================ */
-.cal-step.panel4                       { background: #e8eaec !important; }
-.cal-step.panel4:hover:not(.disabled)  { background: rgba(99, 102, 241, 0.10) !important; }
-.cal-step.panel4.active                { background: rgba(99, 102, 241, 0.12) !important; }
-.cal-step.panel4.completed             { background: rgba(16,185,129,0.12) !important; }
+.cal-step.panel4                       { background: var(--surface) !important; }
+.cal-step:hover:not(.disabled)         { background: rgba(99, 102, 241, 0.10) !important; }
+.cal-step.active                       { background: rgba(99, 102, 241, 0.12) !important; }
+.cal-step.completed                    { background: rgba(16, 185, 129, 0.12) !important; }
 
 /* ============================================
    FIRMWARE GÜNCELLE BUTONU - SARI RENG

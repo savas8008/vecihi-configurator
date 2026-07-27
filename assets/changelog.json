@@ -2,6 +2,13 @@
   {
     "date": "2026-07-27",
     "items": [
+      "Arayüz tasarım sistemi tek merkeze taşındı — renkler artık üç katmanda yönetiliyor: ham palet, panel yüzey sözleşmesi ve bileşenler; bir bileşenin rengini değiştirmek için artık tek bir yeri düzenlemek yeterli",
+      "Dört panel seviyesi (panel, panel2, panel3, panel4) aynı değişken sözleşmesini kullanıyor; panel4 için yazılmış 40'ı aşkın tekil renk yaması kaldırıldı",
+      "Tüm input bileşenleri (metin kutusu, açılır liste, kanal seçici, birim etiketi) tek bir form sözleşmesinden besleniyor — zemin, yazı, kenarlık ve odak rengi tek yerden kontrol ediliyor",
+      "Açık zeminli panelde vurgu ve durum renklerinin okunamayacak kadar soluk kalması giderildi — renkler bulundukları yüzeye göre otomatik koyulaşıyor",
+      "Açık panelde input yazılarının ve etiketlerin görünmez kalmasına yol açan renk devralma hatası düzeltildi",
+      "configurator.html içinde kullanılan ancak hiç tanımlanmamış olan --primary, --success, --warning ve --danger renk değişkenleri tanımlandı (bildirim ve uyarı kutularının renkleri artık doğru uygulanıyor)",
+      "Tasarım sistemi belgelendi: docs/TASARIM_SISTEMI.md",
       "GPS akışı kesildiğinde (kablo/modül arızası) is_gps_safe bayrağının son değerinde donarak navigasyonun bayat konum verisiyle devam etmesine yol açan hata düzeltildi — 2 saniye veri gelmezse GPS güvensiz sayılır ve GPS'li modlar ANGLE'a düşer",
       "GPS UBX ayrıştırıcısında sıfır uzunluklu paketin bellek taşmasına (RAM bozulması/çökme) yol açabildiği hata düzeltildi; ayrıca POSLLH/VELNED/SOL/MON-VER paketlerine minimum uzunluk kontrolü eklendi",
       "SBUS failsafe biti artık tanınıyor — TX bağlantısı koptuğunda alıcının kendi failsafe değerleriyle uçuş yerine RF Failsafe kademeleri (kısa/uzun kademe, RTH) doğru şekilde devreye giriyor",
