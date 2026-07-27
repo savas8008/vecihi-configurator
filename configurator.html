@@ -69,30 +69,30 @@
         letter-spacing: 0.08em;
         padding: 0 9px;
         height: 100%;
-        color: #4b5563;
-        border-right: 1px solid rgba(255,255,255,0.06);
+        color: #6b7280;
+        border-right: 1px solid rgba(0,0,0,0.08);
         transition: color 0.25s;
         cursor: default;
         user-select: none;
         white-space: nowrap;
     }
-    .hw-status-item:first-child { border-left: 1px solid rgba(255,255,255,0.06); }
+    .hw-status-item:first-child { border-left: 1px solid rgba(0,0,0,0.08); }
     .hw-status-item::before {
         content: '';
         width: 6px;
         height: 6px;
         border-radius: 50%;
-        background: #374151;
+        background: #9ca3af;
         flex-shrink: 0;
-        transition: background 0.25s, box-shadow 0.25s;
+        transition: background 0.25s;
     }
     .hw-status-item::after { content: attr(data-label); }
-    .hw-status-item.hw-ok   { color: #d1d5db; }
-    .hw-status-item.hw-ok::before   { background: #22c55e; box-shadow: 0 0 5px #22c55e88; }
-    .hw-status-item.hw-err  { color: #d1d5db; }
-    .hw-status-item.hw-err::before  { background: #ef4444; box-shadow: 0 0 5px #ef444488; }
-    .hw-status-item.hw-warn { color: #d1d5db; }
-    .hw-status-item.hw-warn::before { background: #f59e0b; box-shadow: 0 0 5px #f59e0b88; }
+    .hw-status-item.hw-ok   { color: #374151; }
+    .hw-status-item.hw-ok::before   { background: #22c55e; }
+    .hw-status-item.hw-err  { color: #374151; }
+    .hw-status-item.hw-err::before  { background: #ef4444; }
+    .hw-status-item.hw-warn { color: #374151; }
+    .hw-status-item.hw-warn::before { background: #f59e0b; }
 
     /* OSD ve diğer özel stiller */
     /* Kısayollar accordion dark theme uyumu */
@@ -106,7 +106,7 @@
     }
     #shortcutsAccordion .accordion-button:not(.collapsed) {
         box-shadow: none;
-        color: #fff;
+        color: var(--color-primary);
     }
     #shortcutsAccordion .accordion-button:focus {
         box-shadow: none;
@@ -127,21 +127,21 @@
     }
     html {
         scrollbar-width: auto;
-        scrollbar-color: #850404 #1a1a1a;
+        scrollbar-color: #b7bec4 var(--p-light-1);
     }
     body::-webkit-scrollbar {
         width: 14px;
     }
     body::-webkit-scrollbar-track {
-        background: #1a1a1a;
+        background: var(--p-light-1);
     }
     body::-webkit-scrollbar-thumb {
-        background: #850404;
+        background: #b7bec4;
         border-radius: 10px;
-        border: 2px solid #1a1a1a;
+        border: 2px solid var(--p-light-1);
     }
     body::-webkit-scrollbar-thumb:hover {
-        background: #850404;
+        background: var(--color-primary);
     }
     .osd-element-list::-webkit-scrollbar {
         width: 4px;
@@ -178,7 +178,7 @@
 </head>
 <body>
     
-    <header style="background:#0a0f1a;border-bottom:1px solid #1a2535;margin-bottom:6px;">
+    <header style="background:var(--bg-panel);border-bottom:1px solid var(--border-default);margin-bottom:6px;">
       <div class="container-fluid px-3">
         <div class="d-flex align-items-center justify-content-between" style="height:46px;">
 
