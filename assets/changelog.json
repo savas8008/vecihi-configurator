@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-07-27",
+    "items": [
+      "GPS akışı kesildiğinde (kablo/modül arızası) is_gps_safe bayrağının son değerinde donarak navigasyonun bayat konum verisiyle devam etmesine yol açan hata düzeltildi — 2 saniye veri gelmezse GPS güvensiz sayılır ve GPS'li modlar ANGLE'a düşer",
+      "GPS UBX ayrıştırıcısında sıfır uzunluklu paketin bellek taşmasına (RAM bozulması/çökme) yol açabildiği hata düzeltildi; ayrıca POSLLH/VELNED/SOL/MON-VER paketlerine minimum uzunluk kontrolü eklendi",
+      "SBUS failsafe biti artık tanınıyor — TX bağlantısı koptuğunda alıcının kendi failsafe değerleriyle uçuş yerine RF Failsafe kademeleri (kısa/uzun kademe, RTH) doğru şekilde devreye giriyor",
+      "Blackbox kaydını durdurma işlemi artık uçuş döngüsünü bloklamıyor — disarm sırasında 3 saniyeye varan bekleme watchdog resetine yol açabiliyordu; dosya kapatma arka plan görevine devredildi",
+      "Core 0 GPS görevi de watchdog kapsamına alındı — görev takılırsa otomatik reset + havada hızlı kurtarma devreye girer",
+      "Motor/servo pinlerinin iki farklı config kopyasında (PinConfig ve OutputConfig) tutulup NVS'te aynı anahtarları paylaşmasından doğan tutarsızlık giderildi — pinler artık tek kaynaktan senkronize ediliyor",
+      "Waypoint misyonu yüklenirken NVS bozulmasına karşı nokta sayısı sınırı (maks 16) doğrulanıyor",
+      "GCS komut paketlerinde uzunluk alanı doğrulanıyor; GCS ile normal ARM artık en az bir stick paketi görülmesini şart koşuyor",
+      "Yer istasyonu seri protokolünde aşırı uzun komut sonrası komut senkronunun bozulması düzeltildi"
+    ]
+  },
+  {
     "date": "2026-07-24",
     "items": [
       "OSD'ye ELRS/CRSF sinyal telemetrisi eklendi — RSSI (dBm), Link Quality (LQ %), SNR (dB) ve TX Gücü (mW) artık ayrı ayrı gösterilebiliyor; bu değerler yalnızca CRSF/ELRS protokolünde doludur, SBUS'ta desteklenmez"
