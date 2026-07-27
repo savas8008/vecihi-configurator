@@ -1,77 +1,208 @@
-﻿/* Copyright (c) 2024-2026 savas8008 - All Rights Reserved
+/* Copyright (c) 2024-2026 savas8008 - All Rights Reserved
    Bu dosyanın izinsiz kopyalanması, değiştirilmesi veya dağıtılması yasaktır. */
 
 /* ============================================
-   VECİHİ CONFIGURATOR - THEME SYSTEM
+   VECİHİ CONFIGURATOR - TASARIM SİSTEMİ
    ============================================
-   Flight Controller için profesyonel koyu tema
-   
-   Değiştirmek için sadece :root içindeki değişkenleri düzenleyin.
-   Tüm renkler ve boyutlar merkezi olarak yönetilir.
+
+   ÜÇ KATMANLI MİMARİ — nereyi değiştireceğinizi bilmek için:
+
+   KATMAN 1  PALET (§1a)      Ham renkler. Tema/renk paleti değiştirmek
+                              istediğinizde SADECE burayı düzenleyin.
+   KATMAN 2  YÜZEY SÖZLEŞMESİ Panel seviyeleri (§1c). Dört panelin de
+             (.panel/.panel2/ AYNI değişken adlarını kendi değerleriyle
+              .panel3/.panel4) doldurduğu ortak sözleşme. Bir panelin
+                              görünümünü değiştirmek = o bloğu düzenlemek.
+   KATMAN 3  BİLEŞENLER       Input, buton, kart, slider... Bunlar ASLA
+                              ham renk kullanmaz; yalnızca sözleşmeyi okur.
+
+   ALTIN KURAL: Bileşen kurallarına sabit renk (#hex / rgba) YAZMAYIN.
+   Bir bileşen panele göre renk değiştirmeli ise, sözleşme değişkenini
+   kullanın — panel kapsamı gerisini otomatik halleder. Bu sayede
+   ".panel4 .filanca { color: #111 !important }" türü yamalar gerekmez.
+
+   SIK YAPILAN İŞLER:
+   · Tüm inputların içi          → --field-bg          (§1b)
+   · Tüm input yazıları          → --field-text        (§1b) / .field-text sınıfı
+   · Tüm input kenarlıkları      → --field-border      (§1b)
+   · Bir panelin zemini/metni    → §1c ilgili panel bloğu
+   · Başlık/açıklama tipografisi → --t-* değişkenleri  (§1b)
    ============================================ */
 
 /* ============================================
-   1. MERKEZI DEĞİŞKENLER (THEME TOKENS)
+   1a. KATMAN 1 — HAM PALET
+   Renk paleti değişimi burada yapılır. Aşağıdaki
+   katmanlar yalnızca bu değişkenleri referans alır.
    ============================================ */
 :root {
+    /* Marka / vurgu — INAV Açık: mat çelik-mavi.
+       KATMAN 1 paletin TEK kaynağı; aşağıdaki tüm katmanlar buna bağlı.
+       NOT: Tema artık AÇIK zemin varsayılan (bkz. §1b/§1c). --p-dark-*
+       rampası kaldırılmadı — 3D sahne, terminal, OSD önizleme gibi
+       kasıtlı olarak koyu kalan bileşenler hâlâ onu kullanıyor. */
+    --p-accent:          #03131f;   /* Mat çelik-mavi */
+    --p-accent-strong:   #16232d;   /* Koyu mavi — hover */
+    --p-accent-deep:     #060708;   /* En koyu mavi — koyu zeminler için */
+    --p-accent-rgb:      53, 116, 160;
+
+    /* Durum renkleri — doygunluğu düşürülmüş, açık zeminde okunaklı */
+    --p-success:         #3f8f45;
+    --p-warning:         #b57a2e;
+    --p-danger:          #b8433c;
+
+    /* Koyu yüzey rampası — YALNIZCA kasıtlı koyu bileşenler için
+       (3D sahne, terminal, OSD önizleme, reconnect overlay) */
+    --p-dark-0:          #0f172a;   /* en koyu */
+    --p-dark-1:          #1e293b;
+    --p-dark-2:          #f7f7f8;
+    --p-dark-3:          #afb1b6;
+
+    /* Açık yüzey rampası — artık VARSAYILAN UI zemini (§1b/§1c) */
+    --p-light-0:         #e6eae5;
+    --p-light-1:         #f8fafb;
+    --p-light-2:         #159687;
+
+    /* Koyu zemin üstü metin (yalnızca kasıtlı koyu bileşenlerde) */
+    --p-on-dark:         #e2e8f0;
+    --p-on-dark-soft:    #cbd5e1;
+    --p-on-dark-muted:   #94a3b8;
+    --p-on-dark-value:   #4ade80;
+
+    /* Açık zemin üstü metin — artık VARSAYILAN UI metni */
+    --p-on-light:        #1c1f22;
+    --p-on-light-soft:   #454a51;
+    --p-on-light-muted:  #767c84;
+    --p-on-light-value:  #3f8f45;
+}
+
+/* ============================================
+   1b. KATMAN 2 — GENEL SÖZLEŞME (VARSAYILAN: AÇIK)
+   :root açık yüzey varsayılanını tanımlar; panel
+   seviyeleri (§1c) aynı adları kendi değerleriyle
+   yeniden tanımlayarak kapsam içinde devralır.
+   ============================================ */
+:root {
+    /* --- YÜZEY SÖZLEŞMESİ (her panel bunu doldurur) --- */
+    --surface:            var(--p-light-1);           /* panelin kendi zemini */
+    --surface-sunken:     rgba(0, 0, 0, 0.05);        /* içine gömülü alan (değer kutusu, track) */
+    --surface-raised:     rgba(0, 0, 0, 0.04);        /* hover / yükseltilmiş alan */
+    --surface-border:     rgba(0, 0, 0, 0.13);
+    --surface-border-soft:rgba(0, 0, 0, 0.10);
+
+    --on-surface:         var(--p-on-light);          /* birincil metin */
+    --on-surface-soft:    var(--p-on-light-soft);     /* ikincil metin */
+    --on-surface-muted:   var(--p-on-light-muted);    /* yardım metni */
+    --on-surface-value:   var(--p-on-light-value);    /* ölçüm/veri metni */
+    /* Vurgu/durum renklerinin BU yüzeyde okunabilir tonu.
+       Açık zeminde parlak/doygun tonlar okunurluğu düşürdüğü için
+       burada koyulaştırılmış varyantlar kullanılır. Renkli METİN
+       yazan her bileşen ham --color-* yerine bunları okumalıdır. */
+    --accent-on-surface:  var(--p-accent-deep);
+    --success-on-surface: var(--p-on-light-value);
+    --warning-on-surface: #a1560b;
+    --danger-on-surface:  #b91c1c;
+
+    /* --- FORM ALANI (INPUT) SÖZLEŞMESİ ---
+       "Tüm inputların içi aynı renk" burada yönetilir.
+       form-control, form-select, mode-channel-select, pin-select
+       ve input-group-text hepsi bu değişkenleri okur. */
+    --field-bg:           var(--p-light-0);
+    --field-text:         var(--on-surface);
+    --field-placeholder:  var(--on-surface-muted);
+    --field-border:       rgba(0, 0, 0, 0.22);
+    --field-border-focus: var(--color-primary);
+    --field-focus-ring:   var(--color-primary-glow);
+    --field-addon-bg:     var(--p-light-2);      /* input-group-text zemini */
+    --field-addon-text:   var(--on-surface-soft);
+    --field-radius:       var(--radius-xs);
+    --field-pad-y:        2px;
+    --field-pad-x:        6px;
+    --field-font-size:    var(--font-size-sm);
+
+    /* --- KONTROL (SLIDER/TRACK) SÖZLEŞMESİ --- */
+    --control-track:        rgba(0, 0, 0, 0.18);
+    --control-track-border: rgba(0, 0, 0, 0.15);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
+    --control-fill:         rgba(var(--p-accent-rgb), 0.40);
+
     /* --- ANA RENKLER — Slate / Indigo Teması --- */
-    --color-brand-blue: #818cf8;        /* Indigo-400 */
-    --color-brand-blue-rgb: 129, 140, 248;
+    --color-brand-blue: var(--p-accent);
+    --color-brand-blue-rgb: var(--p-accent-rgb);
 
-    --color-primary: #818cf8;           /* Indigo accent */
-    --color-primary-hover: #6366f1;     /* Indigo-500 */
-    --color-primary-glow: rgba(99, 102, 241, 0.3);
+    --color-primary: var(--p-accent);
+    --color-primary-hover: var(--p-accent-strong);
+    --color-primary-glow: rgba(53, 116, 160, 0.3);
 
-    --color-secondary: #94a3b8;         /* Slate-400 */
-    --color-secondary-hover: #64748b;
+    --color-secondary: var(--p-on-light-muted);
+    --color-secondary-hover: #5b6066;
 
     /* --- DURUM RENKLERİ --- */
-    --color-success: #4ade80;           /* Green-400 */
-    --color-success-glow: rgba(74, 222, 128, 0.3);
+    --color-success: var(--p-success);
+    --color-success-glow: rgba(63, 143, 69, 0.3);
 
-    --color-warning: #fb923c;           /* Orange-400 */
-    --color-warning-glow: rgba(251, 146, 60, 0.3);
+    --color-warning: var(--p-warning);
+    --color-warning-glow: rgba(181, 122, 46, 0.3);
 
-    --color-danger: #f87171;            /* Red-400 */
-    --color-danger-glow: rgba(248, 113, 113, 0.3);
+    --color-danger: var(--p-danger);
+    --color-danger-glow: rgba(184, 67, 60, 0.3);
 
-    --color-info: #818cf8;              /* Indigo — bilgi rengi */
+    --color-info: var(--p-accent);      /* bilgi rengi */
+
+    /* KISA TAKMA ADLAR — configurator.html içinde inline stillerde
+       (var(--primary), var(--success)...) kullanılıyor. Daha önce
+       tanımsızdılar ve sessizce etkisiz kalıyorlardı. */
+    --primary: var(--color-primary);
+    --success: var(--color-success);
+    --warning: var(--color-warning);
+    --danger:  var(--color-danger);
+    --info:    var(--color-info);
 
     /* --- ARKAPLAN RENKLERİ --- */
-    --bg-body: #0f172a;
+    --bg-body: var(--p-light-2);   /* sayfa zemini — panellerden kasıtlı olarak daha koyu, kaynaşmayı önler */
     --bg-body-gradient: none;
 
     /* =========================================
-       PANEL HİYERARŞİSİ  (Slate/Indigo teması)
-       .panel  → Sayfa bölümü dış kap
-       .panel2 → İç grup/kart
-       .panel3 → En iç içerik kartı
-       Değiştirmek için sadece bu değişkenleri güncelleyin.
+       PANEL ZEMİNLERİ
+       Panel seviyelerinin tam sözleşmesi §1c'dedir;
+       burada yalnızca zemin renkleri tanımlanır.
+       İç içe geçtikçe beyaza yaklaşır (panel < panel2 < panel3).
     ========================================= */
-    --bg-panel:   rgba(30, 41, 59, 0.95);   /* slate-800 */
-    --bg-panel-2: rgba(41, 53, 72, 0.95);   /* slate-700/800 arası */
-    --bg-panel-3: rgba(15, 23, 42, 0.97);   /* slate-950 */
+    --bg-panel:   var(--p-light-1);         /* dış bölüm kabı */
+    --bg-panel-2: #e8ecef;                  /* iç grup/kart */
+    --bg-panel-3: #f4f6f7;                  /* en iç içerik kartı */
+    --bg-panel-4: var(--p-light-1);         /* açık içerik kartı */
     --bg-panel-pin: rgba(255, 193, 117, 0.92); /* Pin paneli: donanım bağlantısı */
-    --cal-step-bg: var(--bg-panel-3);        /* Cal-step varsayılan arka planı */
+    --cal-step-bg: var(--surface-sunken);    /* Cal-step varsayılan arka planı */
 
-    --bg-panel-solid: #1e293b;
-    --bg-input: rgba(15, 23, 42, 0.85);      /* Input: koyu şeffaf */
-    --bg-hover: rgba(255, 255, 255, 0.05);
+    --bg-panel-solid: #f4f6f7;
+    /* GERİYE UYUMLULUK: --bg-input artık --field-bg'nin takma adıdır.
+       Yeni kodda --field-bg kullanın. */
+    --bg-input: var(--field-bg);
+    --bg-hover: var(--surface-raised);
 
     --bg-terminal: #0a0f1a;             /* Log/Terminal arkası */
-    --bg-3d-canvas: #0f172a;            /* 3D Sahne arkası */
+    --bg-3d-canvas: var(--p-dark-0);    /* 3D Sahne arkası */
 
-    /* --- KENARLIK RENKLERİ --- */
-    --border-default: rgba(51, 65, 85, 0.8);    /* slate-700 */
-    --border-light:   rgba(51, 65, 85, 0.4);
+    /* --- TERMİNAL (panel sözleşmesinden bağımsız, CMD görünümü) --- */
+    --terminal-bg:          #0C0C0C;
+    --terminal-text:        #f0f0f0;
+    --terminal-text-muted:  #aaaaaa;
+    --terminal-border:      #555555;
+
+    /* --- KENARLIK RENKLERİ (sözleşme takma adları) --- */
+    --border-default: var(--surface-border);
+    --border-light:   var(--surface-border-soft);
     --border-focus: var(--color-primary);
 
-    /* --- METİN RENKLERİ --- */
-    --text-primary:   #e2e8f0;          /* slate-200 */
-    --text-secondary: #cbd5e1;          /* slate-300 */
-    --text-muted:     #94a3b8;          /* slate-400 */
-    --text-inverse:   #0f172a;          /* ters metin (açık arka plan için) */
-    --text-value:     #4ade80;          /* sensör değerleri — yeşil */
+    /* --- METİN RENKLERİ (sözleşme takma adları) ---
+       Eski kod bu adları kullanıyor; sözleşmeye bağlandılar ki
+       panel kapsamında --on-surface değişince bunlar da değişsin. */
+    --text-primary:   var(--on-surface);
+    --text-secondary: var(--on-surface-soft);
+    --text-muted:     var(--on-surface-muted);
+    --text-inverse:   var(--p-dark-0);  /* ters metin (açık arka plan için) */
+    --text-value:     var(--on-surface-value);
 
     /* =========================================
        MERKEZİ METİN TİPOGRAFİ SİSTEMİ
@@ -82,33 +213,39 @@
     /* t-baslik: Panel başlıkları, bölüm adları */
     --t-baslik-size:   var(--font-size-lg);
     --t-baslik-weight: 700;
-    --t-baslik-color:  var(--text-primary);
+    --t-baslik-color:  var(--on-surface);
     --t-baslik-style:  normal;
 
     /* t-alt-baslik: Grup başlıkları, alan adları */
     --t-alt-baslik-size:   var(--font-size-xl);
     --t-alt-baslik-weight: 700;
-    --t-alt-baslik-color:  var(--text-primary);
+    --t-alt-baslik-color:  var(--on-surface);
     --t-alt-baslik-style:  normal;
 
     /* t-aciklama: Yardım metni, talimatlar */
     --t-aciklama-size:   var(--font-size-sm);
     --t-aciklama-weight: 500;
-    --t-aciklama-color:  #94a3b8;
+    --t-aciklama-color:  var(--on-surface-muted);
     --t-aciklama-style:  normal;
 
     /* t-deger: Sensör/ölçüm değerleri */
     --t-deger-size:   var(--font-size-sm);
     --t-deger-weight: 400;
-    --t-deger-color:  var(--text-value);
+    --t-deger-color:  var(--on-surface-value);
     --t-deger-style:  normal;
 
+    /* t-etiket: Form alanı etiketleri (label, form-label) */
+    --t-etiket-size:   var(--font-size-sm);
+    --t-etiket-weight: 500;
+    --t-etiket-color:  var(--on-surface-soft);
+    --t-etiket-style:  normal;
+
     /* --- HUD & DATA RENKLERİ --- */
-    --hud-green: #4ade80;               /* HUD yeşili */
+    --hud-green: var(--p-success);      /* HUD yeşili */
     --hud-amber: #fbbf24;               /* Canlı imleç sarısı */
-    --data-x: #f87171;                  /* X ekseni (kırmızı) */
-    --data-y: #4ade80;                  /* Y ekseni (yeşil) */
-    --data-z: #818cf8;                  /* Z ekseni (indigo) */
+    --data-x: var(--p-danger);          /* X ekseni (kırmızı) */
+    --data-y: var(--p-success);         /* Y ekseni (yeşil) */
+    --data-z: var(--p-accent);          /* Z ekseni (indigo) */
     
     /* --- BOYUTLAR --- */
     --radius-xs: 2px;
@@ -125,11 +262,19 @@
     --spacing-xl: 16px;
 
     /* --- BLUR & GÖLGE --- */
-    --blur-amount: 8px;
+    --blur-amount: 3px;
     --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.5);
     --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.55);
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.65);
-    --shadow-glow: 0 0 8px var(--color-primary-glow);
+    --shadow-glow: none;
+
+    /* --- EFEKT YOĞUNLUĞU (INAV tarzı düz görünüm) ---
+       Butonlarda/aktif kartlarda kullanılan renkli "glow" gölgeleri ve
+       hover'daki translateY sıçraması bu iki tokendan geçer. Tekrar
+       "parlak" bir tema istenirse SADECE bu iki satır değişir. */
+    --shadow-glow-sm: none;
+    --shadow-glow-lg: none;
+    --hover-lift: 0px;
 
     /* --- FONTLAR --- */
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -145,6 +290,167 @@
     --transition-fast: 0.1s ease;
     --transition-normal: 0.15s ease;
     --transition-slow: 0.25s ease;
+}
+
+/* ============================================
+   1c. KATMAN 2 — PANEL SÖZLEŞMELERİ (4 PANEL, TEK YER)
+   ============================================
+   Dört panel de AYNI değişken adlarını doldurur. İçlerindeki
+   bileşenler hangi panelde olduklarını bilmez; yalnızca bu
+   değişkenleri okurlar. Bir panelin görünümünü değiştirmek
+   için SADECE ilgili bloğu düzenleyin — bileşenlere veya
+   ".panel4 .filanca { !important }" yamalarına dokunmayın.
+
+   Sözleşme alanları:
+     --surface / --surface-sunken / --surface-raised
+     --surface-border / --surface-border-soft
+     --on-surface / --on-surface-soft / --on-surface-muted / --on-surface-value
+     --field-*        (input ailesi)
+     --control-*      (slider/track ailesi)
+   ============================================ */
+
+/* --------------------------------------------
+   TÜRETİLMİŞ TAKMA ADLAR — her panel kapsamında yeniden çözülür
+   --------------------------------------------
+   ÖNEMLİ (CSS kuralı): "--field-text: var(--on-surface)" ifadesi,
+   BİLDİRİLDİĞİ elemandaki --on-surface değerine göre çözülür.
+   Yalnızca :root'ta bildirilseydi, .panel4 --on-surface'i koyuya
+   çevirdiğinde --field-text ESKİ (açık) değerinde kalırdı — açık
+   zeminde açık yazı = görünmez metin.
+   Bu blok türetilmiş adları her panel elemanında yeniden bildirir,
+   böylece panelin kendi sözleşmesine göre çözülürler.
+
+   Bu blok panel bloklarından ÖNCE gelmelidir: eşit özgüllükte
+   sonraki kazanır, böylece bir panel istediği adı (ör. panel4'ün
+   --field-border'ı) kendi bloğunda özelleştirebilir.
+   -------------------------------------------- */
+.panel, .panel2, .panel3, .panel4, .sidebar,
+.mode-card, .cal-step {
+    --field-text:         var(--on-surface);
+    --field-placeholder:  var(--on-surface-muted);
+    --field-border:       var(--surface-border);
+    --field-addon-text:   var(--on-surface-soft);
+
+    --text-primary:       var(--on-surface);
+    --text-secondary:     var(--on-surface-soft);
+    --text-muted:         var(--on-surface-muted);
+    --text-value:         var(--on-surface-value);
+
+    --t-baslik-color:     var(--on-surface);
+    --t-alt-baslik-color: var(--on-surface);
+    --t-aciklama-color:   var(--on-surface-muted);
+    --t-deger-color:      var(--on-surface-value);
+    --t-etiket-color:     var(--on-surface-soft);
+
+    --border-default:     var(--surface-border);
+    --border-light:       var(--surface-border-soft);
+    --bg-hover:           var(--surface-raised);
+    --bg-input:           var(--field-bg);
+    --cal-step-bg:        var(--surface-sunken);
+}
+
+/* PANEL 1 — Sayfa bölümü dış kabı (açık) */
+.panel, .sidebar {
+    --accent-on-surface:   var(--p-accent-deep);
+    --success-on-surface:  var(--p-on-light-value);
+    --warning-on-surface:  #a1560b;
+    --danger-on-surface:   #b91c1c;
+    --surface:             var(--bg-panel);
+    --surface-sunken:      rgba(0, 0, 0, 0.05);
+    --surface-raised:      rgba(0, 0, 0, 0.04);
+    --surface-border:      rgba(0, 0, 0, 0.13);
+    --surface-border-soft: rgba(0, 0, 0, 0.10);
+
+    --on-surface:          var(--p-on-light);
+    --on-surface-soft:     var(--p-on-light-soft);
+    --on-surface-muted:    var(--p-on-light-muted);
+    --on-surface-value:    var(--p-on-light-value);
+
+    --field-bg:            var(--p-light-0);
+    --field-addon-bg:      var(--p-light-2);
+    --control-track:        rgba(0, 0, 0, 0.18);
+    --control-track-border: rgba(0, 0, 0, 0.15);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
+}
+
+/* PANEL 2 — İç grup/kart (açık, bir ton daha beyaza yakın) */
+.panel2 {
+    --accent-on-surface:   var(--p-accent-deep);
+    --success-on-surface:  var(--p-on-light-value);
+    --warning-on-surface:  #a1560b;
+    --danger-on-surface:   #b91c1c;
+    --surface:             var(--bg-panel-2);
+    --surface-sunken:      rgba(0, 0, 0, 0.06);
+    --surface-raised:      rgba(0, 0, 0, 0.04);
+    --surface-border:      rgba(0, 0, 0, 0.13);
+    --surface-border-soft: rgba(0, 0, 0, 0.10);
+
+    --on-surface:          var(--p-on-light);
+    --on-surface-soft:     var(--p-on-light-soft);
+    --on-surface-muted:    var(--p-on-light-muted);
+    --on-surface-value:    var(--p-on-light-value);
+
+    --field-bg:            var(--p-light-0);
+    --field-addon-bg:      var(--p-light-2);
+    --control-track:        rgba(0, 0, 0, 0.18);
+    --control-track-border: rgba(0, 0, 0, 0.15);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
+}
+
+/* PANEL 3 — En iç içerik kartı (açık, beyaz) */
+.panel3 {
+    --accent-on-surface:   var(--p-accent-deep);
+    --success-on-surface:  var(--p-on-light-value);
+    --warning-on-surface:  #a1560b;
+    --danger-on-surface:   #b91c1c;
+    --surface:             var(--bg-panel-3);
+    --surface-sunken:      rgba(0, 0, 0, 0.07);
+    --surface-raised:      rgba(0, 0, 0, 0.04);
+    --surface-border:      rgba(0, 0, 0, 0.13);
+    --surface-border-soft: rgba(0, 0, 0, 0.10);
+
+    --on-surface:          var(--p-on-light);
+    --on-surface-soft:     var(--p-on-light-soft);
+    --on-surface-muted:    var(--p-on-light-muted);
+    --on-surface-value:    var(--p-on-light-value);
+
+    --field-bg:            var(--p-light-0);
+    --field-addon-bg:      var(--p-light-2);
+    --control-track:        rgba(0, 0, 0, 0.18);
+    --control-track-border: rgba(0, 0, 0, 0.15);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
+}
+
+/* PANEL 4 — Açık içerik kartı (koyu zemin üstünde aydınlık ada)
+   Diğer üçüyle AYNI sözleşmeyi doldurur; tek farkı değerlerin
+   açık zemine göre seçilmiş olması. Bu yüzden içindeki hiçbir
+   bileşenin ayrıca override edilmesi gerekmez. */
+.panel4 {
+    --accent-on-surface:   var(--p-accent-deep);
+    --success-on-surface:  var(--p-on-light-value);
+    --warning-on-surface:  #a1560b;
+    --danger-on-surface:   #b91c1c;
+    --surface:             var(--bg-panel-4);
+    --surface-sunken:      rgba(0, 0, 0, 0.06);
+    --surface-raised:      rgba(0, 0, 0, 0.04);
+    --surface-border:      rgba(0, 0, 0, 0.13);
+    --surface-border-soft: rgba(0, 0, 0, 0.10);
+
+    --on-surface:          var(--p-on-light);
+    --on-surface-soft:     var(--p-on-light-soft);
+    --on-surface-muted:    var(--p-on-light-muted);
+    --on-surface-value:    var(--p-on-light-value);
+
+    --field-bg:            var(--p-light-0);
+    --field-border:        rgba(0, 0, 0, 0.22);
+    --field-addon-bg:      var(--p-light-2);
+    --control-track:        rgba(0, 0, 0, 0.18);
+    --control-track-border: rgba(0, 0, 0, 0.15);
+    --control-thumb:        var(--color-primary);
+    --control-thumb-border: var(--p-light-0);
 }
 
 /* ============================================
@@ -182,10 +488,10 @@ body {
     height: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #1e293b;
+    background: var(--p-light-1);
 }
 ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #b7bec4;
     border-radius: var(--radius-xs);
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -267,10 +573,10 @@ a:hover {
     color: var(--text-primary);
 }
 
-/* Hiyerarşik arka planlar */
-.panel, .sidebar { background: var(--bg-panel);   }  /* Dış: teal */
-.panel2           { background: var(--bg-panel-2); }  /* Orta */
-.panel3           { background: var(--bg-panel-3); }  /* İç */
+/* Hiyerarşik arka planlar — hepsi kendi sözleşmesindeki --surface'i kullanır */
+.panel, .panel2, .panel3, .panel4, .sidebar {
+    background: var(--surface);
+}
 
 /* Pin bağlantı panelleri — tüm sayfalarda tutarlı donanım rengi */
 .pin-panel {
@@ -361,78 +667,15 @@ a:hover {
     border-radius: 5px !important;
 }
 
-/* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
-.panel4 {
-    background: #e8eaec !important;
-    color: #111111;
-    --border-default:       rgba(0, 0, 0, 0.13);
-    /* cal-step ve diğer bileşenlerin background değişkenini override et */
-    --cal-step-bg:          #e8eaec;
-    /* CSS değişkenlerini panel4 kapsamında koyu metne çevir */
-    --text-primary:         #111111;
-    --text-secondary:       #333333;
-    --t-baslik-color:       #111111;
-    --t-alt-baslik-color:   #111111;
-    --t-aciklama-color:     #444444;
-    --t-deger-color:        #1a6b2e;
-    --text-value:           #1a6b2e;
-}
-/* panel4 içindeki !important ile ayarlanan metin renkleri */
-.panel4 .step-label                         { color: #444444 !important; }
-.panel4 .cal-step-values                    { color: #111111 !important; background: rgba(0,0,0,0.06) !important; }
-/* Çift sınıf — .cal-step-icon { !important } (satır ~1621) kuralını özgüllükle yener */
-.cal-step.panel4 .cal-step-icon             { color: #666666 !important; }
-.cal-step.panel4.active  .cal-step-icon     { color: var(--color-primary) !important; }
-.cal-step.panel4.completed .cal-step-icon   { color: var(--color-success) !important; }
-.panel4 .cal-step-done i    { color: var(--color-success); }
-.panel4 .output-title       { color: #111111; }
-.panel4 .output-value       { color: #111111; }
-.panel4 .mixer-title        { color: #111111; }
-.panel4 .mixer-description  { color: #444444; }
-.panel4 small               { color: #555555 !important; }
-.panel4 .servo-value-label  { color: #333333; }
-.panel4 .servo-value-display { color: #111111; font-weight: 600; }
-.panel4 .form-check-label   { color: #333333 !important; }
-.panel4 .safety-warning     { color: #555555 !important; }
-.panel4 .port-label         { color: #444444 !important; }
-.panel4 .t-deger            { color: #1a6b2e !important; }
-.panel4 .mono               { color: #1a6b2e !important; }
-.panel4 .form-label         { color: #222222 !important; }
-.panel4 label               { color: #222222 !important; }
-.panel4 .text-muted         { color: #555555 !important; }
-.panel4 h6.text-muted       { color: #444444 !important; }
-.panel4 .border-secondary   { border-color: rgba(0,0,0,0.15) !important; }
-.panel4 .text-white         { color: #111111 !important; }
-.panel4 .input-group-text.bg-secondary { background: #cdd0d4 !important; color: #111 !important; border-color: rgba(0,0,0,0.2) !important; }
-.panel4 .output-display     { background: transparent !important; border-color: rgba(0,0,0,0.12) !important; }
-.panel4 .throttle-slider    { height: 120px !important; }
-.panel4 .form-control,
-.panel4 .form-select        { background-color: #ffffff !important; color: #111111 !important; border-color: rgba(0,0,0,0.22) !important; }
-.panel4 .form-control:focus,
-.panel4 .form-select:focus  { background-color: #ffffff !important; color: #111111 !important; border-color: var(--color-primary) !important; }
-
-/* PID kutuları — panel4 metin renkleri */
-.panel4 .pid-label          { color: #333333 !important; }
-.panel4 .pid-value          { color: #111111 !important; }
-.panel4 .pid-unit           { color: #555555 !important; }
-/* pid-axis: axis başlığı kendi renklerini (primary/info/warning) korur */
-
-/* Mod kartları — panel4 metin ve kontrol renkleri */
-.mode-card.panel4           { background: #e8eaec !important; }
-.panel4 .mode-name          { color: #111111 !important; }
-.panel4 .mode-channel-select {
-    background: #ffffff !important;
-    color: #111111 !important;
-    border: 1px solid rgba(0,0,0,0.20) !important;
-}
-.panel4 .range-track-container {
-    background: rgba(0, 0, 0, 0.10) !important;
-    border: 1px solid rgba(0,0,0,0.15) !important;
-}
-.panel4 .mode-category-title {
-    color: #111111 !important;
-    border-bottom-color: rgba(0,0,0,0.15) !important;
-}
+/* ============================================
+   PANEL 4 — açık içerik kartı
+   Renk/metin sözleşmesi §1c'dedir. Buradaki eski 40 satırlık
+   ".panel4 .filanca { color: #xxx !important }" yama bloğu
+   KALDIRILDI: bileşenler artık sözleşme değişkenlerini okuduğu
+   için panel kapsamı yeterli. Aşağıda yalnızca panel4'e özgü
+   ÖLÇÜ (renk olmayan) istisnası kalır.
+   ============================================ */
+.panel4 .throttle-slider { height: 120px !important; }
 
 .panel-title {
     display: flex;
@@ -475,14 +718,14 @@ a:hover {
 }
 .page-loading-content {
     text-align: center;
-    color: #c8d6f0;
+    color: var(--p-on-dark-soft);
     padding: 32px;
 }
 .page-loading-content .spinner-border {
     width: 2.5rem;
     height: 2.5rem;
     border-width: 3px;
-    color: var(--primary, #4e8cff);
+    color: var(--primary, var(--p-accent));
 }
 .page-loading-content p {
     margin-top: 14px;
@@ -491,7 +734,7 @@ a:hover {
     font-weight: 500;
 }
 .page-loading-content small {
-    color: #7a90b8;
+    color: var(--p-on-dark-muted);
     font-size: 0.8rem;
 }
 
@@ -512,7 +755,7 @@ a:hover {
     border-radius: 12px;
     padding: 40px 48px;
     text-align: center;
-    color: #c8d6f0;
+    color: var(--p-on-dark-soft);
     max-width: 400px;
     width: 90%;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
@@ -521,23 +764,23 @@ a:hover {
     width: 3rem;
     height: 3rem;
     border-width: 3px;
-    color: #4e8cff;
+    color: var(--p-accent);
 }
 #reconnectOverlay h5 {
     margin: 16px 0 8px;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #e0eaff;
+    color: var(--p-on-dark);
 }
 #reconnectOverlay #reconnectStatus {
     font-size: 0.875rem;
-    color: #7a90b8;
+    color: var(--p-on-dark-muted);
     min-height: 1.4em;
 }
 #reconnectOverlay .reconnect-steps {
     margin-top: 20px;
     font-size: 0.8rem;
-    color: #5a70a0;
+    color: var(--p-on-dark-muted);
     line-height: 1.6;
     text-align: left;
 }
@@ -558,8 +801,8 @@ a:hover {
 }
 
 .gradient-text {
-    color: #ffffff;
-    -webkit-text-fill-color: #ffffff;
+    color: var(--text-primary);
+    -webkit-text-fill-color: var(--text-primary);
     font-weight: 700;
     letter-spacing: -1px;
 }
@@ -635,14 +878,14 @@ a:hover {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    background: rgba(0, 0, 0, 0.28);
-    border: 1.5px solid rgba(255, 255, 255, 0.13);
+    background: rgba(0, 0, 0, 0.05);
+    border: 1.5px solid rgba(0, 0, 0, 0.13);
     padding: 5px 14px;
     border-radius: var(--radius-full);
     font-family: var(--font-mono);
     font-size: var(--font-size-sm);
     font-weight: 600;
-    color: #dce8f5;
+    color: var(--p-on-light);
     min-width: 150px;
     justify-content: center;
     letter-spacing: 0.3px;
@@ -650,16 +893,15 @@ a:hover {
 }
 /* Bağlı olduğunda çerçeve yeşil parlar */
 .connection-status.is-connected {
-    border-color: rgba(16, 185, 129, 0.5);
-    background: rgba(16, 185, 129, 0.10);
-    color: #6ee7c6;
+    border-color: rgba(63, 143, 69, 0.5);
+    background: rgba(63, 143, 69, 0.10);
+    color: var(--p-on-light-value);
 }
 
 .status-indicator {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    box-shadow: 0 0 8px currentColor;
     transition: all var(--transition-fast);
 }
 .status-off {
@@ -669,12 +911,6 @@ a:hover {
 .status-connected {
     background-color: var(--color-success);
     color: var(--color-success);
-    animation: pulse-glow 2s infinite;
-}
-
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 8px currentColor; }
-    50% { box-shadow: 0 0 16px currentColor; }
 }
 
 /* Sidebar Navigasyon */
@@ -696,12 +932,11 @@ a:hover {
     color: var(--text-primary);
     background: rgba(var(--color-brand-blue-rgb), 0.1);
     border-color: var(--border-light);
-    transform: translateX(4px);
 }
 
 .sidebar .nav-link.active {
     color: var(--color-primary);
-    background: linear-gradient(90deg, rgba(129, 140, 248, 0.15), transparent);
+    background: rgba(var(--p-accent-rgb), 0.10);
     border-color: transparent;
     border-left: 3px solid var(--color-primary);
 }
@@ -752,7 +987,7 @@ a:hover {
 }
 
 .status-disarmed {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.04);
     color: var(--text-muted);
     border: 1px solid var(--border-light);
 }
@@ -809,10 +1044,10 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(129, 140, 248, 0.1);
+    background: rgba(var(--p-accent-rgb), 0.10);
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--radius-sm);
-    border: 1px solid rgba(129, 140, 248, 0.3);
+    border: 1px solid rgba(var(--p-accent-rgb), 0.3);
     margin-top: var(--spacing-md);
 }
 
@@ -860,14 +1095,12 @@ a:hover {
 .cal-step:hover:not(.disabled) {
     border-color: var(--color-primary);
     background: rgba(59, 130, 246, 0.1);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(var(--hover-lift));
 }
 
 .cal-step.active {
     border-color: var(--color-primary);
     background: rgba(59, 130, 246, 0.08);
-    box-shadow: 0 0 20px var(--color-primary-glow);
 }
 
 .cal-step.completed {
@@ -890,13 +1123,14 @@ a:hover {
     color: var(--color-success);
 }
 .cal-step.active .cal-step-icon {
-    color: var(--color-primary);
+    color: var(--accent-on-surface);
 }
 
 .cal-step-values {
     font-family: var(--font-mono);
     font-size: var(--font-size-xs);
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--surface-sunken);
+    color: var(--on-surface);
     padding: var(--spacing-xs);
     border-radius: var(--radius-xs);
     margin-top: var(--spacing-xs);
@@ -925,24 +1159,23 @@ a:hover {
 }
 
 .aircraft-card:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.05);
     border-color: var(--border-light);
 }
 
 .aircraft-card.active {
     border-color: var(--color-primary);
-    background: rgba(14, 165, 233, 0.30);
-    box-shadow: 0 0 18px var(--color-primary-glow);
+    background: rgba(var(--p-accent-rgb), 0.18);
 }
 
 .aircraft-card h5 {
-    color: #ffffff;
+    color: var(--on-surface);
     font-weight: 700;
     margin-bottom: var(--spacing-xs);
 }
 
 .aircraft-card small {
-    color: #b0cfe8;
+    color: var(--on-surface-muted);
     font-size: var(--font-size-xs);
 }
 
@@ -977,8 +1210,8 @@ a:hover {
 
 /* Servo/Output Display */
 .output-display {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border-default);
+    background: var(--surface-sunken);
+    border: 1px solid var(--surface-border);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     text-align: center;
@@ -1007,7 +1240,7 @@ a:hover {
     font-family: var(--font-mono);
     font-size: var(--font-size-lg);
     font-weight: bold;
-    color: var(--color-primary);
+    color: var(--accent-on-surface);
     margin: var(--spacing-xs) 0;
 }
 
@@ -1063,7 +1296,7 @@ a:hover {
 
 .channel-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-info));
+    background: var(--color-primary);
     width: 50%;
     transition: width 0.05s linear;
     border-radius: var(--radius-xs);
@@ -1091,8 +1324,8 @@ a:hover {
    9. UÇUŞ MODLARI
    ============================================ */
 .mode-card {
-    background: rgba(35, 65, 100, 0.75);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
@@ -1102,7 +1335,6 @@ a:hover {
 .mode-card.active-mode {
     border-color: var(--color-success);
     background: rgba(16, 185, 129, 0.08);
-    box-shadow: 0 0 15px var(--color-success-glow);
 }
 
 .mode-header-row {
@@ -1118,13 +1350,9 @@ a:hover {
     color: var(--text-primary);
 }
 
+/* Renk/kenarlık §12 form ailesinden gelir — burada yalnızca ölçü */
 .mode-channel-select {
     padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    background: var(--bg-input);
-    color: var(--text-primary);
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-xs);
     min-width: 120px;
 }
 
@@ -1133,18 +1361,18 @@ a:hover {
     position: relative;
     width: 100%;
     height: 36px;
-    background: rgba(10, 25, 50, 0.70);
+    background: var(--control-track);
     border-radius: 18px;
     margin: var(--spacing-lg) 0;
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255,255,255,0.10);
+    border: 1px solid var(--control-track-border);
 }
 
 .range-fill {
     position: absolute;
     height: 100%;
     top: 0;
-    background: rgba(59, 130, 246, 0.4);
+    background: var(--control-fill);
     border-radius: 18px;
     pointer-events: none;
     z-index: 1;
@@ -1162,7 +1390,6 @@ a:hover {
     bottom: -6px;
     width: 4px;
     background: var(--hud-amber);
-    box-shadow: 0 0 8px var(--hud-amber), 0 0 4px #000;
     border-radius: 2px;
     z-index: 10;
     pointer-events: none;
@@ -1204,8 +1431,8 @@ a:hover {
     -webkit-appearance: none;
     width: 24px;
     height: 36px;
-    background: var(--text-primary);
-    border: 1px solid var(--text-secondary);
+    background: var(--on-surface);
+    border: 1px solid var(--on-surface-soft);
     border-radius: var(--radius-xs);
     cursor: col-resize;
     box-shadow: var(--shadow-sm);
@@ -1215,26 +1442,27 @@ a:hover {
     pointer-events: auto;
     width: 24px;
     height: 36px;
-    background: var(--text-primary);
+    background: var(--on-surface);
     border: none;
     border-radius: var(--radius-xs);
     cursor: col-resize;
 }
 
 .mode-category-title {
-    color: #ffffff;
+    color: var(--on-surface);
+    border-bottom-color: var(--surface-border);
     font-size: var(--font-size-sm);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     padding-bottom: var(--spacing-sm);
     margin: var(--spacing-md) 0 var(--spacing-md);
-    border-bottom: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 1px solid var(--surface-border);
 }
 
 .mode-category-title i {
     margin-right: var(--spacing-sm);
-    color: var(--color-primary);
+    color: var(--accent-on-surface);
 }
 
 /* ============================================
@@ -1250,7 +1478,7 @@ a:hover {
 .pid-axis {
     font-size: var(--font-size-md);
     font-weight: 700;
-    color: var(--color-primary);
+    color: var(--accent-on-surface);
     text-transform: uppercase;
     margin-bottom: var(--spacing-md);
 }
@@ -1277,13 +1505,13 @@ a:hover {
     font-weight: bold;
 }
 
-/* Range Slider (Genel) */
+/* Range Slider (Genel) — renkler --control-* sözleşmesinden gelir */
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
     height: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--control-track);
     border-radius: 3px;
     outline: none;
 }
@@ -1293,62 +1521,60 @@ input[type="range"]::-webkit-slider-thumb {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--color-primary);
+    background: var(--control-thumb);
     cursor: pointer;
-    box-shadow: 0 0 10px var(--color-primary-glow);
-    border: 2px solid #fff;
+    border: 2px solid var(--control-thumb-border);
     transition: transform var(--transition-fast);
-}
-
-input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
 }
 
 input[type="range"]::-moz-range-thumb {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--color-primary);
+    background: var(--control-thumb);
     cursor: pointer;
-    border: 2px solid #fff;
+    border: 2px solid var(--control-thumb-border);
 }
 
 /* ============================================
    11. LOG TERMİNAL
+   Terminal bilinçli olarak panel sözleşmesinden bağımsızdır
+   (her temada CMD görünümü korunur); yine de renkleri
+   --terminal-* değişkenlerinden okur.
    ============================================ */
 .log-container {
-    background: #0C0C0C;
-    color: #f0f0f0;
-    font-family: 'Consolas', 'Courier New', monospace;
+    background: var(--terminal-bg);
+    color: var(--terminal-text);
+    font-family: var(--font-mono);
     font-size: 12px;
     padding: 6px 8px;
     border-radius: var(--radius-xs);
     height: 280px;
     overflow-y: auto;
-    border: 1px solid #555;
+    border: 1px solid var(--terminal-border);
 }
 
 .log-entry {
     padding: 0;
     line-height: 1.5;
-    color: #f0f0f0;
+    color: var(--terminal-text);
     white-space: pre-wrap;
     word-break: break-all;
 }
 
 .log-time {
-    color: #aaaaaa;
+    color: var(--terminal-text-muted);
     margin-right: 4px;
     user-select: none;
 }
 
 /* Log Renkleri - CMD tarzı siyah/beyaz */
-.log-info    { color: #f0f0f0; }
-.log-success { color: #f0f0f0; }
-.log-warning { color: #f0f0f0; }
-.log-error   { color: #f0f0f0; }
-.log-command { color: #f0f0f0; }
-.log-receive { color: #f0f0f0; }
+.log-info    { color: var(--terminal-text); }
+.log-success { color: var(--terminal-text); }
+.log-warning { color: var(--terminal-text); }
+.log-error   { color: var(--terminal-text); }
+.log-command { color: var(--terminal-text); }
+.log-receive { color: var(--terminal-text); }
 .search-match {
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
@@ -1374,16 +1600,26 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================
-   12. FORM ELEMANLARI
+   12. FORM ELEMANLARI — TEK MERKEZ
+   ============================================
+   TÜM input benzeri kontroller (.form-control, .form-select,
+   .mode-channel-select, .pin-select, .field) burada tanımlanan
+   --field-* sözleşmesini okur. "Tüm inputların içi aynı renk"
+   istiyorsanız §1b'deki --field-bg'yi değiştirmeniz yeterli;
+   sadece bir panelde farklı olsun isterseniz §1c'de o panelin
+   bloğunda --field-bg'yi yeniden tanımlayın.
    ============================================ */
 .form-control,
-.form-select {
-    background-color: var(--bg-input) !important;
-    border: 1px solid var(--border-default) !important;
-    color: var(--text-primary) !important;
-    border-radius: var(--radius-xs) !important;
-    padding: 2px 6px;
-    font-size: var(--font-size-sm) !important;
+.form-select,
+.mode-channel-select,
+.pin-select,
+.field {
+    background-color: var(--field-bg) !important;
+    border: 1px solid var(--field-border) !important;
+    color: var(--field-text) !important;
+    border-radius: var(--field-radius) !important;
+    padding: var(--field-pad-y) var(--field-pad-x);
+    font-size: var(--field-font-size) !important;
     transition: all var(--transition-fast);
     height: auto;
     min-height: unset;
@@ -1391,16 +1627,29 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .form-control:focus,
-.form-select:focus {
-    background-color: var(--bg-input) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--color-primary) !important;
-    box-shadow: 0 0 0 3px var(--color-primary-glow) !important;
+.form-select:focus,
+.mode-channel-select:focus,
+.pin-select:focus,
+.field:focus {
+    background-color: var(--field-bg) !important;
+    color: var(--field-text) !important;
+    border-color: var(--field-border-focus) !important;
+    box-shadow: 0 0 0 3px var(--field-focus-ring) !important;
     outline: none;
 }
 
-.form-control::placeholder {
-    color: var(--text-muted) !important;
+.form-control::placeholder,
+.field::placeholder {
+    color: var(--field-placeholder) !important;
+}
+
+/* Input içindeki yazıyı tek sınıfla yönetmek için yardımcı sınıf.
+   Bir metnin "input yazısı" gibi görünmesini istediğinizde kullanın. */
+.field-text {
+    color:       var(--field-text);
+    font-size:   var(--field-font-size);
+    font-family: var(--font-sans);
+    line-height: 1.4;
 }
 
 /* Tarayıcı autofill beyaz arkaplan inject ediyor → kapat */
@@ -1408,15 +1657,19 @@ input[type="range"]::-moz-range-thumb {
 .form-control:-webkit-autofill:focus,
 .form-select:-webkit-autofill,
 .form-select:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
-    -webkit-text-fill-color: var(--text-primary) !important;
-    caret-color: var(--text-primary);
+    -webkit-box-shadow: 0 0 0 1000px var(--field-bg) inset !important;
+    -webkit-text-fill-color: var(--field-text) !important;
+    caret-color: var(--field-text);
 }
 
-.form-label {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
+/* Form etiketleri — .t-etiket ile aynı merkezden yönetilir */
+.form-label,
+.form-check-label,
+.t-etiket {
+    color:       var(--t-etiket-color);
+    font-size:   var(--t-etiket-size);
+    font-weight: var(--t-etiket-weight);
+    font-style:  var(--t-etiket-style);
     margin-bottom: var(--spacing-xs);
 }
 
@@ -1447,32 +1700,28 @@ input[type="range"]::-moz-range-thumb {
 .btn-primary {
     background: var(--color-brand-blue);
     color: white;
-    box-shadow: 0 4px 12px var(--color-primary-glow);
 }
 .btn-primary:hover {
     background: var(--color-primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--color-primary-glow);
+    transform: translateY(var(--hover-lift));
 }
 
 .btn-success {
     background: var(--color-success);
     color: white;
-    box-shadow: 0 4px 12px var(--color-success-glow);
 }
 .btn-success:hover {
     background: #0d9668;
-    transform: translateY(-2px);
+    transform: translateY(var(--hover-lift));
 }
 
 .btn-danger {
     background: var(--color-danger);
     color: white;
-    box-shadow: 0 4px 12px var(--color-danger-glow);
 }
 .btn-danger:hover {
     background: #dc2626;
-    transform: translateY(-2px);
+    transform: translateY(var(--hover-lift));
 }
 
 .btn-warning {
@@ -1499,13 +1748,12 @@ input[type="range"]::-moz-range-thumb {
 
 /* Header bağlantı butonları — ayırt edici, tema uyumlu */
 .btn-connect {
-    background: linear-gradient(135deg, #059669, #10b981);
+    background: var(--color-success);
     color: #ffffff;
     font-weight: 700;
     padding: 6px 18px;
     font-size: var(--font-size-sm);
     border-radius: var(--radius-sm);
-    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45), 0 2px 8px rgba(0,0,0,0.3);
     border: 1.5px solid rgba(16, 185, 129, 0.55);
     letter-spacing: 0.4px;
     text-transform: uppercase;
@@ -1513,37 +1761,33 @@ input[type="range"]::-moz-range-thumb {
     transition: all var(--transition-fast);
 }
 .btn-connect:hover {
-    background: linear-gradient(135deg, #047857, #059669);
-    box-shadow: 0 0 22px rgba(16, 185, 129, 0.65), 0 4px 14px rgba(0,0,0,0.3);
-    transform: translateY(-1px);
+    background: #0d9668;
+    transform: translateY(var(--hover-lift));
     color: #ffffff;
 }
 
 .btn-disconnect {
-    background: linear-gradient(135deg, #dc2626, #ef4444);
+    background: var(--color-danger);
     padding: 5px 8px;
     border-radius: var(--radius-sm);
-    box-shadow: 0 0 14px rgba(239, 68, 68, 0.45), 0 2px 8px rgba(0,0,0,0.3);
     border: 1.5px solid rgba(239, 68, 68, 0.55);
     cursor: pointer;
     transition: all var(--transition-fast);
     line-height: 1;
 }
 .btn-disconnect:hover {
-    background: linear-gradient(135deg, #b91c1c, #dc2626);
-    box-shadow: 0 0 22px rgba(239, 68, 68, 0.65), 0 4px 14px rgba(0,0,0,0.3);
-    transform: translateY(-1px);
+    background: #dc2626;
+    transform: translateY(var(--hover-lift));
     color: #ffffff;
 }
 
 .btn-ground-control {
-    background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    background: var(--color-primary);
     color: #ffffff;
     font-weight: 700;
     padding: 6px 18px;
     font-size: var(--font-size-sm);
     border-radius: var(--radius-sm);
-    box-shadow: 0 0 14px rgba(14, 165, 233, 0.42), 0 2px 8px rgba(0,0,0,0.3);
     border: 1.5px solid rgba(56, 189, 248, 0.55);
     letter-spacing: 0.4px;
     text-transform: uppercase;
@@ -1552,9 +1796,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .btn-ground-control:hover {
-    background: linear-gradient(135deg, #1d4ed8, #0284c7);
-    box-shadow: 0 0 22px rgba(14, 165, 233, 0.62), 0 4px 14px rgba(0,0,0,0.3);
-    transform: translateY(-1px);
+    background: var(--color-primary-hover);
+    transform: translateY(var(--hover-lift));
     color: #ffffff;
 }
 
@@ -1609,13 +1852,10 @@ input[type="range"]::-moz-range-thumb {
     background: #d97706 !important;
     border-color: #d97706 !important;
     color: #ffffff !important;
-    box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.28);
 }
 
 .recommended-pins-modal {
-    background:
-        radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 30%),
-        linear-gradient(160deg, rgba(8, 18, 34, 0.98), rgba(13, 31, 57, 0.98)) !important;
+    background: rgba(10, 20, 36, 0.98) !important;
     color: #e6f1fb !important;
     border: 1px solid rgba(123, 172, 255, 0.14);
 }
@@ -1640,7 +1880,7 @@ input[type="range"]::-moz-range-thumb {
     padding: 16px 18px;
     margin-bottom: 18px;
     border-radius: 16px;
-    background: linear-gradient(145deg, rgba(245, 158, 11, 0.16), rgba(239, 68, 68, 0.08));
+    background: rgba(245, 158, 11, 0.12);
     border: 1px solid rgba(245, 158, 11, 0.24);
 }
 
@@ -1953,9 +2193,9 @@ input[type="range"]::-moz-range-thumb {
 
 .font-mono { font-family: var(--font-mono) !important; }
 
-.glow-primary { box-shadow: var(--shadow-glow) !important; }
-.glow-success { box-shadow: 0 0 20px var(--color-success-glow) !important; }
-.glow-danger { box-shadow: 0 0 20px var(--color-danger-glow) !important; }
+.glow-primary { box-shadow: var(--shadow-glow-sm) !important; }
+.glow-success { box-shadow: var(--shadow-glow-sm) !important; }
+.glow-danger { box-shadow: var(--shadow-glow-sm) !important; }
 
 /* ============================================
    18b. TİPOGRAFİ — Mevcut HTML elemanlarını merkezi sisteme bağlama
@@ -2031,12 +2271,12 @@ label.small.text-muted,
 /* bg-black → panel */
 .bg-black { background: var(--bg-panel) !important; }
 
-/* bg-secondary input-group → tema rengi */
+/* bg-secondary input-group → form addon sözleşmesi */
 .input-group-text.bg-secondary,
 .bg-secondary.input-group-text {
-    background-color: rgba(0,0,0,0.07) !important;
-    color: var(--text-secondary) !important;
-    border-color: var(--border-default) !important;
+    background-color: var(--field-addon-bg) !important;
+    color: var(--field-addon-text) !important;
+    border-color: var(--field-border) !important;
 }
 
 /* text-white, text-light → tema metni */
@@ -2045,11 +2285,13 @@ label.small.text-muted,
 .text-muted  { color: var(--text-muted)     !important; }
 
 /* Renkli durum metinleri - sadece anlamlı yerlerde kalsın */
-/* text-info / text-success / text-warning / text-danger → tema renkleri */
-.text-info    { color: var(--color-info)    !important; }
-.text-success { color: var(--color-success) !important; }
-.text-warning { color: var(--color-warning) !important; }
-.text-danger  { color: var(--color-danger)  !important; }
+/* text-info / text-success / text-warning / text-danger → yüzeye
+   uyarlanmış durum renkleri. Ham --color-* yerine *-on-surface
+   kullanılır ki açık panelde (panel4) renkler "patlamasın". */
+.text-info    { color: var(--accent-on-surface)  !important; }
+.text-success { color: var(--success-on-surface) !important; }
+.text-warning { color: var(--warning-on-surface) !important; }
+.text-danger  { color: var(--danger-on-surface)  !important; }
 
 /* border-secondary → tema kenarlığı */
 .border-secondary { border-color: var(--border-default) !important; }
@@ -2094,23 +2336,23 @@ label.small.text-muted,
     color: var(--text-primary) !important;
 }
 
-/* Input group text - standart tema */
+/* Input group text - form addon sözleşmesi */
 .input-group-text {
-    background-color: rgba(0,0,0,0.06) !important;
-    color: var(--text-secondary) !important;
-    border-color: var(--border-default) !important;
-    padding: 2px 6px !important;
-    font-size: var(--font-size-sm) !important;
+    background-color: var(--field-addon-bg) !important;
+    color: var(--field-addon-text) !important;
+    border-color: var(--field-border) !important;
+    padding: var(--field-pad-y) var(--field-pad-x) !important;
+    font-size: var(--field-font-size) !important;
 }
 
-/* bg-dark form-control / form-select → tema inputu */
+/* bg-dark form-control / form-select → form sözleşmesi */
 .form-control.bg-dark,
 .form-select.bg-dark,
 .form-control[class*="bg-dark"],
 .form-select[class*="bg-dark"] {
-    background-color: var(--bg-input) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-default) !important;
+    background-color: var(--field-bg) !important;
+    color: var(--field-text) !important;
+    border-color: var(--field-border) !important;
 }
 
 /* bg-dark bg-opacity-25 border → tema */
@@ -2124,9 +2366,8 @@ label.small.text-muted,
     background: var(--bg-panel) !important;
     color: var(--text-primary) !important;
 }
-.osd-element-list .form-check-label { color: var(--text-primary) !important; }
-.panel4 .osd-element-list .form-check-label { color: #222222 !important; }
-.panel4 .osd-element-list hr { border-color: rgba(0,0,0,0.15) !important; }
+.osd-element-list .form-check-label { color: var(--on-surface) !important; }
+.osd-element-list hr { border-color: var(--surface-border); }
 
 /* Aircraft seçim kartları */
 .aircraft-card {
@@ -2136,12 +2377,11 @@ label.small.text-muted,
 .aircraft-card:hover {
     background: rgba(0,0,0,0.07);
     border-color: var(--color-primary);
-    transform: translateY(-1px);
+    transform: translateY(var(--hover-lift));
 }
 .aircraft-card.active {
-    background: rgba(99, 102, 241, 0.20);
+    background: rgba(var(--p-accent-rgb), 0.20);
     border-color: var(--color-primary);
-    box-shadow: 0 0 14px var(--color-primary-glow);
 }
 .mixer-title   { font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); }
 .mixer-description { color: var(--text-muted); font-size: var(--font-size-xs); }
@@ -2151,12 +2391,12 @@ label.small.text-muted,
 .cal-step { border: 1px solid var(--border-default) !important; }
 .cal-step:hover:not(.disabled) {
     border-color: var(--color-primary) !important;
-    background: rgba(99, 102, 241, 0.07) !important;
+    background: rgba(var(--p-accent-rgb), 0.07) !important;
 }
-.cal-step.active  { border-color: var(--color-primary) !important; background: rgba(99, 102, 241, 0.08) !important; }
-.cal-step.completed { border-color: var(--color-success) !important; background: rgba(74, 222, 128, 0.07) !important; }
+.cal-step.active  { border-color: var(--color-primary) !important; background: rgba(var(--p-accent-rgb), 0.08) !important; }
+.cal-step.completed { border-color: var(--color-success) !important; background: rgba(63, 143, 69, 0.07) !important; }
 .cal-step-icon { color: var(--text-muted) !important; }
-.cal-step.active .cal-step-icon { color: var(--color-primary) !important; }
+.cal-step.active .cal-step-icon { color: var(--accent-on-surface) !important; }
 .cal-step.completed .cal-step-icon { color: var(--color-success) !important; }
 .step-label    { color: var(--text-secondary) !important; font-size: var(--font-size-xs) !important; }
 .cal-step-values { background: rgba(0,0,0,0.08) !important; color: var(--text-primary) !important; }
@@ -2167,11 +2407,11 @@ label.small.text-muted,
     color: #000 !important;
     border: none;
 }
-.btn-warning:hover { background: #d97706; color: #000 !important; transform: translateY(-1px); }
+.btn-warning:hover { background: #d97706; color: #000 !important; transform: translateY(var(--hover-lift)); }
 .btn-danger  { background: var(--color-danger); color: #fff !important; border: none; }
-.btn-danger:hover  { background: #dc2626; transform: translateY(-1px); }
+.btn-danger:hover  { background: #dc2626; transform: translateY(var(--hover-lift)); }
 .btn-primary { background: var(--color-brand-blue); color: #fff !important; border: none; }
-.btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-1px); }
+.btn-primary:hover { background: var(--color-primary-hover); transform: translateY(var(--hover-lift)); }
 
 /* Accordion - Loglar sayfası kısayollar */
 .accordion-item {
@@ -2183,7 +2423,7 @@ label.small.text-muted,
     color: var(--text-primary) !important;
 }
 .accordion-button:not(.collapsed) {
-    background: rgba(99, 102, 241, 0.08) !important;
+    background: rgba(var(--p-accent-rgb), 0.08) !important;
     color: var(--color-primary) !important;
     box-shadow: none !important;
 }
@@ -2195,9 +2435,9 @@ label.small.text-muted,
 .text-success.h5, h3.text-success { color: var(--text-primary) !important; font-size: var(--font-size-md) !important; }
 
 /* Tab menüsü - tercihler */
-.adv-tab { background: rgba(30, 41, 59, 0.80); border-color: rgba(51,65,85,0.6); color: #94a3b8; }
-.adv-tab:hover { background: rgba(41, 53, 72, 0.90); color: #e2e8f0; }
-.adv-tab.active { background: #e8eaec; color: #111111; border-color: rgba(0,0,0,0.20); border-bottom-color: transparent; }
+.adv-tab { background: var(--bg-panel-2); border-color: var(--border-default); color: var(--text-secondary); }
+.adv-tab:hover { background: var(--bg-panel-3); color: var(--text-primary); }
+.adv-tab.active { background: var(--bg-panel-3); color: var(--color-primary); border-color: var(--border-default); border-bottom-color: transparent; }
 
 /* h5/h6 card header renkleri */
 .card-header h5, .card-header .h5 { color: var(--text-primary) !important; font-size: var(--font-size-sm) !important; margin: 0; }
@@ -2251,11 +2491,11 @@ label.small.text-muted,
     width: 100%;
     max-width: 100%;
     background: var(--bg-panel) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
+    border: 1px solid var(--border-default) !important;
     border-radius: 18px !important;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+    box-shadow: var(--shadow-md);
     padding: 44px 32px 32px !important;
-    color: rgba(255,255,255,0.95) !important;
+    color: var(--text-primary) !important;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -2269,26 +2509,20 @@ label.small.text-muted,
 #connectionPrompt .prompt-card h2 {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #ffffff !important;
+    color: var(--text-primary) !important;
     margin-bottom: 1rem !important;
 }
 
 #connectionPrompt .prompt-card p,
 #connectionPrompt .prompt-card .text-muted,
 #connectionPrompt .prompt-card small {
-    color: rgba(255,255,255,0.88) !important;
+    color: var(--text-secondary) !important;
 }
 
 #connectionPrompt .prompt-card .badge {
-    background: rgba(40, 180, 115, 0.16) !important;
-    color: #b6f0bc !important;
-    border: 1px solid rgba(40, 180, 115, 0.28) !important;
-}
-
-#connectionPrompt .prompt-card .badge {
-    background: rgba(40, 180, 115, 0.16) !important;
-    color: #b6f0bc !important;
-    border: 1px solid rgba(40, 180, 115, 0.28) !important;
+    background: rgba(63, 143, 69, 0.14) !important;
+    color: var(--p-on-light-value) !important;
+    border: 1px solid rgba(63, 143, 69, 0.30) !important;
 }
 
 #connectionPrompt .prompt-card .btn {
@@ -2411,24 +2645,21 @@ label.small.text-muted,
 #pid .row { margin-left: -6px !important; margin-right: -6px !important; }
 #pid .row + .row { margin-top: 12px !important; }
 
-/* PID slider — kalın ve siyah */
+/* PID slider — kalın gövde. Renkler --control-* sözleşmesinden
+   gelir; panel4 kendi bloğunda (§1c) açık zemine uygun değerleri
+   zaten tanımlıyor, burada yalnızca ölçü ayarı yapılır. */
 .panel4 input[type="range"]:not(.throttle-slider) {
     height: 10px !important;
-    background: #222 !important;
     border-radius: 5px !important;
 }
 .panel4 input[type="range"]:not(.throttle-slider)::-webkit-slider-thumb {
     width: 20px !important;
     height: 20px !important;
-    background: #111 !important;
-    border: 3px solid #555 !important;
     box-shadow: none !important;
 }
 .panel4 input[type="range"]:not(.throttle-slider)::-moz-range-thumb {
     width: 20px !important;
     height: 20px !important;
-    background: #111 !important;
-    border: 3px solid #555 !important;
 }
 
 /* Scrollbar daha ince */
@@ -2457,7 +2688,7 @@ label.small.text-muted,
     margin: 0 auto;
     padding: 20px 22px !important;
     border-radius: 18px;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+    box-shadow: var(--shadow-md);
 }
 
 .prompt-links-header {
@@ -2473,21 +2704,21 @@ label.small.text-muted,
     border-radius: 16px;
     display: grid;
     place-items: center;
-    background: linear-gradient(145deg, rgba(56, 189, 248, 0.2), rgba(59, 130, 246, 0.12));
-    color: #8fdcff;
-    border: 1px solid rgba(143, 220, 255, 0.18);
+    background: rgba(var(--p-accent-rgb), 0.14);
+    color: var(--p-accent-deep);
+    border: 1px solid rgba(var(--p-accent-rgb), 0.25);
     font-size: 1.35rem;
     flex-shrink: 0;
 }
 
 .prompt-links-title {
-    color: #f7fbff;
+    color: var(--text-primary);
     font-size: 1.15rem;
     font-weight: 700;
 }
 
 .prompt-links-subtitle {
-    color: rgba(220, 232, 245, 0.76);
+    color: var(--text-secondary);
     line-height: 1.5;
 }
 
@@ -2508,19 +2739,18 @@ label.small.text-muted,
     background: var(--bg-panel-2);
     backdrop-filter: blur(var(--blur-amount));
     -webkit-backdrop-filter: blur(var(--blur-amount));
-    color: #eff6ff !important;
+    color: var(--text-primary) !important;
     text-decoration: none;
     transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .prompt-link-tile:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-default);
-    box-shadow: var(--shadow-sm);
+    transform: translateY(var(--hover-lift));
+    border-color: var(--color-primary);
 }
 
 .prompt-link-label {
-    color: #ffffff;
+    color: var(--text-primary);
     font-size: 1rem;
     font-weight: 700;
     display: flex;
@@ -2528,7 +2758,7 @@ label.small.text-muted,
 }
 
 .prompt-link-caption {
-    color: rgba(220, 232, 245, 0.78);
+    color: var(--text-secondary);
     line-height: 1.45;
     font-size: 0.9rem;
 }
@@ -2673,10 +2903,10 @@ label.small.text-muted,
 }
 
 .adv-tab {
-    background: rgba(30, 41, 59, 0.80);
-    border: 1px solid rgba(51, 65, 85, 0.6);
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border-default);
     border-bottom: none;
-    color: #c8dff0;
+    color: var(--text-secondary);
     padding: 5px 14px;
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -2690,14 +2920,14 @@ label.small.text-muted,
 }
 
 .adv-tab:hover {
-    background: rgba(41, 53, 72, 0.90);
-    color: #e2e8f0;
+    background: var(--bg-panel-3);
+    color: var(--text-primary);
 }
 
 .adv-tab.active {
-    background: #e8eaec;
-    color: #111111;
-    border-color: rgba(0,0,0,0.20);
+    background: var(--bg-panel-3);
+    color: var(--color-primary);
+    border-color: var(--border-default);
     border-bottom: 2px solid transparent;
     box-shadow: var(--shadow-sm);
 }
@@ -2719,8 +2949,8 @@ label.small.text-muted,
    SENSOR ALIGNMENT CARDS
    ============================================ */
 .align-card {
-    background: rgba(255,255,255,0.04);
-    border: 2px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.03);
+    border: 2px solid rgba(0,0,0,0.08);
     border-radius: 12px;
     padding: 16px 12px 12px;
     cursor: pointer;
@@ -2730,26 +2960,26 @@ label.small.text-muted,
 }
 
 .align-card:hover {
-    background: rgba(37,99,235,0.12);
-    border-color: rgba(96,165,250,0.4);
-    transform: translateY(-2px);
+    background: rgba(var(--p-accent-rgb),0.10);
+    border-color: rgba(var(--p-accent-rgb),0.4);
+    transform: translateY(var(--hover-lift));
 }
 
 .align-card--selected {
-    background: rgba(37,99,235,0.15);
-    border-color: rgba(96,165,250,0.7);
-    box-shadow: 0 0 0 3px rgba(96,165,250,0.18);
+    background: rgba(var(--p-accent-rgb),0.14);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--p-accent-rgb),0.18);
 }
 
 .align-card--active {
-    background: rgba(37,99,235,0.22);
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96,165,250,0.25);
+    background: rgba(var(--p-accent-rgb),0.20);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--p-accent-rgb),0.25);
 }
 
 .align-card--active.align-card--selected {
-    border-color: #34d399;
-    box-shadow: 0 0 0 3px rgba(52,211,153,0.25);
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 3px rgba(63,143,69,0.25);
 }
 
 .align-card__icon {
@@ -2762,44 +2992,43 @@ label.small.text-muted,
 .align-card__label {
     font-size: 0.82rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: var(--text-primary);
     margin-bottom: 2px;
 }
 
 .align-card__desc {
     font-size: 0.72rem;
-    color: #94a3b8;
+    color: var(--text-muted);
 }
 
 .align-card__badge {
     margin-top: 6px;
     font-size: 0.72rem;
-    color: #60a5fa;
+    color: var(--color-primary);
     font-weight: 600;
 }
 
 /* ============================================
-   PANEL4 — KESİN BACKGROUND OVERRIDE (EN SON)
-   .panel4 !important tek sınıflı; sonradan gelen
-   çift sınıflı kurallar onu ezebilir. Bu blok
-   stylesheet sonunda olduğu için her durumda kazanır.
+   CAL-STEP durum zeminleri — panelden bağımsız
+   Vurgu renkleri saydam olduğu için hem koyu hem
+   açık panelde doğru okunur; ayrı panel4 bloğu
+   gerekmez (§1c sözleşmesi zemini zaten belirler).
    ============================================ */
-.cal-step.panel4                       { background: #e8eaec !important; }
-.cal-step.panel4:hover:not(.disabled)  { background: rgba(99, 102, 241, 0.10) !important; }
-.cal-step.panel4.active                { background: rgba(99, 102, 241, 0.12) !important; }
-.cal-step.panel4.completed             { background: rgba(16,185,129,0.12) !important; }
+.cal-step.panel4                       { background: var(--surface) !important; }
+.cal-step:hover:not(.disabled)         { background: rgba(var(--p-accent-rgb), 0.10) !important; }
+.cal-step.active                       { background: rgba(var(--p-accent-rgb), 0.12) !important; }
+.cal-step.completed                    { background: rgba(63, 143, 69, 0.12) !important; }
 
 /* ============================================
    FIRMWARE GÜNCELLE BUTONU - SARI RENG
    ============================================ */
 .btn-firmware-nav {
-    background: linear-gradient(135deg, #fcd34d, #fbbf24) !important;
+    background: var(--color-warning) !important;
     color: #1f2937 !important;
     font-weight: 700;
     padding: 6px 18px;
     font-size: var(--font-size-sm);
     border-radius: var(--radius-sm);
-    box-shadow: 0 0 14px rgba(251, 191, 36, 0.45), 0 2px 8px rgba(0,0,0,0.3);
     border: 1.5px solid rgba(251, 191, 36, 0.55);
     letter-spacing: 0.4px;
     text-transform: uppercase;
@@ -2808,9 +3037,8 @@ label.small.text-muted,
 }
 
 .btn-firmware-nav:hover {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
-    box-shadow: 0 0 22px rgba(251, 191, 36, 0.65), 0 4px 14px rgba(0,0,0,0.3);
-    transform: translateY(-1px);
+    background: #f59e0b !important;
+    transform: translateY(var(--hover-lift));
     color: #1f2937 !important;
 }
 
@@ -2873,14 +3101,14 @@ label.small.text-muted,
 }
 
 .kml-drop-text {
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-size: 0.95rem;
     margin: 0 0 4px;
     font-weight: 500;
 }
 
 .kml-drop-hint {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 0.8rem;
     margin: 0;
 }
@@ -2891,7 +3119,7 @@ label.small.text-muted,
     border: 1px solid rgba(239, 68, 68, 0.35);
     border-radius: 10px;
     padding: 12px 16px;
-    color: #fca5a5;
+    color: var(--color-danger);
     font-size: 0.88rem;
     margin-top: 14px;
 }
@@ -2908,7 +3136,7 @@ label.small.text-muted,
     height: 480px;
     border-radius: 12px;
     overflow: hidden;
-    border: 1.5px solid rgba(255,255,255,0.08);
+    border: 1.5px solid var(--border-default);
 }
 
 /* İstatistik grid */
@@ -2920,8 +3148,8 @@ label.small.text-muted,
 }
 
 .kml-stat-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border-light);
     border-radius: 10px;
     padding: 10px 12px;
     display: flex;
@@ -2931,14 +3159,14 @@ label.small.text-muted,
 
 .kml-stat-label {
     font-size: 0.72rem;
-    color: #94a3b8;
+    color: var(--text-muted);
     white-space: nowrap;
 }
 
 .kml-stat-val {
     font-size: 1rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-family: 'JetBrains Mono', monospace;
 }
 
@@ -2955,25 +3183,25 @@ label.small.text-muted,
     align-items: center;
     gap: 5px;
     font-size: 0.78rem;
-    color: #cbd5e1;
-    background: rgba(255,255,255,0.05);
+    color: var(--text-secondary);
+    background: var(--bg-panel-2);
     padding: 3px 9px 3px 6px;
     border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid var(--border-light);
     cursor: pointer;
     user-select: none;
     transition: background 0.15s, border-color 0.15s, opacity 0.2s;
 }
 
 .kml-leg-item:hover {
-    background: rgba(255,255,255,0.12);
-    border-color: rgba(255,255,255,0.28);
+    background: var(--bg-panel-3);
+    border-color: var(--border-default);
 }
 
 .kml-leg-item.kml-leg-active {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.45);
-    color: #fff;
+    background: rgba(var(--p-accent-rgb), 0.16);
+    border-color: var(--color-primary);
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -3017,23 +3245,23 @@ label.small.text-muted,
     align-items: center;
     gap: 6px;
     padding: 6px 14px;
-    background: rgba(30, 41, 59, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border-default);
     border-radius: 6px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 13px;
     cursor: pointer;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .kml-toolbar-btn:hover {
-    background: rgba(51, 65, 85, 0.95);
-    color: #e2e8f0;
-    border-color: rgba(255, 255, 255, 0.25);
+    background: var(--bg-panel-3);
+    color: var(--text-primary);
+    border-color: var(--color-primary);
 }
 .kml-toolbar-btn.kml-map-ctrl-active {
     background: rgba(245, 158, 11, 0.18);
     border-color: #f59e0b;
-    color: #f59e0b;
+    color: #a1560b;
 }
 
 /* Tam ekran kapat butonu — body'ye eklenir, her zaman görünür */
@@ -3094,7 +3322,7 @@ label.small.text-muted,
 }
 
 .kml-btn-download {
-    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    background: var(--color-primary);
     color: #fff !important;
     border: none;
     padding: 9px 20px;
@@ -3102,16 +3330,14 @@ label.small.text-muted,
     font-weight: 600;
     font-size: 0.88rem;
     transition: all 0.18s;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.35);
 }
 .kml-btn-download:hover {
-    background: linear-gradient(135deg, #1e40af, #1d4ed8);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(37,99,235,0.5);
+    background: var(--color-primary-hover);
+    transform: translateY(var(--hover-lift));
 }
 
 .kml-btn-earth {
-    background: linear-gradient(135deg, #15803d, #16a34a);
+    background: var(--color-success);
     color: #fff !important;
     border: none;
     padding: 9px 20px;
@@ -3119,26 +3345,24 @@ label.small.text-muted,
     font-weight: 600;
     font-size: 0.88rem;
     transition: all 0.18s;
-    box-shadow: 0 2px 8px rgba(22,163,74,0.35);
 }
 .kml-btn-earth:hover {
-    background: linear-gradient(135deg, #166534, #15803d);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(22,163,74,0.5);
+    background: #0d9668;
+    transform: translateY(var(--hover-lift));
 }
 
 .kml-btn-reset {
-    background: rgba(255,255,255,0.07);
-    color: #94a3b8 !important;
-    border: 1px solid rgba(255,255,255,0.12);
+    background: var(--bg-panel-2);
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-default);
     padding: 9px 16px;
     border-radius: 10px;
     font-size: 0.85rem;
     transition: all 0.18s;
 }
 .kml-btn-reset:hover {
-    background: rgba(255,255,255,0.12);
-    color: #e2e8f0 !important;
+    background: var(--bg-panel-3);
+    color: var(--text-primary) !important;
 }
 
 /* Google Earth ipucu */
@@ -3147,12 +3371,12 @@ label.small.text-muted,
     align-items: flex-start;
     gap: 8px;
     margin-top: 12px;
-    background: rgba(14, 165, 233, 0.10);
-    border: 1px solid rgba(14, 165, 233, 0.25);
+    background: rgba(var(--p-accent-rgb), 0.10);
+    border: 1px solid rgba(var(--p-accent-rgb), 0.25);
     border-radius: 10px;
     padding: 11px 14px;
     font-size: 0.84rem;
-    color: #7dd3fc;
+    color: var(--p-accent-deep);
     animation: fadeIn 0.3s ease;
 }
 
