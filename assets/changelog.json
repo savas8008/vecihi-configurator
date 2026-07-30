@@ -2,6 +2,19 @@
   {
     "date": "2026-07-30",
     "items": [
+      "İniş asistanı: FINAL fazından FLARE'e çok erken geçilmesi düzeltildi. APPROACH noktasına varmak final yaklaşmanın BAŞLANGICI olduğu halde bitişi sayılıyor, uçak eve 150 m uzakta ve 50 m yüksekteyken flare'e geçip gazı kesiyordu. Ayrıca gaz kesme, yaklaşma hızı kontrolcüsünün çıkışını tamamen eziyordu — stall'a karşı tek koruma devre dışı kalıyordu",
+      "İniş asistanında FLARE artık yalnızca gerçek flare koşulunda tetikleniyor: eve flare_distance kalınca veya flare irtifasına inilince. Glide slope boyunca uçuş fazı FINAL kalıyor ve hız kontrolcüsü çalışmaya devam ediyor",
+      "İniş asistanında final'e geçiş için pist başlığına hizalanma şartı eklendi (35°). Önceden eşik yalnızca eve olan mesafeye bakıyordu ve esas bacaktan final'e DÖNÜŞÜN ORTASINDA tetikleniyordu",
+      "İniş asistanında glide slope boyunca temel gaz değeri düzeltildi: alçalma FLARE noktasını hedeflediği için o noktanın flare gazı (rölanti) bütün final boyunca uygulanıyor, hız kontrolcüsü minimum gaz tabanının altında kalıp hiç devreye giremiyordu",
+      "SITL uçuş simülasyonu kuvvet/moment tabanlı olarak yeniden yazıldı. Önceki model dönüş ağırlıklı senaryolarda kullanılamıyordu; iniş asistanı paterni hiç uçulamıyordu. Üç kök neden bulundu: jiroskopun Euler/gövde eksen karışıklığı, sahte sensörün eksen işaret uyuşmazlığı ve uçağın simülasyonda hiç arm olmaması",
+      "SITL'e yanal kayma (sideslip) durumu eklendi — dönüş artık kinematik olarak dayatılmıyor, bankadan doğal olarak doğuyor. Böylece dutch roll modu oluşuyor ve yaw sönümleyici/kuyruk sallama davranışı simülasyonda test edilebiliyor",
+      "SITL'de tüm gövde tipleri (v-tail, flying-wing/delta, geleneksel) artık destekleniyor; önceden v-tail dışındaki kurulumlar sessizce kumandasız uçak simüle ediyordu. Ayrıca yük faktörü, stall dinamiği, dinamik basınçla ölçeklenen kontrol otoritesi ve zemin teması eklendi",
+      "SITL doğrulaması: iniş asistanı tam devreyi uçuyor (ENROUTE → rüzgar tespiti → esas bacak → final) ve eve 15 m mesafede 5.3 m/s ile yere temas ediyor"
+    ]
+  },
+  {
+    "date": "2026-07-30",
+    "items": [
       "Stabilize modlarda (Angle/Horizon) kuyruk sallama (snaking) sorununa yönelik yaw ekseni düzenlemeleri yapıldı. Yaw stabilizasyonu yalnızca jiroskop Z ekseninden beslenen bir sönümleyicidir (yaw damper): hedefi 'sıfır yaw hızı'dır, yön/heading tutmaz ve ivmeölçerden beslenmez",
       "Yaw sönümleyicisine washout (yüksek geçirgen) filtresi eklendi — ArduPlane yaw damper mantığı. Sönümleyici artık yalnızca geçici (ani) yaw hareketini görüyor; bankeli dönüşün meşru ve kalıcı yaw hızına karşı rudder basmıyor. Filtre yalnızca P ve D yoluna uygulanıyor, I ham hata üzerinde kalarak uzun vadeli trim yeteneğini koruyor. Yeni ayar: yaw_washout_hz (varsayılan 0.032 Hz ≈ 5 sn zaman sabiti, 0 = kapalı)",
       "Yaw PID varsayılanları iNav sabit kanat (PIFF) eşdeğerine getirildi: P 0.40 → 0.20, I 0.15 → 2.50, FF 0.50 → 1.90, I limiti 50 → 165. Önceki değerlerde yüksek P + neredeyse yok I birleşimi klasik kuyruk sallama imzasıydı. ÖNEMLİ: kayıtlı ayarı olan kartlarda yeni varsayılanlar kendiliğinden gelmez — ayarları sıfırlamak veya PID sayfasından elle girmek gerekir",
