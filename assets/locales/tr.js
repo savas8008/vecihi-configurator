@@ -332,6 +332,7 @@ window.VECIHI_LOCALE_TR = {
     "launch_section": "Otomatik Kalkış (Auto Launch)",
     "launch_auto_on_arm": "Her arm sonrasında otomatik kalkış moduna geç",
     "launch_disarm_on_land": "İniş sonrasında otomatik disarm",
+    "launch_lock_disarm_flying": "Uçuş sırasında switch ile disarm'ı kilitle",
     "launch_acc_threshold": "Fırlatma Eşiği (G)",
     "launch_acc_hint": "Kalkışı tetiklemek için gereken ivme",
     "launch_throttle": "Kalkış Gazı (PWM)",
@@ -348,8 +349,6 @@ window.VECIHI_LOCALE_TR = {
     "stall_section": "Stall Koruması",
     "stall_speed": "Stall Hızı (km/h)",
     "stall_speed_hint": "Bu hızın altında stall koruması devreye girer",
-    "stall_pitch_drop": "Pitch Düşürme (°)",
-    "stall_pitch_hint": "Stall'da burun ne kadar düşürülsün",
 
     "turn_comp_section": "Dönüş Telafisi (Load Factor + Koordineli Dönüş)",
     "turn_comp_pitch_title": "Yükseklik Telafisi (RTH/WAYPOINT/LAND ASSIST'te her zaman aktif)",

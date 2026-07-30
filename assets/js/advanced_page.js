@@ -34,7 +34,6 @@ let advancedConfig = {
         rth_radius: 50,
         loiter_direction: 1,
         stall_speed_kmh: 40.0,
-        stall_pitch_drop: 3.0,
         climb_throttle: 1700,
         descend_throttle: 1100,
         
@@ -52,7 +51,8 @@ let advancedConfig = {
         launch_angle: 20,
         launch_time: 2000,
         auto_launch_on_arm: true,
-        disarm_on_landing: true
+        disarm_on_landing: true,
+        lock_disarm_while_flying: true
     },
     misc: {
         tpa: 0.00,
@@ -239,6 +239,7 @@ function updateAdvancedUI() {
         // Auto launch
         setChk("inp_auto_launch_on_arm", n.auto_launch_on_arm);
         setChk("inp_disarm_on_landing", n.disarm_on_landing);
+        setChk("inp_lock_disarm_while_flying", n.lock_disarm_while_flying);
         setVal("inp_launch_acc_threshold", n.launch_acc_threshold);
         setVal("inp_launch_throttle", n.launch_throttle);
         setVal("inp_launch_time", n.launch_time);
@@ -248,7 +249,6 @@ function updateAdvancedUI() {
 
         // Stall koruması
         setVal("inp_stall_speed_kmh", n.stall_speed_kmh);
-        setVal("inp_stall_pitch_drop", n.stall_pitch_drop);
 
         // GPS donanım
         setChk("inp_has_gps", n.has_gps);
@@ -295,6 +295,19 @@ function updateAdvancedUI() {
         setChk("inp_nav_turn_assist_enabled", n.turn_assist_enabled);
         setVal("inp_nav_turn_assist_ref_airspeed", n.turn_assist_ref_airspeed_ms);
         setVal("inp_nav_turn_assist_yaw_gain", n.turn_assist_yaw_gain);
+
+        // TECS (Total Energy Control System, opsiyonel)
+        setChk("inp_nav_use_tecs", n.use_tecs);
+        toggleTecsSettings();
+        setVal("inp_nav_tecs_airspeed_ms", n.tecs_airspeed_ms);
+        setVal("inp_nav_tecs_time_const", n.tecs_time_const);
+        setVal("inp_nav_tecs_thr_damp", n.tecs_thr_damp);
+        setVal("inp_nav_tecs_pitch_damp", n.tecs_pitch_damp);
+        setVal("inp_nav_tecs_integ_gain", n.tecs_integ_gain);
+        setVal("inp_nav_tecs_spd_weight", n.tecs_spd_weight);
+        setVal("inp_nav_tecs_vert_accel_lim", n.tecs_vert_accel_lim);
+        setVal("inp_nav_tecs_pitch_gain", n.tecs_pitch_gain);
+        setVal("inp_nav_tecs_throttle_gain", n.tecs_throttle_gain);
     }
 
     // --- Altitude config ---
@@ -439,6 +452,7 @@ function saveAdvancedConfig() {
     // Auto launch
     setIf(nav, "auto_launch_on_arm", bool("inp_auto_launch_on_arm"));
     setIf(nav, "disarm_on_landing", bool("inp_disarm_on_landing"));
+    setIf(nav, "lock_disarm_while_flying", bool("inp_lock_disarm_while_flying"));
     setIf(nav, "launch_acc_threshold", num("inp_launch_acc_threshold"));
     setIf(nav, "launch_throttle", int("inp_launch_throttle"));
     setIf(nav, "launch_time", int("inp_launch_time"));
@@ -448,7 +462,6 @@ function saveAdvancedConfig() {
 
     // Stall koruması
     setIf(nav, "stall_speed_kmh", num("inp_stall_speed_kmh"));
-    setIf(nav, "stall_pitch_drop", num("inp_stall_pitch_drop"));
 
     // GPS donanım
     setIf(nav, "has_gps", bool("inp_has_gps"));
@@ -494,6 +507,18 @@ function saveAdvancedConfig() {
     setIf(nav, "turn_assist_enabled", bool("inp_nav_turn_assist_enabled"));
     setIf(nav, "turn_assist_ref_airspeed_ms", num("inp_nav_turn_assist_ref_airspeed"));
     setIf(nav, "turn_assist_yaw_gain", num("inp_nav_turn_assist_yaw_gain"));
+
+    // TECS (Total Energy Control System, opsiyonel)
+    setIf(nav, "use_tecs", bool("inp_nav_use_tecs"));
+    setIf(nav, "tecs_airspeed_ms", num("inp_nav_tecs_airspeed_ms"));
+    setIf(nav, "tecs_time_const", num("inp_nav_tecs_time_const"));
+    setIf(nav, "tecs_thr_damp", num("inp_nav_tecs_thr_damp"));
+    setIf(nav, "tecs_pitch_damp", num("inp_nav_tecs_pitch_damp"));
+    setIf(nav, "tecs_integ_gain", num("inp_nav_tecs_integ_gain"));
+    setIf(nav, "tecs_spd_weight", num("inp_nav_tecs_spd_weight"));
+    setIf(nav, "tecs_vert_accel_lim", num("inp_nav_tecs_vert_accel_lim"));
+    setIf(nav, "tecs_pitch_gain", num("inp_nav_tecs_pitch_gain"));
+    setIf(nav, "tecs_throttle_gain", num("inp_nav_tecs_throttle_gain"));
 
     if (Object.keys(nav).length) cfg.nav = nav;
 
@@ -661,6 +686,20 @@ function toggleGpsSettings() {
         settingsDiv.style.display = isChecked ? 'block' : 'none';
     }
 }
+
+function toggleTecsSettings() {
+    const isChecked = document.getElementById('inp_nav_use_tecs')?.checked;
+    const settingsDiv = document.getElementById('tecs_settings');
+    if (settingsDiv) {
+        settingsDiv.style.display = isChecked ? 'block' : 'none';
+    }
+    // Pitch→Gaz (fw_pitch2thr) TECS'in alternatifi — TECS açıkken gizlenir, kapalıyken görünür
+    const pitch2thrDiv = document.getElementById('fw_pitch2thr_settings');
+    if (pitch2thrDiv) {
+        pitch2thrDiv.style.display = isChecked ? 'none' : 'block';
+    }
+}
+window.toggleTecsSettings = toggleTecsSettings;
 
 /**
  * @brief Waypoint sayfasındaki katlanabilir bölümü aç/kapat

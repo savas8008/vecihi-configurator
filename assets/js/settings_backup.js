@@ -304,6 +304,7 @@ function _flattenConfig(s) {
             push('out.mixer_pitch', o.mixer.pitch_mix);
             push('out.mixer_yaw',   o.mixer.yaw_mix);
             push('out.mixer_thr',   o.mixer.throttle_mix);
+            push('out.yaw_thrust_mix', o.mixer.yaw_thrust_mix ? 1 : 0);
         }
         if (o.esc_hz          !== undefined) push('out.esc_hz',          o.esc_hz);
         if (o.servo_hz        !== undefined) push('out.servo_hz',        o.servo_hz);
@@ -342,7 +343,6 @@ function _flattenConfig(s) {
         if (a.nav) {
             const n = a.nav;
             push('adv.nav.stall_speed_kmh',      n.stall_speed_kmh);
-            push('adv.nav.stall_pitch_drop',     n.stall_pitch_drop);
             push('adv.nav.rth_altitude',         n.rth_altitude);
             push('adv.nav.rth_radius',           n.rth_radius);
             push('adv.nav.cruise_throttle',      n.cruise_throttle);
@@ -358,6 +358,7 @@ function _flattenConfig(s) {
             push('adv.nav.launch_spool_time',    n.launch_spool_time);
             if (n.auto_launch_on_arm !== undefined) push('adv.nav.auto_launch_on_arm', n.auto_launch_on_arm ? 1 : 0);
             if (n.disarm_on_landing  !== undefined) push('adv.nav.disarm_on_landing',  n.disarm_on_landing  ? 1 : 0);
+            if (n.lock_disarm_while_flying !== undefined) push('adv.nav.lock_disarm_while_flying', n.lock_disarm_while_flying ? 1 : 0);
             push('adv.nav.max_bank_angle_roll',  n.max_bank_angle_roll  ?? n.max_bank_angle);
             push('adv.nav.max_bank_angle_pitch', n.max_bank_angle_pitch);
             if (n.has_gps !== undefined) push('adv.nav.has_gps', n.has_gps ? 1 : 0);

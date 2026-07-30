@@ -129,6 +129,8 @@ function handleOutputsPageData(data) {
         setMix('mixPitch',    data.mixer.pitch_mix);
         setMix('mixYaw',      data.mixer.yaw_mix);
         setMix('mixThrottle', data.mixer.throttle_mix);
+        const yawThrustEl = document.getElementById('inp_yaw_thrust_mix');
+        if (yawThrustEl && data.mixer.yaw_thrust_mix !== undefined) yawThrustEl.checked = !!data.mixer.yaw_thrust_mix;
     }
 }
 
@@ -347,6 +349,8 @@ function handleMixerPageData(data) {
     setMix('mixPitch',    data.pitch_mix);
     setMix('mixYaw',      data.yaw_mix);
     setMix('mixThrottle', data.throttle_mix);
+    const yawThrustEl = document.getElementById('inp_yaw_thrust_mix');
+    if (yawThrustEl && data.yaw_thrust_mix !== undefined) yawThrustEl.checked = !!data.yaw_thrust_mix;
 
     if (data.aux) {
         const setAux = (rcChId, pinId, auxData) => {
@@ -518,6 +522,7 @@ function saveMixerConfig() {
             pitch_mix:    getMixVal('mixPitch', 100),
             yaw_mix:      getMixVal('mixYaw', 100),
             throttle_mix: getMixVal('mixThrottle', 100),
+            yaw_thrust_mix: !!_$('inp_yaw_thrust_mix')?.checked,
         },
         servo_values: servoValues,
         aux: {
@@ -582,6 +587,7 @@ function saveOutputsConfig() {
         pitch_mix:    getMixVal('mixPitch', 100),
         yaw_mix:      getMixVal('mixYaw', 100),
         throttle_mix: getMixVal('mixThrottle', 100),
+        yaw_thrust_mix: !!document.getElementById('inp_yaw_thrust_mix')?.checked,
     };
 
     const outputData = {

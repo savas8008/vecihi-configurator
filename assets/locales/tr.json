@@ -311,6 +311,7 @@
     "launch_section": "Otomatik Kalkış (Auto Launch)",
     "launch_auto_on_arm": "Her arm sonrasında otomatik kalkış moduna geç",
     "launch_disarm_on_land": "İniş sonrasında otomatik disarm",
+    "launch_lock_disarm_flying": "Uçuş sırasında switch ile disarm'ı kilitle",
     "launch_acc_threshold": "Fırlatma Eşiği (G)",
     "launch_acc_hint": "Kalkışı tetiklemek için gereken ivme",
     "launch_throttle": "Kalkış Gazı (PWM)",

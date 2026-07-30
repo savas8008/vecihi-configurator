@@ -1,5 +1,21 @@
 [
   {
+    "date": "2026-07-29",
+    "items": [
+      "TECS (Total Energy Control System) eklendi — Gelişmiş Ayarlar'dan açılan opsiyonel bir switch; CRUISE/ALTHOLD/LOITER/RTH/WAYPOINT/LAND ASSIST modlarında pitch ve throttle'ı artık hem irtifa hem hava hızı hatasına göre birlikte (enerji dengesi) ayarlıyor, mevcut basit pitch→throttle mantığına alternatif. Varsayılan kapalı; kapalıyken davranış hiç değişmiyor. İniş yaklaşma/flare fazına dokunmuyor",
+      "GPS bağlantısı uçuş sırasında koparsa (kablo/modül arızası) rüzgar tahmincisinin ve TECS'in donmuş (bayat) hız verisiyle çalışmaya devam etmesini önleyen bir güvenlik kontrolü eklendi — GPS verisi bayatladığında hava hızı tahmini otomatik olarak geçersiz sayılıyor",
+      "Mikser sayfasına 'Yaw'a Göre Fark İtki Kullan (Çift Motor)' switch'i eklendi, varsayılan kapalı — kapalıyken yaw çıkışı motor gazına hiç yansımıyor. Önceden bu her zaman aktifti; tek motorlu uçaklarda yaw çubuğu (veya Turn Assist açıkken roll çubuğu) verince gazın istem dışı artıp azalmasına yol açıyordu. Yalnızca gerçek çift motorlu/fark itkili kurulumlarda açılmalı",
+      "Gelişmiş Ayarlar > Uçuş Limitleri sekmesi yeniden düzenlendi: Dönüş Telafisi (Koordineli Dönüş) ve Pitch/Throttle Kontrolü (TECS) artık yan yana; 'Pitch → Gaz' ayarı GPS sayfasından buraya taşındı ve TECS açıkken otomatik gizleniyor (ikisi birbirinin alternatifi)",
+      "Kullanılmayan 'Stall Pitch Düşürme' ayarı kaldırıldı (hiçbir uçuş mantığı okumuyordu); Stall Hızı ayarı aynen kalıyor"
+    ]
+  },
+  {
+    "date": "2026-07-27",
+    "items": [
+      "Uçuş sırasında (is_flying) RC arm switch ile disarm edilmesini engelleyen kilit eklendi — Gelişmiş Ayarlar'dan kapatılabilir, varsayılan olarak açık; kumanda sinyali kesilip yeniden bağlandığında switch'in geçici olarak yanlış okunması sonucu havada istemsiz disarm olmasını önler"
+    ]
+  },
+  {
     "date": "2026-07-24",
     "items": [
       "OSD'ye ELRS/CRSF sinyal telemetrisi eklendi — RSSI (dBm), Link Quality (LQ %), SNR (dB) ve TX Gücü (mW) artık ayrı ayrı gösterilebiliyor; bu değerler yalnızca CRSF/ELRS protokolünde doludur, SBUS'ta desteklenmez"

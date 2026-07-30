@@ -1015,7 +1015,7 @@
       </div>
     </div>
 
-    <!-- L1 Navigasyon + Pitch→Gaz -->
+    <!-- L1 Navigasyon (Pitch→Gaz artık Gelişmiş Ayarlar > Uçuş Limitleri sekmesinde, TECS'in yanında) -->
     <div class="col-md-4">
       <div class="panel2 h-100 p-3">
         <h2 class="panel-title"><i class="bi bi-bezier2"></i> <span data-i18n="gps.l1_title">L1 Navigasyon</span></h2>
@@ -1030,14 +1030,6 @@
         <div class="mb-2 row">
           <label class="col-7 col-form-label col-form-label-sm">L1 Damping</label>
           <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_l1_damping" min="0.5" max="1.0" step="0.05" value="0.75"></div>
-        </div>
-        <hr class="border-secondary my-2">
-        <div class="mb-2 row">
-          <label class="col-7 col-form-label col-form-label-sm text-info">
-            Pitch → Gaz
-            <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" title="Her 1° pitch artışı için eklenen PWM gaz miktarı."></i>
-          </label>
-          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_fw_pitch2thr" step="0.1" value="8.0"></div>
         </div>
       </div>
     </div>
@@ -1395,6 +1387,11 @@
           <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
         </div>
       </div>
+    </div>
+    <div class="mt-3 form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="inp_yaw_thrust_mix">
+      <label class="form-check-label" for="inp_yaw_thrust_mix" data-i18n="mixer.yaw_thrust_mix">Yaw'a Göre Fark İtki Kullan (Çift Motor)</label>
+      <div class="form-text small" data-i18n="mixer.yaw_thrust_mix_hint">Yalnızca gerçekten çift motorlu bir uçakta açın — yaw çıkışı iki motorun gazını farklılaştırarak dönüşe yardım eder. Tek motorlu uçaklarda kapalı kalmalı; açıksa yaw (ve Turn Assist açıkken roll) verince gaz istem dışı değişir.</div>
     </div>
     <div class="mt-3">
       <button type="button" class="btn btn-warning shadow-sm" id="btnSaveMixer">
@@ -2067,6 +2064,10 @@
                                     <input class="form-check-input" type="checkbox" id="inp_disarm_on_landing" checked>
                                     <label class="form-check-label small" for="inp_disarm_on_landing" data-i18n="advanced.launch_disarm_on_land">İniş sonrasında otomatik disarm</label>
                                 </div>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="inp_lock_disarm_while_flying" checked>
+                                    <label class="form-check-label small" for="inp_lock_disarm_while_flying" data-i18n="advanced.launch_lock_disarm_flying">Uçuş sırasında switch ile disarm'ı kilitle</label>
+                                </div>
                                 <hr>
                                 <div class="mb-2 row">
                                     <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.launch_acc_threshold">
@@ -2149,21 +2150,11 @@
                                         <input type="number" class="form-control form-control-sm" id="inp_stall_speed_kmh" min="20" max="100" step="1" value="28">
                                     </div>
                                 </div>
-																<hr>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-8 col-form-label col-form-label-sm" data-i18n="advanced.stall_pitch_drop">
-                                        Pitch Düşürme (°)
-                                        <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.7rem;" title="Stall'da burun ne kadar düşürülsün"></i>
-                                    </label>
-                                    <div class="col-sm-4">
-                                        <input type="number" class="form-control form-control-sm" id="inp_stall_pitch_drop" min="0" max="15" step="0.5" value="3.0">
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                        <!-- Dönüş Telafisi (Load Factor + Koordineli Dönüş) — tek bölüm -->
+                        <!-- Dönüş Telafisi + Pitch/Throttle Kontrolü (TECS) — yan yana -->
                         <div class="row mt-3 border-top border-secondary pt-3">
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <h6 class="text-muted border-bottom border-secondary pb-1"><i class="bi bi-arrow-repeat me-1"></i><span data-i18n="advanced.turn_comp_section">Dönüş Telafisi (Load Factor + Koordineli Dönüş)</span></h6>
 
                                 <div class="text-muted small mb-1" data-i18n="advanced.turn_comp_pitch_title">Yükseklik Telafisi (RTH/WAYPOINT/LAND ASSIST'te her zaman aktif)</div>
@@ -2212,6 +2203,111 @@
                                 </div>
                                 <div class="alert alert-dark py-2 px-3 small mb-0 mt-2" data-i18n="gps.turn_assist_warning">
                                     Kapalıyken hiçbir modda (RTH dahil) çalışmaz. Etkinleştirmeden önce yerde/düşük irtifada test edin.
+                                </div>
+                            </div>
+
+                            <!-- Pitch/Throttle Kontrolü: basit (Pitch→Gaz) veya TECS (enerji dengesi) — birbirinin alternatifi -->
+                            <div class="col-md-6">
+                                <h6 class="text-muted border-bottom border-secondary pb-1"><i class="bi bi-lightning-charge me-1"></i><span data-i18n="advanced.tecs_section">Pitch/Throttle Kontrolü (TECS)</span></h6>
+
+                                <div id="fw_pitch2thr_settings">
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm text-info">
+                                            <span data-i18n="gps.fw_pitch2thr">Pitch → Gaz</span>
+                                            <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" title="Her 1° pitch artışı için eklenen PWM gaz miktarı. TECS kapalıyken kullanılan basit mod."></i>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_fw_pitch2thr" step="0.1" value="8.0">
+                                        </div>
+                                    </div>
+                                    <hr class="border-secondary my-2">
+                                </div>
+
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="inp_nav_use_tecs" onchange="toggleTecsSettings()">
+                                    <label class="form-check-label" for="inp_nav_use_tecs" data-i18n="advanced.use_tecs">TECS Kullan (Pitch/Throttle'ı Enerji Dengesiyle Sür)</label>
+                                </div>
+
+                                <div id="tecs_settings" style="display:none">
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_airspeed_ms">Hedef Hava Hızı (m/s)</span>
+                                            <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" title="Moda özgü hedef yoksa kullanılan referans hava hızı."></i>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_airspeed_ms" min="3" max="40" step="0.5" value="15">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_time_const">Zaman Sabiti (s)</span>
+                                            <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" title="Genel tepki hızı: küçük=agresif, büyük=yumuşak. Varsayılan: 5s."></i>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_time_const" min="1" max="15" step="0.5" value="5">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_thr_damp">Throttle Sönümleme</span>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_thr_damp" min="0" max="2" step="0.05" value="0.5">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_pitch_damp">Pitch Sönümleme</span>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_pitch_damp" min="0" max="2" step="0.05" value="0.3">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_integ_gain">İntegratör Kazancı</span>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_integ_gain" min="0" max="2" step="0.05" value="0.3">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_spd_weight">Hız/İrtifa Ağırlığı</span>
+                                            <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" title="0=pitch sadece irtifa, 2=pitch sadece hız kontrol eder, 1=dengeli."></i>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_spd_weight" min="0" max="2" step="0.1" value="1.0">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_vert_accel_lim">Dikey İvme Limiti (g)</span>
+                                            <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" title="İrtifa oranı talebindeki ani sıçramaları yumuşatan limit."></i>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_vert_accel_lim" min="0.05" max="1" step="0.05" value="0.3">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_pitch_gain">Pitch Ölçek Kazancı</span>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_pitch_gain" min="0" max="5" step="0.1" value="1.0">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-8 col-form-label col-form-label-sm">
+                                            <span data-i18n="advanced.tecs_throttle_gain">Throttle Ölçek Kazancı</span>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control form-control-sm" id="inp_nav_tecs_throttle_gain" min="0" max="5" step="0.1" value="1.0">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-dark py-2 px-3 small mb-0 mt-2" data-i18n="advanced.tecs_warning">
+                                    Kapalıyken (varsayılan) mevcut basit pitch→throttle mantığı aynen çalışır. CRUISE/ALTHOLD/LOITER/RTH/WAYPOINT/LAND ASSIST'te etkilidir; iniş yaklaşma/flare fazına dokunmaz. Etkinleştirmeden önce SITL'de veya yerde/düşük irtifada test edin.
                                 </div>
                             </div>
                         </div>

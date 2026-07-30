@@ -332,6 +332,7 @@ window.VECIHI_LOCALE_EN = {
     "launch_section": "Auto Launch",
     "launch_auto_on_arm": "Automatically enter launch mode after each arm",
     "launch_disarm_on_land": "Auto disarm after landing",
+    "launch_lock_disarm_flying": "Lock switch disarm while flying",
     "launch_acc_threshold": "Launch Threshold (G)",
     "launch_acc_hint": "Acceleration required to trigger launch",
     "launch_throttle": "Launch Throttle (PWM)",
@@ -348,8 +349,6 @@ window.VECIHI_LOCALE_EN = {
     "stall_section": "Stall Protection",
     "stall_speed": "Stall Speed (km/h)",
     "stall_speed_hint": "Stall protection activates below this speed",
-    "stall_pitch_drop": "Pitch Drop (°)",
-    "stall_pitch_hint": "How much to drop the nose during stall",
 
     "turn_comp_section": "Turn Compensation (Load Factor + Coordinated Turn)",
     "turn_comp_pitch_title": "Altitude Compensation (always active in RTH/WAYPOINT/LAND ASSIST)",
