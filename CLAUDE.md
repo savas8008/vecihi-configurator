@@ -74,6 +74,15 @@ paketlerini standart `RC_CHANNELS_OVERRIDE` (msg_id=70)'a dönüştürebilir. Bu
 
 ---
 
+## Tespit Edilen Eksikleri Kaydetme
+
+Bu repoda bir iş sırasında tespit edilen ama o an kapsam dışı bırakılan eksikler
+**`vecihi/GOREVLER.md` içindeki "Bakım Listesi" bölümüne** eklenir — configurator
+için ayrı bir liste tutulmaz, iki repo tek listede izlenir. Kural ve format için
+bkz. `vecihi/CLAUDE.md`.
+
+---
+
 ## Geliştirici Notları
 
 - Tarayıcı sekme throttling'ini her zaman göz önünde bulundur; zamanlayıcı gerektiren
