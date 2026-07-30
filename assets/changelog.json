@@ -1,5 +1,17 @@
 [
   {
+    "date": "2026-07-30",
+    "items": [
+      "Stabilize modlarda (Angle/Horizon) kuyruk sallama (snaking) sorununa yönelik yaw ekseni düzenlemeleri yapıldı. Yaw stabilizasyonu yalnızca jiroskop Z ekseninden beslenen bir sönümleyicidir (yaw damper): hedefi 'sıfır yaw hızı'dır, yön/heading tutmaz ve ivmeölçerden beslenmez",
+      "Yaw sönümleyicisine washout (yüksek geçirgen) filtresi eklendi — ArduPlane yaw damper mantığı. Sönümleyici artık yalnızca geçici (ani) yaw hareketini görüyor; bankeli dönüşün meşru ve kalıcı yaw hızına karşı rudder basmıyor. Filtre yalnızca P ve D yoluna uygulanıyor, I ham hata üzerinde kalarak uzun vadeli trim yeteneğini koruyor. Yeni ayar: yaw_washout_hz (varsayılan 0.032 Hz ≈ 5 sn zaman sabiti, 0 = kapalı)",
+      "Yaw PID varsayılanları iNav sabit kanat (PIFF) eşdeğerine getirildi: P 0.40 → 0.20, I 0.15 → 2.50, FF 0.50 → 1.90, I limiti 50 → 165. Önceki değerlerde yüksek P + neredeyse yok I birleşimi klasik kuyruk sallama imzasıydı. ÖNEMLİ: kayıtlı ayarı olan kartlarda yeni varsayılanlar kendiliğinden gelmez — ayarları sıfırlamak veya PID sayfasından elle girmek gerekir",
+      "TPA (gaz bazlı PID zayıflatma) artık gerçekten uygulanıyor. Ayar önceden arayüzde mevcuttu fakat uçuş kodunda hiç okunmuyordu; iNav'ın sabit kanat TPA eğrisi (gaz kırılma noktasının üstünde kazanç düşer, altında yükselir) P/I/D/FF'in tümüne uygulanıyor. Gaz PT1 ile filtreleniyor, disarm ve autotune sırasında devre dışı kalıyor. Yeni ayarlar: tpa_breakpoint (PID'lerin ayarlandığı gaz, varsayılan 1500) ve tpa_time_constant_ms (varsayılan 2000)",
+      "TPA varsayılanı iNav ile aynı şekilde 0 (kapalı) yapıldı — kullanıcı kademeli olarak artırmalı ve tpa_breakpoint'i kendi seyir gazına ayarlamalıdır. Kırılma noktası yanlışken TPA'yı açmak düşük gazda kazancı ciddi biçimde yükseltir",
+      "Yaw ekseni autotune'u etkinleştirildi. Yaw setpoint'i autotune'a hiç iletilmediği için bu eksen tek örnek bile toplayamıyordu; iNav de yaw'ı autotune ettiğinden aynı davranış sağlandı",
+      "Autotune'a verilen PID çıkışı iNav ile hizalandı: artık yalnızca P + FF toplamı iletiliyor, I ve D dışarıda bırakılıyor (her üç eksende). Önceki halinde I ve D toplamı şişirdiği için maksimum dönüş hızı sistematik olarak olduğundan düşük tahmin ediliyordu. Servolara giden çıkış değişmedi"
+    ]
+  },
+  {
     "date": "2026-07-29",
     "items": [
       "TECS (Total Energy Control System) eklendi — Gelişmiş Ayarlar'dan açılan opsiyonel bir switch; CRUISE/ALTHOLD/LOITER/RTH/WAYPOINT/LAND ASSIST modlarında pitch ve throttle'ı artık hem irtifa hem hava hızı hatasına göre birlikte (enerji dengesi) ayarlıyor, mevcut basit pitch→throttle mantığına alternatif. Varsayılan kapalı; kapalıyken davranış hiç değişmiyor. İniş yaklaşma/flare fazına dokunmuyor",
