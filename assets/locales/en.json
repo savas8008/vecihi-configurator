@@ -377,6 +377,11 @@
     "stream_start": "Start Data Stream",
 
     "bat_section": "Battery",
+    "bat_volt_panel": "Voltage",
+    "bat_volt_panel_sub": "ADC measurement and cell limits",
+    "bat_curr_panel": "Current",
+    "bat_curr_panel_sub": "Virtual current sensor and capacity",
+    "bat_calc_toggle": "Calibration Tools",
     "bat_voltage_section": "Voltage Measurement (ADC)",
     "bat_adc_hint": "ADC GPIO pin setting is at the top of the page.",
     "bat_scale": "Scale Factor",

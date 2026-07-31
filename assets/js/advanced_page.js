@@ -638,16 +638,39 @@ function updateAdvDisplay(key) {
     }
 }
 
+/**
+ * @brief Kalibrasyon sonucu bildirimi — hesaplanan değer ilgili alana yazıldı,
+ *        ancak henüz karta kaydedilmedi. Kullanıcıyı "Tercihleri Kaydet" için uyarır.
+ */
+function showCalibAppliedModal(fieldName, value) {
+    const msg = `Kalibrasyon katsayısı hesaplandı ve <strong>${fieldName}</strong> alanına ` +
+                `<strong>${value}</strong> olarak girildi.<br><br>` +
+                `<span class="text-warning">Değer henüz uçuş kartına yazılmadı — ` +
+                `<strong>Tercihleri Kaydet</strong> butonuna basmayı unutmayın.</span>`;
+    if (typeof showModal === 'function') {
+        showModal('Kalibrasyon Uygulandı', msg, 'warning');
+    } else {
+        alert(`Kalibrasyon katsayısı hesaplandı ve ${fieldName} alanına ${value} olarak girildi. ` +
+              `Tercihleri Kaydet butonuna basmayı unutmayın.`);
+    }
+}
+
+function showCalibErrorModal(msg) {
+    if (typeof showModal === 'function') showModal('Eksik Değer', msg, 'error');
+    else alert(msg);
+}
+
 function computeVoltageCalib() {
     const shown  = parseFloat(document.getElementById('inp_calib_volt_shown').value);
     const actual = parseFloat(document.getElementById('inp_calib_volt_actual').value);
     const curScale = parseFloat(document.getElementById('inp_bat_adc_scale').value) || 11.0;
     if (!Number.isFinite(shown) || !Number.isFinite(actual) || shown <= 0 || actual <= 0) {
-        alert('Lütfen her iki voltaj alanını da geçerli bir değerle doldurun.');
+        showCalibErrorModal('Lütfen her iki voltaj alanını da geçerli bir değerle doldurun.');
         return;
     }
     const newScale = Math.round(curScale * (actual / shown) * 1000) / 1000;
     document.getElementById('inp_bat_adc_scale').value = newScale.toFixed(3);
+    showCalibAppliedModal('Ölçek Faktörü', newScale.toFixed(3));
 }
 window.computeVoltageCalib = computeVoltageCalib;
 
@@ -656,11 +679,12 @@ function computeCurrentCalib() {
     const actual   = parseFloat(document.getElementById('inp_calib_actual_mah').value);
     const curCalib = parseFloat(document.getElementById('inp_vc_calib').value) || 1.0;
     if (!Number.isFinite(reported) || !Number.isFinite(actual) || reported <= 0 || actual <= 0) {
-        alert('Lütfen her iki mAh alanını da geçerli bir değerle doldurun.');
+        showCalibErrorModal('Lütfen her iki mAh alanını da geçerli bir değerle doldurun.');
         return;
     }
     const newCalib = Math.round(curCalib * (actual / reported) * 1000) / 1000;
     document.getElementById('inp_vc_calib').value = newCalib.toFixed(3);
+    showCalibAppliedModal('Kalibrasyon', newCalib.toFixed(3));
 }
 window.computeCurrentCalib = computeCurrentCalib;
 

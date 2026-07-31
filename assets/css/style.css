@@ -434,6 +434,105 @@ a:hover {
     border-bottom-color: rgba(0,0,0,0.15) !important;
 }
 
+/* ============================================
+   BATARYA SEKMESİ — Voltaj / Akım ikili paneli
+   panel4 (açık zemin) içinde iki ayrı beyaz kart
+   ============================================ */
+.bat-split .bat-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-top: 3px solid var(--bat-accent, #4f46e5);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+}
+.bat-panel-volt { --bat-accent: #4f46e5; --bat-accent-soft: rgba(79, 70, 229, 0.10); }
+.bat-panel-curr { --bat-accent: #d97706; --bat-accent-soft: rgba(217, 119, 6, 0.12); }
+
+.bat-panel-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 9px 14px;
+    background: var(--bat-accent-soft);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+}
+.bat-panel-head > i        { color: var(--bat-accent); font-size: 1rem; align-self: center; }
+.bat-panel-name            { font-size: 1rem; font-weight: 700; color: #111111; letter-spacing: 0.2px; }
+.bat-panel-head .bat-panel-sub { font-size: 0.74rem; color: #5b6470 !important; }
+
+.bat-panel-body { padding: 12px 14px 14px; flex: 1 1 auto; }
+
+.bat-group-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #222222;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+.bat-group-title i { color: var(--bat-accent); margin-right: 4px; }
+
+.bat-note {
+    font-size: 0.72rem;
+    margin-bottom: 8px;
+    color: #4b5563;
+}
+.bat-note-info i { color: var(--bat-accent); }
+
+.bat-help {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.74rem;
+    color: #333333;
+    margin-top: 8px;
+}
+.bat-help code     { color: var(--bat-accent); background: transparent; }
+.bat-help-warn     { color: #b45309; }
+
+/* Katlanır kalibrasyon araçları */
+.bat-calc-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 14px;
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(0, 0, 0, 0.035);
+    color: #222222;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+.bat-calc-toggle:hover      { background: var(--bat-accent-soft); }
+.bat-calc-toggle > i        { color: var(--bat-accent); }
+.bat-calc-chevron           { transition: transform 0.25s ease; }
+.bat-calc-toggle.open .bat-calc-chevron { transform: rotate(180deg); }
+
+.bat-calc-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: rgba(0, 0, 0, 0.03);
+    border-top: 1px solid transparent;
+}
+.bat-calc-body.open {
+    max-height: 460px;
+    border-top-color: rgba(0, 0, 0, 0.08);
+}
+.bat-calc-inner  { padding: 12px 14px 14px; }
+.bat-calc-title  { font-size: 0.82rem; font-weight: 600; color: var(--bat-accent); margin-bottom: 8px; }
+.bat-calc-hint   { font-size: 0.72rem; color: #555555; margin-top: 8px; }
+.bat-calc-hint code { color: var(--bat-accent); background: transparent; }
+
 .panel-title {
     display: flex;
     align-items: center;

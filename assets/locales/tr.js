@@ -403,6 +403,11 @@ window.VECIHI_LOCALE_TR = {
     "stream_start": "Veri Akışını Başlat",
 
     "bat_section": "Batarya",
+    "bat_volt_panel": "Voltaj",
+    "bat_volt_panel_sub": "ADC ölçümü ve hücre limitleri",
+    "bat_curr_panel": "Akım",
+    "bat_curr_panel_sub": "Sanal akım sensörü ve kapasite",
+    "bat_calc_toggle": "Kalibrasyon Araçları",
     "bat_voltage_section": "Voltaj Ölçümü (ADC)",
     "bat_adc_hint": "ADC GPIO pin ayarı sayfanın üstündedir.",
     "bat_scale": "Ölçek Faktörü",
