@@ -1,5 +1,17 @@
 [
   {
+    "date": "2026-07-31",
+    "items": [
+      "IMU glitch (darbe gürültüsü) koruması eklendi. Önceden yalnızca I2C seviyesinde koruma vardı: okuma başarısız olursa örnek atılıyordu. Ama bit dönmesi veya clock stretch sonucu DOĞRU uzunlukta ama YANLIŞ bir okuma bu kontrolleri geçip doğrudan Mahony filtresine ve PID'e giriyordu",
+      "Neden önemli: tek örneklik bir gyro darbesi ölçüldü — koruma kapalıyken tutum kestirimine 3.9 derece hata enjekte ediyor, bu da Angle modunda 35 derece/saniyelik GERÇEK bir yatış komutu üretiyor. Servo çıkışının 300 Hz olması bunu engellemez; sorun servo yolunda değil entegratörlerde (Mahony quaternion + PID I terimi). Koruma açıkken aynı darbenin bıraktığı hata sıfır",
+      "Üç örnekli medyan filtresi (iNav'ın LULU filtresinin N=1 hali ile aynı etki) gyro'ya eklendi — notch ve alçak geçiren filtrelerden ÖNCE, çünkü doğrusal filtreler darbeyi yok etmez, zamana yayar. Maliyeti bir örneklik gecikme (~1-2 ms)",
+      "Makullük (aralık) kontrolü: fiziksel olarak imkânsız gyro/ivme değerleri reddedilip bir önceki geçerli örnek tutuluyor. İvme eşiği iNav'ın ACC_CLIPPING_THRESHOLD_G değerinden alındı. Bu kontrol hem tutum kestirimini hem irtifa tahmincisini birlikte koruyor",
+      "Donmuş sensör tespiti eklendi: I2C donup aynı ham değeri tekrar tekrar döndürdüğünde okuma 'başarılı' sayılıyor ve mevcut hata sayacı bunu göremiyordu — sessiz ve tehlikeli bir arıza modu. Artık tespit edilip mevcut failsafe zincirine bağlanıyor (I2C kurtarma, ardından kumanda geçişi; motor kesilmiyor). Sensör düzelirse kendiliğinden toparlıyor",
+      "Teşhis sayaçları sensör akışına eklendi: reddedilen gyro darbesi sayısı, ivme kırpma sayısı ve donmuş sensör durumu. Uçuş sonrası 'gerçekten glitch var mıydı?' sorusu artık veriyle cevaplanabiliyor; sıfırdan farklıysa IMU veri yolu temiz değil demektir",
+      "Yeni ayarlar (Filtreler): imu_despike_enabled (varsayılan açık), gyro_sanity_dps (1800), accel_sanity_g (15.5), imu_stuck_count (200)"
+    ]
+  },
+  {
     "date": "2026-07-30",
     "items": [
       "İniş asistanı: FINAL fazından FLARE'e çok erken geçilmesi düzeltildi. APPROACH noktasına varmak final yaklaşmanın BAŞLANGICI olduğu halde bitişi sayılıyor, uçak eve 150 m uzakta ve 50 m yüksekteyken flare'e geçip gazı kesiyordu. Ayrıca gaz kesme, yaklaşma hızı kontrolcüsünün çıkışını tamamen eziyordu — stall'a karşı tek koruma devre dışı kalıyordu",
