@@ -457,6 +457,28 @@
                     el.classList.add(state.critical ? 'hw-err' : 'hw-warn');
                 }
             });
+            // IMU veri yolu sagligi: reddedilen darbe/kirpma sayaclari.
+            // Normal bir kurulumda hepsi 0 kalir; sifirdan farkli olmasi I2C
+            // hattinin gurultulu oldugunu gosterir (uzun kablo, ESC parazit,
+            // eksik pull-up). Bu yuzden gosterge yalnizca sorun varken cikar.
+            var glitchEl = document.getElementById('hw-imu-glitch');
+            if (glitchEl) {
+                var spikes = data.hw.gyro_spikes || 0;
+                var clips  = data.hw.accel_clips || 0;
+                var stuck  = data.hw.imu_stuck === true;
+                if (spikes > 0 || clips > 0 || stuck) {
+                    glitchEl.classList.remove('d-none', 'hw-ok', 'hw-err', 'hw-warn');
+                    glitchEl.classList.add(stuck ? 'hw-err' : 'hw-warn');
+                    glitchEl.setAttribute('data-label', stuck ? 'IMU DONDU' : 'IMU ' + (spikes + clips));
+                    glitchEl.title = stuck
+                        ? 'IMU DONMUS: ham gyro degeri degismiyor — I2C baglantisini kontrol edin'
+                        : 'Reddedilen IMU darbesi: ' + spikes + ' gyro, ' + clips +
+                          ' ivme. Sifirdan farkli olmasi I2C hattinin gurultulu oldugunu gosterir.';
+                } else {
+                    glitchEl.classList.add('d-none');
+                }
+            }
+
             var bar = document.getElementById('hwStatusBar');
             if (bar) bar.classList.remove('d-none');
         }

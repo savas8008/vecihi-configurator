@@ -199,6 +199,11 @@
               <span class="hw-status-item" id="hw-gps"      data-label="GPS"   title="GPS"></span>
               <span class="hw-status-item" id="hw-pitot"    data-label="PITOT" title="Pitot Tüpü (MS4525DO)"></span>
               <span class="hw-status-item" id="hw-receiver" data-label="RADIO" title="RC Alıcı"></span>
+              <!-- IMU veri yolu sagligi: reddedilen darbe / kirpma sayaclari.
+                   Sifir degilse I2C hatti temiz degil demektir. Yalnizca
+                   sayac sifirdan farkliysa gorunur. -->
+              <span class="hw-status-item d-none" id="hw-imu-glitch" data-label="IMU"
+                    title="Reddedilen IMU darbesi — sıfırdan farklıysa I2C hattı gürültülü"></span>
             </div>
 
             <!-- Bağlantı Durumu -->

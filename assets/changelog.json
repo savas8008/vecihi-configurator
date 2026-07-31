@@ -8,7 +8,8 @@
       "Makullük (aralık) kontrolü: fiziksel olarak imkânsız gyro/ivme değerleri reddedilip bir önceki geçerli örnek tutuluyor. İvme eşiği iNav'ın ACC_CLIPPING_THRESHOLD_G değerinden alındı. Bu kontrol hem tutum kestirimini hem irtifa tahmincisini birlikte koruyor",
       "Donmuş sensör tespiti eklendi: I2C donup aynı ham değeri tekrar tekrar döndürdüğünde okuma 'başarılı' sayılıyor ve mevcut hata sayacı bunu göremiyordu — sessiz ve tehlikeli bir arıza modu. Artık tespit edilip mevcut failsafe zincirine bağlanıyor (I2C kurtarma, ardından kumanda geçişi; motor kesilmiyor). Sensör düzelirse kendiliğinden toparlıyor",
       "Teşhis sayaçları sensör akışına eklendi: reddedilen gyro darbesi sayısı, ivme kırpma sayısı ve donmuş sensör durumu. Uçuş sonrası 'gerçekten glitch var mıydı?' sorusu artık veriyle cevaplanabiliyor; sıfırdan farklıysa IMU veri yolu temiz değil demektir",
-      "Yeni ayarlar (Filtreler): imu_despike_enabled (varsayılan açık), gyro_sanity_dps (1800), accel_sanity_g (15.5), imu_stuck_count (200)"
+      "Yeni ayarlar (Filtreler): imu_despike_enabled (varsayılan açık), gyro_sanity_dps (1800), accel_sanity_g (15.5), imu_stuck_count (200)",
+      "IMU sağlık sayaçları için durum barına bir uyarı göstergesi eklendi — sayaçlar sıfırken hiç görünmez, darbe reddedildiğinde turuncu, sensör donduğunda kırmızı olarak belirir. NOT: bu gösterge USB bağlıyken çalışır, yani yalnızca tezgâh kontrolü içindir (motor rölanti testinde I2C hattının temiz olup olmadığını görmek gibi). Uçuş sırasında görülebilmesi için OSD göstergesi ve iniş sonrası uçuş raporu ekranı gerekiyor; ikisi de yapılacaklar listesine alındı"
     ]
   },
   {
