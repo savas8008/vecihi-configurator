@@ -18,6 +18,7 @@
     "modes": "Flight Modes",
     "pid": "PID",
     "advanced": "Preferences",
+    "parameters": "Parameters",
     "osd": "OSD",
     "waypoint": "Waypoint",
     "logs": "Logs",
@@ -377,6 +378,11 @@
     "stream_start": "Start Data Stream",
 
     "bat_section": "Battery",
+    "bat_volt_panel": "Voltage",
+    "bat_volt_panel_sub": "ADC measurement and cell limits",
+    "bat_curr_panel": "Current",
+    "bat_curr_panel_sub": "Virtual current sensor and capacity",
+    "bat_calc_toggle": "Calibration Tools",
     "bat_voltage_section": "Voltage Measurement (ADC)",
     "bat_adc_hint": "ADC GPIO pin setting is at the top of the page.",
     "bat_scale": "Scale Factor",
@@ -426,6 +432,36 @@
 
     "btn_save": "Save Preferences"
   },
+
+    "params": {
+
+      "page_title": "Parameters",
+
+      "page_subtitle": "Every tunable parameter in the flight software. Edit a value and press the save button on that row — only the section that parameter belongs to is written to the board.",
+
+      "search_ph": "Search parameter name or description…",
+
+      "changed_only": "Changed only",
+
+      "refresh": "Refresh",
+
+      "save_all": "Save Changed",
+
+      "export": "CSV",
+
+      "reset_all": "Reset All",
+
+      "col_name": "PARAMETER NAME",
+
+      "col_desc": "DESCRIPTION",
+
+      "col_value": "VALUE",
+
+      "col_save": "SAVE",
+
+      "connect_hint": "Parameters load automatically once the board is connected."
+
+    },
 
   "osd": {
     "page_title": "OSD Designer",

@@ -48,6 +48,8 @@
 <script src="assets/js/settings_backup.js"></script>
 <script src="assets/js/kml_converter.js"></script>
 <script src="assets/js/changelog.js"></script>
+<script src="assets/js/param_meta.js"></script>
+<script src="assets/js/parameters.js"></script>
     <link rel="stylesheet" href="assets/css/style.css"> 
     <style>
     /* ===== DONANIM DURUM BARI (header içi, sağa yaslanmış) ===== */
@@ -240,6 +242,11 @@
 						<li class="nav-item">
     <a class="nav-link" href="#" data-page="advanced">
         <i class="bi bi-sliders me-2"></i> <span data-i18n="nav.advanced">Tercihler</span>
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="#" data-page="parameters">
+        <i class="bi bi-list-columns-reverse me-2"></i> <span data-i18n="nav.parameters">Parametreler</span>
     </a>
 </li>
 <li class="nav-item">
@@ -2509,197 +2516,191 @@
                 <div class="panel4 mode-cat-safety">
                     <div class="mode-category-title"><i class="bi bi-battery-half"></i> <span data-i18n="advanced.bat_section">Batarya</span></div>
 
-                    <!-- Voltaj Ölçümü -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-muted border-bottom border-secondary pb-1">
-                                <i class="bi bi-plug me-1"></i> <span data-i18n="advanced.bat_voltage_section">Voltaj Ölçümü (ADC)</span>
-                            </h6>
-                        </div>
-                        <div class="col-md-4 border-end border-secondary">
-                            <div class="mb-2">
-                                <small class="text-info"><i class="bi bi-info-circle me-1"></i><span data-i18n="advanced.bat_adc_hint">ADC GPIO pin ayarı sayfanın üstündedir.</span></small>
-                            </div>
-                            <div class="mb-2 row">
-                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Gerilim bölücü oranı = (R1+R2)/R2. Örn: 100kΩ+10kΩ → 11.0" data-i18n="advanced.bat_scale">Ölçek Faktörü <small class="text-muted">(R1+R2)/R2</small></label>
-                                <div class="col-sm-5">
-                                    <input type="number" class="form-control form-control-sm" id="inp_bat_adc_scale"
-                                           min="1" max="50" step="0.1" value="11.0">
+                    <div class="row g-3 bat-split">
+
+                        <!-- ---------- SOL PANEL: VOLTAJ ---------- -->
+                        <div class="col-lg-6">
+                            <div class="bat-panel bat-panel-volt">
+                                <div class="bat-panel-head">
+                                    <i class="bi bi-plug-fill"></i>
+                                    <span class="bat-panel-name" data-i18n="advanced.bat_volt_panel">Voltaj</span>
+                                    <span class="bat-panel-sub" data-i18n="advanced.bat_volt_panel_sub">ADC ölçümü ve hücre limitleri</span>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="alert alert-dark py-2 px-3 small mb-0">
-                                <strong>Gerilim Bölücü Hesabı:</strong>
-                                <div class="mt-1">
-                                    ESP32 ADC girişi maks. <strong>3.3V</strong> ölçer. Lipo voltajını bölücüyle düşürmek gerekir.<br>
-                                    <code>Ölçek = (R1 + R2) / R2</code> &nbsp;|&nbsp; Tipik: R1=100kΩ, R2=10kΩ → <strong>11.0</strong> (4S lipo ≈ 16.8V ölçebilir)<br>
-                                    Pin -1 ise voltaj ölçümü devre dışı kalır.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <hr class="border-secondary my-3">
+                                <div class="bat-panel-body">
+                                    <div class="bat-group-title">
+                                        <i class="bi bi-rulers"></i> <span data-i18n="advanced.bat_voltage_section">Voltaj Ölçümü (ADC)</span>
+                                    </div>
+                                    <div class="bat-note bat-note-info">
+                                        <i class="bi bi-info-circle me-1"></i><span data-i18n="advanced.bat_adc_hint">ADC GPIO pin ayarı sayfanın üstündedir.</span>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm" title="Gerilim bölücü oranı = (R1+R2)/R2. Örn: 100kΩ+10kΩ → 11.0" data-i18n="advanced.bat_scale">Ölçek Faktörü <small class="text-muted">(R1+R2)/R2</small></label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control form-control-sm" id="inp_bat_adc_scale"
+                                                   min="1" max="50" step="0.1" value="11.0">
+                                        </div>
+                                    </div>
+                                    <div class="bat-help">
+                                        <strong>Gerilim Bölücü Hesabı:</strong>
+                                        <div class="mt-1">
+                                            ESP32 ADC girişi maks. <strong>3.3V</strong> ölçer. Lipo voltajını bölücüyle düşürmek gerekir.<br>
+                                            <code>Ölçek = (R1 + R2) / R2</code> &nbsp;|&nbsp; Tipik: R1=100kΩ, R2=10kΩ → <strong>11.0</strong> (4S lipo ≈ 16.8V ölçebilir)<br>
+                                            Pin -1 ise voltaj ölçümü devre dışı kalır.
+                                        </div>
+                                    </div>
 
-                    <!-- Hücre Voltaj Limitleri -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-muted border-bottom border-secondary pb-1">
-                                <i class="bi bi-battery me-1"></i> <span data-i18n="advanced.bat_cell_section">Hücre Voltaj Limitleri</span> <small class="text-muted" data-i18n="advanced.bat_cell_section_hint">(OSD Pil Simgesi)</small>
-                            </h6>
-                        </div>
-                        <div class="col-md-4 border-end border-secondary">
-                            <div class="mb-2 row">
-                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına boş voltaj — pil simgesi bu eşiğin altında boş görünür" data-i18n="advanced.bat_cell_min">Boş Hücre Voltajı <small class="text-muted">(V)</small></label>
-                                <div class="col-sm-5">
-                                    <input type="number" class="form-control form-control-sm" id="inp_cell_min_v"
-                                           min="2.0" max="4.0" step="0.05" value="3.0">
-                                </div>
-                            </div>
-                            <div class="mb-2 row">
-                                <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına dolu voltaj — pil simgesi bu eşikte dolu görünür" data-i18n="advanced.bat_cell_max">Dolu Hücre Voltajı <small class="text-muted">(V)</small></label>
-                                <div class="col-sm-5">
-                                    <input type="number" class="form-control form-control-sm" id="inp_cell_max_v"
-                                           min="3.5" max="4.5" step="0.05" value="4.2">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="alert alert-dark py-2 px-3 small mb-0">
-                                <strong>OSD Pil Simgesi Hesabı:</strong>
-                                <div class="mt-1">
-                                    Simge doluluk oranı = <code>(hücre_voltajı − boş) ÷ (dolu − boş)</code><br>
-                                    Tipik LiPo: Boş = <strong>3.0V</strong>, Dolu = <strong>4.2V</strong><br>
-                                    LiHV piller için: Boş = <strong>3.0V</strong>, Dolu = <strong>4.35V</strong><br>
-                                    <span class="text-warning">⚠ Boş voltajı gerçek hücre voltajının üstünde ayarlamak simgenin hep boş görünmesine yol açar.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="border-secondary my-3">
-
-                    <!-- Sanal Akım Sensörü -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-muted border-bottom border-secondary pb-1">
-                                <i class="bi bi-lightning-charge me-1"></i> <span data-i18n="advanced.bat_virtual_section">Sanal Akım Sensörü</span>
-                            </h6>
-                        </div>
-
-                        <!-- Sol: Max & Boşta Akım -->
-                        <div class="col-md-3 border-end border-secondary">
-                            <div class="mb-2 row">
-                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Tam gazda motor + tüm elektroniklerin toplam çektiği akım (A)" data-i18n="advanced.bat_max_current">Max Akım (A)</label>
-                                <div class="col-sm-4">
-                                    <input type="number" class="form-control form-control-sm" id="inp_vc_scale"
-                                           step="0.5" min="1" max="200" value="30.0">
-                                </div>
-                            </div>
-                            <div class="mb-2 row">
-                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Gaz sıfırken alıcı + servo + ESP32 toplam boşta akım (A)" data-i18n="advanced.bat_idle_current">Boşta Akım (A)</label>
-                                <div class="col-sm-4">
-                                    <input type="number" class="form-control form-control-sm" id="inp_vc_idle"
-                                           step="0.1" min="0" max="10" value="0.5">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Orta: Kalibrasyon & Kapasite -->
-                        <div class="col-md-3 border-end border-secondary">
-                            <div class="mb-2 row">
-                                <label class="col-sm-8 col-form-label col-form-label-sm" title="İlk uçuş sonrası ince ayar: gerçek_tüketim / tahmin_tüketim" data-i18n="advanced.bat_calibration">Kalibrasyon</label>
-                                <div class="col-sm-4">
-                                    <input type="number" class="form-control form-control-sm" id="inp_vc_calib"
-                                           step="0.01" min="0.5" max="2.0" value="1.0">
-                                </div>
-                            </div>
-                            <div class="mb-2 row">
-                                <label class="col-sm-8 col-form-label col-form-label-sm" title="Pilin toplam kapasitesi — kumandada Bat% göstergesi bu değere göre hesaplanır" data-i18n="advanced.bat_capacity">Kapasite (mAh)</label>
-                                <div class="col-sm-4">
-                                    <input type="number" class="form-control form-control-sm" id="inp_vc_cap_mah"
-                                           step="100" min="100" max="20000" value="2200">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sağ: Kullanım kılavuzu -->
-                        <div class="col-md-6">
-                            <div class="alert alert-dark py-2 px-3 small mb-0">
-                                <strong>Kalibrasyon Adımları:</strong>
-                                <ol class="mb-0 ps-3 mt-1">
-                                    <li>Uçak tipine göre max akımı tahmin et (örn. 4S + 40A motor = 40A).</li>
-                                    <li>Boşta akımı gir: alıcı + servolar + ESP32 ≈ 0.5–1A.</li>
-                                    <li>İlk uçuş sonrası şarj cihazından okunan mAh değerini, configuratördeki tahmini ile karşılaştır.</li>
-                                    <li><strong>Kalibrasyon = gerçek mAh ÷ tahmini mAh</strong> olarak ayarla.</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="border-secondary my-3">
-
-                    <!-- Kalibrasyon Hesaplayıcılar -->
-                    <div class="col-12 mb-2">
-                        <h6 class="text-muted border-bottom border-secondary pb-1">
-                            <i class="bi bi-calculator me-1"></i> <span data-i18n="advanced.bat_calc_section">Kalibrasyon Hesaplayıcılar</span>
-                        </h6>
-                    </div>
-                    <div class="row g-3 mb-2">
-
-                        <!-- Panel 1: Voltaj -->
-                        <div class="col-md-6">
-                            <div class="border border-secondary rounded p-3 h-100">
-                                <div class="fw-semibold small mb-2 text-info"><i class="bi bi-plug me-1"></i> <span data-i18n="advanced.volt_calc_title">Voltaj Kalibrasyonu</span></div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.volt_calc_shown">Telemetride görünen (V)</label>
-                                    <div class="col-sm-5">
-                                        <input type="number" class="form-control form-control-sm" id="inp_calib_volt_shown"
-                                               step="0.1" min="0.1" max="60">
+                                    <div class="bat-group-title mt-3">
+                                        <i class="bi bi-battery"></i> <span data-i18n="advanced.bat_cell_section">Hücre Voltaj Limitleri</span>
+                                        <small class="text-muted ms-1" data-i18n="advanced.bat_cell_section_hint">(OSD Pil Simgesi)</small>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına boş voltaj — pil simgesi bu eşiğin altında boş görünür" data-i18n="advanced.bat_cell_min">Boş Hücre Voltajı <small class="text-muted">(V)</small></label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control form-control-sm" id="inp_cell_min_v"
+                                                   min="2.0" max="4.0" step="0.05" value="3.0">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm" title="Hücre başına dolu voltaj — pil simgesi bu eşikte dolu görünür" data-i18n="advanced.bat_cell_max">Dolu Hücre Voltajı <small class="text-muted">(V)</small></label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control form-control-sm" id="inp_cell_max_v"
+                                                   min="3.5" max="4.5" step="0.05" value="4.2">
+                                        </div>
+                                    </div>
+                                    <div class="bat-help">
+                                        <strong>OSD Pil Simgesi Hesabı:</strong>
+                                        <div class="mt-1">
+                                            Simge doluluk oranı = <code>(hücre_voltajı − boş) ÷ (dolu − boş)</code><br>
+                                            Tipik LiPo: Boş = <strong>3.0V</strong>, Dolu = <strong>4.2V</strong><br>
+                                            LiHV piller için: Boş = <strong>3.0V</strong>, Dolu = <strong>4.35V</strong><br>
+                                            <span class="bat-help-warn">⚠ Boş voltajı gerçek hücre voltajının üstünde ayarlamak simgenin hep boş görünmesine yol açar.</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.volt_calc_actual">Gerçekte ölçülen (V)</label>
-                                    <div class="col-sm-5">
-                                        <input type="number" class="form-control form-control-sm" id="inp_calib_volt_actual"
-                                               step="0.1" min="0.1" max="60">
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-info w-100 mt-1"
-                                        onclick="computeVoltageCalib()">
-                                    <i class="bi bi-arrow-repeat me-1"></i> <span data-i18n="advanced.volt_calc_btn">Ölçeği Hesapla ve Uygula</span>
+
+                                <!-- Kalibrasyon araçları (katlanır) -->
+                                <button type="button" class="bat-calc-toggle" id="bat_calc_volt_btn"
+                                        aria-expanded="false" aria-controls="bat_calc_volt"
+                                        onclick="toggleBatCalc('bat_calc_volt', this)">
+                                    <i class="bi bi-tools"></i>
+                                    <span data-i18n="advanced.bat_calc_toggle">Kalibrasyon Araçları</span>
+                                    <i class="bi bi-chevron-down bat-calc-chevron ms-auto"></i>
                                 </button>
-                                <div class="text-muted mt-2" style="font-size:0.72rem;">
-                                    Multimetre ile ölçülen gerçek voltajı gir. <code>yeni_ölçek = mevcut × (gerçek ÷ gösterilen)</code> — sonuç <em>Ölçek Faktörü</em> alanına yazılır.
+                                <div class="bat-calc-body" id="bat_calc_volt">
+                                    <div class="bat-calc-inner">
+                                        <div class="bat-calc-title"><i class="bi bi-calculator me-1"></i> <span data-i18n="advanced.volt_calc_title">Voltaj Kalibrasyonu</span></div>
+                                        <div class="mb-2 row">
+                                            <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.volt_calc_shown">Telemetride görünen (V)</label>
+                                            <div class="col-sm-5">
+                                                <input type="number" class="form-control form-control-sm" id="inp_calib_volt_shown"
+                                                       step="0.1" min="0.1" max="60">
+                                            </div>
+                                        </div>
+                                        <div class="mb-2 row">
+                                            <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.volt_calc_actual">Gerçekte ölçülen (V)</label>
+                                            <div class="col-sm-5">
+                                                <input type="number" class="form-control form-control-sm" id="inp_calib_volt_actual"
+                                                       step="0.1" min="0.1" max="60">
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-info w-100 mt-1"
+                                                onclick="computeVoltageCalib()">
+                                            <i class="bi bi-arrow-repeat me-1"></i> <span data-i18n="advanced.volt_calc_btn">Ölçeği Hesapla ve Uygula</span>
+                                        </button>
+                                        <div class="bat-calc-hint">
+                                            Multimetre ile ölçülen gerçek voltajı gir. <code>yeni_ölçek = mevcut × (gerçek ÷ gösterilen)</code> — sonuç <em>Ölçek Faktörü</em> alanına yazılır.
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Panel 2: Kapasite (mAh) -->
-                        <div class="col-md-6">
-                            <div class="border border-secondary rounded p-3 h-100">
-                                <div class="fw-semibold small mb-2 text-info"><i class="bi bi-battery-charging me-1"></i> <span data-i18n="advanced.mah_calc_title">Kapasite Kalibrasyonu</span></div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.mah_calc_reported">Tahmin edilen tüketim (mAh)</label>
-                                    <div class="col-sm-5">
-                                        <input type="number" class="form-control form-control-sm" id="inp_calib_reported_mah"
-                                               step="10" min="1" max="50000">
+                        <!-- ---------- SAĞ PANEL: AKIM ---------- -->
+                        <div class="col-lg-6">
+                            <div class="bat-panel bat-panel-curr">
+                                <div class="bat-panel-head">
+                                    <i class="bi bi-lightning-charge-fill"></i>
+                                    <span class="bat-panel-name" data-i18n="advanced.bat_curr_panel">Akım</span>
+                                    <span class="bat-panel-sub" data-i18n="advanced.bat_curr_panel_sub">Sanal akım sensörü ve kapasite</span>
+                                </div>
+
+                                <div class="bat-panel-body">
+                                    <div class="bat-group-title">
+                                        <i class="bi bi-speedometer2"></i> <span data-i18n="advanced.bat_virtual_section">Sanal Akım Sensörü</span>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm" title="Tam gazda motor + tüm elektroniklerin toplam çektiği akım (A)" data-i18n="advanced.bat_max_current">Max Akım (A)</label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control form-control-sm" id="inp_vc_scale"
+                                                   step="0.5" min="1" max="200" value="30.0">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm" title="Gaz sıfırken alıcı + servo + ESP32 toplam boşta akım (A)" data-i18n="advanced.bat_idle_current">Boşta Akım (A)</label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control form-control-sm" id="inp_vc_idle"
+                                                   step="0.1" min="0" max="10" value="0.5">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm" title="İlk uçuş sonrası ince ayar: gerçek_tüketim / tahmin_tüketim" data-i18n="advanced.bat_calibration">Kalibrasyon</label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control form-control-sm" id="inp_vc_calib"
+                                                   step="0.01" min="0.5" max="2.0" value="1.0">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label class="col-sm-7 col-form-label col-form-label-sm" title="Pilin toplam kapasitesi — kumandada Bat% göstergesi bu değere göre hesaplanır" data-i18n="advanced.bat_capacity">Kapasite (mAh)</label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control form-control-sm" id="inp_vc_cap_mah"
+                                                   step="100" min="100" max="20000" value="2200">
+                                        </div>
+                                    </div>
+                                    <div class="bat-help">
+                                        <strong>Kalibrasyon Adımları:</strong>
+                                        <ol class="mb-0 ps-3 mt-1">
+                                            <li>Uçak tipine göre max akımı tahmin et (örn. 4S + 40A motor = 40A).</li>
+                                            <li>Boşta akımı gir: alıcı + servolar + ESP32 ≈ 0.5–1A.</li>
+                                            <li>İlk uçuş sonrası şarj cihazından okunan mAh değerini, configuratördeki tahmini ile karşılaştır.</li>
+                                            <li><strong>Kalibrasyon = gerçek mAh ÷ tahmini mAh</strong> olarak ayarla.</li>
+                                        </ol>
                                     </div>
                                 </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.mah_calc_actual">Gerçek tüketim (mAh)</label>
-                                    <div class="col-sm-5">
-                                        <input type="number" class="form-control form-control-sm" id="inp_calib_actual_mah"
-                                               step="10" min="1" max="50000">
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-info w-100 mt-1"
-                                        onclick="computeCurrentCalib()">
-                                    <i class="bi bi-arrow-repeat me-1"></i> <span data-i18n="advanced.mah_calc_btn">Kalibrasyonu Hesapla ve Uygula</span>
+
+                                <!-- Kalibrasyon araçları (katlanır) -->
+                                <button type="button" class="bat-calc-toggle" id="bat_calc_curr_btn"
+                                        aria-expanded="false" aria-controls="bat_calc_curr"
+                                        onclick="toggleBatCalc('bat_calc_curr', this)">
+                                    <i class="bi bi-tools"></i>
+                                    <span data-i18n="advanced.bat_calc_toggle">Kalibrasyon Araçları</span>
+                                    <i class="bi bi-chevron-down bat-calc-chevron ms-auto"></i>
                                 </button>
-                                <div class="text-muted mt-2" style="font-size:0.72rem;">
-                                    Şarj cihazının yüklediği mAh'ı gir. <code>yeni_calib = mevcut × (gerçek ÷ tahmin)</code> — sonuç <em>Kalibrasyon</em> alanına yazılır.
+                                <div class="bat-calc-body" id="bat_calc_curr">
+                                    <div class="bat-calc-inner">
+                                        <div class="bat-calc-title"><i class="bi bi-battery-charging me-1"></i> <span data-i18n="advanced.mah_calc_title">Kapasite Kalibrasyonu</span></div>
+                                        <div class="mb-2 row">
+                                            <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.mah_calc_reported">Tahmin edilen tüketim (mAh)</label>
+                                            <div class="col-sm-5">
+                                                <input type="number" class="form-control form-control-sm" id="inp_calib_reported_mah"
+                                                       step="10" min="1" max="50000">
+                                            </div>
+                                        </div>
+                                        <div class="mb-2 row">
+                                            <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.mah_calc_actual">Gerçek tüketim (mAh)</label>
+                                            <div class="col-sm-5">
+                                                <input type="number" class="form-control form-control-sm" id="inp_calib_actual_mah"
+                                                       step="10" min="1" max="50000">
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-info w-100 mt-1"
+                                                onclick="computeCurrentCalib()">
+                                            <i class="bi bi-arrow-repeat me-1"></i> <span data-i18n="advanced.mah_calc_btn">Kalibrasyonu Hesapla ve Uygula</span>
+                                        </button>
+                                        <div class="bat-calc-hint">
+                                            Şarj cihazının yüklediği mAh'ı gir. <code>yeni_calib = mevcut × (gerçek ÷ tahmin)</code> — sonuç <em>Kalibrasyon</em> alanına yazılır.
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2724,7 +2725,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label text-muted small" data-i18n="advanced.pitot_scale_label">Ölçek (Scale)</label>
-                            <input type="number" class="form-control form-control-sm bg-dark text-white border-secondary" id="pitotScale" min="0.5" max="2.0" step="0.01" value="1.00">
+                            <input type="number" class="form-control form-control-sm" id="pitotScale" min="0.5" max="2.0" step="0.01" value="1.00">
                             <small class="text-muted d-block mt-1" data-i18n="advanced.pitot_scale_hint">Varsayılan: 1.00 · Tüp açısı veya uzunluk farkı için ince ayar.</small>
                         </div>
                     </div>
@@ -2745,6 +2746,15 @@ function switchAdvTab(tabId, btn) {
     document.querySelectorAll('.adv-tab').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     btn.classList.add('active');
+}
+
+/* Batarya sekmesi — kalibrasyon araçları bölümünü aç/kapat */
+function toggleBatCalc(bodyId, btn) {
+    const body = document.getElementById(bodyId);
+    if (!body) return;
+    const open = body.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 </script>
 
@@ -3087,6 +3097,67 @@ function switchAdvTab(tabId, btn) {
     });
 </script>
 		
+<!-- ==================== PARAMETRELER (TAM LİSTE) ==================== -->
+<div id="parameters" class="page">
+    <div class="panel">
+        <h2 class="panel-title">
+            <i class="bi bi-list-columns-reverse"></i>
+            <span data-i18n="params.page_title">Parametreler</span>
+        </h2>
+        <p class="text-muted small mb-3" data-i18n="params.page_subtitle">
+            Uçuş yazılımındaki tüm ayarlanabilir parametreler. Değeri düzenleyip satırdaki kaydet düğmesine basın — yalnızca o parametrenin ait olduğu bölüm karta yazılır.
+        </p>
+
+        <div class="param-toolbar">
+            <div class="param-search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" id="paramSearch" class="form-control form-control-sm"
+                       data-i18n-placeholder="params.search_ph"
+                       placeholder="Parametre adı veya açıklamada ara…">
+            </div>
+            <div class="form-check form-switch param-changed-switch">
+                <input class="form-check-input" type="checkbox" id="paramChangedOnly">
+                <label class="form-check-label small" for="paramChangedOnly" data-i18n="params.changed_only">Yalnızca değiştirilenler</label>
+            </div>
+            <span class="param-count-badge" id="paramVisibleCount">0 / 0</span>
+            <div class="param-toolbar-actions">
+                <button type="button" class="btn btn-sm btn-outline-info" id="btnParamRefresh">
+                    <i class="bi bi-arrow-clockwise me-1"></i><span data-i18n="params.refresh">Yenile</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-warning" id="btnParamSaveAll">
+                    <i class="bi bi-save2 me-1"></i><span data-i18n="params.save_all">Değişenleri Kaydet</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnParamExport">
+                    <i class="bi bi-filetype-csv me-1"></i><span data-i18n="params.export">CSV</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" id="btnParamResetAll">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i><span data-i18n="params.reset_all">Tümünü Sıfırla</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="param-group-chips" id="paramGroupChips"></div>
+
+        <div class="param-table-wrap">
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th class="param-th-name"  data-i18n="params.col_name">PARAMETRE ADI</th>
+                        <th class="param-th-desc"  data-i18n="params.col_desc">AÇIKLAMA</th>
+                        <th class="param-th-value" data-i18n="params.col_value">DEĞER</th>
+                        <th class="param-th-save"  data-i18n="params.col_save">KAYDET</th>
+                    </tr>
+                </thead>
+                <tbody id="paramTableBody">
+                    <tr><td colspan="4" class="text-center text-muted py-4" data-i18n="params.connect_hint">
+                        Karta bağlanınca parametreler otomatik yüklenir.
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <div id="logs" class="page">
     <div class="panel panel2">
         <h2 class="panel-title"><i class="bi bi-terminal"></i> <span data-i18n="logs.page_title">Komut Konsolu & Sistem Logları</span></h2>
