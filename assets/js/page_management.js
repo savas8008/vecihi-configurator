@@ -179,6 +179,12 @@ function startPageSpecificStream(page) {
             if (typeof initFirmwarePage === 'function') initFirmwarePage();
             break;
 
+        case 'blackbox':
+            // Stream yok. Kayıt cihazdan tek seferlik 'dump' ile çekilir —
+            // otomatik çekmiyoruz, kullanıcı butona basmalı (dump uzun sürebilir).
+            if (typeof initBlackboxPage === 'function') initBlackboxPage();
+            break;
+
         default:
             // calibration, outputs, logs, advanced: stream yok
             break;

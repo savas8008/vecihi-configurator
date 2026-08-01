@@ -437,7 +437,13 @@ function processSingleLine(line) {
     if (typeof debugIncomingData === 'function') {
         debugIncomingData(line);
     }
-    
+
+    // Blackbox dump'ı ÖNCE yakala: binlerce heks satırı konsolu boğmasın.
+    // true dönerse satır blackbox tarafından tüketilmiştir.
+    if (typeof Blackbox !== 'undefined' && Blackbox.feedLine(line)) {
+        return;
+    }
+
     if (line.startsWith('{') && line.endsWith('}')) {
         try {
             const jsonData = JSON.parse(line);

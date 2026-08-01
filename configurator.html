@@ -29,6 +29,7 @@
 <script src="assets/js/aircraft_model.js"></script>
 <script src="assets/js/serial_communication.js"></script>
 <script src="assets/js/logger.js"></script>
+<script src="assets/js/blackbox.js"></script>
 <script src="assets/js/sensors.js"></script>
 <script src="assets/js/transmitter.js"></script>
 <script src="assets/js/calibration.js"></script>
@@ -259,6 +260,7 @@
         <i class="bi bi-map me-2"></i> <span data-i18n="nav.waypoint">Waypoint</span>
     </a>
 </li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="blackbox"><i class="bi bi-hdd-stack me-2"></i> <span data-i18n="nav.blackbox">Uçuş Kaydı</span></a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="logs"><i class="bi bi-journal-text me-2"></i> <span data-i18n="nav.logs">Loglar</span></a></li>
 
                         <!-- BAĞLANTISIZ ARAÇLAR — bağlıyken JS ile gizlenir -->
@@ -3154,6 +3156,105 @@ function toggleBatCalc(bodyId, btn) {
                     </td></tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== UÇUŞ KAYDI (BLACKBOX) ==================== -->
+<div id="blackbox" class="page">
+    <div class="panel panel2">
+        <h2 class="panel-title">
+            <i class="bi bi-hdd-stack"></i>
+            <span data-i18n="blackbox.page_title">Uçuş Kaydı (Blackbox)</span>
+        </h2>
+
+        <div class="row g-3">
+            <!-- SOL: kontroller + özet + uyarılar -->
+            <div class="col-lg-4">
+                <div class="panel mb-3">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" onclick="Blackbox.request()">
+                            <i class="bi bi-download me-2"></i>Logu Oku
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="Blackbox.eraseDevice()">
+                            <i class="bi bi-trash me-2"></i>Cihazdaki Kaydı Sil
+                        </button>
+                    </div>
+                    <div id="bbStatus" class="small text-muted mt-3">
+                        Hazır. "Logu Oku" ile cihazdan kaydı çekin.
+                    </div>
+                    <div class="alert alert-secondary py-2 px-3 mt-3 mb-0 small">
+                        Silme işlemi birkaç saniye sürer ve <strong>yerde</strong> yapılmalıdır.
+                        Uçuşta flash'a hiç silme yapılmaz — kilitlenmeyi önleyen tasarım budur.
+                    </div>
+                </div>
+
+                <div class="panel mb-3">
+                    <h3 class="h6 mb-2"><i class="bi bi-info-circle me-2"></i>Özet</h3>
+                    <div id="bbSummary" class="small">
+                        <span class="text-muted">Henüz kayıt okunmadı.</span>
+                    </div>
+                </div>
+
+                <div class="panel mb-3">
+                    <h3 class="h6 mb-2"><i class="bi bi-exclamation-triangle me-2"></i>Sağlık</h3>
+                    <div id="bbWarnings">
+                        <span class="text-muted small">Henüz kayıt okunmadı.</span>
+                    </div>
+                </div>
+
+                <div class="panel" id="bbDownloads" style="display:none">
+                    <h3 class="h6 mb-2"><i class="bi bi-file-earmark-arrow-down me-2"></i>İndir</h3>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadSlow()">
+                            Uçuş kaydı (CSV)
+                        </button>
+                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadFast()">
+                            Filtre kaydı (CSV) — ayar için
+                        </button>
+                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadEvents()">
+                            Olaylar (CSV)
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="Blackbox.downloadRaw()">
+                            Ham veri (.bin)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAĞ: veri tabloları -->
+            <div class="col-lg-8">
+                <ul class="nav nav-tabs mb-2" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab"
+                        data-bs-target="#bbTabSlow" type="button">Uçuş (10 Hz)</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                        data-bs-target="#bbTabFast" type="button">Filtre (tam hız)</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                        data-bs-target="#bbTabEvent" type="button">Olaylar</button></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="bbTabSlow">
+                        <div id="bbSlowTable" style="max-height:65vh;overflow:auto">
+                            <div class="text-muted small p-2">Henüz kayıt okunmadı.</div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="bbTabFast">
+                        <div class="alert alert-secondary py-2 px-3 mb-2 small">
+                            Bu kayıt filtre zincirinin üç aşamasını birden içerir:
+                            <strong>ham → notch sonrası → LPF sonrası</strong>.
+                            Filtre ayarı için CSV'yi indirip inceleyin.
+                        </div>
+                        <div id="bbFastTable" style="max-height:60vh;overflow:auto">
+                            <div class="text-muted small p-2">Henüz kayıt okunmadı.</div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="bbTabEvent">
+                        <div id="bbEventList" style="max-height:65vh;overflow:auto">
+                            <div class="text-muted small p-2">Henüz kayıt okunmadı.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
