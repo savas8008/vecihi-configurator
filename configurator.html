@@ -48,6 +48,8 @@
 <script src="assets/js/settings_backup.js"></script>
 <script src="assets/js/kml_converter.js"></script>
 <script src="assets/js/changelog.js"></script>
+<script src="assets/js/param_meta.js"></script>
+<script src="assets/js/parameters.js"></script>
     <link rel="stylesheet" href="assets/css/style.css"> 
     <style>
     /* ===== DONANIM DURUM BARI (header içi, sağa yaslanmış) ===== */
@@ -240,6 +242,11 @@
 						<li class="nav-item">
     <a class="nav-link" href="#" data-page="advanced">
         <i class="bi bi-sliders me-2"></i> <span data-i18n="nav.advanced">Tercihler</span>
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="#" data-page="parameters">
+        <i class="bi bi-list-columns-reverse me-2"></i> <span data-i18n="nav.parameters">Parametreler</span>
     </a>
 </li>
 <li class="nav-item">
@@ -3090,6 +3097,67 @@ function toggleBatCalc(bodyId, btn) {
     });
 </script>
 		
+<!-- ==================== PARAMETRELER (TAM LİSTE) ==================== -->
+<div id="parameters" class="page">
+    <div class="panel">
+        <h2 class="panel-title">
+            <i class="bi bi-list-columns-reverse"></i>
+            <span data-i18n="params.page_title">Parametreler</span>
+        </h2>
+        <p class="text-muted small mb-3" data-i18n="params.page_subtitle">
+            Uçuş yazılımındaki tüm ayarlanabilir parametreler. Değeri düzenleyip satırdaki kaydet düğmesine basın — yalnızca o parametrenin ait olduğu bölüm karta yazılır.
+        </p>
+
+        <div class="param-toolbar">
+            <div class="param-search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" id="paramSearch" class="form-control form-control-sm"
+                       data-i18n-placeholder="params.search_ph"
+                       placeholder="Parametre adı veya açıklamada ara…">
+            </div>
+            <div class="form-check form-switch param-changed-switch">
+                <input class="form-check-input" type="checkbox" id="paramChangedOnly">
+                <label class="form-check-label small" for="paramChangedOnly" data-i18n="params.changed_only">Yalnızca değiştirilenler</label>
+            </div>
+            <span class="param-count-badge" id="paramVisibleCount">0 / 0</span>
+            <div class="param-toolbar-actions">
+                <button type="button" class="btn btn-sm btn-outline-info" id="btnParamRefresh">
+                    <i class="bi bi-arrow-clockwise me-1"></i><span data-i18n="params.refresh">Yenile</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-warning" id="btnParamSaveAll">
+                    <i class="bi bi-save2 me-1"></i><span data-i18n="params.save_all">Değişenleri Kaydet</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnParamExport">
+                    <i class="bi bi-filetype-csv me-1"></i><span data-i18n="params.export">CSV</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" id="btnParamResetAll">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i><span data-i18n="params.reset_all">Tümünü Sıfırla</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="param-group-chips" id="paramGroupChips"></div>
+
+        <div class="param-table-wrap">
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th class="param-th-name"  data-i18n="params.col_name">PARAMETRE ADI</th>
+                        <th class="param-th-desc"  data-i18n="params.col_desc">AÇIKLAMA</th>
+                        <th class="param-th-value" data-i18n="params.col_value">DEĞER</th>
+                        <th class="param-th-save"  data-i18n="params.col_save">KAYDET</th>
+                    </tr>
+                </thead>
+                <tbody id="paramTableBody">
+                    <tr><td colspan="4" class="text-center text-muted py-4" data-i18n="params.connect_hint">
+                        Karta bağlanınca parametreler otomatik yüklenir.
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <div id="logs" class="page">
     <div class="panel panel2">
         <h2 class="panel-title"><i class="bi bi-terminal"></i> <span data-i18n="logs.page_title">Komut Konsolu & Sistem Logları</span></h2>

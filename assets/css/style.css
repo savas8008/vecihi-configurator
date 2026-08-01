@@ -3412,3 +3412,182 @@ label.small.text-muted,
 }
 .fs-status-off { background: rgba(148,163,184,0.20); color: #64748b; }
 .fs-status-on  { background: var(--color-warning-glow); color: #c2620a; }
+
+/* ============================================
+   PARAMETRELER SAYFASI — ArduPilot tarzı tam liste
+   ============================================ */
+
+/* --- Araç çubuğu --- */
+.param-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-panel-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    margin-bottom: 10px;
+}
+.param-search-wrap {
+    position: relative;
+    flex: 1 1 260px;
+    min-width: 200px;
+}
+.param-search-wrap i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+.param-search-wrap input { padding-left: 30px !important; }
+.param-changed-switch { margin: 0; white-space: nowrap; }
+.param-count-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border-default);
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+}
+.param-toolbar-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+/* --- Grup filtre çipleri --- */
+.param-group-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.param-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-panel-2);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.param-chip:hover { border-color: var(--color-primary); color: var(--text-primary); }
+.param-chip.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #0f172a;
+}
+.param-chip-count {
+    font-size: 0.66rem;
+    opacity: 0.75;
+    background: rgba(0,0,0,0.18);
+    border-radius: 999px;
+    padding: 0 5px;
+}
+.param-chip.active .param-chip-count { background: rgba(0,0,0,0.22); }
+
+/* --- Tablo --- */
+.param-table-wrap {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+    max-height: 68vh;
+    overflow-y: auto;
+}
+.param-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    min-width: 760px;
+}
+.param-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg-panel-solid);
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 2px solid var(--border-default);
+    white-space: nowrap;
+}
+.param-th-name  { width: 20%; }
+.param-th-desc  { width: 50%; }
+.param-th-value { width: 18%; }
+.param-th-save  { width: 12%; text-align: center !important; }
+
+.param-table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: background 0.12s ease;
+}
+.param-table tbody tr:hover { background: var(--bg-hover); }
+.param-table td { padding: 8px 12px; vertical-align: top; }
+
+/* Varsayılandan farklı satır — sol kenarda sarı işaret */
+.param-row-changed { box-shadow: inset 3px 0 0 var(--color-warning); }
+
+.param-name {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    word-break: break-all;
+}
+.param-group-tag {
+    font-size: 0.64rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+.param-desc {
+    color: var(--text-secondary);
+    line-height: 1.45;
+    font-size: 0.78rem;
+}
+.param-limits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+.param-default strong { color: var(--color-success); }
+.param-type {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    opacity: 0.7;
+}
+.param-value-cell .param-input { min-width: 92px; }
+.param-input.param-dirty {
+    border-color: var(--color-warning) !important;
+    box-shadow: 0 0 0 2px var(--color-warning-glow);
+}
+.param-save-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+.param-save-cell .btn { padding: 3px 8px; }
+.param-save-btn { margin-right: 4px; }
+
+/* Dar ekran: açıklama sütunu daralır, tablo yatay kaydırılır */
+@media (max-width: 992px) {
+    .param-table { min-width: 680px; }
+    .param-toolbar-actions { margin-left: 0; width: 100%; }
+}
+.param-save-btn .param-save-label { margin-left: 5px; font-size: 0.72rem; font-weight: 600; }
+@media (max-width: 1200px) { .param-save-btn .param-save-label { display: none; } }

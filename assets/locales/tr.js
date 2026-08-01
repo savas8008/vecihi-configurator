@@ -22,6 +22,7 @@ window.VECIHI_LOCALE_TR = {
     "modes": "Uçuş Modları",
     "pid": "PID",
     "advanced": "Tercihler",
+    "parameters": "Parametreler",
     "osd": "OSD",
     "waypoint": "Waypoint",
     "logs": "Loglar",
@@ -457,6 +458,36 @@ window.VECIHI_LOCALE_TR = {
 
     "btn_save": "Tercihleri Kaydet"
   },
+
+    "params": {
+
+      "page_title": "Parametreler",
+
+      "page_subtitle": "Uçuş yazılımındaki tüm ayarlanabilir parametreler. Değeri düzenleyip satırdaki kaydet düğmesine basın — yalnızca o parametrenin ait olduğu bölüm karta yazılır.",
+
+      "search_ph": "Parametre adı veya açıklamada ara…",
+
+      "changed_only": "Yalnızca değiştirilenler",
+
+      "refresh": "Yenile",
+
+      "save_all": "Değişenleri Kaydet",
+
+      "export": "CSV",
+
+      "reset_all": "Tümünü Sıfırla",
+
+      "col_name": "PARAMETRE ADI",
+
+      "col_desc": "AÇIKLAMA",
+
+      "col_value": "DEĞER",
+
+      "col_save": "KAYDET",
+
+      "connect_hint": "Karta bağlanınca parametreler otomatik yüklenir."
+
+    },
 
   "osd": {
     "page_title": "OSD Tasarımcı",

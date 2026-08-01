@@ -11,7 +11,7 @@
 let currentPage = '';
 
 // Veri beklenen sayfalar (ESP'den page_data gelmeden kaydet engellenir)
-const DATA_PAGES = new Set(['calibration', 'mixer', 'gps', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint', 'failsafe']);
+const DATA_PAGES = new Set(['calibration', 'mixer', 'gps', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint', 'failsafe', 'parameters']);
 
 // Loading timeout handle'ları (sayfa başına)
 const loadingTimeouts = {};
@@ -100,6 +100,10 @@ function managePageStreams(page) {
         } else if (page === 'osd') {
             sendCommand('osd_page_data');
             setTimeout(() => sendCommand('outputs_page_data'), 200);
+        } else if (page === 'parameters') {
+            // Parametre tablosu ayri protokol kullanir (param_list, parcali dump)
+            if (typeof requestParamList === 'function') requestParamList();
+            else sendCommand('param_list');
         } else if (page !== 'sensors') {
             sendCommand(page + '_page_data');
         }

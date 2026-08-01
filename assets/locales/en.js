@@ -22,6 +22,7 @@ window.VECIHI_LOCALE_EN = {
     "modes": "Flight Modes",
     "pid": "PID",
     "advanced": "Preferences",
+    "parameters": "Parameters",
     "osd": "OSD",
     "waypoint": "Waypoint",
     "logs": "Logs",
@@ -457,6 +458,36 @@ window.VECIHI_LOCALE_EN = {
 
     "btn_save": "Save Preferences"
   },
+
+    "params": {
+
+      "page_title": "Parameters",
+
+      "page_subtitle": "Every tunable parameter in the flight software. Edit a value and press the save button on that row — only the section that parameter belongs to is written to the board.",
+
+      "search_ph": "Search parameter name or description…",
+
+      "changed_only": "Changed only",
+
+      "refresh": "Refresh",
+
+      "save_all": "Save Changed",
+
+      "export": "CSV",
+
+      "reset_all": "Reset All",
+
+      "col_name": "PARAMETER NAME",
+
+      "col_desc": "DESCRIPTION",
+
+      "col_value": "VALUE",
+
+      "col_save": "SAVE",
+
+      "connect_hint": "Parameters load automatically once the board is connected."
+
+    },
 
   "osd": {
     "page_title": "OSD Designer",
