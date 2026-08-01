@@ -283,12 +283,121 @@ const Blackbox = {
 
         if (btnBox) btnBox.style.display = this.raw && this.raw.length ? 'block' : 'none';
 
+        this._renderCharts();
         this._renderTable('bbSlowTable', BB_SLOW_COLS, d.slow, 200);
         this._renderTable('bbFastTable', BB_FAST_COLS, d.fast, 200);
         this._renderEvents(d.events);
 
         this._setStatus(
             `Hazır — ${d.slow.length} uçuş kaydı, ${d.fast.length} filtre kaydı`, 'success');
+    },
+
+    // ------------------------------------------------------------------
+    // Grafikler (Chart.js)
+    // ------------------------------------------------------------------
+    _charts: {},
+
+    // Uzun kayıtta her noktayı çizmek tarayıcıyı kilitler; eşit aralıkla seyrelt.
+    _thin(rows, maxPoints) {
+        if (rows.length <= maxPoints) return rows;
+        const step = rows.length / maxPoints;
+        const out = [];
+        for (let i = 0; i < maxPoints; i++) out.push(rows[Math.floor(i * step)]);
+        return out;
+    },
+
+    _line(canvasId, labels, datasets, opts) {
+        const el = document.getElementById(canvasId);
+        if (!el || typeof Chart === 'undefined') return;
+        if (this._charts[canvasId]) this._charts[canvasId].destroy();
+        this._charts[canvasId] = new Chart(el.getContext('2d'), {
+            type: 'line',
+            data: { labels: labels, datasets: datasets },
+            options: Object.assign({
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { mode: 'index', intersect: false },
+                elements: { point: { radius: 0 }, line: { borderWidth: 1.4, tension: 0.15 } },
+                plugins: { legend: { labels: { boxWidth: 12, font: { size: 10 } } } },
+                scales: {
+                    x: { ticks: { maxTicksLimit: 12, font: { size: 9 } },
+                         grid: { color: 'rgba(255,255,255,0.06)' } },
+                    y: { ticks: { font: { size: 9 } },
+                         grid: { color: 'rgba(255,255,255,0.06)' } }
+                }
+            }, opts || {})
+        });
+    },
+
+    _renderCharts() {
+        const d = this.decoded;
+        const empty = document.getElementById('bbChartEmpty');
+        const area  = document.getElementById('bbChartArea');
+        if (!d || !d.slow.length) {
+            if (empty) empty.style.display = 'block';
+            if (area) area.style.display = 'none';
+            return;
+        }
+        if (empty) empty.style.display = 'none';
+        if (area)  area.style.display = 'block';
+
+        const S = this._thin(d.slow, 900);
+        const t0 = S[0][0];
+        const lab = S.map(r => ((r[0] - t0) / 1000).toFixed(1));
+        const ds = (label, idx, color) => ({
+            label: label, data: S.map(r => r[idx]),
+            borderColor: color, backgroundColor: color, fill: false
+        });
+
+        this._line('bbChartAtt', lab, [
+            ds('roll', 1, '#4dabf7'), ds('pitch', 2, '#ffa94d')
+        ]);
+
+        this._line('bbChartAlt', lab, [
+            Object.assign(ds('irtifa (m)', 12, '#69db7c'), { yAxisID: 'y' }),
+            Object.assign(ds('yer hızı (m/s)', 13, '#da77f2'), { yAxisID: 'y1' })
+        ], {
+            scales: {
+                x: { ticks: { maxTicksLimit: 12, font: { size: 9 } },
+                     grid: { color: 'rgba(255,255,255,0.06)' } },
+                y:  { position: 'left',  ticks: { font: { size: 9 } } },
+                y1: { position: 'right', ticks: { font: { size: 9 } },
+                      grid: { drawOnChartArea: false } }
+            }
+        });
+
+        this._line('bbChartGyro', lab, [
+            ds('gyro X', 4, '#4dabf7'), ds('gyro Y', 5, '#ffa94d'), ds('gyro Z', 6, '#69db7c')
+        ]);
+
+        this._line('bbChartDt', lab, [
+            ds('min', 29, '#69db7c'), ds('ort', 30, '#adb5bd'), ds('max', 31, '#ff6b6b')
+        ]);
+
+        this._line('bbChartErr', lab, [
+            ds('notch red', 32, '#ff6b6b'), ds('gyro darbe', 33, '#ffa94d'),
+            ds('accel doyma', 34, '#ffd43b'), ds('düşen kayıt', 35, '#868e96')
+        ]);
+
+        // Filtre zinciri — yalnızca FAST kaydı varsa
+        const fbox = document.getElementById('bbChartFilterBox');
+        if (d.fast.length) {
+            if (fbox) fbox.style.display = 'block';
+            const F = this._thin(d.fast, 1500);
+            const f0 = F[0][0];
+            const flab = F.map(r => ((r[0] - f0) / 1000).toFixed(2));
+            this._line('bbChartFilter', flab, [
+                { label: 'ham', data: F.map(r => r[1]),
+                  borderColor: '#868e96', fill: false },
+                { label: 'notch sonrası', data: F.map(r => r[4]),
+                  borderColor: '#ffa94d', fill: false },
+                { label: 'LPF sonrası (PID)', data: F.map(r => r[7]),
+                  borderColor: '#4dabf7', fill: false }
+            ]);
+        } else if (fbox) {
+            fbox.style.display = 'none';
+        }
     },
 
     _renderTable(id, cols, rows, limit) {

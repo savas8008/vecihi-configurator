@@ -3226,6 +3226,8 @@ function toggleBatCalc(bodyId, btn) {
             <div class="col-lg-8">
                 <ul class="nav nav-tabs mb-2" role="tablist">
                     <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab"
+                        data-bs-target="#bbTabChart" type="button">Grafikler</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
                         data-bs-target="#bbTabSlow" type="button">Uçuş (10 Hz)</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
                         data-bs-target="#bbTabFast" type="button">Filtre (tam hız)</button></li>
@@ -3233,7 +3235,52 @@ function toggleBatCalc(bodyId, btn) {
                         data-bs-target="#bbTabEvent" type="button">Olaylar</button></li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane fade show active" id="bbTabSlow">
+                    <div class="tab-pane fade show active" id="bbTabChart">
+                        <div id="bbChartEmpty" class="text-muted small p-2">
+                            Henüz kayıt okunmadı.
+                        </div>
+                        <div id="bbChartArea" style="display:none;max-height:70vh;overflow:auto">
+                            <div class="mb-3">
+                                <div class="small text-muted mb-1">
+                                    Tutum — roll / pitch (derece)
+                                </div>
+                                <canvas id="bbChartAtt" height="110"></canvas>
+                            </div>
+                            <div class="mb-3">
+                                <div class="small text-muted mb-1">
+                                    İrtifa (m) ve yer hızı (m/s)
+                                </div>
+                                <canvas id="bbChartAlt" height="110"></canvas>
+                            </div>
+                            <div class="mb-3">
+                                <div class="small text-muted mb-1">
+                                    Gyro — PID'in gördüğü değer (derece/s)
+                                </div>
+                                <canvas id="bbChartGyro" height="110"></canvas>
+                            </div>
+                            <div class="mb-3">
+                                <div class="small text-warning mb-1">
+                                    Döngü periyodu min / ort / max (µs) — RPM notch filtresi
+                                    aşırı titremede bozuluyor
+                                </div>
+                                <canvas id="bbChartDt" height="110"></canvas>
+                            </div>
+                            <div class="mb-3">
+                                <div class="small text-muted mb-1">
+                                    Hata sayaçları (aralıktaki artış)
+                                </div>
+                                <canvas id="bbChartErr" height="90"></canvas>
+                            </div>
+                            <div class="mb-3" id="bbChartFilterBox" style="display:none">
+                                <div class="small text-info mb-1">
+                                    Filtre zinciri — roll ekseni: ham / notch sonrası /
+                                    LPF sonrası. Ayar için bu üçünü karşılaştır.
+                                </div>
+                                <canvas id="bbChartFilter" height="110"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="bbTabSlow">
                         <div id="bbSlowTable" style="max-height:65vh;overflow:auto">
                             <div class="text-muted small p-2">Henüz kayıt okunmadı.</div>
                         </div>

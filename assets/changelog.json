@@ -1,5 +1,26 @@
 [
   {
+    "date": "2026-08-01",
+    "items": [
+      "RPM notch filtresi uçuşta bozuk gyro verisi üretebiliyordu — düzeltildi. Filtre her turda ANLIK döngü süresinden hesaplanan örnekleme hızıyla yeniden yapılandırılıyordu. IIR biquad sabit örnekleme hızı varsayar; durumu (x1,x2,y1,y2) önceki hıza göre birikmiştir. Her turda farklı hız verilince katsayılarla durum uyumsuz kalıyor ve filtre kendi başına devasa değerler üretiyor",
+      "Ölçüldü (gerçek attitude_mahony + imu_handler + filters, analitik kinematik girdiyle 45 dakika, gaz değişken; gerçek gyro hiçbir zaman 30 derece/saniyeyi aşmıyorken): döngü süresi titremesi ±%20'de filtre çıkışı 4 derece/s ve tutum hatası 0.03 derece; ±%30'da 101 derece/s ve 0.42 derece; ±%50'de 13634 derece/s ve 205 derece. Filtre kapatılınca aynı koşulda hata 0.06 dereceye düşüyordu — yani tek değişken buydu. Uydurulan gyro değeri doğrudan Mahony filtresine ve PID'e giriyor",
+      "Düzeltme: örnekleme hızı artık döngü hızının yavaş filtrelenmiş ortalaması (yaklaşık 1000 örnek zaman sabiti). Titreme katsayılara değil yalnızca ihmal edilebilir örnekleme gürültüsüne dönüşüyor. Düzeltme sonrası ±%50 titremede tutum hatası 0.03 derece",
+      "Makullük kontrolü yanlış sıradaydı: notch filtresinden ÖNCE çalıştığı için filtrenin KENDİ ürettiği bozuk değer denetimsiz geçiyordu. filters.cpp'deki ±20000 kelepçesi de bunu yakalamıyor, çünkü değer NaN/sonsuz olmadığından oradaki kurtarma sıfırlaması tetiklenmiyor. Artık notch çıkışı da gyro_sanity_dps ile denetleniyor; bozuksa filtrelenmemiş örneğe düşülüyor ve filtre sıfırlanıyor",
+      "Teşhis için notch red sayacı ve filtrenin tasarlandığı örnekleme hızı dışa açıldı. Uçuş sonrası red sayacı sıfırdan farklıysa döngü periyodu notch'un tolere edebileceğinden fazla titriyor demektir",
+      "Uçuş kaydı (blackbox) yeniden yazıldı ve etkinleştirildi. Eski sistem LittleFS üzerinden CSV yazıyordu ve kilitlenmeye yol açtığı için kapatılmıştı. Kök neden: ESP32 programı harici flash yongasından doğrudan çalışır; aynı yongaya yazarken yonga meşguldür ve komut okunamaz. Sayfa yazma 0.3-1 ms (tolere edilebilir) ama sektör SİLME 20-40 ms sürer ve HER İKİ ÇEKİRDEK birden durur. Eski kodda 'yazma Core 0'da, navigasyon etkilenmez' diyen bir yorum vardı; yanlıştı",
+      "Çözüm — silme işi yere çekildi: bölge yerde, açık komutla tamamen siliniyor; uçuşta yalnızca sayfa yazma yapılıyor, silme yok; bölge dolunca kayıt sessizce duruyor. Betaflight/iNav ile aynı model. Partition tablosu DEĞİŞMEDİ: mevcut dosya sistemi bölgesi (~1.44 MB) ham olarak kullanılıyor, yeniden flash gerekmiyor, NVS'teki ayar ve kalibrasyon silinmiyor",
+      "Kayıt güvenlik önlemleri: uçuş döngüsü flash'a hiç dokunmuyor, yalnızca statik RAM halka tamponuna yazıyor (heap ayırma yok). Tampon doluysa kayıt düşürülüyor, asla beklenmiyor — ve düşen kayıt sayısı loga yazılıyor, böylece analiz sırasında log'un delik olduğu görülüyor. Tek bir yazma 15 ms'yi aşarsa sayılıyor; 5 kez olursa kayıt kendini kapatıyor. Kalkış öncesi kapasite kontrolü var; yer yoksa kayıt hiç başlamıyor",
+      "Kayıt içeriği üç tipte: uçuş kaydı 10 Hz ve hep açık (tutum, gyro, ivme, ham koordinat, irtifa, hız, rüzgar, uydu, mod, gaz + 4 servo, DÖNGÜ SÜRESİ min/ort/max, hata sayaçları — yaklaşık 40 dakika); filtre kaydı döngü hızında ve isteğe bağlı (filtre zincirinin ÜÇ aşaması birden: ham / notch sonrası / LPF sonrası — tam hızda ~2 dakika); olay kaydı (OSD sistem mesajları zaman damgasıyla)",
+      "Kayıt artık arm'dan disarm'a kadar TÜM uçuş boyunca çalışıyor. Eskiden yalnızca RTH sırasında yazıyordu ve navigasyon boşa döndüğünde duruyordu; kaydın yarısı kayboluyordu",
+      "Konfiguratöre 'Uçuş Kaydı' sayfası eklendi: tek butonla cihazdan kaydı çeker, çözer ve gösterir. Gelen heks satırları konsola basılmaz, okuma sırasında yüzde gösterilir",
+      "Uçuş kaydı görselleştirmesi: tutum (roll/pitch), irtifa + yer hızı, gyro, DÖNGÜ PERİYODU min/ort/max, hata sayaçları ve filtre zinciri karşılaştırması (ham / notch sonrası / LPF sonrası) grafikleri. Uzun kayıtlar tarayıcıyı kilitlemesin diye eşit aralıkla seyreltiliyor",
+      "Uçuş kaydı sağlık özeti: düşen kayıt, notch red, gyro darbe ve ivmeölçer doyma sayıları ile döngü periyodu titreme yüzdesi otomatik çıkarılıyor; %30 üstü titreme kırmızı uyarı veriyor (ölçülen eşik: %30'da notch bozulmaya başlıyor)",
+      "İndirme: uçuş, filtre ve olay kayıtları CSV olarak, ham veri .bin olarak indirilebiliyor. Filtre CSV'si zincirin üç aşamasını da içerdiği için dışarıda analiz edip filtre ayarı yapmaya elverişli",
+      "tools/blackbox_decode.py eklendi — dump çıktısını komut satırında CSV'ye çevirir. Konfiguratördeki çözücüyle aynı sentetik veriyle test edildi, ikisi birebir aynı sonucu veriyor",
+      "NOT: bu sürümdeki firmware değişiklikleri donanımda test EDİLMEDİ. Filtre düzeltmesi izole ölçümle, kayıt sistemi sentetik veriyle doğrulandı; gerçek uçuş öncesi yerde arm/disarm + dump denemesi yapılmalıdır"
+    ]
+  },
+  {
     "date": "2026-07-31",
     "items": [
       "IMU glitch (darbe gürültüsü) koruması eklendi. Önceden yalnızca I2C seviyesinde koruma vardı: okuma başarısız olursa örnek atılıyordu. Ama bit dönmesi veya clock stretch sonucu DOĞRU uzunlukta ama YANLIŞ bir okuma bu kontrolleri geçip doğrudan Mahony filtresine ve PID'e giriyordu",
