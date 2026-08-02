@@ -3235,44 +3235,59 @@ function toggleBatCalc(bodyId, btn) {
                         <div id="bbChartEmpty" class="text-muted small p-2" data-i18n="blackbox.not_read">
                             Henüz kayıt okunmadı.
                         </div>
-                        <div id="bbChartArea" style="display:none;max-height:70vh;overflow:auto">
+                        <div id="bbChartArea" style="display:none">
+                            <div class="d-flex align-items-center gap-2 flex-wrap mb-2 p-2 rounded"
+                                 style="background:rgba(255,255,255,0.04)">
+                                <span class="small text-muted" data-i18n="blackbox.range_label">Zaman aralığı</span>
+                                <input type="range" id="bbRangeFrom" class="form-range flex-grow-1"
+                                       min="0" max="1000" value="0" style="min-width:120px"
+                                       oninput="Blackbox.onRangeChange()">
+                                <input type="range" id="bbRangeTo" class="form-range flex-grow-1"
+                                       min="0" max="1000" value="1000" style="min-width:120px"
+                                       oninput="Blackbox.onRangeChange()">
+                                <span id="bbRangeLabel" class="small text-info" style="min-width:130px"></span>
+                                <button class="btn btn-outline-secondary btn-sm py-0" onclick="Blackbox.resetRange()"
+                                        data-i18n="blackbox.range_all">Tümü</button>
+                            </div>
+                            <div style="max-height:70vh;overflow-y:auto;overflow-x:hidden">
                             <div class="mb-3">
                                 <div class="small text-muted mb-1" data-i18n="blackbox.chart_att">
                                     Tutum — roll / pitch (derece)
                                 </div>
-                                <canvas id="bbChartAtt" height="110"></canvas>
+                                <div style="height:190px;position:relative"><canvas id="bbChartAtt"></canvas></div>
                             </div>
                             <div class="mb-3">
                                 <div class="small text-muted mb-1" data-i18n="blackbox.chart_alt">
                                     İrtifa (m) ve yer hızı (m/s)
                                 </div>
-                                <canvas id="bbChartAlt" height="110"></canvas>
+                                <div style="height:190px;position:relative"><canvas id="bbChartAlt"></canvas></div>
                             </div>
                             <div class="mb-3">
                                 <div class="small text-muted mb-1" data-i18n="blackbox.chart_gyro">
                                     Gyro — PID'in gördüğü değer (derece/s)
                                 </div>
-                                <canvas id="bbChartGyro" height="110"></canvas>
+                                <div style="height:190px;position:relative"><canvas id="bbChartGyro"></canvas></div>
                             </div>
                             <div class="mb-3">
                                 <div class="small text-warning mb-1" data-i18n="blackbox.chart_dt">
                                     Döngü periyodu min / ort / max (µs) — RPM notch filtresi
                                     aşırı titremede bozuluyor
                                 </div>
-                                <canvas id="bbChartDt" height="110"></canvas>
+                                <div style="height:190px;position:relative"><canvas id="bbChartDt"></canvas></div>
                             </div>
                             <div class="mb-3">
                                 <div class="small text-muted mb-1" data-i18n="blackbox.chart_err">
                                     Hata sayaçları (aralıktaki artış)
                                 </div>
-                                <canvas id="bbChartErr" height="90"></canvas>
+                                <div style="height:190px;position:relative"><canvas id="bbChartErr"></canvas></div>
                             </div>
                             <div class="mb-3" id="bbChartFilterBox" style="display:none">
                                 <div class="small text-info mb-1" data-i18n="blackbox.chart_filter">
                                     Filtre zinciri — roll ekseni: ham / notch sonrası /
                                     LPF sonrası. Ayar için bu üçünü karşılaştır.
                                 </div>
-                                <canvas id="bbChartFilter" height="110"></canvas>
+                                <div style="height:190px;position:relative"><canvas id="bbChartFilter"></canvas></div>
+                            </div>
                             </div>
                         </div>
                     </div>

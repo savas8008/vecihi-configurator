@@ -25,7 +25,7 @@ const loadingTimeouts = {};
 function changePage(targetPage) {
     // "home" → bağlan ekranına dön (offline sayfa yok)
     if (targetPage === 'home') {
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        document.querySelectorAll('.nav-link[data-page]').forEach(n => n.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const homeLink = document.querySelector('.nav-link[data-page="home"]');
         if (homeLink) homeLink.classList.add('active');
@@ -35,7 +35,7 @@ function changePage(targetPage) {
     }
 
     // 1. UI Güncellemeleri
-    document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+    document.querySelectorAll('.nav-link[data-page]').forEach(nav => nav.classList.remove('active'));
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
 
     const activeLink = document.querySelector(`.nav-link[data-page="${targetPage}"]`);
@@ -347,7 +347,11 @@ function resetSaveButton(btn, delay = 2000) {
  * @brief Navigasyon linklerine event listener ekler
  */
 function setupNavigationListeners() {
-    document.querySelectorAll('.nav-link').forEach(link => {
+    // Yalnizca kenar cubugu linkleri (data-page tasiyanlar). Bootstrap sekme
+    // butonlari da .nav-link sinifini kullanir ama data-page tasimaz; filtre
+    // olmadan onlara da tiklama dinleyicisi baglaniyor ve changePage(null)
+    // cagrilarak sayfa degistiriyordu.
+    document.querySelectorAll('.nav-link[data-page]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetPage = link.getAttribute('data-page');
@@ -434,7 +438,7 @@ function updateConnectionStatus() {
     if (connStatus) connStatus.textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
 
     // Navigasyon menüsü: online↔offline görünürlük
-    document.querySelectorAll('.nav-link').forEach(nav => {
+    document.querySelectorAll('.nav-link[data-page]').forEach(nav => {
         const navPage = nav.getAttribute('data-page');
         const isOfflineNav = nav.closest('.nav-offline') !== null
                           || ['kml','firmware','docs'].includes(navPage);

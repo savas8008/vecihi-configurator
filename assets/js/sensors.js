@@ -548,7 +548,7 @@
      * @brief Sensörler sayfasını aktif eder
      */
     function activateSensorsPage() {
-        document.querySelectorAll('.nav-link').forEach(function(nav) { nav.classList.remove('active'); });
+        document.querySelectorAll('.nav-link[data-page]').forEach(function(nav) { nav.classList.remove('active'); });
         document.querySelectorAll('.page').forEach(function(page) { page.classList.remove('active'); });
 
         var nav = document.querySelector('[data-page="sensors"]');

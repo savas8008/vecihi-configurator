@@ -128,6 +128,11 @@ const Blackbox = {
         }
         this.raw = bytes;
         this.decoded = this.decode(bytes);
+        this._range = { from: 0, to: 1 };
+        const rf = document.getElementById('bbRangeFrom');
+        const rt = document.getElementById('bbRangeTo');
+        if (rf) rf.value = 0;
+        if (rt) rt.value = 1000;
         this.render();
         if (typeof log === 'function') {
             log('📼 ' + this._fmt('log_decoded',
@@ -331,6 +336,39 @@ const Blackbox = {
     // Grafikler (Chart.js)
     // ------------------------------------------------------------------
     _charts: {},
+    _range: { from: 0, to: 1 },   // gösterilen zaman aralığı (0..1 oran)
+
+    onRangeChange() {
+        const a = document.getElementById('bbRangeFrom');
+        const b = document.getElementById('bbRangeTo');
+        if (!a || !b) return;
+        let f = parseInt(a.value, 10) / 1000;
+        let t = parseInt(b.value, 10) / 1000;
+        if (f > t) { const tmp = f; f = t; t = tmp; }   // kollar çaprazlanırsa düzelt
+        if (t - f < 0.005) t = Math.min(1, f + 0.005); // en az %0.5'lik pencere
+        this._range = { from: f, to: t };
+        this._renderCharts();
+    },
+
+    resetRange() {
+        const a = document.getElementById('bbRangeFrom');
+        const b = document.getElementById('bbRangeTo');
+        if (a) a.value = 0;
+        if (b) b.value = 1000;
+        this._range = { from: 0, to: 1 };
+        this._renderCharts();
+    },
+
+    // Kayıtları seçili zaman aralığına göre keser
+    _slice(rows) {
+        if (!rows.length) return rows;
+        const t0 = rows[0][0], t1 = rows[rows.length - 1][0];
+        const span = t1 - t0;
+        if (span <= 0) return rows;
+        const a = t0 + span * this._range.from;
+        const b = t0 + span * this._range.to;
+        return rows.filter(r => r[0] >= a && r[0] <= b);
+    },
 
     // Uzun kayıtta her noktayı çizmek tarayıcıyı kilitler; eşit aralıkla seyrelt.
     _thin(rows, maxPoints) {
@@ -351,7 +389,17 @@ const Blackbox = {
             options: Object.assign({
                 responsive: true,
                 maintainAspectRatio: false,
+                // Chart.js responsive + maintainAspectRatio:false, yüksekliği
+                // belirsiz bir ebeveynde SONSUZ yeniden boyutlanma döngüsüne
+                // girer: canvas ebeveyni büyütür, ebeveyn canvas'ı büyütür...
+                // Grafik canlı veri geliyormuş gibi sürekli oynar. Ebeveyne
+                // HTML'de sabit yükseklik verildi; animasyon ve resize
+                // gecikmesi de kapatıldı ki tek seferde çizilsin.
                 animation: false,
+                animations: false,
+                transitions: { active: { animation: { duration: 0 } } },
+                responsiveAnimationDuration: 0,
+                resizeDelay: 0,
                 interaction: { mode: 'index', intersect: false },
                 elements: { point: { radius: 0 }, line: { borderWidth: 1.4, tension: 0.15 } },
                 plugins: { legend: { labels: { boxWidth: 12, font: { size: 10 } } } },
@@ -377,7 +425,9 @@ const Blackbox = {
         if (empty) empty.style.display = 'none';
         if (area)  area.style.display = 'block';
 
-        const S = this._thin(d.slow, 900);
+        const Sall = this._slice(d.slow);
+        if (!Sall.length) return;
+        const S = this._thin(Sall, 900);
         const t0 = S[0][0];
         const lab = S.map(r => ((r[0] - t0) / 1000).toFixed(1));
         const ds = (label, idx, color) => ({
@@ -422,11 +472,21 @@ const Blackbox = {
             ds(this._t('ds_drop', 'düşen kayıt'), 35, '#868e96')
         ]);
 
+        // Aralık etiketi: yüzde değil, gerçek saniye aralığını göster
+        const lblEl = document.getElementById('bbRangeLabel');
+        if (lblEl && d.slow.length) {
+            const base = d.slow[0][0];
+            const a = ((S[0][0] - base) / 1000).toFixed(1);
+            const b = ((S[S.length - 1][0] - base) / 1000).toFixed(1);
+            lblEl.textContent = `${a} – ${b} s (${S.length}/${d.slow.length})`;
+        }
+
         // Filtre zinciri — yalnızca FAST kaydı varsa
         const fbox = document.getElementById('bbChartFilterBox');
         if (d.fast.length) {
             if (fbox) fbox.style.display = 'block';
-            const F = this._thin(d.fast, 1500);
+            const Fall = this._slice(d.fast);
+            const F = this._thin(Fall.length ? Fall : d.fast, 1500);
             const f0 = F[0][0];
             const flab = F.map(r => ((r[0] - f0) / 1000).toFixed(2));
             this._line('bbChartFilter', flab, [

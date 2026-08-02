@@ -665,6 +665,8 @@ window.VECIHI_LOCALE_EN = {
     "ds_raw": "raw",
     "ds_after_notch": "after notch",
     "ds_after_lpf": "after LPF (PID)",
-    "status_summary": "Ready — {slow} flight records, {fast} filter records"
+    "status_summary": "Ready — {slow} flight records, {fast} filter records",
+    "range_label": "Time range",
+    "range_all": "All"
   }
 };

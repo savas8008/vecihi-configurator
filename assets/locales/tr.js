@@ -665,6 +665,8 @@ window.VECIHI_LOCALE_TR = {
     "ds_raw": "ham",
     "ds_after_notch": "notch sonrası",
     "ds_after_lpf": "LPF sonrası (PID)",
-    "status_summary": "Hazır — {slow} uçuş kaydı, {fast} filtre kaydı"
+    "status_summary": "Hazır — {slow} uçuş kaydı, {fast} filtre kaydı",
+    "range_label": "Zaman aralığı",
+    "range_all": "Tümü"
   }
 };
