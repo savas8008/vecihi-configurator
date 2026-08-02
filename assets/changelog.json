@@ -2,6 +2,10 @@
   {
     "date": "2026-08-02",
     "items": [
+      "RPM notch filtresi artık VARSAYILAN KAPALI. Ölçülen döngü periyodu 1188-6448 µs arası geziniyor (ort. 598 Hz, tur-içi sapma medyan +%212). Notch bir IIR biquad'dır ve sabit örnekleme hızı ister; bu titremede kendisi bozuk gyro üretiyor ve o değer doğrudan Mahony'ye ve PID'e giriyor",
+      "KRİTİK: RPM notch ve gyro LPF anahtarları hiçbir zaman NVS'e kaydedilmiyordu. imu_rpm_filter_enabled / imu_gyro_lpf_enabled FilterConfig içinde değil düz global olduğu için nvs_save_advanced() onları kapsamıyordu. Gelişmiş sayfasında anahtarı kapatıp kaydetseniz bile her açılışta koddaki başlangıç değerine dönüyordu — yani notch fiilen kapatılamıyordu. Ayrı NVS anahtarlarıyla kalıcı yapıldı",
+      "Gelişmiş sayfasındaki RPM anahtarının varsayılanı kapalıya çekildi ve neden kapalı olduğunu açıklayan uyarı eklendi",
+      "Yeni 'profile <0|1>' komutu: döngüyü 10 bölüme ayırıp (gps+nav, I2C, filtre+AHRS, PID, RC, seri, modlar, telemetri, OSD, diğer) saniyede bir ortalama ve en kötü mikrosaniye raporu verir. USB varken ekrana, USB yokken blackbox olaylarına yazar — çünkü USB modunda OSD kapalı olduğu için OSD maliyeti ancak kablosuz ölçülebiliyor. Ayar NVS'te kalıcı",
       "Uçuş kaydı artık kullanıcı tercihi: sayfanın en üstünde ana aç/kapat anahtarı var. Kapalıyken uçuşta flash'a tek bayt bile yazılmaz (startNewLog hiç başlamaz). Ayar NVS'e yazılır, güç kesilse de korunur. Varsayılan AÇIK — kayıt tutmak normal davranış, kapatmak bilinçli tercih",
       "Uçarken kapatılırsa süren kayıt da düzgün kapatılır (setEnabled içinde stopLog)",
       "Filtre (FAST) kaydını açıp kapatmak için Uçuş Kaydı sayfasına bir kutu eklendi: Kapalı / Her tur (~2 dk) / Her 2. tur (~4 dk) / Her 4. tur (~8 dk). Önceden bu kayıt varsayılan olarak kapalıydı ve açmanın hiçbir yolu yoktu; sayfada 'filtre kaydı: 0' görünüyordu",

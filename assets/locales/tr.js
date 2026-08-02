@@ -341,6 +341,7 @@ window.VECIHI_LOCALE_TR = {
     "mahony_ki": "Mahony Ki",
     "rpm_section": "RPM Filtresi",
     "rpm_active": "RPM Filtresi Aktif",
+    "rpm_warn": "Varsayılan KAPALI. Notch sabit örnekleme hızı ister; döngü periyodu ±%30'dan fazla titrerse filtre kendisi bozuk gyro üretir. Açmadan önce Uçuş Kaydı sayfasından döngü titremesini kontrol edin.",
     "rpm_min_freq": "Min Frekans (Hz)",
     "rpm_max_freq": "Max Frekans (Hz)",
     "rpm_bw": "Bandwidth (%)",

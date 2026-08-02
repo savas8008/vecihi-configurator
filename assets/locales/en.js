@@ -341,6 +341,7 @@ window.VECIHI_LOCALE_EN = {
     "mahony_ki": "Mahony Ki",
     "rpm_section": "RPM Filter",
     "rpm_active": "RPM Filter Active",
+    "rpm_warn": "OFF by default. A notch filter needs a steady sample rate; if the loop period jitters more than ±30% the filter itself produces corrupted gyro data. Check the loop jitter on the Flight Log page before enabling it.",
     "rpm_min_freq": "Min Frequency (Hz)",
     "rpm_max_freq": "Max Frequency (Hz)",
     "rpm_bw": "Bandwidth (%)",

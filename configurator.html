@@ -2454,8 +2454,13 @@
                                 <div class="mb-2 d-flex align-items-center justify-content-between">
                                     <label class="form-check-label small" data-i18n="advanced.rpm_active">RPM Filtresi Aktif</label>
                                     <div class="form-check form-switch mb-0">
-                                        <input class="form-check-input" type="checkbox" id="inp_rpm_filter_enabled" checked>
+                                        <input class="form-check-input" type="checkbox" id="inp_rpm_filter_enabled">
                                     </div>
+                                </div>
+                                <div class="alert alert-warning py-2 px-2 small mb-2" data-i18n="advanced.rpm_warn">
+                                    Varsayılan KAPALI. Notch sabit örnekleme hızı ister; döngü periyodu
+                                    ±%30'dan fazla titrerse filtre kendisi bozuk gyro üretir. Açmadan önce
+                                    Uçuş Kaydı sayfasından döngü titremesini kontrol edin.
                                 </div>
                                 <div class="mb-2 row">
                                     <label class="col-sm-7 col-form-label col-form-label-sm" data-i18n="advanced.rpm_min_freq">Min Frekans (Hz)</label>
