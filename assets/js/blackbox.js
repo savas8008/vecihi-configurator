@@ -84,6 +84,14 @@ const Blackbox = {
     // heks satırı log ekranını boğmasın).
     // ------------------------------------------------------------------
     feedLine(line) {
+        // Silme yanıtı: cihaz gerçekten sildi mi, kaç KB kaldı. Satırı yutmuyoruz
+        // (false döner) — normal durum işleyicisi de görsün.
+        if (!this.capturing && line.indexOf('"command":"clear"') >= 0) {
+            const m = line.match(/"used_kb"\s*:\s*(\d+)/);
+            this._setStatus(this._fmt('erase_done', 'Silindi. Cihazda {n} KB kayıt kaldı.',
+                                      { n: m ? m[1] : 0 }), 'success');
+            return false;
+        }
         if (line.indexOf('BEGIN BLACKBOX DUMP') >= 0) {
             this.capturing = true;
             this.hexParts = [];
@@ -238,8 +246,57 @@ const Blackbox = {
                 'Cihazdaki TÜM uçuş kayıtları silinecek. Emin misiniz?\n\n' +
                 'Not: silme birkaç saniye sürer ve YERDE yapılmalıdır.'))) return;
         if (typeof sendCommand === 'function') sendCommand('clear');
+        // Ekranda duran eski kayıt artık cihazda yok — hemen temizle, yoksa
+        // silinmiş bir kaydın sayıları ekranda kalıp yanıltıyor.
+        this.reset();
         this._setStatus(this._t('erase_sent', 'Silme komutu gönderildi (birkaç saniye sürebilir)'),
                         'warning');
+    },
+
+    // Görüntülenen kaydı ve tüm panelleri boşalt
+    reset() {
+        this.capturing = false;
+        this.hexParts  = [];
+        this.raw       = null;
+        this.decoded   = null;
+        this._range    = { from: 0, to: 1 };
+
+        for (const id in this._charts) {
+            if (this._charts[id]) this._charts[id].destroy();
+        }
+        this._charts = {};
+
+        const none = `<span class="text-muted small">${this._t('not_read', 'Henüz kayıt okunmadı.')}</span>`;
+        const set = (id, html) => { const e = document.getElementById(id); if (e) e.innerHTML = html; };
+        set('bbSummary',   none);
+        set('bbWarnings',  none);
+        set('bbSlowTable', `<div class="text-muted small p-2">${this._t('not_read', 'Henüz kayıt okunmadı.')}</div>`);
+        set('bbFastTable', `<div class="text-muted small p-2">${this._t('not_read', 'Henüz kayıt okunmadı.')}</div>`);
+        set('bbEventList', `<div class="text-muted small p-2">${this._t('not_read', 'Henüz kayıt okunmadı.')}</div>`);
+
+        const dl = document.getElementById('bbDownloads');
+        if (dl) dl.style.display = 'none';
+        const area = document.getElementById('bbChartArea');
+        if (area) area.style.display = 'none';
+        const empty = document.getElementById('bbChartEmpty');
+        if (empty) empty.style.display = 'block';
+        const lbl = document.getElementById('bbRangeLabel');
+        if (lbl) lbl.textContent = '';
+    },
+
+    // FAST (filtre ayarı) kaydını aç/kapat. Firmware: "bb_fast <bolen>"
+    applyFast() {
+        const sel = document.getElementById('bbFastDiv');
+        if (!sel || typeof sendCommand !== 'function') return;
+        const div = parseInt(sel.value, 10) || 0;
+        sendCommand('bb_fast ' + div);
+        const el = document.getElementById('bbFastStatus');
+        if (el) {
+            el.textContent = div > 0
+                ? this._fmt('fast_on', 'Açık — her {n}. tur. Ayar karta kaydedildi, USB çekilince de korunur.', { n: div })
+                : this._t('fast_off_msg', 'Kapalı. Ayar karta kaydedildi.');
+            el.className = 'small mt-2 ' + (div > 0 ? 'text-info' : 'text-muted');
+        }
     },
 
     // ------------------------------------------------------------------
@@ -321,6 +378,23 @@ const Blackbox = {
         }
 
         if (btnBox) btnBox.style.display = this.raw && this.raw.length ? 'block' : 'none';
+
+        // Son oturumun FAST böleni = cihazda o an geçerli ayar. Seçim kutusunu
+        // ona getir ki kullanıcı ne durumda olduğunu görsün.
+        if (d.sessions.length) {
+            const div = d.sessions[d.sessions.length - 1].fast_div;
+            const sel = document.getElementById('bbFastDiv');
+            if (sel && [...sel.options].some(o => parseInt(o.value, 10) === div)) {
+                sel.value = String(div);
+            }
+            const st = document.getElementById('bbFastStatus');
+            if (st) {
+                st.textContent = div > 0
+                    ? this._fmt('fast_was_on', 'Bu kayıtta açıktı — her {n}. tur.', { n: div })
+                    : this._t('fast_was_off', 'Bu kayıtta kapalıydı.');
+                st.className = 'small mt-2 ' + (div > 0 ? 'text-info' : 'text-muted');
+            }
+        }
 
         this._renderCharts();
         this._renderTable('bbSlowTable', BB_SLOW_COLS, d.slow, 200);

@@ -3190,6 +3190,28 @@ function toggleBatCalc(bodyId, btn) {
                 </div>
 
                 <div class="panel mb-3">
+                    <h3 class="h6 mb-2">
+                        <i class="bi bi-sliders me-2"></i>
+                        <span data-i18n="blackbox.fast_title">Filtre Kaydı (ayar için)</span>
+                    </h3>
+                    <div class="small text-muted mb-2" data-i18n="blackbox.fast_note">
+                        Döngü hızında ham/notch/LPF üç aşamayı birden yazar. Kapasite ~2 dakika,
+                        bölen 4 ile ~8 dakika. Normal uçuşta KAPALI tutun.
+                    </div>
+                    <div class="d-flex gap-2 align-items-center">
+                        <select id="bbFastDiv" class="form-select form-select-sm" style="max-width:150px">
+                            <option value="0" data-i18n="blackbox.fast_off">Kapalı</option>
+                            <option value="1" data-i18n="blackbox.fast_1">Her tur (~2 dk)</option>
+                            <option value="2" data-i18n="blackbox.fast_2">Her 2. tur (~4 dk)</option>
+                            <option value="4" data-i18n="blackbox.fast_4">Her 4. tur (~8 dk)</option>
+                        </select>
+                        <button class="btn btn-outline-info btn-sm" onclick="Blackbox.applyFast()"
+                                data-i18n="blackbox.fast_apply">Uygula</button>
+                    </div>
+                    <div id="bbFastStatus" class="small text-muted mt-2"></div>
+                </div>
+
+                <div class="panel mb-3">
                     <h3 class="h6 mb-2"><i class="bi bi-info-circle me-2"></i><span data-i18n="blackbox.summary_title">Özet</span></h3>
                     <div id="bbSummary" class="small">
                         <span class="text-muted" data-i18n="blackbox.not_read">Henüz kayıt okunmadı.</span>

@@ -1,5 +1,17 @@
 [
   {
+    "date": "2026-08-02",
+    "items": [
+      "Filtre (FAST) kaydını açıp kapatmak için Uçuş Kaydı sayfasına bir kutu eklendi: Kapalı / Her tur (~2 dk) / Her 2. tur (~4 dk) / Her 4. tur (~8 dk). Önceden bu kayıt varsayılan olarak kapalıydı ve açmanın hiçbir yolu yoktu; sayfada 'filtre kaydı: 0' görünüyordu",
+      "Ayar karta kalıcı olarak yazılıyor (NVS 'bb_fast_en' / 'bb_fast_div'). Ayar USB üzerinden yapılıp kablo çekilince kart yeniden başlıyor; kalıcı olmasaydı kullanıcı filtre kaydını açtığını sanıp uçacak ve log yine boş çıkacaktı",
+      "Yeni seri komut: 'bb_fast <bolen>' — 0 kapatır, 1/2/4 böleni ayarlar; yanıt olarak güncel durumu JSON döndürür",
+      "'Kaydı sil' artık ekranı da anında temizliyor: grafikler yok ediliyor, özet/uyarı/tablo/olay panelleri ve indirme düğmeleri sıfırlanıyor. Önceden silinen bir kaydın sayıları ekranda kalıp yanıltıyordu",
+      "Firmware 'clear' komutuna artık {'used_kb','total_kb'} içeren bir durum yanıtı veriyor; sayfa 'Silindi, cihazda N KB kaldı' diye gerçek sonucu gösteriyor",
+      "Okunan kaydın oturum başlığındaki bölen değeri seçim kutusuna yansıtılıyor — o uçuşta filtre kaydının açık mı kapalı mı olduğu görülüyor",
+      "Yeni panelin Türkçe/İngilizce karşılıkları eklendi (blackbox.fast_*, blackbox.erase_done)"
+    ]
+  },
+  {
     "date": "2026-08-01",
     "items": [
       "RPM notch filtresi uçuşta bozuk gyro verisi üretebiliyordu — düzeltildi. Filtre her turda ANLIK döngü süresinden hesaplanan örnekleme hızıyla yeniden yapılandırılıyordu. IIR biquad sabit örnekleme hızı varsayar; durumu (x1,x2,y1,y2) önceki hıza göre birikmiştir. Her turda farklı hız verilince katsayılarla durum uyumsuz kalıyor ve filtre kendi başına devasa değerler üretiyor",
