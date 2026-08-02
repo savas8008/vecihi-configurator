@@ -60,6 +60,25 @@ const Blackbox = {
     decoded: null,    // { slow, fast, events, sessions, bad }
 
     // ------------------------------------------------------------------
+    // i18n — I18N.t() varsa onu kullan, yoksa yedek metne düş. Sayfa dili
+    // değişince metinler yeniden çizilsin diye render() tekrar çağrılabilir.
+    // ------------------------------------------------------------------
+    _t(key, fallback) {
+        if (typeof I18N !== 'undefined' && I18N && typeof I18N.t === 'function') {
+            const v = I18N.t('blackbox.' + key);
+            if (v && v !== 'blackbox.' + key) return v;
+        }
+        return fallback;
+    },
+
+    // "{n} kayıt" gibi yer tutuculari doldurur
+    _fmt(key, fallback, vars) {
+        let s = this._t(key, fallback);
+        for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
+        return s;
+    },
+
+    // ------------------------------------------------------------------
     // Seri satır yakalama. serial_communication.js -> processSingleLine()
     // içinden ÖNCE çağrılır; true dönerse satır konsola basılmaz (binlerce
     // heks satırı log ekranını boğmasın).
@@ -70,9 +89,11 @@ const Blackbox = {
             this.hexParts = [];
             const m = line.match(/(\d+)\s*bytes/);
             this.expectedBytes = m ? parseInt(m[1], 10) : 0;
-            this._setStatus(`Okunuyor... (${this.expectedBytes} bayt)`, 'info');
+            this._setStatus(this._t('status_reading', 'Okunuyor...') +
+                            ` (${this.expectedBytes} ${this._t('unit_bytes', 'bayt')})`, 'info');
             if (typeof log === 'function') {
-                log(`📼 Blackbox indiriliyor: ${this.expectedBytes} bayt`, 'info');
+                log('📼 ' + this._fmt('log_downloading', 'Blackbox indiriliyor: {n} bayt',
+                                      { n: this.expectedBytes }), 'info');
             }
             return true;
         }
@@ -89,7 +110,9 @@ const Blackbox = {
             if ((this.hexParts.length & 63) === 0) {
                 const got = this.hexParts.reduce((a, s) => a + s.length / 2, 0);
                 const pct = this.expectedBytes ? Math.round(got * 100 / this.expectedBytes) : 0;
-                this._setStatus(`Okunuyor... %${pct} (${got}/${this.expectedBytes} bayt)`, 'info');
+                this._setStatus(this._t('status_reading', 'Okunuyor...') +
+                                ` %${pct} (${got}/${this.expectedBytes} ${this._t('unit_bytes','bayt')})`,
+                                'info');
             }
             return true;
         }
@@ -107,8 +130,10 @@ const Blackbox = {
         this.decoded = this.decode(bytes);
         this.render();
         if (typeof log === 'function') {
-            log(`📼 Blackbox çözüldü: ${this.decoded.slow.length} uçuş kaydı, ` +
-                `${this.decoded.fast.length} filtre kaydı, ${this.decoded.events.length} olay`, 'success');
+            log('📼 ' + this._fmt('log_decoded',
+                'Blackbox çözüldü: {slow} uçuş kaydı, {fast} filtre kaydı, {ev} olay',
+                { slow: this.decoded.slow.length, fast: this.decoded.fast.length,
+                  ev: this.decoded.events.length }), 'success');
         }
     },
 
@@ -199,15 +224,17 @@ const Blackbox = {
         if (typeof sendCommand !== 'function') return;
         this.capturing = false;
         this.hexParts = [];
-        this._setStatus('Komut gönderildi, cihaz yanıtı bekleniyor...', 'info');
+        this._setStatus(this._t('status_sent', 'Komut gönderildi, cihaz yanıtı bekleniyor...'), 'info');
         sendCommand('dump');
     },
 
     eraseDevice() {
-        if (!confirm('Cihazdaki TÜM uçuş kayıtları silinecek. Emin misiniz?\n\n' +
-                     'Not: silme birkaç saniye sürer ve YERDE yapılmalıdır.')) return;
+        if (!confirm(this._t('erase_confirm',
+                'Cihazdaki TÜM uçuş kayıtları silinecek. Emin misiniz?\n\n' +
+                'Not: silme birkaç saniye sürer ve YERDE yapılmalıdır.'))) return;
         if (typeof sendCommand === 'function') sendCommand('clear');
-        this._setStatus('Silme komutu gönderildi (birkaç saniye sürebilir)', 'warning');
+        this._setStatus(this._t('erase_sent', 'Silme komutu gönderildi (birkaç saniye sürebilir)'),
+                        'warning');
     },
 
     // ------------------------------------------------------------------
@@ -232,14 +259,16 @@ const Blackbox = {
 
         // --- Özet ---
         const rows = [];
-        rows.push(['Ham veri', `${this.raw.length} bayt`]);
-        rows.push(['Oturum', `${d.sessions.length}`]);
-        rows.push(['Uçuş kaydı (10 Hz)', `${d.slow.length}`]);
-        rows.push(['Filtre kaydı (tam hız)', `${d.fast.length}`]);
-        rows.push(['Olay', `${d.events.length}`]);
+        rows.push([this._t('sum_raw', 'Ham veri'),
+                   `${this.raw.length} ${this._t('unit_bytes', 'bayt')}`]);
+        rows.push([this._t('sum_sessions', 'Oturum'), `${d.sessions.length}`]);
+        rows.push([this._t('sum_slow', 'Uçuş kaydı (10 Hz)'), `${d.slow.length}`]);
+        rows.push([this._t('sum_fast', 'Filtre kaydı (tam hız)'), `${d.fast.length}`]);
+        rows.push([this._t('sum_events', 'Olay'), `${d.events.length}`]);
         if (d.slow.length > 1) {
             const dur = (d.slow[d.slow.length - 1][0] - d.slow[0][0]) / 1000;
-            rows.push(['Kayıt süresi', `${(dur / 60).toFixed(1)} dakika`]);
+            rows.push([this._t('sum_duration', 'Kayıt süresi'),
+                       `${(dur / 60).toFixed(1)} ${this._t('unit_min', 'dakika')}`]);
         }
         if (sumEl) {
             sumEl.innerHTML = rows.map(r =>
@@ -258,27 +287,32 @@ const Blackbox = {
             const dtMax = Math.max.apply(null, d.slow.map(r => r[31]));
             const dtMin = Math.min.apply(null, d.slow.map(r => r[29]).filter(v => v > 0));
 
-            if (drops) warns.push(['warning',
-                `${drops} kayıt RAM tamponu dolu olduğu için düşürüldü — log'da boşluk var.`]);
-            if (notch) warns.push(['danger',
-                `Notch filtresi ${notch} bozuk örnek üretti — döngü periyodu aşırı titriyor. ` +
-                `Filtre ayarı bu uçuşta güvenilmez.`]);
-            if (spike) warns.push(['warning', `${spike} gyro darbesi reddedildi.`]);
-            if (clip)  warns.push(['warning', `${clip} ivmeölçer doyması (titreşim/darbe).`]);
+            if (drops) warns.push(['warning', this._fmt('warn_drop',
+                "{n} kayıt RAM tamponu dolu olduğu için düşürüldü — log'da boşluk var.",
+                { n: drops })]);
+            if (notch) warns.push(['danger', this._fmt('warn_notch',
+                'Notch filtresi {n} bozuk örnek üretti — döngü periyodu aşırı titriyor. ' +
+                'Filtre ayarı bu uçuşta güvenilmez.', { n: notch })]);
+            if (spike) warns.push(['warning', this._fmt('warn_spike',
+                '{n} gyro darbesi reddedildi.', { n: spike })]);
+            if (clip)  warns.push(['warning', this._fmt('warn_clip',
+                '{n} ivmeölçer doyması (titreşim/darbe).', { n: clip })]);
 
             const jitterPct = (dtMin && dtMax) ? Math.round((dtMax - dtMin) * 100 / dtMin) : 0;
             const lvl = jitterPct > 30 ? 'danger' : (jitterPct > 20 ? 'warning' : 'success');
-            warns.push([lvl,
-                `Döngü periyodu ${dtMin}-${dtMax} µs (±%${jitterPct} titreme). ` +
-                `%30 üstü notch filtresini bozabilir.`]);
+            warns.push([lvl, this._fmt('warn_jitter',
+                'Döngü periyodu {min}-{max} µs (±%{pct} titreme). ' +
+                '%30 üstü notch filtresini bozabilir.',
+                { min: dtMin, max: dtMax, pct: jitterPct })]);
         }
-        if (d.bad) warns.push(['warning',
-            `${d.bad} çözülemeyen bayt — kayıt aniden kesilmiş olabilir (kaza/güç kaybı).`]);
+        if (d.bad) warns.push(['warning', this._fmt('warn_bad',
+            '{n} çözülemeyen bayt — kayıt aniden kesilmiş olabilir (kaza/güç kaybı).',
+            { n: d.bad })]);
 
         if (warnEl) {
             warnEl.innerHTML = warns.length
                 ? warns.map(w => `<div class="alert alert-${w[0]} py-2 px-3 mb-2 small">${w[1]}</div>`).join('')
-                : '<div class="text-muted small">Kayıt temiz görünüyor.</div>';
+                : `<div class="text-muted small">${this._t('health_clean', 'Kayıt temiz görünüyor.')}</div>`;
         }
 
         if (btnBox) btnBox.style.display = this.raw && this.raw.length ? 'block' : 'none';
@@ -288,8 +322,9 @@ const Blackbox = {
         this._renderTable('bbFastTable', BB_FAST_COLS, d.fast, 200);
         this._renderEvents(d.events);
 
-        this._setStatus(
-            `Hazır — ${d.slow.length} uçuş kaydı, ${d.fast.length} filtre kaydı`, 'success');
+        this._setStatus(this._fmt('status_summary',
+            'Hazır — {slow} uçuş kaydı, {fast} filtre kaydı',
+            { slow: d.slow.length, fast: d.fast.length }), 'success');
     },
 
     // ------------------------------------------------------------------
@@ -351,12 +386,13 @@ const Blackbox = {
         });
 
         this._line('bbChartAtt', lab, [
-            ds('roll', 1, '#4dabf7'), ds('pitch', 2, '#ffa94d')
+            ds(this._t('ds_roll', 'roll'), 1, '#4dabf7'),
+            ds(this._t('ds_pitch', 'pitch'), 2, '#ffa94d')
         ]);
 
         this._line('bbChartAlt', lab, [
-            Object.assign(ds('irtifa (m)', 12, '#69db7c'), { yAxisID: 'y' }),
-            Object.assign(ds('yer hızı (m/s)', 13, '#da77f2'), { yAxisID: 'y1' })
+            Object.assign(ds(this._t('ds_alt', 'irtifa (m)'), 12, '#69db7c'), { yAxisID: 'y' }),
+            Object.assign(ds(this._t('ds_gspd', 'yer hızı (m/s)'), 13, '#da77f2'), { yAxisID: 'y1' })
         ], {
             scales: {
                 x: { ticks: { maxTicksLimit: 12, font: { size: 9 } },
@@ -368,16 +404,22 @@ const Blackbox = {
         });
 
         this._line('bbChartGyro', lab, [
-            ds('gyro X', 4, '#4dabf7'), ds('gyro Y', 5, '#ffa94d'), ds('gyro Z', 6, '#69db7c')
+            ds(this._t('ds_gx', 'gyro X'), 4, '#4dabf7'),
+            ds(this._t('ds_gy', 'gyro Y'), 5, '#ffa94d'),
+            ds(this._t('ds_gz', 'gyro Z'), 6, '#69db7c')
         ]);
 
         this._line('bbChartDt', lab, [
-            ds('min', 29, '#69db7c'), ds('ort', 30, '#adb5bd'), ds('max', 31, '#ff6b6b')
+            ds(this._t('ds_min', 'min'), 29, '#69db7c'),
+            ds(this._t('ds_avg', 'ort'), 30, '#adb5bd'),
+            ds(this._t('ds_max', 'max'), 31, '#ff6b6b')
         ]);
 
         this._line('bbChartErr', lab, [
-            ds('notch red', 32, '#ff6b6b'), ds('gyro darbe', 33, '#ffa94d'),
-            ds('accel doyma', 34, '#ffd43b'), ds('düşen kayıt', 35, '#868e96')
+            ds(this._t('ds_notch', 'notch red'), 32, '#ff6b6b'),
+            ds(this._t('ds_spike', 'gyro darbe'), 33, '#ffa94d'),
+            ds(this._t('ds_clip', 'accel doyma'), 34, '#ffd43b'),
+            ds(this._t('ds_drop', 'düşen kayıt'), 35, '#868e96')
         ]);
 
         // Filtre zinciri — yalnızca FAST kaydı varsa
@@ -388,11 +430,11 @@ const Blackbox = {
             const f0 = F[0][0];
             const flab = F.map(r => ((r[0] - f0) / 1000).toFixed(2));
             this._line('bbChartFilter', flab, [
-                { label: 'ham', data: F.map(r => r[1]),
+                { label: this._t('ds_raw', 'ham'), data: F.map(r => r[1]),
                   borderColor: '#868e96', fill: false },
-                { label: 'notch sonrası', data: F.map(r => r[4]),
+                { label: this._t('ds_after_notch', 'notch sonrası'), data: F.map(r => r[4]),
                   borderColor: '#ffa94d', fill: false },
-                { label: 'LPF sonrası (PID)', data: F.map(r => r[7]),
+                { label: this._t('ds_after_lpf', 'LPF sonrası (PID)'), data: F.map(r => r[7]),
                   borderColor: '#4dabf7', fill: false }
             ]);
         } else if (fbox) {
@@ -404,7 +446,7 @@ const Blackbox = {
         const el = document.getElementById(id);
         if (!el) return;
         if (!rows.length) {
-            el.innerHTML = '<div class="text-muted small p-2">Bu tipte kayıt yok.</div>';
+            el.innerHTML = `<div class="text-muted small p-2">${this._t('no_records', 'Bu tipte kayıt yok.')}</div>`;
             return;
         }
         const shown = rows.slice(0, limit);
@@ -416,8 +458,9 @@ const Blackbox = {
         }
         h += '</tbody></table>';
         if (rows.length > limit) {
-            h += `<div class="text-muted small p-2">İlk ${limit} satır gösteriliyor
-                  (toplam ${rows.length}). Tamamı için CSV indir.</div>`;
+            h += `<div class="text-muted small p-2">${this._fmt('table_limit',
+                  'İlk {n} satır gösteriliyor (toplam {total}). Tamamı için CSV indir.',
+                  { n: limit, total: rows.length })}</div>`;
         }
         el.innerHTML = h;
     },
@@ -426,7 +469,7 @@ const Blackbox = {
         const el = document.getElementById('bbEventList');
         if (!el) return;
         if (!events.length) {
-            el.innerHTML = '<div class="text-muted small">Olay kaydı yok.</div>';
+            el.innerHTML = `<div class="text-muted small">${this._t('no_events', 'Olay kaydı yok.')}</div>`;
             return;
         }
         el.innerHTML = events.map(e =>
@@ -456,7 +499,9 @@ const Blackbox = {
         a.download = `vecihi-blackbox-${ts}-${name}`;
         a.click();
         URL.revokeObjectURL(url);
-        if (typeof log === 'function') log(`📥 İndirildi: ${name}`, 'success');
+        if (typeof log === 'function') {
+            log('📥 ' + this._fmt('log_saved', 'İndirildi: {name}', { name: name }), 'success');
+        }
     },
 
     downloadSlow() {
@@ -480,5 +525,8 @@ const Blackbox = {
 
 // Sayfa açıldığında çağrılır (page_management.js)
 function initBlackboxPage() {
-    Blackbox._setStatus('Hazır. "Logu Oku" ile cihazdan kaydı çekin.', 'info');
+    // Kayıt zaten okunmuşsa dil değişmiş olabilir — yeniden çiz.
+    if (Blackbox.decoded) { Blackbox.render(); return; }
+    Blackbox._setStatus(
+        Blackbox._t('status_ready', 'Hazır. "Logu Oku" ile cihazdan kaydı çekin.'), 'info');
 }

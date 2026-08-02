@@ -8,11 +8,9 @@ window.VECIHI_LOCALE_TR = {
     "hw_pitot_title": "Pitot Tüpü (MS4525DO)",
     "hw_receiver_title": "RC Alıcı"
   },
-
   "ticker": {
     "label": "Son Güncellemeler"
   },
-
   "nav": {
     "sensors": "Sensörler",
     "calibration": "Kalibrasyon",
@@ -30,9 +28,9 @@ window.VECIHI_LOCALE_TR = {
     "firmware": "Firmware",
     "ground_control": "Yer Kontrol",
     "kml": "Log → KML",
-    "docs": "Dokümanlar"
+    "docs": "Dokümanlar",
+    "blackbox": "Uçuş Kaydı"
   },
-
   "connection": {
     "title": "Konfiguratöre Giriş",
     "description": "Cihazınıza enerji verdikten sonra",
@@ -40,14 +38,12 @@ window.VECIHI_LOCALE_TR = {
     "description_end": "seri porta bağlayın. Aksi takdirde uçuş moduna geçer.",
     "connect_btn": "Porta Bağlan"
   },
-
   "pin_common": {
     "reboot_warning": "Kaydet butonuna basıldığında cihaz",
     "reboot_warning_bold": "otomatik olarak yeniden başlatılır",
     "reboot_warning_end": "ve bağlantı kendiliğinden yeniden kurulur.",
     "recommend": "Tavsiye: GPIO"
   },
-
   "firmware": {
     "title": "Firmware Güncelleme",
     "subtitle": "ESP32 üzerine Vecihi firmware yükler",
@@ -57,7 +53,6 @@ window.VECIHI_LOCALE_TR = {
     "flash_warning": "Flash işlemi için önce seri bağlantıyı kesin ve tarayıcı sekmesini yenileyin.",
     "flash_btn": "Flash Başlat"
   },
-
   "kml": {
     "title": "EdgeTX Log → KML Dönüştürücü",
     "subtitle": "EdgeTX CSV log kaydını Google Earth'e aktarın — bağlantı gerekmez.",
@@ -76,7 +71,6 @@ window.VECIHI_LOCALE_TR = {
     "ge_hint_bold": "Dosya → İçe Aktar",
     "ge_hint_end": "veya dosyayı sürükle-bırak ile yükleyin."
   },
-
   "docs": {
     "title": "Dokümanlar & Kaynaklar",
     "subtitle": "Kablolama, kurulum ve kullanım rehberleri.",
@@ -90,27 +84,22 @@ window.VECIHI_LOCALE_TR = {
     "hw_label": "Donanım / PCB",
     "hw_caption": "PCB üretim dosyalarını indir"
   },
-
   "sensors": {
     "title": "Canlı Sensör Verileri",
     "cal_view": "Kalibrasyon Görünümü",
     "flight_mode": "UÇUŞ MODU",
-
     "gps_title": "GPS Durumu",
     "gps_sats": "UYDU SAYISI",
     "gps_lat": "ENLEM",
     "gps_lon": "BOYLAM",
     "gps_speed": "YER HIZI (km/h)",
     "gps_airspeed": "HAVA HIZI (km/h)",
-
     "alt_title": "İrtifa & Pusula",
     "altitude": "İRTİFA",
     "vario": "VARİO",
-
     "battery_title": "Batarya",
     "voltage": "VOLTAJ",
     "adc_pin": "ADC PIN",
-
     "map_title": "Konum",
     "mcu_title": "MCU & Sistem Durumu",
     "core1": "CORE 1 (LOOP)",
@@ -118,7 +107,6 @@ window.VECIHI_LOCALE_TR = {
     "temperature": "SICAKLIK",
     "free_ram": "BOŞ RAM"
   },
-
   "calibration": {
     "page_title": "Kalibrasyon",
     "pin_title": "IMU Sensör Pinleri (I2C)",
@@ -127,7 +115,6 @@ window.VECIHI_LOCALE_TR = {
     "pin_save": "I2C Pinlerini Kaydet",
     "gpio_scl_hint": "Tavsiye: GPIO 22",
     "gpio_sda_hint": "Tavsiye: GPIO 21",
-
     "pose_title": "Pozisyon Kalibrasyonu (6 Yüz)",
     "pose_hint": "Her adımda uçağı konumlandırıp tıklayın",
     "pose_zp": "Düz (tekerlekler aşağıda)",
@@ -136,23 +123,17 @@ window.VECIHI_LOCALE_TR = {
     "pose_xn": "Burun aşağı (dik)",
     "pose_yp": "Sol kanat yukarı",
     "pose_yn": "Sağ kanat yukarı",
-
     "current_values": "Mevcut Kalibrasyon Değerleri",
-
     "gyro_title": "Gyro Kalibrasyonu",
     "gyro_hint": "Cihazı tamamen hareketsiz tutun ve tıklayın.",
-
     "level_title": "Hard Kalibrasyon (Level)",
     "level_hint": "Cihazı düz konuma alıp 2sn bekleyin, sonra tıklayın.",
-
     "btn_save": "Kalibrasyonu Kaydet",
     "btn_reset": "Kalibrasyonu Sıfırla",
-
     "align_title": "Sensör Yönelimi (Board Alignment)",
     "align_desc": "Uçuş kontrol kartının gövde içindeki montaj yönünü seçin. Değiştirildiğinde kalibrasyon sıfırlanır.",
     "align_save": "Yönelimi Kaydet"
   },
-
   "gps": {
     "page_title": "Navigasyon & GPS",
     "pin_title": "GPS Bağlantı Pinleri (UART)",
@@ -161,7 +142,6 @@ window.VECIHI_LOCALE_TR = {
     "pin_save": "GPS Pinlerini Kaydet",
     "gpio_tx_hint": "Tavsiye: GPIO 5",
     "gpio_rx_hint": "Tavsiye: GPIO 18",
-
     "hw_title": "GPS Donanım",
     "hw_active": "GPS Modülü Aktif",
     "hw_protocol": "Protokol",
@@ -173,7 +153,6 @@ window.VECIHI_LOCALE_TR = {
     "hw_min_fix": "Min Fix Tipi",
     "hw_fix_2d": "2D Fix",
     "hw_fix_3d": "3D Fix",
-
     "rth_title": "RTH (Eve Dönüş)",
     "rth_alt": "RTH İrtifası (m)",
     "rth_radius": "Loiter Yarıçapı (m)",
@@ -184,19 +163,16 @@ window.VECIHI_LOCALE_TR = {
     "rth_geofence": "Geofence (m)",
     "rth_geofence_hint": "0=Yok",
     "rth_climb_first": "Eve Dönerken Önce Yüksel",
-
     "angle_title": "Açı Limitleri",
     "angle_max_roll": "Max Roll (°)",
     "angle_max_climb": "Max Tırmanma (°)",
     "angle_max_dive": "Max Dalış (°)",
-
     "throttle_title": "Gaz (Throttle) Ayarları",
     "throttle_min": "Nav Min Gaz",
     "throttle_descend": "Alçalma Gazı",
     "throttle_cruise": "Seyir Gazı",
     "throttle_climb": "Tırmanma Gazı",
     "throttle_max": "Nav Max Gaz",
-
     "l1_title": "L1 Navigasyon",
     "l1_desc": "Rota takip algoritması parametreleri.",
     "l1_period": "L1 Periyodu (sn)",
@@ -204,7 +180,6 @@ window.VECIHI_LOCALE_TR = {
     "l1_damping": "L1 Damping",
     "l1_pitch2thr": "Pitch → Gaz",
     "l1_pitch2thr_hint": "Her 1° pitch artışı için eklenen PWM gaz miktarı.",
-
     "turn_assist_enabled": "Turn Assist Kullan (Koordineli Dönüş)",
     "turn_assist_warning": "Kapalıyken hiçbir modda (RTH dahil) çalışmaz. Etkinleştirmeden önce yerde/düşük irtifada test edin.",
     "turn_assist_ref_airspeed": "Referans Hız (m/s)",
@@ -215,11 +190,9 @@ window.VECIHI_LOCALE_TR = {
     "turn_pitch_gain_hint": "Dönüşte fazladan her 1G için burun kaldırma miktarı. Varsayılan: 15°.",
     "turn_throttle_gain": "Throttle Kazancı (PWM/G)",
     "turn_throttle_gain_hint": "Dönüşte fazladan her 1G için gaz takviyesi. Varsayılan: 250 PWM.",
-
     "btn_save": "GPS & Nav Kaydet",
     "btn_reset_nav": "Nav Ayarlarını Sıfırla"
   },
-
   "mixer": {
     "page_title": "Mikser",
     "pin_title": "Çıkış Pinleri",
@@ -227,11 +200,9 @@ window.VECIHI_LOCALE_TR = {
     "pin_save": "Çıkış Pinlerini Kaydet",
     "aux_hint1": "Yardımcı çıkış 1",
     "aux_hint2": "Yardımcı çıkış 2",
-
     "motor_ctrl": "MOTOR CTRL",
     "no_prop": "Pervane yok",
     "safety_warning": "⚠️ Onay gerekiyor",
-
     "aux_title": "Yardımcı Çıkışlar",
     "aux_desc": "Her yardımcı çıkış, seçilen RC kanalını doğrudan belirlenen GPIO pinine iletir (uçuş mikseri dışında). Kamera gimbal, iniş takımı, ışık veya ilave motor için kullanabilirsiniz.",
     "rc_channel": "RC Kanalı",
@@ -240,41 +211,33 @@ window.VECIHI_LOCALE_TR = {
     "ch_2_pitch": "Kanal 2 (Pitch)",
     "ch_3_throttle": "Kanal 3 (Throttle)",
     "ch_4_yaw": "Kanal 4 (Yaw)",
-
     "aircraft_title": "Uçak Tipi Seçimi",
     "vtail_desc": "V şeklinde kuyruk yapısı",
     "ttail_desc": "T şeklinde kuyruk yapısı",
     "noruder_title": "RUDERSIZ",
     "noruder_desc": "Ruder olmadan",
     "delta_desc": "Delta kanat",
-
     "gains_title": "Mikser Kazançları",
     "gains_desc": "Her eksen için mikser oranını ayarlayın. 100 = normal, -100 = ters, 50 = %50 güç. Yaw tersleniyorsa Yaw değerini negatif yapın (örn: -100).",
     "btn_save": "Kaydet"
   },
-
   "transmitter": {
     "page_title": "Kumanda ve Alıcı Ayarları",
     "pin_title": "Alıcı Bağlantı Pinleri (UART)",
     "pin_tx": "TX (ESP → Alıcı)",
     "pin_rx": "RX (Alıcı → ESP)",
     "pin_save": "Alıcı Pinlerini Kaydet",
-
     "config_title": "Konfigürasyon",
     "protocol_label": "HABERLEŞME PROTOKOLÜ",
     "proto_sbus": "SBUS / IBUS",
     "proto_elrs": "CRSF (ELRS / Crossfire)",
     "proto_mavlink": "MAVLink",
-
     "ch_map_label": "KANAL SIRALAMASI (CHANNEL MAP)",
     "ch_map_hint": "Her eksene istediğiniz fiziksel alıcı kanalını atayın",
     "ch_reverse_label": "KANAL TERSLEME (REVERSE)",
-
     "live_title": "Canlı Kanal Değerleri",
     "waiting": "Veri bekleniyor... Bağlantıyı kontrol edin.",
-
     "btn_save": "Kumanda Ayarlarını Kaydet",
-
     "stick_cmds_link": "Kumanda Stick Komutları",
     "stick_modal_title": "Kumanda Stick Komutları",
     "stick_warn_important": "Önemli:",
@@ -298,38 +261,31 @@ window.VECIHI_LOCALE_TR = {
     "save_settings_skip": "atlanır",
     "save_settings_end": "— veri bozulması riski yoktur. 2 saniye boyunca aşağıdaki pozisyonu koruyun."
   },
-
   "modes": {
     "page_title": "Uçuş Modları",
     "btn_save": "Modları Kaydet"
   },
-
   "pid": {
     "page_title": "PID Ayarları",
     "level_desc": "Uçağın kendini düzeltme sertliği.",
     "tpa_desc": "throttle veya pitot tüpü varsa hava hızı arttıkça PIFF kazancını yüzde bazında düşürür.",
     "btn_save": "PID Kaydet"
   },
-
   "advanced": {
     "page_title": "Tercihler",
-
     "bat_pin_title": "Batarya Voltaj Ölçümü (ADC)",
     "bat_pin_label": "ADC GPIO Pin",
     "bat_pin_save": "ADC Pinlerini Kaydet",
     "adc_pin_hint": "Tavsiye: GPIO 34, 35 veya 36 (giriş-only)",
-
     "tab_flight": "Uçuş Limitleri",
     "tab_alt": "İrtifa",
     "tab_hw": "Donanım & Filtreler",
     "tab_battery": "Batarya",
     "tab_pitot": "Pitot Tüpü",
-
     "flight_section": "Uçuş Limitleri & Auto Launch",
     "angle_limits": "Angle Mod Limitleri",
     "angle_max_roll": "Max Roll Açısı (°)",
     "angle_max_pitch": "Max Pitch Açısı (°)",
-
     "launch_section": "Otomatik Kalkış (Auto Launch)",
     "launch_auto_on_arm": "Her arm sonrasında otomatik kalkış moduna geç",
     "launch_disarm_on_land": "İniş sonrasında otomatik disarm",
@@ -346,22 +302,18 @@ window.VECIHI_LOCALE_TR = {
     "stick_cancel_hint": "Merkezden stick sapması bu değeri aşarsa Auto Launch veya otomatik iniş iptal edilir (pilot devralır)",
     "thr_cancel_thr": "Gaz İptal Eşiği (PWM)",
     "thr_cancel_hint": "Gaz bu değeri aşarsa otomatik iniş iptal edilir (pilot devralır)",
-
     "stall_section": "Stall Koruması",
     "stall_speed": "Stall Hızı (km/h)",
     "stall_speed_hint": "Bu hızın altında stall koruması devreye girer",
-
     "turn_comp_section": "Dönüş Telafisi (Load Factor + Koordineli Dönüş)",
     "turn_comp_pitch_title": "Yükseklik Telafisi (RTH/WAYPOINT/LAND ASSIST'te her zaman aktif)",
     "turn_comp_yaw_title": "Turn Assist — Koordineli Dönüş (opsiyonel)",
-
     "flaperon_section": "Flaperon Droop",
     "flaperon_amount": "Droop Miktarı (µs)",
     "flaperon_info_title": "Flaperon Droop Ayarı:",
     "flaperon_info_1": "Flaperon aktifken aileronlara uygulanan simetrik droop. Aralık: −500–+500 µs.",
     "flaperon_info_2": "Pozitif değer: aileronlar aşağı iner (normal).",
     "flaperon_info_3": "Negatif değer: aileronlar yukarı kalkar — servo montajı nedeniyle aileronlar ters yönde hareket ediyorsa negatif değer kullanın (örn: −150).",
-
     "alt_section": "İrtifa Tahmini",
     "alt_sensor_source": "Sensör Kaynağı",
     "alt_use_baro": "Barometre Kullan",
@@ -371,7 +323,6 @@ window.VECIHI_LOCALE_TR = {
     "alt_acc_bias": "ACC Bias",
     "alt_acc_deadzone": "ACC Deadzone",
     "alt_acc_lpf": "ACC LPF",
-
     "hw_section": "Donanım, Sensör & Filtreler",
     "esc_section": "ESC Protokolü",
     "esc_hz_label": "ESC Hızı",
@@ -382,27 +333,22 @@ window.VECIHI_LOCALE_TR = {
     "servo_hz_digital": "160Hz (Dijital)",
     "servo_hz_fast": "333Hz (Dijital Hızlı)",
     "servo_hz_max": "400Hz (Maksimum)",
-
     "gyro_section": "Gyro & IMU",
     "gyro_lpf_active": "Gyro LPF Aktif",
     "gyro_lpf_hz": "Gyro LPF (Hz)",
     "accel_lpf_hz": "Accel LPF (Hz)",
     "mahony_kp": "Mahony Kp",
     "mahony_ki": "Mahony Ki",
-
     "rpm_section": "RPM Filtresi",
     "rpm_active": "RPM Filtresi Aktif",
     "rpm_min_freq": "Min Frekans (Hz)",
     "rpm_max_freq": "Max Frekans (Hz)",
     "rpm_bw": "Bandwidth (%)",
-
     "trim_section": "Kart Hizalama (Trim)",
     "trim_roll": "Roll Trim (°)",
     "trim_pitch": "Pitch Trim (°)",
-
     "realtime_section": "Gerçek Zamanlı Sensör Verileri",
     "stream_start": "Veri Akışını Başlat",
-
     "bat_section": "Batarya",
     "bat_volt_panel": "Voltaj",
     "bat_volt_panel_sub": "ADC ölçümü ve hücre limitleri",
@@ -416,7 +362,6 @@ window.VECIHI_LOCALE_TR = {
     "bat_voltage_help_title": "Gerilim Bölücü Hesabı:",
     "bat_voltage_help": "ESP32 ADC girişi maks. 3.3V ölçer. Lipo voltajını bölücüyle düşürmek gerekir.",
     "bat_pin_disabled_hint": "Pin -1 ise voltaj ölçümü devre dışı kalır.",
-
     "bat_cell_section": "Hücre Voltaj Limitleri",
     "bat_cell_section_hint": "(OSD Pil Simgesi)",
     "bat_cell_min": "Boş Hücre Voltajı",
@@ -424,7 +369,6 @@ window.VECIHI_LOCALE_TR = {
     "bat_cell_max": "Dolu Hücre Voltajı",
     "bat_cell_max_hint": "Hücre başına dolu voltaj — pil simgesi bu eşikte dolu görünür",
     "bat_cell_help_title": "OSD Pil Simgesi Hesabı:",
-
     "bat_virtual_section": "Sanal Akım Sensörü",
     "bat_max_current": "Max Akım (A)",
     "bat_max_current_hint": "Tam gazda motor + tüm elektroniklerin toplam çektiği akım (A)",
@@ -435,60 +379,40 @@ window.VECIHI_LOCALE_TR = {
     "bat_capacity": "Kapasite (mAh)",
     "bat_capacity_hint": "Pilin toplam kapasitesi — kumandada Bat% göstergesi bu değere göre hesaplanır",
     "bat_cal_steps_title": "Kalibrasyon Adımları:",
-
     "bat_calc_section": "Kalibrasyon Hesaplayıcılar",
     "volt_calc_title": "Voltaj Kalibrasyonu",
     "volt_calc_shown": "Telemetride görünen (V)",
     "volt_calc_actual": "Gerçekte ölçülen (V)",
     "volt_calc_btn": "Ölçeği Hesapla ve Uygula",
     "volt_calc_hint": "Multimetre ile ölçülen gerçek voltajı gir.",
-
     "mah_calc_title": "Kapasite Kalibrasyonu",
     "mah_calc_reported": "Tahmin edilen tüketim (mAh)",
     "mah_calc_actual": "Gerçek tüketim (mAh)",
     "mah_calc_btn": "Kalibrasyonu Hesapla ve Uygula",
     "mah_calc_hint": "Şarj cihazının yüklediği mAh'ı gir.",
-
     "pitot_section": "MS4525DO Pitot Tüpü",
     "pitot_sensor_label": "Pitot Sensörü",
     "pitot_enabled": "Etkin",
     "pitot_disabled_hint": "Devre dışıyken hava hızı GPS bazlı (sanal) hesaplanır.",
     "pitot_scale_label": "Ölçek (Scale)",
     "pitot_scale_hint": "Varsayılan: 1.00 · Tüp açısı veya uzunluk farkı için ince ayar.",
-
     "btn_save": "Tercihleri Kaydet"
   },
-
-    "params": {
-
-      "page_title": "Parametreler",
-
-      "page_subtitle": "Uçuş yazılımındaki tüm ayarlanabilir parametreler. Değeri düzenleyip satırdaki kaydet düğmesine basın — yalnızca o parametrenin ait olduğu bölüm karta yazılır.",
-
-      "search_ph": "Parametre adı veya açıklamada ara…",
-
-      "changed_only": "Yalnızca değiştirilenler",
-
-      "refresh": "Yenile",
-
-      "save_all": "Değişenleri Kaydet",
-
-      "export": "CSV",
-
-      "reset_all": "Tümünü Sıfırla",
-
-      "col_name": "PARAMETRE ADI",
-
-      "col_desc": "AÇIKLAMA",
-
-      "col_value": "DEĞER",
-
-      "col_save": "KAYDET",
-
-      "connect_hint": "Karta bağlanınca parametreler otomatik yüklenir."
-
-    },
-
+  "params": {
+    "page_title": "Parametreler",
+    "page_subtitle": "Uçuş yazılımındaki tüm ayarlanabilir parametreler. Değeri düzenleyip satırdaki kaydet düğmesine basın — yalnızca o parametrenin ait olduğu bölüm karta yazılır.",
+    "search_ph": "Parametre adı veya açıklamada ara…",
+    "changed_only": "Yalnızca değiştirilenler",
+    "refresh": "Yenile",
+    "save_all": "Değişenleri Kaydet",
+    "export": "CSV",
+    "reset_all": "Tümünü Sıfırla",
+    "col_name": "PARAMETRE ADI",
+    "col_desc": "AÇIKLAMA",
+    "col_value": "DEĞER",
+    "col_save": "KAYDET",
+    "connect_hint": "Karta bağlanınca parametreler otomatik yüklenir."
+  },
   "osd": {
     "page_title": "OSD Tasarımcı",
     "page_subtitle": "Ekran öğelerini ve sistem bilgilerini özelleştirin",
@@ -497,12 +421,10 @@ window.VECIHI_LOCALE_TR = {
     "pin_rx": "RX (OSD → ESP)",
     "pin_save": "OSD Pinlerini Kaydet",
     "osd_active": "OSD Aktif",
-
     "font_warning_title": "Önemli:",
     "font_warning": "OSD sembollerinin doğru görüntülenebilmesi için gözlüğünüzde",
     "font_warning_bold": "INAV",
     "font_warning_end": "fontu seçili olmalıdır. Aksi takdirde ekranda anlamsız semboller ve karakterler görünecektir.",
-
     "elements_title": "Ekran Öğeleri",
     "el_arm_status": "Arm Durumu",
     "el_flight_mode": "Uçuş Modu",
@@ -533,9 +455,7 @@ window.VECIHI_LOCALE_TR = {
     "el_lon": "GPS Boylam (Lon)",
     "el_gcode": "Google Plus Code",
     "el_timer": "Uçuş Süresi",
-
     "preview_hint": "Önizleme Ekranı (50x20 Karakter Izgarası)",
-
     "settings_title": "Sistem & Görüntü Ayarları",
     "screen_ratio": "Ekran Oranı",
     "pilot_name": "Pilot Adı (Callsign)",
@@ -547,22 +467,18 @@ window.VECIHI_LOCALE_TR = {
     "max_dist": "Mesafe Uyarısı (m)",
     "btn_save": "Ayarları Cihaza Kaydet"
   },
-
   "logs": {
     "page_title": "Komut Konsolu & Sistem Logları",
-
     "shortcuts_title": "Kısayollar",
     "acc_system": "Sistem & Konfigürasyon",
     "btn_factory": "FABRİKA AYARLARI",
     "btn_pid_reset": "PID SIFIRLA",
     "btn_calib_del": "KALİB. SİL",
-
     "acc_calibration": "Kalibrasyon İşlemleri",
     "btn_gyro_reset": "JİROSKOP SIFIRLA",
     "btn_level": "TERAZİ (TRIM)",
     "btn_cal_start": "BAŞLAT",
     "btn_cal_solve": "HESAPLA & KAYDET",
-
     "acc_streams": "Canlı Veri Akışları",
     "stream_sensors": "SENSÖRLER (GPS/BARO)",
     "stream_imu": "IMU (JİRO/İVME)",
@@ -570,17 +486,14 @@ window.VECIHI_LOCALE_TR = {
     "stream_receiver": "ALICI & KANALLAR",
     "btn_open": "AÇ",
     "btn_close": "KAPAT",
-
     "acc_pages": "Sayfa Verilerini Güncelle",
     "btn_advanced": "GELİŞMİŞ",
     "btn_outputs": "ÇIKIŞLAR",
     "btn_modes": "MODLAR",
     "btn_receiver": "ALICI",
-
     "acc_backup": "Ayar Yedekleme",
     "btn_export": "Dışa Aktar",
     "btn_import": "İçe Aktar",
-
     "search_placeholder": "Loglarda arama yap...",
     "filter_all": "Tüm Kayıtlar",
     "filter_info": "Bilgi (Info)",
@@ -589,16 +502,13 @@ window.VECIHI_LOCALE_TR = {
     "filter_error": "Hatalar",
     "filter_command": "Giden Komutlar",
     "filter_receive": "Gelen Veri",
-
     "auto_scroll": "Oto. Kaydır",
     "pause": "Akışı Durdur",
     "btn_clear": "Temizle",
     "btn_save_log": "Kaydet",
-
     "log_title": "Sistem Kayıtları (Logs)",
     "cmd_label": "MANUEL KOMUT GİRİŞİ",
     "cmd_placeholder": "Örn: CAL_GYRO yazıp gönderin...",
-
     "stats_title": "İletişim İstatistikleri",
     "stat_total": "Toplam Satır",
     "stat_commands": "Giden Komut",
@@ -607,35 +517,29 @@ window.VECIHI_LOCALE_TR = {
     "stat_warning": "Uyarı:",
     "stat_error": "Hata:"
   },
-
   "waypoint": {
     "page_title": "Waypoint Misyon Planlayıcı",
     "map_title": "Harita",
     "map_hint": "Haritaya tıklayarak waypoint ekleyin",
-
     "upload_title": "FC'ye Yükle",
     "btn_upload": "Waypoint'leri Kaydet",
     "btn_clear_all": "Tüm Waypoint'leri Temizle",
-
     "list_title": "Waypoint Listesi",
     "list_empty": "Henüz waypoint eklenmedi.",
     "list_empty_hint": "Haritaya tıklayın.",
     "manual_add": "Manuel Ekle",
     "btn_add": "Ekle",
-
     "kamikaze_title": "Kamikaze Görev Ayarları",
     "dive_section": "DALIŞ",
     "dive_angle": "Dalış Açısı (°)",
     "dive_angle_hint": "5° = sığ  —  90° = dik dik",
     "dive_alt_offset": "Başlama İrtifa Farkı (m)",
     "dive_alt_hint": "0 = WP irtifasından  —  negatif = daha alçak",
-
     "mission_section": "GÖREV SİSTEMİ",
     "trigger_alt": "Tetikleme İrtifası (m AGL)",
     "trigger_alt_hint": "Bu irtifada servo tam gaz konumuna geçer",
     "mission_servo": "Görev Servosu",
     "mission_servo_disabled": "Devre Dışı",
-
     "usage_section": "KULLANIM",
     "usage_1": "Sol taraftaki alanlarda dalış açısı ve servo ayarlarını yapın",
     "usage_2": "WP Parametrelerini Kaydet butonuna basın",
@@ -645,44 +549,35 @@ window.VECIHI_LOCALE_TR = {
     "usage_4_end": "olarak seçin",
     "usage_5": "Waypoint'leri FC'ye yükleyin",
     "usage_note": "Dalış açısı sabit tutulur; başlama mesafesi mevcut irtifaya göre otomatik hesaplanır.",
-
     "mission_params_title": "Misyon Genel Parametreleri",
     "wp_capture_radius": "WP Yakalama Yarıçapı (m)",
     "wp_capture_hint": "Varsayılan: 25m",
-
     "land_assist_title": "İniş Asistan Ayarları",
     "land_assist_subtitle": "Land Assist — Rüzgara Göre Otomatik Devre",
-
     "approach_section": "Yaklaşma",
     "approach_alt": "Yaklaşma İrtifası (m AGL)",
     "circuit_dir": "Devre Yönü",
     "circuit_right": "Sağ Devre",
     "circuit_left": "Sol Devre",
-
     "final_section": "Son Yaklaşma (Final)",
     "final_distance": "Final Başlangıç Mesafesi (m)",
     "final_distance_hint": "0 = Otomatik (irtifa÷tan3°)",
     "circuit_width": "Devre Genişliği (m)",
-
     "flare_section": "Flare & Gaz",
     "flare_alt": "Flare Başlangıç İrtifası (m AGL)",
     "approach_throttle": "Yaklaşma Gazı (PWM)",
     "flare_throttle": "Flare Gazı (PWM)",
-
     "runway_section": "Pist",
     "min_wind_speed": "Min Rüzgar Hızı (m/s)",
     "manual_runway_hdg": "Manuel Pist Başlığı (°)",
-
     "btn_save_wp": "WP Parametrelerini Kaydet"
   },
-
   "modal": {
     "confirm_title": "Onay",
     "btn_cancel": "İptal",
     "btn_confirm": "Devam Et",
     "save_title": "Kayıt Durumu",
     "btn_close": "Kapat",
-
     "pins_title": "Tavsiye Edilen Pinler",
     "pins_subtitle": "Aşağıdaki eşleşmeler paylaştığın görselden çıkarılmış öneri yerleşimidir.",
     "pins_warning_title": "Önemli bağlantı notu",
@@ -690,7 +585,6 @@ window.VECIHI_LOCALE_TR = {
     "pins_motor_section": "Motor ve Servo Çıkışları",
     "pins_aux_section": "AUX Portları"
   },
-
   "common": {
     "save": "Kaydet",
     "cancel": "İptal",
@@ -702,5 +596,75 @@ window.VECIHI_LOCALE_TR = {
     "off": "KAPAT",
     "disabled": "Devre Dışı",
     "recommended": "Tavsiye"
+  },
+  "blackbox": {
+    "page_title": "Uçuş Kaydı (Blackbox)",
+    "btn_read": "Logu Oku",
+    "btn_erase": "Cihazdaki Kaydı Sil",
+    "status_ready": "Hazır. \"Logu Oku\" ile cihazdan kaydı çekin.",
+    "status_sent": "Komut gönderildi, cihaz yanıtı bekleniyor...",
+    "status_reading": "Okunuyor...",
+    "status_done": "Hazır",
+    "erase_note": "Silme işlemi birkaç saniye sürer ve yerde yapılmalıdır. Uçuşta flash'a hiç silme yapılmaz — kilitlenmeyi önleyen tasarım budur.",
+    "erase_confirm": "Cihazdaki TÜM uçuş kayıtları silinecek. Emin misiniz?\n\nNot: silme birkaç saniye sürer ve YERDE yapılmalıdır.",
+    "erase_sent": "Silme komutu gönderildi (birkaç saniye sürebilir)",
+    "not_read": "Henüz kayıt okunmadı.",
+    "summary_title": "Özet",
+    "health_title": "Sağlık",
+    "health_clean": "Kayıt temiz görünüyor.",
+    "download_title": "İndir",
+    "dl_flight": "Uçuş kaydı (CSV)",
+    "dl_filter": "Filtre kaydı (CSV) — ayar için",
+    "dl_events": "Olaylar (CSV)",
+    "dl_raw": "Ham veri (.bin)",
+    "tab_charts": "Grafikler",
+    "tab_flight": "Uçuş (10 Hz)",
+    "tab_filter": "Filtre (tam hız)",
+    "tab_events": "Olaylar",
+    "chart_att": "Tutum — roll / pitch (derece)",
+    "chart_alt": "İrtifa (m) ve yer hızı (m/s)",
+    "chart_gyro": "Gyro — PID'in gördüğü değer (derece/s)",
+    "chart_dt": "Döngü periyodu min / ort / max (µs) — RPM notch filtresi aşırı titremede bozuluyor",
+    "chart_err": "Hata sayaçları (aralıktaki artış)",
+    "chart_filter": "Filtre zinciri — roll ekseni: ham / notch sonrası / LPF sonrası. Ayar için bu üçünü karşılaştır.",
+    "filter_hint": "Bu kayıt filtre zincirinin üç aşamasını birden içerir: ham → notch sonrası → LPF sonrası. Filtre ayarı için CSV'yi indirip inceleyin.",
+    "sum_raw": "Ham veri",
+    "sum_sessions": "Oturum",
+    "sum_slow": "Uçuş kaydı (10 Hz)",
+    "sum_fast": "Filtre kaydı (tam hız)",
+    "sum_events": "Olay",
+    "sum_duration": "Kayıt süresi",
+    "unit_bytes": "bayt",
+    "unit_min": "dakika",
+    "no_records": "Bu tipte kayıt yok.",
+    "no_events": "Olay kaydı yok.",
+    "table_limit": "İlk {n} satır gösteriliyor (toplam {total}). Tamamı için CSV indir.",
+    "warn_drop": "{n} kayıt RAM tamponu dolu olduğu için düşürüldü — log'da boşluk var.",
+    "warn_notch": "Notch filtresi {n} bozuk örnek üretti — döngü periyodu aşırı titriyor. Filtre ayarı bu uçuşta güvenilmez.",
+    "warn_spike": "{n} gyro darbesi reddedildi.",
+    "warn_clip": "{n} ivmeölçer doyması (titreşim/darbe).",
+    "warn_jitter": "Döngü periyodu {min}-{max} µs (±%{pct} titreme). %30 üstü notch filtresini bozabilir.",
+    "warn_bad": "{n} çözülemeyen bayt — kayıt aniden kesilmiş olabilir (kaza/güç kaybı).",
+    "log_downloading": "Blackbox indiriliyor: {n} bayt",
+    "log_decoded": "Blackbox çözüldü: {slow} uçuş kaydı, {fast} filtre kaydı, {ev} olay",
+    "log_saved": "İndirildi: {name}",
+    "ds_roll": "roll",
+    "ds_pitch": "pitch",
+    "ds_alt": "irtifa (m)",
+    "ds_gspd": "yer hızı (m/s)",
+    "ds_gx": "gyro X",
+    "ds_gy": "gyro Y",
+    "ds_gz": "gyro Z",
+    "ds_min": "min",
+    "ds_avg": "ort",
+    "ds_max": "max",
+    "ds_notch": "notch red",
+    "ds_spike": "gyro darbe",
+    "ds_clip": "accel doyma",
+    "ds_drop": "düşen kayıt",
+    "ds_raw": "ham",
+    "ds_after_notch": "notch sonrası",
+    "ds_after_lpf": "LPF sonrası (PID)",
+    "status_summary": "Hazır — {slow} uçuş kaydı, {fast} filtre kaydı"
   }
 };

@@ -104,7 +104,11 @@ function managePageStreams(page) {
             // Parametre tablosu ayri protokol kullanir (param_list, parcali dump)
             if (typeof requestParamList === 'function') requestParamList();
             else sendCommand('param_list');
-        } else if (page !== 'sensors') {
+        } else if (page !== 'sensors' && page !== 'blackbox') {
+            // blackbox: firmware'de 'blackbox_page_data' diye bir komut YOK.
+            // Uçuş kaydı sayfaya girince otomatik çekilmez — kullanıcı "Logu Oku"
+            // butonuna basınca tek seferlik 'dump' gönderilir (dump uzun sürer,
+            // sayfaya her girişte tetiklenmemeli).
             sendCommand(page + '_page_data');
         }
     }, 50);

@@ -3174,105 +3174,101 @@ function toggleBatCalc(bodyId, btn) {
                 <div class="panel mb-3">
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" onclick="Blackbox.request()">
-                            <i class="bi bi-download me-2"></i>Logu Oku
+                            <i class="bi bi-download me-2"></i><span data-i18n="blackbox.btn_read">Logu Oku</span>
                         </button>
                         <button class="btn btn-outline-danger btn-sm" onclick="Blackbox.eraseDevice()">
-                            <i class="bi bi-trash me-2"></i>Cihazdaki Kaydı Sil
+                            <i class="bi bi-trash me-2"></i><span data-i18n="blackbox.btn_erase">Cihazdaki Kaydı Sil</span>
                         </button>
                     </div>
-                    <div id="bbStatus" class="small text-muted mt-3">
+                    <div id="bbStatus" class="small text-muted mt-3" data-i18n="blackbox.status_ready">
                         Hazır. "Logu Oku" ile cihazdan kaydı çekin.
                     </div>
-                    <div class="alert alert-secondary py-2 px-3 mt-3 mb-0 small">
-                        Silme işlemi birkaç saniye sürer ve <strong>yerde</strong> yapılmalıdır.
+                    <div class="alert alert-secondary py-2 px-3 mt-3 mb-0 small" data-i18n="blackbox.erase_note">
+                        Silme işlemi birkaç saniye sürer ve yerde yapılmalıdır.
                         Uçuşta flash'a hiç silme yapılmaz — kilitlenmeyi önleyen tasarım budur.
                     </div>
                 </div>
 
                 <div class="panel mb-3">
-                    <h3 class="h6 mb-2"><i class="bi bi-info-circle me-2"></i>Özet</h3>
+                    <h3 class="h6 mb-2"><i class="bi bi-info-circle me-2"></i><span data-i18n="blackbox.summary_title">Özet</span></h3>
                     <div id="bbSummary" class="small">
-                        <span class="text-muted">Henüz kayıt okunmadı.</span>
+                        <span class="text-muted" data-i18n="blackbox.not_read">Henüz kayıt okunmadı.</span>
                     </div>
                 </div>
 
                 <div class="panel mb-3">
-                    <h3 class="h6 mb-2"><i class="bi bi-exclamation-triangle me-2"></i>Sağlık</h3>
+                    <h3 class="h6 mb-2"><i class="bi bi-exclamation-triangle me-2"></i><span data-i18n="blackbox.health_title">Sağlık</span></h3>
                     <div id="bbWarnings">
-                        <span class="text-muted small">Henüz kayıt okunmadı.</span>
+                        <span class="text-muted small" data-i18n="blackbox.not_read">Henüz kayıt okunmadı.</span>
                     </div>
                 </div>
 
                 <div class="panel" id="bbDownloads" style="display:none">
-                    <h3 class="h6 mb-2"><i class="bi bi-file-earmark-arrow-down me-2"></i>İndir</h3>
+                    <h3 class="h6 mb-2"><i class="bi bi-file-earmark-arrow-down me-2"></i><span data-i18n="blackbox.download_title">İndir</span></h3>
                     <div class="d-grid gap-2">
-                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadSlow()">
-                            Uçuş kaydı (CSV)
-                        </button>
-                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadFast()">
-                            Filtre kaydı (CSV) — ayar için
-                        </button>
-                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadEvents()">
-                            Olaylar (CSV)
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="Blackbox.downloadRaw()">
-                            Ham veri (.bin)
-                        </button>
+                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadSlow()"
+                                data-i18n="blackbox.dl_flight">Uçuş kaydı (CSV)</button>
+                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadFast()"
+                                data-i18n="blackbox.dl_filter">Filtre kaydı (CSV) — ayar için</button>
+                        <button class="btn btn-outline-light btn-sm" onclick="Blackbox.downloadEvents()"
+                                data-i18n="blackbox.dl_events">Olaylar (CSV)</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="Blackbox.downloadRaw()"
+                                data-i18n="blackbox.dl_raw">Ham veri (.bin)</button>
                     </div>
                 </div>
             </div>
 
-            <!-- SAĞ: veri tabloları -->
+            <!-- SAĞ: grafikler + veri tabloları -->
             <div class="col-lg-8">
                 <ul class="nav nav-tabs mb-2" role="tablist">
                     <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab"
-                        data-bs-target="#bbTabChart" type="button">Grafikler</button></li>
+                        data-bs-target="#bbTabChart" type="button" data-i18n="blackbox.tab_charts">Grafikler</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
-                        data-bs-target="#bbTabSlow" type="button">Uçuş (10 Hz)</button></li>
+                        data-bs-target="#bbTabSlow" type="button" data-i18n="blackbox.tab_flight">Uçuş (10 Hz)</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
-                        data-bs-target="#bbTabFast" type="button">Filtre (tam hız)</button></li>
+                        data-bs-target="#bbTabFast" type="button" data-i18n="blackbox.tab_filter">Filtre (tam hız)</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
-                        data-bs-target="#bbTabEvent" type="button">Olaylar</button></li>
+                        data-bs-target="#bbTabEvent" type="button" data-i18n="blackbox.tab_events">Olaylar</button></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="bbTabChart">
-                        <div id="bbChartEmpty" class="text-muted small p-2">
+                        <div id="bbChartEmpty" class="text-muted small p-2" data-i18n="blackbox.not_read">
                             Henüz kayıt okunmadı.
                         </div>
                         <div id="bbChartArea" style="display:none;max-height:70vh;overflow:auto">
                             <div class="mb-3">
-                                <div class="small text-muted mb-1">
+                                <div class="small text-muted mb-1" data-i18n="blackbox.chart_att">
                                     Tutum — roll / pitch (derece)
                                 </div>
                                 <canvas id="bbChartAtt" height="110"></canvas>
                             </div>
                             <div class="mb-3">
-                                <div class="small text-muted mb-1">
+                                <div class="small text-muted mb-1" data-i18n="blackbox.chart_alt">
                                     İrtifa (m) ve yer hızı (m/s)
                                 </div>
                                 <canvas id="bbChartAlt" height="110"></canvas>
                             </div>
                             <div class="mb-3">
-                                <div class="small text-muted mb-1">
+                                <div class="small text-muted mb-1" data-i18n="blackbox.chart_gyro">
                                     Gyro — PID'in gördüğü değer (derece/s)
                                 </div>
                                 <canvas id="bbChartGyro" height="110"></canvas>
                             </div>
                             <div class="mb-3">
-                                <div class="small text-warning mb-1">
+                                <div class="small text-warning mb-1" data-i18n="blackbox.chart_dt">
                                     Döngü periyodu min / ort / max (µs) — RPM notch filtresi
                                     aşırı titremede bozuluyor
                                 </div>
                                 <canvas id="bbChartDt" height="110"></canvas>
                             </div>
                             <div class="mb-3">
-                                <div class="small text-muted mb-1">
+                                <div class="small text-muted mb-1" data-i18n="blackbox.chart_err">
                                     Hata sayaçları (aralıktaki artış)
                                 </div>
                                 <canvas id="bbChartErr" height="90"></canvas>
                             </div>
                             <div class="mb-3" id="bbChartFilterBox" style="display:none">
-                                <div class="small text-info mb-1">
+                                <div class="small text-info mb-1" data-i18n="blackbox.chart_filter">
                                     Filtre zinciri — roll ekseni: ham / notch sonrası /
                                     LPF sonrası. Ayar için bu üçünü karşılaştır.
                                 </div>
@@ -3282,22 +3278,21 @@ function toggleBatCalc(bodyId, btn) {
                     </div>
                     <div class="tab-pane fade" id="bbTabSlow">
                         <div id="bbSlowTable" style="max-height:65vh;overflow:auto">
-                            <div class="text-muted small p-2">Henüz kayıt okunmadı.</div>
+                            <div class="text-muted small p-2" data-i18n="blackbox.not_read">Henüz kayıt okunmadı.</div>
                         </div>
                     </div>
                     <div class="tab-pane fade" id="bbTabFast">
-                        <div class="alert alert-secondary py-2 px-3 mb-2 small">
+                        <div class="alert alert-secondary py-2 px-3 mb-2 small" data-i18n="blackbox.filter_hint">
                             Bu kayıt filtre zincirinin üç aşamasını birden içerir:
-                            <strong>ham → notch sonrası → LPF sonrası</strong>.
-                            Filtre ayarı için CSV'yi indirip inceleyin.
+                            ham → notch sonrası → LPF sonrası. Filtre ayarı için CSV'yi indirip inceleyin.
                         </div>
                         <div id="bbFastTable" style="max-height:60vh;overflow:auto">
-                            <div class="text-muted small p-2">Henüz kayıt okunmadı.</div>
+                            <div class="text-muted small p-2" data-i18n="blackbox.not_read">Henüz kayıt okunmadı.</div>
                         </div>
                     </div>
                     <div class="tab-pane fade" id="bbTabEvent">
                         <div id="bbEventList" style="max-height:65vh;overflow:auto">
-                            <div class="text-muted small p-2">Henüz kayıt okunmadı.</div>
+                            <div class="text-muted small p-2" data-i18n="blackbox.not_read">Henüz kayıt okunmadı.</div>
                         </div>
                     </div>
                 </div>
