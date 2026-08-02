@@ -3227,6 +3227,25 @@ function toggleBatCalc(bodyId, btn) {
                 </div>
 
                 <div class="panel mb-3">
+                    <h3 class="h6 mb-2">
+                        <i class="bi bi-speedometer2 me-2"></i>
+                        <span data-i18n="blackbox.prof_title">Döngü Profili (teşhis)</span>
+                    </h3>
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" id="bbProfile"
+                               onchange="Blackbox.applyProfile()">
+                        <label class="form-check-label" for="bbProfile"
+                               data-i18n="blackbox.prof_label">Döngü profilini aç</label>
+                    </div>
+                    <div class="small text-muted mb-2" data-i18n="blackbox.prof_note">
+                        Turu 10 bölüme ayırıp saniyede bir ortalama/en kötü mikrosaniye yazar.
+                        USB takılıyken OSD kapalı olduğundan, OSD maliyetini görmek için
+                        açıp kabloyu çekin: rapor kayda "Olaylar" olarak düşer.
+                    </div>
+                    <div id="bbProfStatus" class="small text-muted"></div>
+                </div>
+
+                <div class="panel mb-3">
                     <h3 class="h6 mb-2"><i class="bi bi-info-circle me-2"></i><span data-i18n="blackbox.summary_title">Özet</span></h3>
                     <div id="bbSummary" class="small">
                         <span class="text-muted" data-i18n="blackbox.not_read">Henüz kayıt okunmadı.</span>

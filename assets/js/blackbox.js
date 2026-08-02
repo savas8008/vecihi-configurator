@@ -301,6 +301,15 @@ const Blackbox = {
         const cb = document.getElementById('bbEnabled');
         if (cb) cb.checked = en;
 
+        const prof = /"profile"\s*:\s*true/.test(line);
+        const pcb = document.getElementById('bbProfile');
+        if (pcb) pcb.checked = prof;
+        const pst = document.getElementById('bbProfStatus');
+        if (pst) {
+            pst.textContent = prof ? this._t('prof_on_short', 'Açık.') : this._t('prof_off', 'Kapalı.');
+            pst.className = 'small ' + (prof ? 'text-info' : 'text-muted');
+        }
+
         const div = fast ? (dm ? parseInt(dm[1], 10) : 1) : 0;
         const sel = document.getElementById('bbFastDiv');
         if (sel && [...sel.options].some(o => parseInt(o.value, 10) === div)) {
@@ -329,6 +338,20 @@ const Blackbox = {
             ? this._t('enable_on',  'Uçuş kaydı açıldı. Ayar karta kaydedildi.')
             : this._t('enable_off', 'Uçuş kaydı kapatıldı — uçuşta hiçbir şey yazılmayacak.'),
             cb.checked ? 'success' : 'warning');
+    },
+
+    // Döngü profili. Firmware: "profile <0|1>"
+    applyProfile() {
+        const cb = document.getElementById('bbProfile');
+        if (!cb || typeof sendCommand !== 'function') return;
+        sendCommand('profile ' + (cb.checked ? 1 : 0));
+        const el = document.getElementById('bbProfStatus');
+        if (el) {
+            el.textContent = cb.checked
+                ? this._t('prof_on',  'Açık. Kabloyu çekip force arm ile 30 sn dönün, sonra logu okuyun — satırlar Olaylar sekmesinde.')
+                : this._t('prof_off', 'Kapalı.');
+            el.className = 'small ' + (cb.checked ? 'text-info' : 'text-muted');
+        }
     },
 
     // Cihazın gerçek ayarlarını sor (sayfa açılışında)

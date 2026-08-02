@@ -2,6 +2,7 @@
   {
     "date": "2026-08-02",
     "items": [
+      "Döngü profili için Uçuş Kaydı sayfasına aç/kapat anahtarı eklendi. Önceden yalnızca seri komutla ('profile 1') açılabiliyordu ama konfigüratörde serbest komut yazılacak bir yer yok — yani pratikte erişilemezdi. Anahtar durumu 'bb_status' ile cihazdan okunuyor",
       "LULU/medyan filtresine sayaç eklendi: filtrenin kaç örneği gerçekten DEĞİŞTİRDİĞİ (yani kaç darbe bastırdığı) sayılıyor. Filtre her turda çalışıyor ama çoğu turda ortanca zaten yeni örnek olduğu için sayaç yalnızca gerçek bir sıçrama bastırıldığında artıyor — böylece 'medyan devrede mi, ne kadar iş yapıyor' sorusu ölçülebilir hale geldi",
       "Uçuş kaydı (SLOW) formatına 'despike' sütunu eklendi (70 bayt). Kod henüz yayınlanmadığı için geriye dönük uyumluluk katmanı yok — tek format",
       "RPM notch filtresi artık VARSAYILAN KAPALI. Ölçülen döngü periyodu 1188-6448 µs arası geziniyor (ort. 598 Hz, tur-içi sapma medyan +%212). Notch bir IIR biquad'dır ve sabit örnekleme hızı ister; bu titremede kendisi bozuk gyro üretiyor ve o değer doğrudan Mahony'ye ve PID'e giriyor",
