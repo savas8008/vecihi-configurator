@@ -2,6 +2,8 @@
   {
     "date": "2026-08-02",
     "items": [
+      "LULU/medyan filtresine sayaç eklendi: filtrenin kaç örneği gerçekten DEĞİŞTİRDİĞİ (yani kaç darbe bastırdığı) sayılıyor. Filtre her turda çalışıyor ama çoğu turda ortanca zaten yeni örnek olduğu için sayaç yalnızca gerçek bir sıçrama bastırıldığında artıyor — böylece 'medyan devrede mi, ne kadar iş yapıyor' sorusu ölçülebilir hale geldi",
+      "Uçuş kaydı (SLOW) formatı v2 oldu: 68 → 70 bayt, yeni 'despike' sütunu. Hem konfigüratör hem tools/blackbox_decode.py iki formatı da açıyor; eski (v1) kayıtlar bozulmadan okunmaya devam ediyor, o sütun 0 görünüyor",
       "RPM notch filtresi artık VARSAYILAN KAPALI. Ölçülen döngü periyodu 1188-6448 µs arası geziniyor (ort. 598 Hz, tur-içi sapma medyan +%212). Notch bir IIR biquad'dır ve sabit örnekleme hızı ister; bu titremede kendisi bozuk gyro üretiyor ve o değer doğrudan Mahony'ye ve PID'e giriyor",
       "KRİTİK: RPM notch ve gyro LPF anahtarları hiçbir zaman NVS'e kaydedilmiyordu. imu_rpm_filter_enabled / imu_gyro_lpf_enabled FilterConfig içinde değil düz global olduğu için nvs_save_advanced() onları kapsamıyordu. Gelişmiş sayfasında anahtarı kapatıp kaydetseniz bile her açılışta koddaki başlangıç değerine dönüyordu — yani notch fiilen kapatılamıyordu. Ayrı NVS anahtarlarıyla kalıcı yapıldı",
       "Gelişmiş sayfasındaki RPM anahtarının varsayılanı kapalıya çekildi ve neden kapalı olduğunu açıklayan uyarı eklendi",

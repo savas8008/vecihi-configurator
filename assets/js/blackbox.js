@@ -21,7 +21,8 @@ const BB_REC_SLOW    = 0x02;
 const BB_REC_FAST     = 0x03;
 const BB_REC_EVENT    = 0x04;
 
-const BB_SLOW_LEN = 68;
+const BB_SLOW_LEN    = 68;   // v1
+const BB_SLOW_LEN_V2 = 70;   // v2: + c_despike
 const BB_FAST_LEN = 30;
 const BB_SESSION_LEN = 12;
 
@@ -40,7 +41,7 @@ const BB_SLOW_COLS = [
     'sats', 'gps_fix3d', 'gps_safe', 'mode', 'mode_adi', 'armed', 'flying',
     'throttle_us', 'servo1_us', 'servo2_us', 'servo3_us', 'servo4_us',
     'dt_min_us', 'dt_avg_us', 'dt_max_us',
-    'notch_reject', 'gyro_spike', 'accel_clip', 'log_drop'
+    'notch_reject', 'gyro_spike', 'accel_clip', 'log_drop', 'despike'
 ];
 
 const BB_FAST_COLS = [
@@ -177,7 +178,7 @@ const Blackbox = {
             const o    = i + 3;
             if (o + len > n) break;   // yarım kayıt: kayıt aniden kesilmiş
 
-            if (type === BB_REC_SLOW && len === BB_SLOW_LEN) {
+            if (type === BB_REC_SLOW && (len === BB_SLOW_LEN || len === BB_SLOW_LEN_V2)) {
                 const gpsF = bytes[o + 41], stF = bytes[o + 43], mode = bytes[o + 42];
                 slow.push([
                     dv.getUint32(o, true),
@@ -201,7 +202,9 @@ const Blackbox = {
                     dv.getUint16(o + 54, true), dv.getUint16(o + 56, true),
                     dv.getUint16(o + 58, true),
                     dv.getUint16(o + 60, true), dv.getUint16(o + 62, true),
-                    dv.getUint16(o + 64, true), dv.getUint16(o + 66, true)
+                    dv.getUint16(o + 64, true), dv.getUint16(o + 66, true),
+                    // v2'de eklendi; eski (68 baytlik) kayitlarda alan yok -> 0
+                    (len === BB_SLOW_LEN_V2) ? dv.getUint16(o + 68, true) : 0
                 ]);
             } else if (type === BB_REC_FAST && len === BB_FAST_LEN) {
                 fast.push([
