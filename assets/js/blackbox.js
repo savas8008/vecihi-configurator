@@ -84,6 +84,11 @@ const Blackbox = {
     // heks satırı log ekranını boğmasın).
     // ------------------------------------------------------------------
     feedLine(line) {
+        // Cihazin gercek ayarlari — anahtarlari buna gore konumlandir.
+        if (!this.capturing && line.indexOf('"command":"bb_status"') >= 0) {
+            this._applyStatusLine(line);
+            return false;
+        }
         // Silme yanıtı: cihaz gerçekten sildi mi, kaç KB kaldı. Satırı yutmuyoruz
         // (false döner) — normal durum işleyicisi de görsün.
         if (!this.capturing && line.indexOf('"command":"clear"') >= 0) {
@@ -284,6 +289,52 @@ const Blackbox = {
         if (lbl) lbl.textContent = '';
     },
 
+    // "bb_status" yanıtındaki değerleri arayüze uygular
+    _applyStatusLine(line) {
+        const en   = /"enabled"\s*:\s*true/.test(line);
+        const fast = /"fast"\s*:\s*true/.test(line);
+        const dm   = line.match(/"divider"\s*:\s*(\d+)/);
+        const um   = line.match(/"used_kb"\s*:\s*(\d+)/);
+        const tm   = line.match(/"total_kb"\s*:\s*(\d+)/);
+
+        const cb = document.getElementById('bbEnabled');
+        if (cb) cb.checked = en;
+
+        const div = fast ? (dm ? parseInt(dm[1], 10) : 1) : 0;
+        const sel = document.getElementById('bbFastDiv');
+        if (sel && [...sel.options].some(o => parseInt(o.value, 10) === div)) {
+            sel.value = String(div);
+        }
+        const st = document.getElementById('bbFastStatus');
+        if (st) {
+            st.textContent = div > 0
+                ? this._fmt('fast_on', 'Açık — her {n}. tur. Ayar karta kaydedildi, USB çekilince de korunur.', { n: div })
+                : this._t('fast_off_msg', 'Kapalı. Ayar karta kaydedildi.');
+            st.className = 'small mt-2 ' + (div > 0 ? 'text-info' : 'text-muted');
+        }
+
+        if (um && tm) {
+            this._setStatus(this._fmt('status_device', 'Cihazda {u} / {t} KB dolu.',
+                                      { u: um[1], t: tm[1] }), en ? 'info' : 'warning');
+        }
+    },
+
+    // Ana anahtar. Firmware: "bb_enable <0|1>"
+    applyEnabled() {
+        const cb = document.getElementById('bbEnabled');
+        if (!cb || typeof sendCommand !== 'function') return;
+        sendCommand('bb_enable ' + (cb.checked ? 1 : 0));
+        this._setStatus(cb.checked
+            ? this._t('enable_on',  'Uçuş kaydı açıldı. Ayar karta kaydedildi.')
+            : this._t('enable_off', 'Uçuş kaydı kapatıldı — uçuşta hiçbir şey yazılmayacak.'),
+            cb.checked ? 'success' : 'warning');
+    },
+
+    // Cihazın gerçek ayarlarını sor (sayfa açılışında)
+    requestStatus() {
+        if (typeof sendCommand === 'function') sendCommand('bb_status');
+    },
+
     // FAST (filtre ayarı) kaydını aç/kapat. Firmware: "bb_fast <bolen>"
     applyFast() {
         const sel = document.getElementById('bbFastDiv');
@@ -379,14 +430,10 @@ const Blackbox = {
 
         if (btnBox) btnBox.style.display = this.raw && this.raw.length ? 'block' : 'none';
 
-        // Son oturumun FAST böleni = cihazda o an geçerli ayar. Seçim kutusunu
-        // ona getir ki kullanıcı ne durumda olduğunu görsün.
+        // Son oturumun FAST böleni: O KAYITTA ne olduğunu söyler. Seçim kutusuna
+        // dokunmuyoruz — o, cihazın ŞU ANKİ ayarını gösterir (bb_status).
         if (d.sessions.length) {
             const div = d.sessions[d.sessions.length - 1].fast_div;
-            const sel = document.getElementById('bbFastDiv');
-            if (sel && [...sel.options].some(o => parseInt(o.value, 10) === div)) {
-                sel.value = String(div);
-            }
             const st = document.getElementById('bbFastStatus');
             if (st) {
                 st.textContent = div > 0
@@ -659,6 +706,9 @@ const Blackbox = {
 
 // Sayfa açıldığında çağrılır (page_management.js)
 function initBlackboxPage() {
+    // Anahtarları cihazın gerçek ayarına göre konumlandır — HTML'deki varsayılan
+    // kalırsa kullanıcı kaydın açık olduğunu sanıp uçabilir.
+    Blackbox.requestStatus();
     // Kayıt zaten okunmuşsa dil değişmiş olabilir — yeniden çiz.
     if (Blackbox.decoded) { Blackbox.render(); return; }
     Blackbox._setStatus(

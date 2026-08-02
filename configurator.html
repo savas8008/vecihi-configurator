@@ -3172,6 +3172,16 @@ function toggleBatCalc(bodyId, btn) {
             <!-- SOL: kontroller + özet + uyarılar -->
             <div class="col-lg-4">
                 <div class="panel mb-3">
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" id="bbEnabled" checked
+                               onchange="Blackbox.applyEnabled()">
+                        <label class="form-check-label fw-semibold" for="bbEnabled"
+                               data-i18n="blackbox.enable_label">Uçuş kaydı açık</label>
+                    </div>
+                    <div class="small text-muted mb-3" data-i18n="blackbox.enable_note">
+                        Kapatırsanız uçuşta flash'a tek bayt bile yazılmaz. Ayar karta
+                        kaydedilir, güç kesilse de korunur.
+                    </div>
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" onclick="Blackbox.request()">
                             <i class="bi bi-download me-2"></i><span data-i18n="blackbox.btn_read">Logu Oku</span>

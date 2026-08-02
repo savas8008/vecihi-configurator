@@ -2,13 +2,17 @@
   {
     "date": "2026-08-02",
     "items": [
+      "Uçuş kaydı artık kullanıcı tercihi: sayfanın en üstünde ana aç/kapat anahtarı var. Kapalıyken uçuşta flash'a tek bayt bile yazılmaz (startNewLog hiç başlamaz). Ayar NVS'e yazılır, güç kesilse de korunur. Varsayılan AÇIK — kayıt tutmak normal davranış, kapatmak bilinçli tercih",
+      "Uçarken kapatılırsa süren kayıt da düzgün kapatılır (setEnabled içinde stopLog)",
       "Filtre (FAST) kaydını açıp kapatmak için Uçuş Kaydı sayfasına bir kutu eklendi: Kapalı / Her tur (~2 dk) / Her 2. tur (~4 dk) / Her 4. tur (~8 dk). Önceden bu kayıt varsayılan olarak kapalıydı ve açmanın hiçbir yolu yoktu; sayfada 'filtre kaydı: 0' görünüyordu",
       "Ayar karta kalıcı olarak yazılıyor (NVS 'bb_fast_en' / 'bb_fast_div'). Ayar USB üzerinden yapılıp kablo çekilince kart yeniden başlıyor; kalıcı olmasaydı kullanıcı filtre kaydını açtığını sanıp uçacak ve log yine boş çıkacaktı",
       "Yeni seri komut: 'bb_fast <bolen>' — 0 kapatır, 1/2/4 böleni ayarlar; yanıt olarak güncel durumu JSON döndürür",
       "'Kaydı sil' artık ekranı da anında temizliyor: grafikler yok ediliyor, özet/uyarı/tablo/olay panelleri ve indirme düğmeleri sıfırlanıyor. Önceden silinen bir kaydın sayıları ekranda kalıp yanıltıyordu",
       "Firmware 'clear' komutuna artık {'used_kb','total_kb'} içeren bir durum yanıtı veriyor; sayfa 'Silindi, cihazda N KB kaldı' diye gerçek sonucu gösteriyor",
       "Okunan kaydın oturum başlığındaki bölen değeri seçim kutusuna yansıtılıyor — o uçuşta filtre kaydının açık mı kapalı mı olduğu görülüyor",
-      "Yeni panelin Türkçe/İngilizce karşılıkları eklendi (blackbox.fast_*, blackbox.erase_done)"
+      "Yeni panelin Türkçe/İngilizce karşılıkları eklendi (blackbox.fast_*, blackbox.erase_done)",
+      "Yeni seri komutlar: 'bb_enable <0|1>' ana anahtar, 'bb_status' cihazın gerçek ayarını (açık mı, filtre böleni, dolu KB) JSON döndürür",
+      "Sayfa açılışında cihaza 'bb_status' sorulup anahtarlar gerçek duruma göre konumlandırılıyor — HTML'deki varsayılan kalsaydı kullanıcı kaydın açık olduğunu sanıp uçabilirdi"
     ]
   },
   {
