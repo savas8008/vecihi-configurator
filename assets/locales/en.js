@@ -439,6 +439,8 @@ window.VECIHI_LOCALE_EN = {
     "el_snr_hint": "Only populated on the CRSF/ELRS protocol.",
     "el_txpw": "TX Power (mW)",
     "el_txpw_hint": "Only populated on the CRSF/ELRS protocol.",
+    "el_lhz": "Loop Rate (C1/C0)",
+    "el_lhz_hint": "C1 = Core 1 flight loop (IMU/PID/mixer), C0 = Core 0 GPS task. The OSD is disabled while USB is attached, so the real in-flight rate can only be observed here. Diagnostic element.",
     "el_battery": "Battery Voltage",
     "el_altitude": "Altitude",
     "el_vario": "Vario (Vertical Speed)",

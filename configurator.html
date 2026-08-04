@@ -2859,6 +2859,11 @@ function toggleBatCalc(bodyId, btn) {
         <label class="form-check-label small" for="osd_show_txpw" data-i18n="osd.el_txpw">TX Gücü (mW)</label>
         <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" data-i18n-title="osd.el_txpw_hint" title="Yalnızca CRSF/ELRS protokolünde veri üretir."></i>
     </div>
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input osd-toggle" type="checkbox" id="osd_show_lhz" data-target="prev_lhz">
+        <label class="form-check-label small" for="osd_show_lhz" data-i18n="osd.el_lhz">Döngü Hızı (C1/C0)</label>
+        <i class="bi bi-info-circle text-muted ms-1" style="font-size:0.7rem;" data-i18n-title="osd.el_lhz_hint" title="C1 = Core 1 uçuş döngüsü (IMU/PID/mixer), C0 = Core 0 GPS görevi. USB takılıyken OSD kapalı olduğundan gerçek uçuş hızı ancak burada görülebilir. Teşhis amaçlıdır."></i>
+    </div>
 
     <hr class="my-2 border-secondary">
 
@@ -2972,6 +2977,8 @@ function toggleBatCalc(bodyId, btn) {
     <div id="prev_snr" class="osd-draggable position-absolute" style="top: 25%; left: 2%; display: none;">SNR 8dB</div>
 
     <div id="prev_txpw" class="osd-draggable position-absolute" style="top: 30%; left: 2%; display: none;">TX 250mW</div>
+
+    <div id="prev_lhz" class="osd-draggable position-absolute" style="top: 35%; left: 2%; display: none;">C1: 540 C0: 998</div>
 
     <div id="prev_flight_mode" class="osd-draggable position-absolute" style="top: 90%; left: 2%;">STAB</div>
 

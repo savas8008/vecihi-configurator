@@ -2,6 +2,7 @@
   {
     "date": "2026-08-03",
     "items": [
+      "OSD'ye döngü hızı göstergesi eklendi: 'C1:540 C0: 998' — C1 Core 1 uçuş döngüsü (IMU/PID/mikser), C0 Core 0 GPS görevi. USB takılıyken OSD kapalı olduğu için gerçek uçuş hızı başka türlü uçarken görülemiyordu; bu eleman onu havada gösteriyor. OSD sayfasından açılıp konumlandırılabiliyor, ayar NVS'e yazılıyor. Varsayılan KAPALI (teşhis elemanı)",
       "Döngü hızı 481 Hz'den 535-590 Hz'e çıktı (tur 2036 µs -> 1630-1810 µs, uçuş moduna göre). Ölçüm tabanlı çalışıldı: her adımda profil alındı, tahminle değil sayıyla ilerlendi",
       "RC seri okuma öbeklendi: bayt başına available() + read() + micros() (üç sürücü çağrısı, ikisi UART kilidi alıyor) yerine öbek başına bir. 'rc' kovası 394 -> 220 µs",
       "OSD render'ı INAV modeline çevrildi (INAV osd.c osdDrawNextElement): tur başına ~20 elemanın hepsi yerine SADECE sırası gelen bir eleman + her turda yapay ufuk. Render turu 12 Hz -> 62.5 Hz (INAV'ın TASK_PERIOD_HZ(250) / DRAW_FREQ_DENOM 4 hesabıyla aynı). Ufuk 5 kat akıcı ve saniyedeki toplam eleman render'ı ~240'tan ~125'e DÜŞTÜ — ödünleşme yok",

@@ -47,7 +47,8 @@ const osdElementMapping = {
     'prev_throttle2':    'thr2',
     'prev_lq':           'lq',
     'prev_snr':          'snr',
-    'prev_txpw':         'txpw'
+    'prev_txpw':         'txpw',
+    'prev_lhz':          'lhz'
 };
 
 // JSON Key -> HTML ID (ters eşleştirme)
@@ -82,7 +83,8 @@ const osdToggleMapping = {
     'thr2':  'osd_show_thr2',
     'lq':    'osd_show_lq',
     'snr':   'osd_show_snr',
-    'txpw':  'osd_show_txpw'
+    'txpw':  'osd_show_txpw',
+    'lhz':   'osd_show_lhz'
 };
 
 // ============================================================================

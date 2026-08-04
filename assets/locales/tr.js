@@ -439,6 +439,8 @@ window.VECIHI_LOCALE_TR = {
     "el_snr_hint": "Yalnızca CRSF/ELRS protokolünde veri üretir.",
     "el_txpw": "TX Gücü (mW)",
     "el_txpw_hint": "Yalnızca CRSF/ELRS protokolünde veri üretir.",
+    "el_lhz": "Döngü Hızı (C1/C0)",
+    "el_lhz_hint": "C1 = Core 1 uçuş döngüsü (IMU/PID/mikser), C0 = Core 0 GPS görevi. USB takılıyken OSD kapalı olduğundan gerçek uçuş hızı ancak burada görülebilir. Teşhis amaçlıdır.",
     "el_battery": "Pil Voltajı",
     "el_altitude": "İrtifa",
     "el_vario": "Vario (Dikey Hız)",
