@@ -1,5 +1,27 @@
 [
   {
+    "date": "2026-08-03",
+    "items": [
+      "Döngü hızı 481 Hz'den 535-590 Hz'e çıktı (tur 2036 µs -> 1630-1810 µs, uçuş moduna göre). Ölçüm tabanlı çalışıldı: her adımda profil alındı, tahminle değil sayıyla ilerlendi",
+      "RC seri okuma öbeklendi: bayt başına available() + read() + micros() (üç sürücü çağrısı, ikisi UART kilidi alıyor) yerine öbek başına bir. 'rc' kovası 394 -> 220 µs",
+      "OSD render'ı INAV modeline çevrildi (INAV osd.c osdDrawNextElement): tur başına ~20 elemanın hepsi yerine SADECE sırası gelen bir eleman + her turda yapay ufuk. Render turu 12 Hz -> 62.5 Hz (INAV'ın TASK_PERIOD_HZ(250) / DRAW_FREQ_DENOM 4 hesabıyla aynı). Ufuk 5 kat akıcı ve saniyedeki toplam eleman render'ı ~240'tan ~125'e DÜŞTÜ — ödünleşme yok",
+      "OSD kare gönderimi turlara yayıldı: tüm OSD maliyeti 83 ms'de bir tek tura yığılıyordu (ort 62 µs ama max 2569 µs). 'osd' max 2569 -> ~900 µs",
+      "Tampon her karede silinmediği için ortaya çıkan 'eleman kısalınca eski yazı kalıyor' sorunu hücre sahipliği ile çözüldü: her hücreye onu yazan elemanın kimliği damgalanıyor, eleman yeniden çizilmeden önce yalnızca kendi hücreleri boşaltılıyor. Elemanların sabit genişlikte yazması gerekmiyor; çok satırlı elemanlar (gaz çubuğu, home, ufuk) kendiliğinden doğru temizleniyor",
+      "OSD'nin 5 saniyede bir silinip geri gelmesi düzeltildi. Periyodik yenileme ekranı gerçekten siliyordu; tur başına tek eleman çizilmeye başlayınca ekran ~400 ms boyunca kademeli doluyor ve gözle görülür yanıp sönme oluyordu. Artık ekran silinmiyor, yalnızca gölge tamponu geçersiz kılınıp tüm hücreler yeniden gönderiliyor — gözlükteki içerik aynı değerlerle üzerine yazıldığı için görsel olarak hiçbir şey olmuyor. Bozulmadan kurtulma amacı korundu",
+      "OSD'nin gözlükten gelen MSP baytlarını okuması da öbeklendi (RC ile aynı desen)",
+      "Uçuş modunda serial_poll() artık çalıştırılmıyor: klasik ESP32'de UART0 OSD'nin ve setup'ta Serial.end() çağrılmış durumda; her turda yoklamanın karşılığı yoktu. 'seri' kovası ort 26 -> 0 µs. ESP32-S3 istisnası korundu (orada Serial native USB, UART0'dan bağımsız)",
+      "TİTREMENİN KÖK NEDENİ BULUNDU: blackbox flash yazması uçuş döngüsünü durduruyor. Halka tamponu bir sayfa dolunca Core 0'daki flush görevi flash'a yazıyor; ESP32'de flash yazma sırasında HER İKİ çekirdeğin komut önbelleği kapanıyor, yani Core 1'deki uçuş döngüsü duruyor. Bu, birbiriyle alakasız kovaların (i2c, baro, mod, seri) hepsinin ~1 ms tepe yapmasını ve i2c'nin uçuş moduna göre değişmesini açıklıyor — I2C veriyolu süresi fiziktir, değişemez",
+      "Pratik sonuç: filtre (tam hız) kaydı açıkken saniyede ~40 sayfa flash yazılıyor. Normal uçuşta filtre kaydını ve döngü profilini KAPALI tutun; flash trafiği ~3 sayfa/sn'ye iner. Ölçüm araçları kapalıyken maliyetleri tur başına birkaç dal testi, yani ölçülemez seviyede",
+      "Döngü profiline 'baro', 'aux' ve 'prof' kovaları eklendi; 'baro' artık 'filt' içinde saklanmıyor, 'prof' ise profilcinin KENDİ maliyetini gösteriyor",
+      "Profil raporundaki 'max' değeri düzeltildi: tur başına birden fazla kapatılan kovalarda (filt, diger) toplam ile maksimum tutarsız oluyordu — ortalama maksimumdan büyük çıkabiliyordu ('P filt 266/254' gibi imkânsız satırlar). Artık max, bir turda o bölümde geçen TOPLAM sürenin maksimumu",
+      "Profil raporuna en kötü turun kova dağılımı eklendi ('W' satırları): hangi bölümlerin AYNI turda birlikte şiştiği artık tahminle değil ölçümle görülüyor",
+      "Profil raporuna tur başına RC bayt sayısı ve bayt başına ns eklendi ('P rcB' satırı)",
+      "Profil raporunun Serial'e basma yolu kaldırıldı: usb_mode_active açılışta bir kez belirlenip oturum boyunca true kaldığından, konfigüratör kapatılsa bile cihaz saniyede 14 satır basmaya devam ediyordu — ölçmeye çalıştığı turu bozan bir maliyet. Rapor zaten Olaylar sekmesinden okunuyor",
+      "aux çıkışı (kamera tilt) ölçüldü: tur başına 1 µs. 'update_aux_outputs her turda PWM yazıyor, şüpheli' tespiti yanlışmış — artık tahmin değil ölçüm",
+      "I2C hakkında net cevap: 647 µs'nin 382'si veriyolu fiziği (400 kHz × 153 bit) ve MPU6050'nin datasheet sınırı 400 kHz. Yazılımla ciddi bir kazanç yok; sektör standardı çözüm jiroskobu SPI'dan okumak (modern uçuş kontrolcüleri böyle yapıyor, aynı okuma ~15 µs). Karşılığı kart revizyonu"
+    ]
+  },
+  {
     "date": "2026-08-02",
     "items": [
       "Döngü profili için Uçuş Kaydı sayfasına aç/kapat anahtarı eklendi. Önceden yalnızca seri komutla ('profile 1') açılabiliyordu ama konfigüratörde serbest komut yazılacak bir yer yok — yani pratikte erişilemezdi. Anahtar durumu 'bb_status' ile cihazdan okunuyor",
