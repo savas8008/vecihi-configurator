@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-08-05",
+    "items": [
+      "Döngü hızı 555-580 Hz'den 790-870 Hz'e çıktı (MANUAL 1725 -> ~1130 µs, LAUNCH 1800 -> ~1260 µs). Kazancın tamamı tek bir yerden geldi: MPU6050'nin 14 baytlık okuması",
+      "Sorun DMA eksikliği değildi. ESP32'de I2C'nin DMA'sı yok ama gerek de yok: 32 baytlık donanım FIFO'su ve komut listesi motoru transferi zaten kendi başına yürütüyor. Sorun, CPU'nun 325 µs boyunca o transferi BEKLİYOR olmasıydı — Arduino Wire, i2c_master_cmd_begin içinde bir semaforda bloke bekliyor (çekirdek kaynağı incelendi, esp32-hal-i2c.c:176)",
+      "Çözüm: okuma döngünün başında başlatılıyor, IMU'ya bağlı olmayan işler (GPS, RC, aux, seri, modlar, telemetri, OSD ~500 µs) yapılıyor, sonra sonuç toplanıyor. Veriyolu süresi o işle örtüşüyor. KONTROL GECİKMESİ ARTMIYOR — örnek PID'e girdiğinde hâlâ taze",
+      "Ölçüldü: bayt başına 23.23 µs (400 kHz teorik 22.5 — yani saat ayarı doğruydu, orada bir hata yoktu), sabit sürücü yükü 136 µs, 14 baytlık okuma 461 µs. Uçuşta ölçülen ~600 µs'nin kalan ~139 µs'si bloke beklerken yutulan önalımdı",
+      "Önceki 'I2C'de yazılımla yapılacak ciddi bir şey yok, çözüm SPI jiroskop' değerlendirmesi YANLIŞTI. Veriyolu süresi gerçekten fizik ama CPU'nun onu beklemesi değil. SPI hâlâ doğru uzun vadeli cevap ama artık acil değil",
+      "flight_modes_update() artık PID'den ÖNCE çalışıyor. Eskiden sonra geliyordu, yani PID bir önceki turun setpoint'ini kullanıyordu — bir tur gecikme kalktı. Kontrol tepkisini etkileyen gerçek bir değişiklik",
+      "Emniyet ağı: asenkron okuma başarısız olursa (EMI, titreşim, veriyolu kilitlenmesi) o tur eski kanıtlanmış Wire okumasına geri düşüyor. Yani bir aksaklık jiroskobu kaybettirmiyor. Kaç turda geri düşüldüğü 'P i2cF' olarak raporlanıyor ve SIFIR olmalı — sıfırdan büyükse veri doğru gelmeye devam eder ama hız sessizce eski seviyeye döner, başka türlü fark edilmez",
+      "Kapsam: register seviyesine inen yalnızca MPU'nun 14 baytlık okuma yolu. BMP180 baro (~150 µs/tur), pitot ve MPU init hâlâ Wire kullanıyor. ESP32-S3'te asenkron yol derlenmiyor (i2c_dev_t alan adları farklı), orada davranış değişmedi",
+      "OSD'ye Core 1 / Core 0 döngü hızı göstergesi eklendi (önceki sürümde), bu ölçümler onunla uçarken izlenebiliyor"
+    ]
+  },
+  {
     "date": "2026-08-03",
     "items": [
       "OSD'ye döngü hızı göstergesi eklendi: 'C1:540 C0: 998' — C1 Core 1 uçuş döngüsü (IMU/PID/mikser), C0 Core 0 GPS görevi. USB takılıyken OSD kapalı olduğu için gerçek uçuş hızı başka türlü uçarken görülemiyordu; bu eleman onu havada gösteriyor. OSD sayfasından açılıp konumlandırılabiliyor, ayar NVS'e yazılıyor. Varsayılan KAPALI (teşhis elemanı)",
