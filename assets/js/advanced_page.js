@@ -33,7 +33,7 @@ let advancedConfig = {
         // Navigasyon ve Stall
         rth_radius: 50,
         loiter_direction: 1,
-        stall_speed_kmh: 40.0,
+        stall_speed_kmh: 29.0,
         climb_throttle: 1700,
         descend_throttle: 1100,
         
@@ -96,7 +96,7 @@ let advancedConfig = {
     land_assist: {
         circuit_alt: 50,
         final_approach_distance: 0,
-        circuit_width: 150,
+        circuit_width: 60,
         flare_alt: 5.0,
         approach_throttle: 1200,
         flare_throttle: 1000,

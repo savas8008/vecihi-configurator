@@ -959,7 +959,7 @@
         <div class="mb-2 row">
           <label class="col-7 col-form-label col-form-label-sm" data-i18n="gps.loiter_dir">Loiter Yönü</label>
           <div class="col-5">
-            <select class="form-select form-select-sm" id="inp_nav_loiter_dir" title="RTH ve LOITER modu için ortak — sağ veya sol devre">
+            <select class="form-select form-select-sm" id="inp_nav_loiter_dir" title="RTH, LOITER ve Land Assist devre yönü için ortak — sağ veya sol devre">
               <option value="1" data-i18n="gps.loiter_dir_right">Sağ (CW)</option>
               <option value="-1" data-i18n="gps.loiter_dir_left">Sol (CCW)</option>
             </select>
@@ -3800,13 +3800,6 @@ function toggleBatCalc(bodyId, btn) {
                                     <label class="form-label small mb-1" data-i18n="waypoint.approach_alt">Yaklaşma İrtifası (m AGL)</label>
                                     <input type="number" class="form-control form-control-sm" id="inp_la_circuit_alt" min="20" max="300" step="5" value="50" title="Final yaklaşma başlangıç irtifası — AGL metre">
                                 </div>
-                                <div class="mb-0">
-                                    <label class="form-label small mb-1" data-i18n="waypoint.circuit_dir">Devre Yönü</label>
-                                    <select class="form-select form-select-sm" id="inp_la_loiter_dir" title="Sol devre veya sağ devre">
-                                        <option value="1" data-i18n="waypoint.circuit_right">Sağ Devre</option>
-                                        <option value="-1" data-i18n="waypoint.circuit_left">Sol Devre</option>
-                                    </select>
-                                </div>
                             </div>
                         </div>
 
@@ -3816,12 +3809,12 @@ function toggleBatCalc(bodyId, btn) {
                                 <div class="fw-bold mb-2" style="color:#17a2b8;font-size:0.8em;"><i class="bi bi-send me-1"></i>Son Yaklaşma (Final)</div>
                                 <div class="mb-2">
                                     <label class="form-label small mb-1" data-i18n="waypoint.final_distance">Final Başlangıç Mesafesi (m)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_final_approach_distance" min="0" max="2000" step="10" value="250" title="Final waypoint, iniş noktasından kaç metre uzakta olsun? 0 = Otomatik (irtifa÷tan3°)">
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_final_approach_distance" min="0" max="2000" step="10" value="200" title="Final waypoint, iniş noktasından kaç metre uzakta olsun? 0 = Otomatik (irtifa÷tan3°)">
                                     <small class="text-muted" style="font-size:0.78em;">0 = Otomatik (irtifa÷tan3°)</small>
                                 </div>
                                 <div class="mb-0">
                                     <label class="form-label small mb-1" data-i18n="waypoint.circuit_width">Devre Genişliği (m)</label>
-                                    <input type="number" class="form-control form-control-sm" id="inp_la_circuit_width" min="50" max="600" step="10" value="50" title="Pist merkezinden yanal uzaklık — downwind ve base leg için (m)">
+                                    <input type="number" class="form-control form-control-sm" id="inp_la_circuit_width" min="50" max="600" step="10" value="60" title="Pist merkezinden yanal uzaklık — downwind ve base leg için (m)">
                                 </div>
                             </div>
                         </div>
