@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-08-06",
+    "items": [
+      "RTH tırmanma fazına atlama eşiği eklendi: hedef irtifa ile mevcut irtifa arasındaki fark artık mutlak metre cinsinden (varsayılan 10 m) karşılaştırılıyor; eskiden hedefin %90'ı gibi yüzdesel bir eşik kullanılıyordu, bu da düşük hedef irtifalarda dar, yüksek hedeflerde gereksiz geniş bir bant bırakıyordu. Eşik 'Parametreler' sayfasından RTH_CLIMB_SKIP_M adıyla değiştirilebiliyor",
+      "Geofence (menzil) failsafe'i minimum 300m'ye kilitlendi: 1-299 arası girilen değerler sessizce 300'e yükseltiliyor, 0 (sınır yok) korunuyor. Daha kısa mesafelerde RTH navigasyonu (loiter yarıçapı, dönüş menzili) güvenilir çalışmadığından kullanıcı hatasını önlemek için eklendi. Kural dört ayrı yazma yolunda da uygulanıyor: Nav sayfası, Failsafe/Geofence kartı, ayar geri yükleme (CFG restore) ve Parametreler (uzman) sayfası"
+    ]
+  },
+  {
     "date": "2026-08-05",
     "items": [
       "Döngü hızı 555-580 Hz'den 790-870 Hz'e çıktı (MANUAL 1725 -> ~1130 µs, LAUNCH 1800 -> ~1260 µs). Kazancın tamamı tek bir yerden geldi: MPU6050'nin 14 baytlık okuması",

@@ -476,7 +476,16 @@ function saveAdvancedConfig() {
     setIf(nav, "rth_altitude", int("inp_nav_rth_alt"));
     setIf(nav, "rth_radius", int("inp_nav_radius"));
     setIf(nav, "loiter_direction", selInt("inp_nav_loiter_dir"));
-    setIf(nav, "max_distance", int("inp_nav_max_dist"));
+    // Geofence: 0 = sınır yok (kasıtlı), aksi halde min 300m — RTH navigasyonu
+    // daha kısa mesafede güvenilir çalışmaz. Firmware da aynı kuralı uygular
+    // (bkz. vecihi/src/serial_communication.cpp: clamp_geofence_max_distance).
+    let geofenceDist = int("inp_nav_max_dist");
+    if (geofenceDist !== undefined && geofenceDist > 0 && geofenceDist < 300) {
+        geofenceDist = 300;
+        const geofenceEl = getEl("inp_nav_max_dist");
+        if (geofenceEl) geofenceEl.value = geofenceDist;
+    }
+    setIf(nav, "max_distance", geofenceDist);
     setIf(nav, "climb_first", bool("inp_nav_climb_first"));
 
     // Nav açı limitleri

@@ -161,7 +161,7 @@ window.VECIHI_LOCALE_TR = {
     "loiter_dir_left": "Sol (CCW)",
     "loiter_shared_hint": "Yarıçap ve yön, RTH bekleme dairesi ile bağımsız LOITER modu arasında ortaktır.",
     "rth_geofence": "Geofence (m)",
-    "rth_geofence_hint": "0=Yok",
+    "rth_geofence_hint": "0=Yok, min 300",
     "rth_climb_first": "Eve Dönerken Önce Yüksel",
     "angle_title": "Açı Limitleri",
     "angle_max_roll": "Max Roll (°)",

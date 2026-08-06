@@ -970,7 +970,7 @@
         </div>
         <div class="mb-2 row">
           <label class="col-7 col-form-label col-form-label-sm text-danger"><span data-i18n="gps.rth_geofence">Geofence (m)</span> <small class="text-muted" data-i18n="gps.rth_geofence_hint">0=Yok</small></label>
-          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dist" placeholder="0=Yok" value="0"></div>
+          <div class="col-5"><input type="number" class="form-control form-control-sm" id="inp_nav_max_dist" placeholder="0=Yok" value="0" onchange="clampGeofenceDistance(parseInt(this.value,10), 'inp_nav_max_dist')"></div>
         </div>
         <div class="form-check form-switch mt-2">
           <input class="form-check-input" type="checkbox" id="inp_nav_climb_first">
@@ -1837,9 +1837,9 @@
                         <p class="text-muted small" data-i18n="failsafe.geofence_desc">Home noktasından izin verilen maksimum uzaklık.</p>
                         <div class="mb-2 row align-items-center">
                             <label class="col-7 col-form-label" data-i18n="failsafe.geofence_max_dist">Maks. Mesafe (m)</label>
-                            <div class="col-5"><input type="number" class="form-control" id="inp_geofence_max_dist" min="0" step="10" value="0" placeholder="0 = Sınır Yok" oninput="updateGeofenceBadge()"></div>
+                            <div class="col-5"><input type="number" class="form-control" id="inp_geofence_max_dist" min="0" step="10" value="0" placeholder="0 = Sınır Yok" oninput="updateGeofenceBadge()" onchange="clampGeofenceDistance(parseInt(this.value,10), 'inp_geofence_max_dist'); updateGeofenceBadge();"></div>
                         </div>
-                        <small class="text-muted" data-i18n="failsafe.geofence_hint">0 girilirse geofence devre dışıdır. Örn. 1000 girilirse, uçak evden 1001 metre uzaklaştığı anda otomatik <strong>RTH</strong> tetiklenir (GPS ve Home noktası zaten mevcuttur).</small>
+                        <small class="text-muted" data-i18n="failsafe.geofence_hint">0 girilirse geofence devre dışıdır. Aksi halde en az <strong>300m</strong> olmalıdır (daha düşük değerler otomatik 300'e yükseltilir) — RTH navigasyonu daha kısa mesafede güvenilir çalışmaz. Örn. 1000 girilirse, uçak evden 1001 metre uzaklaştığı anda otomatik <strong>RTH</strong> tetiklenir (GPS ve Home noktası zaten mevcuttur).</small>
                     </div>
                 </div>
 

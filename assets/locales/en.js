@@ -161,7 +161,7 @@ window.VECIHI_LOCALE_EN = {
     "loiter_dir_left": "Left (CCW)",
     "loiter_shared_hint": "Radius and direction are shared between the RTH holding circle and the standalone LOITER mode.",
     "rth_geofence": "Geofence (m)",
-    "rth_geofence_hint": "0=None",
+    "rth_geofence_hint": "0=None, min 300",
     "rth_climb_first": "Climb First Before Returning Home",
     "angle_title": "Angle Limits",
     "angle_max_roll": "Max Roll (°)",
