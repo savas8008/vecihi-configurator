@@ -87,6 +87,20 @@ function updateFailsafeUI() {
 // === KAYDETME ===
 
 /**
+ * @brief Geofence mesafesi: 0 = sınır yok (kasıtlı), aksi halde min 300m —
+ * RTH navigasyonu daha kısa mesafede güvenilir çalışmaz. Firmware aynı kuralı
+ * uygular (bkz. vecihi/src/serial_communication.cpp: clamp_geofence_max_distance).
+ * @param {number|undefined} v
+ * @param {string} inputId - kırpılmışsa input kutusunu da düzeltmek için
+ */
+function clampGeofenceDistance(v, inputId) {
+    if (v === undefined || v <= 0 || v >= 300) return v;
+    const el = document.getElementById(inputId);
+    if (el) el.value = 300;
+    return 300;
+}
+
+/**
  * @brief UI'daki değerleri toplar ve ESP'ye gönderir
  */
 function saveFailsafeConfig() {
@@ -121,7 +135,7 @@ function saveFailsafeConfig() {
             fixed_throttle: int('inp_rf_fs_throttle')
         },
         geofence: {
-            max_distance: int('inp_geofence_max_dist')
+            max_distance: clampGeofenceDistance(int('inp_geofence_max_dist'), 'inp_geofence_max_dist')
         },
         sensor: {
             gps_glitch_dist: num('inp_gps_glitch_dist')

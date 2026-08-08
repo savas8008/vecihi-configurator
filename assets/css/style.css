@@ -434,6 +434,105 @@ a:hover {
     border-bottom-color: rgba(0,0,0,0.15) !important;
 }
 
+/* ============================================
+   BATARYA SEKMESİ — Voltaj / Akım ikili paneli
+   panel4 (açık zemin) içinde iki ayrı beyaz kart
+   ============================================ */
+.bat-split .bat-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-top: 3px solid var(--bat-accent, #4f46e5);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+}
+.bat-panel-volt { --bat-accent: #4f46e5; --bat-accent-soft: rgba(79, 70, 229, 0.10); }
+.bat-panel-curr { --bat-accent: #d97706; --bat-accent-soft: rgba(217, 119, 6, 0.12); }
+
+.bat-panel-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 9px 14px;
+    background: var(--bat-accent-soft);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+}
+.bat-panel-head > i        { color: var(--bat-accent); font-size: 1rem; align-self: center; }
+.bat-panel-name            { font-size: 1rem; font-weight: 700; color: #111111; letter-spacing: 0.2px; }
+.bat-panel-head .bat-panel-sub { font-size: 0.74rem; color: #5b6470 !important; }
+
+.bat-panel-body { padding: 12px 14px 14px; flex: 1 1 auto; }
+
+.bat-group-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #222222;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+.bat-group-title i { color: var(--bat-accent); margin-right: 4px; }
+
+.bat-note {
+    font-size: 0.72rem;
+    margin-bottom: 8px;
+    color: #4b5563;
+}
+.bat-note-info i { color: var(--bat-accent); }
+
+.bat-help {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.74rem;
+    color: #333333;
+    margin-top: 8px;
+}
+.bat-help code     { color: var(--bat-accent); background: transparent; }
+.bat-help-warn     { color: #b45309; }
+
+/* Katlanır kalibrasyon araçları */
+.bat-calc-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 14px;
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(0, 0, 0, 0.035);
+    color: #222222;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+.bat-calc-toggle:hover      { background: var(--bat-accent-soft); }
+.bat-calc-toggle > i        { color: var(--bat-accent); }
+.bat-calc-chevron           { transition: transform 0.25s ease; }
+.bat-calc-toggle.open .bat-calc-chevron { transform: rotate(180deg); }
+
+.bat-calc-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: rgba(0, 0, 0, 0.03);
+    border-top: 1px solid transparent;
+}
+.bat-calc-body.open {
+    max-height: 460px;
+    border-top-color: rgba(0, 0, 0, 0.08);
+}
+.bat-calc-inner  { padding: 12px 14px 14px; }
+.bat-calc-title  { font-size: 0.82rem; font-weight: 600; color: var(--bat-accent); margin-bottom: 8px; }
+.bat-calc-hint   { font-size: 0.72rem; color: #555555; margin-top: 8px; }
+.bat-calc-hint code { color: var(--bat-accent); background: transparent; }
+
 .panel-title {
     display: flex;
     align-items: center;
@@ -3313,3 +3412,182 @@ label.small.text-muted,
 }
 .fs-status-off { background: rgba(148,163,184,0.20); color: #64748b; }
 .fs-status-on  { background: var(--color-warning-glow); color: #c2620a; }
+
+/* ============================================
+   PARAMETRELER SAYFASI — ArduPilot tarzı tam liste
+   ============================================ */
+
+/* --- Araç çubuğu --- */
+.param-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-panel-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    margin-bottom: 10px;
+}
+.param-search-wrap {
+    position: relative;
+    flex: 1 1 260px;
+    min-width: 200px;
+}
+.param-search-wrap i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+.param-search-wrap input { padding-left: 30px !important; }
+.param-changed-switch { margin: 0; white-space: nowrap; }
+.param-count-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border-default);
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+}
+.param-toolbar-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+/* --- Grup filtre çipleri --- */
+.param-group-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.param-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-panel-2);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.param-chip:hover { border-color: var(--color-primary); color: var(--text-primary); }
+.param-chip.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #0f172a;
+}
+.param-chip-count {
+    font-size: 0.66rem;
+    opacity: 0.75;
+    background: rgba(0,0,0,0.18);
+    border-radius: 999px;
+    padding: 0 5px;
+}
+.param-chip.active .param-chip-count { background: rgba(0,0,0,0.22); }
+
+/* --- Tablo --- */
+.param-table-wrap {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+    max-height: 68vh;
+    overflow-y: auto;
+}
+.param-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    min-width: 760px;
+}
+.param-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg-panel-solid);
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 2px solid var(--border-default);
+    white-space: nowrap;
+}
+.param-th-name  { width: 20%; }
+.param-th-desc  { width: 50%; }
+.param-th-value { width: 18%; }
+.param-th-save  { width: 12%; text-align: center !important; }
+
+.param-table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: background 0.12s ease;
+}
+.param-table tbody tr:hover { background: var(--bg-hover); }
+.param-table td { padding: 8px 12px; vertical-align: top; }
+
+/* Varsayılandan farklı satır — sol kenarda sarı işaret */
+.param-row-changed { box-shadow: inset 3px 0 0 var(--color-warning); }
+
+.param-name {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    word-break: break-all;
+}
+.param-group-tag {
+    font-size: 0.64rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+.param-desc {
+    color: var(--text-secondary);
+    line-height: 1.45;
+    font-size: 0.78rem;
+}
+.param-limits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+.param-default strong { color: var(--color-success); }
+.param-type {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    opacity: 0.7;
+}
+.param-value-cell .param-input { min-width: 92px; }
+.param-input.param-dirty {
+    border-color: var(--color-warning) !important;
+    box-shadow: 0 0 0 2px var(--color-warning-glow);
+}
+.param-save-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+.param-save-cell .btn { padding: 3px 8px; }
+.param-save-btn { margin-right: 4px; }
+
+/* Dar ekran: açıklama sütunu daralır, tablo yatay kaydırılır */
+@media (max-width: 992px) {
+    .param-table { min-width: 680px; }
+    .param-toolbar-actions { margin-left: 0; width: 100%; }
+}
+.param-save-btn .param-save-label { margin-left: 5px; font-size: 0.72rem; font-weight: 600; }
+@media (max-width: 1200px) { .param-save-btn .param-save-label { display: none; } }

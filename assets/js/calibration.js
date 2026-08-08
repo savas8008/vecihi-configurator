@@ -413,7 +413,7 @@
      * @brief Kalibrasyon sayfasını aktif eder
      */
     function activateCalibrationPage() {
-        document.querySelectorAll('.nav-link').forEach(function(nav) { nav.classList.remove('active'); });
+        document.querySelectorAll('.nav-link[data-page]').forEach(function(nav) { nav.classList.remove('active'); });
         document.querySelectorAll('.page').forEach(function(page) { page.classList.remove('active'); });
         
         var nav = document.querySelector('[data-page="calibration"]');

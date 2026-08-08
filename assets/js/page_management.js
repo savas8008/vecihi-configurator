@@ -11,7 +11,7 @@
 let currentPage = '';
 
 // Veri beklenen sayfalar (ESP'den page_data gelmeden kaydet engellenir)
-const DATA_PAGES = new Set(['calibration', 'mixer', 'gps', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint', 'failsafe']);
+const DATA_PAGES = new Set(['calibration', 'mixer', 'gps', 'transmitter', 'modes', 'pid', 'advanced', 'osd', 'waypoint', 'failsafe', 'parameters']);
 
 // Loading timeout handle'ları (sayfa başına)
 const loadingTimeouts = {};
@@ -25,7 +25,7 @@ const loadingTimeouts = {};
 function changePage(targetPage) {
     // "home" → bağlan ekranına dön (offline sayfa yok)
     if (targetPage === 'home') {
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        document.querySelectorAll('.nav-link[data-page]').forEach(n => n.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const homeLink = document.querySelector('.nav-link[data-page="home"]');
         if (homeLink) homeLink.classList.add('active');
@@ -35,7 +35,7 @@ function changePage(targetPage) {
     }
 
     // 1. UI Güncellemeleri
-    document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+    document.querySelectorAll('.nav-link[data-page]').forEach(nav => nav.classList.remove('active'));
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
 
     const activeLink = document.querySelector(`.nav-link[data-page="${targetPage}"]`);
@@ -100,7 +100,15 @@ function managePageStreams(page) {
         } else if (page === 'osd') {
             sendCommand('osd_page_data');
             setTimeout(() => sendCommand('outputs_page_data'), 200);
-        } else if (page !== 'sensors') {
+        } else if (page === 'parameters') {
+            // Parametre tablosu ayri protokol kullanir (param_list, parcali dump)
+            if (typeof requestParamList === 'function') requestParamList();
+            else sendCommand('param_list');
+        } else if (page !== 'sensors' && page !== 'blackbox') {
+            // blackbox: firmware'de 'blackbox_page_data' diye bir komut YOK.
+            // Uçuş kaydı sayfaya girince otomatik çekilmez — kullanıcı "Logu Oku"
+            // butonuna basınca tek seferlik 'dump' gönderilir (dump uzun sürer,
+            // sayfaya her girişte tetiklenmemeli).
             sendCommand(page + '_page_data');
         }
     }, 50);
@@ -173,6 +181,12 @@ function startPageSpecificStream(page) {
         case 'firmware':
             log('Bağlam: Firmware -> Versiyon bilgisi yükleniyor', 'info');
             if (typeof initFirmwarePage === 'function') initFirmwarePage();
+            break;
+
+        case 'blackbox':
+            // Stream yok. Kayıt cihazdan tek seferlik 'dump' ile çekilir —
+            // otomatik çekmiyoruz, kullanıcı butona basmalı (dump uzun sürebilir).
+            if (typeof initBlackboxPage === 'function') initBlackboxPage();
             break;
 
         default:
@@ -333,7 +347,11 @@ function resetSaveButton(btn, delay = 2000) {
  * @brief Navigasyon linklerine event listener ekler
  */
 function setupNavigationListeners() {
-    document.querySelectorAll('.nav-link').forEach(link => {
+    // Yalnizca kenar cubugu linkleri (data-page tasiyanlar). Bootstrap sekme
+    // butonlari da .nav-link sinifini kullanir ama data-page tasimaz; filtre
+    // olmadan onlara da tiklama dinleyicisi baglaniyor ve changePage(null)
+    // cagrilarak sayfa degistiriyordu.
+    document.querySelectorAll('.nav-link[data-page]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetPage = link.getAttribute('data-page');
@@ -420,7 +438,7 @@ function updateConnectionStatus() {
     if (connStatus) connStatus.textContent = connected ? 'Bağlandı' : 'Bağlantı Yok';
 
     // Navigasyon menüsü: online↔offline görünürlük
-    document.querySelectorAll('.nav-link').forEach(nav => {
+    document.querySelectorAll('.nav-link[data-page]').forEach(nav => {
         const navPage = nav.getAttribute('data-page');
         const isOfflineNav = nav.closest('.nav-offline') !== null
                           || ['kml','firmware','docs'].includes(navPage);

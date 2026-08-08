@@ -1,5 +1,135 @@
 [
   {
+    "date": "2026-08-06",
+    "items": [
+      "RTH tırmanma fazına atlama eşiği eklendi: hedef irtifa ile mevcut irtifa arasındaki fark artık mutlak metre cinsinden (varsayılan 10 m) karşılaştırılıyor; eskiden hedefin %90'ı gibi yüzdesel bir eşik kullanılıyordu, bu da düşük hedef irtifalarda dar, yüksek hedeflerde gereksiz geniş bir bant bırakıyordu. Eşik 'Parametreler' sayfasından RTH_CLIMB_SKIP_M adıyla değiştirilebiliyor",
+      "Geofence (menzil) failsafe'i minimum 300m'ye kilitlendi: 1-299 arası girilen değerler sessizce 300'e yükseltiliyor, 0 (sınır yok) korunuyor. Daha kısa mesafelerde RTH navigasyonu (loiter yarıçapı, dönüş menzili) güvenilir çalışmadığından kullanıcı hatasını önlemek için eklendi. Kural dört ayrı yazma yolunda da uygulanıyor: Nav sayfası, Failsafe/Geofence kartı, ayar geri yükleme (CFG restore) ve Parametreler (uzman) sayfası"
+    ]
+  },
+  {
+    "date": "2026-08-05",
+    "items": [
+      "Döngü hızı 555-580 Hz'den 790-870 Hz'e çıktı (MANUAL 1725 -> ~1130 µs, LAUNCH 1800 -> ~1260 µs). Kazancın tamamı tek bir yerden geldi: MPU6050'nin 14 baytlık okuması",
+      "Sorun DMA eksikliği değildi. ESP32'de I2C'nin DMA'sı yok ama gerek de yok: 32 baytlık donanım FIFO'su ve komut listesi motoru transferi zaten kendi başına yürütüyor. Sorun, CPU'nun 325 µs boyunca o transferi BEKLİYOR olmasıydı — Arduino Wire, i2c_master_cmd_begin içinde bir semaforda bloke bekliyor (çekirdek kaynağı incelendi, esp32-hal-i2c.c:176)",
+      "Çözüm: okuma döngünün başında başlatılıyor, IMU'ya bağlı olmayan işler (GPS, RC, aux, seri, modlar, telemetri, OSD ~500 µs) yapılıyor, sonra sonuç toplanıyor. Veriyolu süresi o işle örtüşüyor. KONTROL GECİKMESİ ARTMIYOR — örnek PID'e girdiğinde hâlâ taze",
+      "Ölçüldü: bayt başına 23.23 µs (400 kHz teorik 22.5 — yani saat ayarı doğruydu, orada bir hata yoktu), sabit sürücü yükü 136 µs, 14 baytlık okuma 461 µs. Uçuşta ölçülen ~600 µs'nin kalan ~139 µs'si bloke beklerken yutulan önalımdı",
+      "Önceki 'I2C'de yazılımla yapılacak ciddi bir şey yok, çözüm SPI jiroskop' değerlendirmesi YANLIŞTI. Veriyolu süresi gerçekten fizik ama CPU'nun onu beklemesi değil. SPI hâlâ doğru uzun vadeli cevap ama artık acil değil",
+      "flight_modes_update() artık PID'den ÖNCE çalışıyor. Eskiden sonra geliyordu, yani PID bir önceki turun setpoint'ini kullanıyordu — bir tur gecikme kalktı. Kontrol tepkisini etkileyen gerçek bir değişiklik",
+      "Emniyet ağı: asenkron okuma başarısız olursa (EMI, titreşim, veriyolu kilitlenmesi) o tur eski kanıtlanmış Wire okumasına geri düşüyor. Yani bir aksaklık jiroskobu kaybettirmiyor. Kaç turda geri düşüldüğü 'P i2cF' olarak raporlanıyor ve SIFIR olmalı — sıfırdan büyükse veri doğru gelmeye devam eder ama hız sessizce eski seviyeye döner, başka türlü fark edilmez",
+      "Kapsam: register seviyesine inen yalnızca MPU'nun 14 baytlık okuma yolu. BMP180 baro (~150 µs/tur), pitot ve MPU init hâlâ Wire kullanıyor. ESP32-S3'te asenkron yol derlenmiyor (i2c_dev_t alan adları farklı), orada davranış değişmedi",
+      "OSD'ye Core 1 / Core 0 döngü hızı göstergesi eklendi (önceki sürümde), bu ölçümler onunla uçarken izlenebiliyor"
+    ]
+  },
+  {
+    "date": "2026-08-03",
+    "items": [
+      "OSD'ye döngü hızı göstergesi eklendi: 'C1:540 C0: 998' — C1 Core 1 uçuş döngüsü (IMU/PID/mikser), C0 Core 0 GPS görevi. USB takılıyken OSD kapalı olduğu için gerçek uçuş hızı başka türlü uçarken görülemiyordu; bu eleman onu havada gösteriyor. OSD sayfasından açılıp konumlandırılabiliyor, ayar NVS'e yazılıyor. Varsayılan KAPALI (teşhis elemanı)",
+      "Döngü hızı 481 Hz'den 535-590 Hz'e çıktı (tur 2036 µs -> 1630-1810 µs, uçuş moduna göre). Ölçüm tabanlı çalışıldı: her adımda profil alındı, tahminle değil sayıyla ilerlendi",
+      "RC seri okuma öbeklendi: bayt başına available() + read() + micros() (üç sürücü çağrısı, ikisi UART kilidi alıyor) yerine öbek başına bir. 'rc' kovası 394 -> 220 µs",
+      "OSD render'ı INAV modeline çevrildi (INAV osd.c osdDrawNextElement): tur başına ~20 elemanın hepsi yerine SADECE sırası gelen bir eleman + her turda yapay ufuk. Render turu 12 Hz -> 62.5 Hz (INAV'ın TASK_PERIOD_HZ(250) / DRAW_FREQ_DENOM 4 hesabıyla aynı). Ufuk 5 kat akıcı ve saniyedeki toplam eleman render'ı ~240'tan ~125'e DÜŞTÜ — ödünleşme yok",
+      "OSD kare gönderimi turlara yayıldı: tüm OSD maliyeti 83 ms'de bir tek tura yığılıyordu (ort 62 µs ama max 2569 µs). 'osd' max 2569 -> ~900 µs",
+      "Tampon her karede silinmediği için ortaya çıkan 'eleman kısalınca eski yazı kalıyor' sorunu hücre sahipliği ile çözüldü: her hücreye onu yazan elemanın kimliği damgalanıyor, eleman yeniden çizilmeden önce yalnızca kendi hücreleri boşaltılıyor. Elemanların sabit genişlikte yazması gerekmiyor; çok satırlı elemanlar (gaz çubuğu, home, ufuk) kendiliğinden doğru temizleniyor",
+      "OSD'nin 5 saniyede bir silinip geri gelmesi düzeltildi. Periyodik yenileme ekranı gerçekten siliyordu; tur başına tek eleman çizilmeye başlayınca ekran ~400 ms boyunca kademeli doluyor ve gözle görülür yanıp sönme oluyordu. Artık ekran silinmiyor, yalnızca gölge tamponu geçersiz kılınıp tüm hücreler yeniden gönderiliyor — gözlükteki içerik aynı değerlerle üzerine yazıldığı için görsel olarak hiçbir şey olmuyor. Bozulmadan kurtulma amacı korundu",
+      "OSD'nin gözlükten gelen MSP baytlarını okuması da öbeklendi (RC ile aynı desen)",
+      "Uçuş modunda serial_poll() artık çalıştırılmıyor: klasik ESP32'de UART0 OSD'nin ve setup'ta Serial.end() çağrılmış durumda; her turda yoklamanın karşılığı yoktu. 'seri' kovası ort 26 -> 0 µs. ESP32-S3 istisnası korundu (orada Serial native USB, UART0'dan bağımsız)",
+      "TİTREMENİN KÖK NEDENİ BULUNDU: blackbox flash yazması uçuş döngüsünü durduruyor. Halka tamponu bir sayfa dolunca Core 0'daki flush görevi flash'a yazıyor; ESP32'de flash yazma sırasında HER İKİ çekirdeğin komut önbelleği kapanıyor, yani Core 1'deki uçuş döngüsü duruyor. Bu, birbiriyle alakasız kovaların (i2c, baro, mod, seri) hepsinin ~1 ms tepe yapmasını ve i2c'nin uçuş moduna göre değişmesini açıklıyor — I2C veriyolu süresi fiziktir, değişemez",
+      "Pratik sonuç: filtre (tam hız) kaydı açıkken saniyede ~40 sayfa flash yazılıyor. Normal uçuşta filtre kaydını ve döngü profilini KAPALI tutun; flash trafiği ~3 sayfa/sn'ye iner. Ölçüm araçları kapalıyken maliyetleri tur başına birkaç dal testi, yani ölçülemez seviyede",
+      "Döngü profiline 'baro', 'aux' ve 'prof' kovaları eklendi; 'baro' artık 'filt' içinde saklanmıyor, 'prof' ise profilcinin KENDİ maliyetini gösteriyor",
+      "Profil raporundaki 'max' değeri düzeltildi: tur başına birden fazla kapatılan kovalarda (filt, diger) toplam ile maksimum tutarsız oluyordu — ortalama maksimumdan büyük çıkabiliyordu ('P filt 266/254' gibi imkânsız satırlar). Artık max, bir turda o bölümde geçen TOPLAM sürenin maksimumu",
+      "Profil raporuna en kötü turun kova dağılımı eklendi ('W' satırları): hangi bölümlerin AYNI turda birlikte şiştiği artık tahminle değil ölçümle görülüyor",
+      "Profil raporuna tur başına RC bayt sayısı ve bayt başına ns eklendi ('P rcB' satırı)",
+      "Profil raporunun Serial'e basma yolu kaldırıldı: usb_mode_active açılışta bir kez belirlenip oturum boyunca true kaldığından, konfigüratör kapatılsa bile cihaz saniyede 14 satır basmaya devam ediyordu — ölçmeye çalıştığı turu bozan bir maliyet. Rapor zaten Olaylar sekmesinden okunuyor",
+      "aux çıkışı (kamera tilt) ölçüldü: tur başına 1 µs. 'update_aux_outputs her turda PWM yazıyor, şüpheli' tespiti yanlışmış — artık tahmin değil ölçüm",
+      "I2C hakkında net cevap: 647 µs'nin 382'si veriyolu fiziği (400 kHz × 153 bit) ve MPU6050'nin datasheet sınırı 400 kHz. Yazılımla ciddi bir kazanç yok; sektör standardı çözüm jiroskobu SPI'dan okumak (modern uçuş kontrolcüleri böyle yapıyor, aynı okuma ~15 µs). Karşılığı kart revizyonu"
+    ]
+  },
+  {
+    "date": "2026-08-02",
+    "items": [
+      "Döngü profili için Uçuş Kaydı sayfasına aç/kapat anahtarı eklendi. Önceden yalnızca seri komutla ('profile 1') açılabiliyordu ama konfigüratörde serbest komut yazılacak bir yer yok — yani pratikte erişilemezdi. Anahtar durumu 'bb_status' ile cihazdan okunuyor",
+      "LULU/medyan filtresine sayaç eklendi: filtrenin kaç örneği gerçekten DEĞİŞTİRDİĞİ (yani kaç darbe bastırdığı) sayılıyor. Filtre her turda çalışıyor ama çoğu turda ortanca zaten yeni örnek olduğu için sayaç yalnızca gerçek bir sıçrama bastırıldığında artıyor — böylece 'medyan devrede mi, ne kadar iş yapıyor' sorusu ölçülebilir hale geldi",
+      "Uçuş kaydı (SLOW) formatına 'despike' sütunu eklendi (70 bayt). Kod henüz yayınlanmadığı için geriye dönük uyumluluk katmanı yok — tek format",
+      "RPM notch filtresi artık VARSAYILAN KAPALI. Ölçülen döngü periyodu 1188-6448 µs arası geziniyor (ort. 598 Hz, tur-içi sapma medyan +%212). Notch bir IIR biquad'dır ve sabit örnekleme hızı ister; bu titremede kendisi bozuk gyro üretiyor ve o değer doğrudan Mahony'ye ve PID'e giriyor",
+      "KRİTİK: RPM notch ve gyro LPF anahtarları hiçbir zaman NVS'e kaydedilmiyordu. imu_rpm_filter_enabled / imu_gyro_lpf_enabled FilterConfig içinde değil düz global olduğu için nvs_save_advanced() onları kapsamıyordu. Gelişmiş sayfasında anahtarı kapatıp kaydetseniz bile her açılışta koddaki başlangıç değerine dönüyordu — yani notch fiilen kapatılamıyordu. Ayrı NVS anahtarlarıyla kalıcı yapıldı",
+      "Gelişmiş sayfasındaki RPM anahtarının varsayılanı kapalıya çekildi ve neden kapalı olduğunu açıklayan uyarı eklendi",
+      "Yeni 'profile <0|1>' komutu: döngüyü 10 bölüme ayırıp (gps+nav, I2C, filtre+AHRS, PID, RC, seri, modlar, telemetri, OSD, diğer) saniyede bir ortalama ve en kötü mikrosaniye raporu verir. USB varken ekrana, USB yokken blackbox olaylarına yazar — çünkü USB modunda OSD kapalı olduğu için OSD maliyeti ancak kablosuz ölçülebiliyor. Ayar NVS'te kalıcı",
+      "Uçuş kaydı artık kullanıcı tercihi: sayfanın en üstünde ana aç/kapat anahtarı var. Kapalıyken uçuşta flash'a tek bayt bile yazılmaz (startNewLog hiç başlamaz). Ayar NVS'e yazılır, güç kesilse de korunur. Varsayılan AÇIK — kayıt tutmak normal davranış, kapatmak bilinçli tercih",
+      "Uçarken kapatılırsa süren kayıt da düzgün kapatılır (setEnabled içinde stopLog)",
+      "Filtre (FAST) kaydını açıp kapatmak için Uçuş Kaydı sayfasına bir kutu eklendi: Kapalı / Her tur (~2 dk) / Her 2. tur (~4 dk) / Her 4. tur (~8 dk). Önceden bu kayıt varsayılan olarak kapalıydı ve açmanın hiçbir yolu yoktu; sayfada 'filtre kaydı: 0' görünüyordu",
+      "Ayar karta kalıcı olarak yazılıyor (NVS 'bb_fast_en' / 'bb_fast_div'). Ayar USB üzerinden yapılıp kablo çekilince kart yeniden başlıyor; kalıcı olmasaydı kullanıcı filtre kaydını açtığını sanıp uçacak ve log yine boş çıkacaktı",
+      "Yeni seri komut: 'bb_fast <bolen>' — 0 kapatır, 1/2/4 böleni ayarlar; yanıt olarak güncel durumu JSON döndürür",
+      "'Kaydı sil' artık ekranı da anında temizliyor: grafikler yok ediliyor, özet/uyarı/tablo/olay panelleri ve indirme düğmeleri sıfırlanıyor. Önceden silinen bir kaydın sayıları ekranda kalıp yanıltıyordu",
+      "Firmware 'clear' komutuna artık {'used_kb','total_kb'} içeren bir durum yanıtı veriyor; sayfa 'Silindi, cihazda N KB kaldı' diye gerçek sonucu gösteriyor",
+      "Okunan kaydın oturum başlığındaki bölen değeri seçim kutusuna yansıtılıyor — o uçuşta filtre kaydının açık mı kapalı mı olduğu görülüyor",
+      "Yeni panelin Türkçe/İngilizce karşılıkları eklendi (blackbox.fast_*, blackbox.erase_done)",
+      "Yeni seri komutlar: 'bb_enable <0|1>' ana anahtar, 'bb_status' cihazın gerçek ayarını (açık mı, filtre böleni, dolu KB) JSON döndürür",
+      "Sayfa açılışında cihaza 'bb_status' sorulup anahtarlar gerçek duruma göre konumlandırılıyor — HTML'deki varsayılan kalsaydı kullanıcı kaydın açık olduğunu sanıp uçabilirdi"
+    ]
+  },
+  {
+    "date": "2026-08-01",
+    "items": [
+      "RPM notch filtresi uçuşta bozuk gyro verisi üretebiliyordu — düzeltildi. Filtre her turda ANLIK döngü süresinden hesaplanan örnekleme hızıyla yeniden yapılandırılıyordu. IIR biquad sabit örnekleme hızı varsayar; durumu (x1,x2,y1,y2) önceki hıza göre birikmiştir. Her turda farklı hız verilince katsayılarla durum uyumsuz kalıyor ve filtre kendi başına devasa değerler üretiyor",
+      "Ölçüldü (gerçek attitude_mahony + imu_handler + filters, analitik kinematik girdiyle 45 dakika, gaz değişken; gerçek gyro hiçbir zaman 30 derece/saniyeyi aşmıyorken): döngü süresi titremesi ±%20'de filtre çıkışı 4 derece/s ve tutum hatası 0.03 derece; ±%30'da 101 derece/s ve 0.42 derece; ±%50'de 13634 derece/s ve 205 derece. Filtre kapatılınca aynı koşulda hata 0.06 dereceye düşüyordu — yani tek değişken buydu. Uydurulan gyro değeri doğrudan Mahony filtresine ve PID'e giriyor",
+      "Düzeltme: örnekleme hızı artık döngü hızının yavaş filtrelenmiş ortalaması (yaklaşık 1000 örnek zaman sabiti). Titreme katsayılara değil yalnızca ihmal edilebilir örnekleme gürültüsüne dönüşüyor. Düzeltme sonrası ±%50 titremede tutum hatası 0.03 derece",
+      "Makullük kontrolü yanlış sıradaydı: notch filtresinden ÖNCE çalıştığı için filtrenin KENDİ ürettiği bozuk değer denetimsiz geçiyordu. filters.cpp'deki ±20000 kelepçesi de bunu yakalamıyor, çünkü değer NaN/sonsuz olmadığından oradaki kurtarma sıfırlaması tetiklenmiyor. Artık notch çıkışı da gyro_sanity_dps ile denetleniyor; bozuksa filtrelenmemiş örneğe düşülüyor ve filtre sıfırlanıyor",
+      "Teşhis için notch red sayacı ve filtrenin tasarlandığı örnekleme hızı dışa açıldı. Uçuş sonrası red sayacı sıfırdan farklıysa döngü periyodu notch'un tolere edebileceğinden fazla titriyor demektir",
+      "Uçuş kaydı (blackbox) yeniden yazıldı ve etkinleştirildi. Eski sistem LittleFS üzerinden CSV yazıyordu ve kilitlenmeye yol açtığı için kapatılmıştı. Kök neden: ESP32 programı harici flash yongasından doğrudan çalışır; aynı yongaya yazarken yonga meşguldür ve komut okunamaz. Sayfa yazma 0.3-1 ms (tolere edilebilir) ama sektör SİLME 20-40 ms sürer ve HER İKİ ÇEKİRDEK birden durur. Eski kodda 'yazma Core 0'da, navigasyon etkilenmez' diyen bir yorum vardı; yanlıştı",
+      "Çözüm — silme işi yere çekildi: bölge yerde, açık komutla tamamen siliniyor; uçuşta yalnızca sayfa yazma yapılıyor, silme yok; bölge dolunca kayıt sessizce duruyor. Betaflight/iNav ile aynı model. Partition tablosu DEĞİŞMEDİ: mevcut dosya sistemi bölgesi (~1.44 MB) ham olarak kullanılıyor, yeniden flash gerekmiyor, NVS'teki ayar ve kalibrasyon silinmiyor",
+      "Kayıt güvenlik önlemleri: uçuş döngüsü flash'a hiç dokunmuyor, yalnızca statik RAM halka tamponuna yazıyor (heap ayırma yok). Tampon doluysa kayıt düşürülüyor, asla beklenmiyor — ve düşen kayıt sayısı loga yazılıyor, böylece analiz sırasında log'un delik olduğu görülüyor. Tek bir yazma 15 ms'yi aşarsa sayılıyor; 5 kez olursa kayıt kendini kapatıyor. Kalkış öncesi kapasite kontrolü var; yer yoksa kayıt hiç başlamıyor",
+      "Kayıt içeriği üç tipte: uçuş kaydı 10 Hz ve hep açık (tutum, gyro, ivme, ham koordinat, irtifa, hız, rüzgar, uydu, mod, gaz + 4 servo, DÖNGÜ SÜRESİ min/ort/max, hata sayaçları — yaklaşık 40 dakika); filtre kaydı döngü hızında ve isteğe bağlı (filtre zincirinin ÜÇ aşaması birden: ham / notch sonrası / LPF sonrası — tam hızda ~2 dakika); olay kaydı (OSD sistem mesajları zaman damgasıyla)",
+      "Kayıt artık arm'dan disarm'a kadar TÜM uçuş boyunca çalışıyor. Eskiden yalnızca RTH sırasında yazıyordu ve navigasyon boşa döndüğünde duruyordu; kaydın yarısı kayboluyordu",
+      "Konfiguratöre 'Uçuş Kaydı' sayfası eklendi: tek butonla cihazdan kaydı çeker, çözer ve gösterir. Gelen heks satırları konsola basılmaz, okuma sırasında yüzde gösterilir",
+      "Uçuş kaydı görselleştirmesi: tutum (roll/pitch), irtifa + yer hızı, gyro, DÖNGÜ PERİYODU min/ort/max, hata sayaçları ve filtre zinciri karşılaştırması (ham / notch sonrası / LPF sonrası) grafikleri. Uzun kayıtlar tarayıcıyı kilitlemesin diye eşit aralıkla seyreltiliyor",
+      "Uçuş kaydı sağlık özeti: düşen kayıt, notch red, gyro darbe ve ivmeölçer doyma sayıları ile döngü periyodu titreme yüzdesi otomatik çıkarılıyor; %30 üstü titreme kırmızı uyarı veriyor (ölçülen eşik: %30'da notch bozulmaya başlıyor)",
+      "İndirme: uçuş, filtre ve olay kayıtları CSV olarak, ham veri .bin olarak indirilebiliyor. Filtre CSV'si zincirin üç aşamasını da içerdiği için dışarıda analiz edip filtre ayarı yapmaya elverişli",
+      "tools/blackbox_decode.py eklendi — dump çıktısını komut satırında CSV'ye çevirir. Konfiguratördeki çözücüyle aynı sentetik veriyle test edildi, ikisi birebir aynı sonucu veriyor",
+      "NOT: bu sürümdeki firmware değişiklikleri donanımda test EDİLMEDİ. Filtre düzeltmesi izole ölçümle, kayıt sistemi sentetik veriyle doğrulandı; gerçek uçuş öncesi yerde arm/disarm + dump denemesi yapılmalıdır"
+    ]
+  },
+  {
+    "date": "2026-07-31",
+    "items": [
+      "IMU glitch (darbe gürültüsü) koruması eklendi. Önceden yalnızca I2C seviyesinde koruma vardı: okuma başarısız olursa örnek atılıyordu. Ama bit dönmesi veya clock stretch sonucu DOĞRU uzunlukta ama YANLIŞ bir okuma bu kontrolleri geçip doğrudan Mahony filtresine ve PID'e giriyordu",
+      "Neden önemli: tek örneklik bir gyro darbesi ölçüldü — koruma kapalıyken tutum kestirimine 3.9 derece hata enjekte ediyor, bu da Angle modunda 35 derece/saniyelik GERÇEK bir yatış komutu üretiyor. Servo çıkışının 300 Hz olması bunu engellemez; sorun servo yolunda değil entegratörlerde (Mahony quaternion + PID I terimi). Koruma açıkken aynı darbenin bıraktığı hata sıfır",
+      "Üç örnekli medyan filtresi (iNav'ın LULU filtresinin N=1 hali ile aynı etki) gyro'ya eklendi — notch ve alçak geçiren filtrelerden ÖNCE, çünkü doğrusal filtreler darbeyi yok etmez, zamana yayar. Maliyeti bir örneklik gecikme (~1-2 ms)",
+      "Makullük (aralık) kontrolü: fiziksel olarak imkânsız gyro/ivme değerleri reddedilip bir önceki geçerli örnek tutuluyor. İvme eşiği iNav'ın ACC_CLIPPING_THRESHOLD_G değerinden alındı. Bu kontrol hem tutum kestirimini hem irtifa tahmincisini birlikte koruyor",
+      "Donmuş sensör tespiti eklendi: I2C donup aynı ham değeri tekrar tekrar döndürdüğünde okuma 'başarılı' sayılıyor ve mevcut hata sayacı bunu göremiyordu — sessiz ve tehlikeli bir arıza modu. Artık tespit edilip mevcut failsafe zincirine bağlanıyor (I2C kurtarma, ardından kumanda geçişi; motor kesilmiyor). Sensör düzelirse kendiliğinden toparlıyor",
+      "Teşhis sayaçları sensör akışına eklendi: reddedilen gyro darbesi sayısı, ivme kırpma sayısı ve donmuş sensör durumu. Uçuş sonrası 'gerçekten glitch var mıydı?' sorusu artık veriyle cevaplanabiliyor; sıfırdan farklıysa IMU veri yolu temiz değil demektir",
+      "Yeni ayarlar (Filtreler): imu_despike_enabled (varsayılan açık), gyro_sanity_dps (1800), accel_sanity_g (15.5), imu_stuck_count (200)",
+      "IMU sağlık sayaçları için durum barına bir uyarı göstergesi eklendi — sayaçlar sıfırken hiç görünmez, darbe reddedildiğinde turuncu, sensör donduğunda kırmızı olarak belirir. NOT: bu gösterge USB bağlıyken çalışır, yani yalnızca tezgâh kontrolü içindir (motor rölanti testinde I2C hattının temiz olup olmadığını görmek gibi). Uçuş sırasında görülebilmesi için OSD göstergesi ve iniş sonrası uçuş raporu ekranı gerekiyor; ikisi de yapılacaklar listesine alındı"
+    ]
+  },
+  {
+    "date": "2026-07-30",
+    "items": [
+      "İniş asistanı: FINAL fazından FLARE'e çok erken geçilmesi düzeltildi. APPROACH noktasına varmak final yaklaşmanın BAŞLANGICI olduğu halde bitişi sayılıyor, uçak eve 150 m uzakta ve 50 m yüksekteyken flare'e geçip gazı kesiyordu. Ayrıca gaz kesme, yaklaşma hızı kontrolcüsünün çıkışını tamamen eziyordu — stall'a karşı tek koruma devre dışı kalıyordu",
+      "İniş asistanında FLARE artık yalnızca gerçek flare koşulunda tetikleniyor: eve flare_distance kalınca veya flare irtifasına inilince. Glide slope boyunca uçuş fazı FINAL kalıyor ve hız kontrolcüsü çalışmaya devam ediyor",
+      "İniş asistanında final'e geçiş için pist başlığına hizalanma şartı eklendi (35°). Önceden eşik yalnızca eve olan mesafeye bakıyordu ve esas bacaktan final'e DÖNÜŞÜN ORTASINDA tetikleniyordu",
+      "İniş asistanında glide slope boyunca temel gaz değeri düzeltildi: alçalma FLARE noktasını hedeflediği için o noktanın flare gazı (rölanti) bütün final boyunca uygulanıyor, hız kontrolcüsü minimum gaz tabanının altında kalıp hiç devreye giremiyordu",
+      "SITL uçuş simülasyonu kuvvet/moment tabanlı olarak yeniden yazıldı. Önceki model dönüş ağırlıklı senaryolarda kullanılamıyordu; iniş asistanı paterni hiç uçulamıyordu. Üç kök neden bulundu: jiroskopun Euler/gövde eksen karışıklığı, sahte sensörün eksen işaret uyuşmazlığı ve uçağın simülasyonda hiç arm olmaması",
+      "SITL'e yanal kayma (sideslip) durumu eklendi — dönüş artık kinematik olarak dayatılmıyor, bankadan doğal olarak doğuyor. Böylece dutch roll modu oluşuyor ve yaw sönümleyici/kuyruk sallama davranışı simülasyonda test edilebiliyor",
+      "SITL'de tüm gövde tipleri (v-tail, flying-wing/delta, geleneksel) artık destekleniyor; önceden v-tail dışındaki kurulumlar sessizce kumandasız uçak simüle ediyordu. Ayrıca yük faktörü, stall dinamiği, dinamik basınçla ölçeklenen kontrol otoritesi ve zemin teması eklendi",
+      "SITL doğrulaması: iniş asistanı tam devreyi uçuyor (ENROUTE → rüzgar tespiti → esas bacak → final) ve eve 15 m mesafede 5.3 m/s ile yere temas ediyor",
+      "Motor gazının üst %20'si kalıcı olarak kullanılamıyordu — düzeltildi. Mikser taban gazı 1800 PWM'de kesiyordu; bu sınır, fark itkisi (differential thrust) için tepe payı bırakmak amacıyla konmuştu ve o dönemde yaw koşulsuz olarak motorlara karışıyordu. Fark itkisi sonradan isteğe bağlı hale getirilip varsayılan olarak kapatılınca sınır olduğu yerde kaldı; tek motorlu kurulumlarda hiçbir karşılığı olmadan gücün beşte birini yok ediyordu. Ayrıca Nav Max Gaz ayarı (varsayılan 1900, arayüzde 2000'e kadar) sessizce 1800'e kırpılıyordu",
+      "Mikserde doygunluk kaydırma (mix desaturation) uygulandı: yaw momentini üreten şey iki motor arasındaki FARK olduğu için, gaz tavandayken fark artık diğer motoru düşürerek elde ediliyor. Peşinen pay ayrılmıyor — yaw talebi yokken tam gaz kullanılabiliyor, talep varken de fark birebir korunup yalnızca toplam itki gerektiği kadar ödün veriyor",
+      "OSD'deki iki gaz göstergesi artık farklı şeyleri gösteriyor: yüzde göstergesi MOTOR gazını (motora fiilen giden PWM), dikey slider ise GAZ ÇUBUĞUNU (pilotun lövyesi). Önceden ikisi de kumanda çubuğunu okuyordu; otomatik modlarda (RTH / Waypoint / İniş Asistanı / Altitude Hold / Cruise) otopilotun gazla ne yaptığı hiç görünmüyordu",
+      "PID toplam çıkış sınırı (pidsum_limit) eklendi — iNav'daki pidSumLimit karşılığı, varsayılan 500. Önceden yalnızca I terimi sınırlıydı (i_limit); P+D+FF toplamı sınırsızdı ve yüksek kazançta tek bir gürültü darbesi servoyu uca vurup mikserde diğer eksenlerin otoritesini de boğabiliyordu. 500 değeri mikserin servo aralığıyla birebir örtüşür (servo = 1500 ± pid, yani tam yüzey sapması). 0 girilerek devre dışı bırakılabilir"
+    ]
+  },
+  {
+    "date": "2026-07-30",
+    "items": [
+      "Stabilize modlarda (Angle/Horizon) kuyruk sallama (snaking) sorununa yönelik yaw ekseni düzenlemeleri yapıldı. Yaw stabilizasyonu yalnızca jiroskop Z ekseninden beslenen bir sönümleyicidir (yaw damper): hedefi 'sıfır yaw hızı'dır, yön/heading tutmaz ve ivmeölçerden beslenmez",
+      "Yaw sönümleyicisine washout (yüksek geçirgen) filtresi eklendi — ArduPlane yaw damper mantığı. Sönümleyici artık yalnızca geçici (ani) yaw hareketini görüyor; bankeli dönüşün meşru ve kalıcı yaw hızına karşı rudder basmıyor. Filtre yalnızca P ve D yoluna uygulanıyor, I ham hata üzerinde kalarak uzun vadeli trim yeteneğini koruyor. Yeni ayar: yaw_washout_hz (varsayılan 0.032 Hz ≈ 5 sn zaman sabiti, 0 = kapalı)",
+      "Yaw PID varsayılanları iNav sabit kanat (PIFF) eşdeğerine getirildi: P 0.40 → 0.20, I 0.15 → 2.50, FF 0.50 → 1.90, I limiti 50 → 165. Önceki değerlerde yüksek P + neredeyse yok I birleşimi klasik kuyruk sallama imzasıydı. ÖNEMLİ: kayıtlı ayarı olan kartlarda yeni varsayılanlar kendiliğinden gelmez — ayarları sıfırlamak veya PID sayfasından elle girmek gerekir",
+      "TPA (gaz bazlı PID zayıflatma) artık gerçekten uygulanıyor. Ayar önceden arayüzde mevcuttu fakat uçuş kodunda hiç okunmuyordu; iNav'ın sabit kanat TPA eğrisi (gaz kırılma noktasının üstünde kazanç düşer, altında yükselir) P/I/D/FF'in tümüne uygulanıyor. Gaz PT1 ile filtreleniyor, disarm ve autotune sırasında devre dışı kalıyor. Yeni ayarlar: tpa_breakpoint (PID'lerin ayarlandığı gaz, varsayılan 1500) ve tpa_time_constant_ms (varsayılan 2000)",
+      "TPA varsayılanı iNav ile aynı şekilde 0 (kapalı) yapıldı — kullanıcı kademeli olarak artırmalı ve tpa_breakpoint'i kendi seyir gazına ayarlamalıdır. Kırılma noktası yanlışken TPA'yı açmak düşük gazda kazancı ciddi biçimde yükseltir",
+      "Yaw ekseni autotune'u etkinleştirildi. Yaw setpoint'i autotune'a hiç iletilmediği için bu eksen tek örnek bile toplayamıyordu; iNav de yaw'ı autotune ettiğinden aynı davranış sağlandı",
+      "Autotune'a verilen PID çıkışı iNav ile hizalandı: artık yalnızca P + FF toplamı iletiliyor, I ve D dışarıda bırakılıyor (her üç eksende). Önceki halinde I ve D toplamı şişirdiği için maksimum dönüş hızı sistematik olarak olduğundan düşük tahmin ediliyordu. Servolara giden çıkış değişmedi"
+    ]
+  },
+  {
     "date": "2026-07-29",
     "items": [
       "TECS (Total Energy Control System) eklendi — Gelişmiş Ayarlar'dan açılan opsiyonel bir switch; CRUISE/ALTHOLD/LOITER/RTH/WAYPOINT/LAND ASSIST modlarında pitch ve throttle'ı artık hem irtifa hem hava hızı hatasına göre birlikte (enerji dengesi) ayarlıyor, mevcut basit pitch→throttle mantığına alternatif. Varsayılan kapalı; kapalıyken davranış hiç değişmiyor. İniş yaklaşma/flare fazına dokunmuyor",

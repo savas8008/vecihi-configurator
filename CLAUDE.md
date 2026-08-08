@@ -74,6 +74,36 @@ paketlerini standart `RC_CHANNELS_OVERRIDE` (msg_id=70)'a dönüştürebilir. Bu
 
 ---
 
+## OSD Sayfası — Yeni Eleman Eklerken
+
+Bir OSD elemanı iki repoda yedi dosyaya birden dokunulmadan çalışmaz ve
+eksik halka **sessizce** bozulmaya yol açar (derleme geçer, hata çıkmaz;
+eleman ya görünmez ya konumu kaydedilmez). Tam iş planı firmware tarafında:
+**bkz. `vecihi/CLAUDE.md` → "OSD'ye Yeni Eleman Ekleme — İş Planı"**.
+
+Bu repodaki dokunulacak yerler özetle:
+
+| Dosya | Ne |
+|---|---|
+| `configurator.html` | OSD sayfası anahtarı (`osd_show_<key>`) **ve** önizleme kutusu (`prev_<ad>`) — iki ayrı yer |
+| `assets/js/osd.js` | `osdElementMapping` + `osdToggleMapping` (`osdReverseMapping` otomatik türetilir, dokunma) |
+| `assets/locales/tr.js` / `en.js` | `osd.el_<key>` ve `osd.el_<key>_hint` — ikisine de |
+| `assets/changelog.json` | kullanıcı onayıyla |
+
+Kısa anahtar (`<key>`) firmware'deki JSON alanıyla **birebir aynı** olmalı;
+`send_osd_page_data()` ve `save_osd_layout()` bu anahtarla eşleşiyor.
+
+---
+
+## Tespit Edilen Eksikleri Kaydetme
+
+Bu repoda bir iş sırasında tespit edilen ama o an kapsam dışı bırakılan eksikler
+**`vecihi/GOREVLER.md` içindeki "Bakım Listesi" bölümüne** eklenir — configurator
+için ayrı bir liste tutulmaz, iki repo tek listede izlenir. Kural ve format için
+bkz. `vecihi/CLAUDE.md`.
+
+---
+
 ## Geliştirici Notları
 
 - Tarayıcı sekme throttling'ini her zaman göz önünde bulundur; zamanlayıcı gerektiren

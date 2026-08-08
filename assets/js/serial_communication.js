@@ -437,7 +437,13 @@ function processSingleLine(line) {
     if (typeof debugIncomingData === 'function') {
         debugIncomingData(line);
     }
-    
+
+    // Blackbox dump'ı ÖNCE yakala: binlerce heks satırı konsolu boğmasın.
+    // true dönerse satır blackbox tarafından tüketilmiştir.
+    if (typeof Blackbox !== 'undefined' && Blackbox.feedLine(line)) {
+        return;
+    }
+
     if (line.startsWith('{') && line.endsWith('}')) {
         try {
             const jsonData = JSON.parse(line);
@@ -636,6 +642,10 @@ function handleStandardJsonData(data) {
     // ==========================================
     // YENİ EKLENEN KISIM BİTTİ
     // ==========================================
+    if (data.param_list) {
+        if (typeof handleParamListChunk === 'function') handleParamListChunk(data.param_list);
+        return;
+    }
     if (data.page_data) {
         handlePageData(data.page_data.type, data.page_data.data);
         return;
@@ -755,6 +765,15 @@ function handleStreamData(streamType, streamData) {
  * @param {Object} data - Tam veri objesi
  */
 function handleStatusResponse(command, result, data) {
+    // Parametre tablosu: firmware YAZILAN degeri geri bildirir (kirpilmis olabilir)
+    if (command === 'PARAM_SET') {
+        const _pd = (typeof null !== 'undefined' && null && null.status) ? null.status : null;
+        if (_pd && typeof handleParamSetResponse === 'function') {
+            handleParamSetResponse(_pd.name, parseFloat(_pd.value));
+        }
+        return;
+    }
+
     // CFG_SET / CFG_COMMIT ack → import akışına bildir
     if (command === 'CFG_SET' || command === 'CFG_COMMIT') {
         _resolveCfgPending(null);

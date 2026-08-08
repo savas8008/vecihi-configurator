@@ -33,7 +33,7 @@ let advancedConfig = {
         // Navigasyon ve Stall
         rth_radius: 50,
         loiter_direction: 1,
-        stall_speed_kmh: 40.0,
+        stall_speed_kmh: 29.0,
         climb_throttle: 1700,
         descend_throttle: 1100,
         
@@ -96,7 +96,7 @@ let advancedConfig = {
     land_assist: {
         circuit_alt: 50,
         final_approach_distance: 0,
-        circuit_width: 150,
+        circuit_width: 60,
         flare_alt: 5.0,
         approach_throttle: 1200,
         flare_throttle: 1000,
@@ -476,7 +476,16 @@ function saveAdvancedConfig() {
     setIf(nav, "rth_altitude", int("inp_nav_rth_alt"));
     setIf(nav, "rth_radius", int("inp_nav_radius"));
     setIf(nav, "loiter_direction", selInt("inp_nav_loiter_dir"));
-    setIf(nav, "max_distance", int("inp_nav_max_dist"));
+    // Geofence: 0 = sınır yok (kasıtlı), aksi halde min 300m — RTH navigasyonu
+    // daha kısa mesafede güvenilir çalışmaz. Firmware da aynı kuralı uygular
+    // (bkz. vecihi/src/serial_communication.cpp: clamp_geofence_max_distance).
+    let geofenceDist = int("inp_nav_max_dist");
+    if (geofenceDist !== undefined && geofenceDist > 0 && geofenceDist < 300) {
+        geofenceDist = 300;
+        const geofenceEl = getEl("inp_nav_max_dist");
+        if (geofenceEl) geofenceEl.value = geofenceDist;
+    }
+    setIf(nav, "max_distance", geofenceDist);
     setIf(nav, "climb_first", bool("inp_nav_climb_first"));
 
     // Nav açı limitleri
@@ -638,16 +647,39 @@ function updateAdvDisplay(key) {
     }
 }
 
+/**
+ * @brief Kalibrasyon sonucu bildirimi — hesaplanan değer ilgili alana yazıldı,
+ *        ancak henüz karta kaydedilmedi. Kullanıcıyı "Tercihleri Kaydet" için uyarır.
+ */
+function showCalibAppliedModal(fieldName, value) {
+    const msg = `Kalibrasyon katsayısı hesaplandı ve <strong>${fieldName}</strong> alanına ` +
+                `<strong>${value}</strong> olarak girildi.<br><br>` +
+                `<span class="text-warning">Değer henüz uçuş kartına yazılmadı — ` +
+                `<strong>Tercihleri Kaydet</strong> butonuna basmayı unutmayın.</span>`;
+    if (typeof showModal === 'function') {
+        showModal('Kalibrasyon Uygulandı', msg, 'warning');
+    } else {
+        alert(`Kalibrasyon katsayısı hesaplandı ve ${fieldName} alanına ${value} olarak girildi. ` +
+              `Tercihleri Kaydet butonuna basmayı unutmayın.`);
+    }
+}
+
+function showCalibErrorModal(msg) {
+    if (typeof showModal === 'function') showModal('Eksik Değer', msg, 'error');
+    else alert(msg);
+}
+
 function computeVoltageCalib() {
     const shown  = parseFloat(document.getElementById('inp_calib_volt_shown').value);
     const actual = parseFloat(document.getElementById('inp_calib_volt_actual').value);
     const curScale = parseFloat(document.getElementById('inp_bat_adc_scale').value) || 11.0;
     if (!Number.isFinite(shown) || !Number.isFinite(actual) || shown <= 0 || actual <= 0) {
-        alert('Lütfen her iki voltaj alanını da geçerli bir değerle doldurun.');
+        showCalibErrorModal('Lütfen her iki voltaj alanını da geçerli bir değerle doldurun.');
         return;
     }
     const newScale = Math.round(curScale * (actual / shown) * 1000) / 1000;
     document.getElementById('inp_bat_adc_scale').value = newScale.toFixed(3);
+    showCalibAppliedModal('Ölçek Faktörü', newScale.toFixed(3));
 }
 window.computeVoltageCalib = computeVoltageCalib;
 
@@ -656,11 +688,12 @@ function computeCurrentCalib() {
     const actual   = parseFloat(document.getElementById('inp_calib_actual_mah').value);
     const curCalib = parseFloat(document.getElementById('inp_vc_calib').value) || 1.0;
     if (!Number.isFinite(reported) || !Number.isFinite(actual) || reported <= 0 || actual <= 0) {
-        alert('Lütfen her iki mAh alanını da geçerli bir değerle doldurun.');
+        showCalibErrorModal('Lütfen her iki mAh alanını da geçerli bir değerle doldurun.');
         return;
     }
     const newCalib = Math.round(curCalib * (actual / reported) * 1000) / 1000;
     document.getElementById('inp_vc_calib').value = newCalib.toFixed(3);
+    showCalibAppliedModal('Kalibrasyon', newCalib.toFixed(3));
 }
 window.computeCurrentCalib = computeCurrentCalib;
 
