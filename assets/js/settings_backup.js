@@ -401,8 +401,9 @@ function _flattenConfig(s) {
             push('adv.land.final_approach_distance', la.final_approach_distance);
             push('adv.land.circuit_width',           la.circuit_width);
             push('adv.land.flare_alt',               la.flare_alt);
-            push('adv.land.approach_throttle',       la.approach_throttle);
             push('adv.land.flare_throttle',          la.flare_throttle);
+            push('adv.land.flare_pitch_deg',         la.flare_pitch_deg);
+            push('adv.land.flare_alt_margin',        la.flare_alt_margin);
             push('adv.land.stick_cancel_thr',        la.stick_cancel_thr);
             push('adv.land.thr_cancel_thr',          la.thr_cancel_thr);
             push('adv.land.min_wind_speed',          la.min_wind_speed);

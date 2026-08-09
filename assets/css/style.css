@@ -18,9 +18,9 @@
     --color-brand-blue: #818cf8;        /* Indigo-400 */
     --color-brand-blue-rgb: 129, 140, 248;
 
-    --color-primary: #818cf8;           /* Indigo accent */
-    --color-primary-hover: #6366f1;     /* Indigo-500 */
-    --color-primary-glow: rgba(99, 102, 241, 0.3);
+    --color-primary: #d3bc0f;           /* Indigo accent */
+    --color-primary-hover: #63f16a;     /* Indigo-500 */
+    --color-primary-glow: rgba(247, 152, 20, 0.3);
 
     --color-secondary: #94a3b8;         /* Slate-400 */
     --color-secondary-hover: #64748b;
@@ -363,7 +363,7 @@ a:hover {
 
 /* Panel 4 — En iç içerik kartı: açık gri zemin, siyah metin */
 .panel4 {
-    background: #e8eaec !important;
+    background: #cdd1d5 !important;
     color: #111111;
     --border-default:       rgba(0, 0, 0, 0.13);
     /* cal-step ve diğer bileşenlerin background değişkenini override et */

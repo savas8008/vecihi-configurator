@@ -97,9 +97,10 @@ let advancedConfig = {
         circuit_alt: 50,
         final_approach_distance: 0,
         circuit_width: 60,
-        flare_alt: 5.0,
-        approach_throttle: 1200,
+        flare_alt: 3.0,
         flare_throttle: 1000,
+        flare_pitch_deg: 4.0,
+        flare_alt_margin: 1.0,
         stick_cancel_thr: 100,
         thr_cancel_thr: 1150,
         min_wind_speed: 2.0,
@@ -374,8 +375,9 @@ function updateAdvancedUI() {
         setVal("inp_la_final_approach_distance", la.final_approach_distance);
         setVal("inp_la_circuit_width", la.circuit_width);
         setVal("inp_la_flare_alt", la.flare_alt);
-        setVal("inp_la_approach_throttle", la.approach_throttle);
         setVal("inp_la_flare_throttle", la.flare_throttle);
+        setVal("inp_la_flare_pitch_deg", la.flare_pitch_deg);
+        setVal("inp_la_flare_alt_margin", la.flare_alt_margin);
         setVal("inp_la_stick_cancel_thr", la.stick_cancel_thr);
         setVal("inp_la_thr_cancel_thr", la.thr_cancel_thr);
         setVal("inp_la_min_wind_speed", la.min_wind_speed);
@@ -586,8 +588,9 @@ function saveAdvancedConfig() {
     setIf(la, "final_approach_distance", int("inp_la_final_approach_distance"));
     setIf(la, "circuit_width", int("inp_la_circuit_width"));
     setIf(la, "flare_alt", num("inp_la_flare_alt"));
-    setIf(la, "approach_throttle", int("inp_la_approach_throttle"));
     setIf(la, "flare_throttle", int("inp_la_flare_throttle"));
+    setIf(la, "flare_pitch_deg", num("inp_la_flare_pitch_deg"));
+    setIf(la, "flare_alt_margin", num("inp_la_flare_alt_margin"));
     setIf(la, "stick_cancel_thr", int("inp_la_stick_cancel_thr"));
     setIf(la, "thr_cancel_thr", int("inp_la_thr_cancel_thr"));
     setIf(la, "min_wind_speed", num("inp_la_min_wind_speed"));

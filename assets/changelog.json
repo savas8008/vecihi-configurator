@@ -1,5 +1,15 @@
 [
   {
+    "date": "2026-08-08",
+    "items": [
+      "OSD'nin uçuşun 5-10. dakikasında donması (elemanlar hareket etmiyor, görüntü bozulmuyor) çözüldü. Kök neden: OSD_DP_OPTIONS (gözlüğe mod/çözünürlük bildiren MSP DisplayPort komutu) hiç gönderilmiyordu — kod tanımlıydı ama kullanılmıyordu. iNav kaynağıyla (displayport_msp_osd.c) karşılaştırıldığında iNav bu komutu yalnızca açılışta değil, gözlük 1 sn'den uzun sessizlik sonrası tekrar konuşmaya başladığında da (vtxReset) yeniden gönderiyor. Bizde bu handshake hiç yoktu; gözlük bir kez bu paketi kaçırırsa (ör. blackbox flash yazmasının Core 1'i milisaniyelerce durdurduğu kötü zamanlamalı bir an — bkz. 2026-08-03 kaydı 'TİTREMENİN KÖK NEDENİ') DJI O4 compositor'ı yeni kareleri işlemeyi bırakabiliyor, son geçerli kare ekranda donmuş kalıyordu. Periyodik 5 sn'lik tam yenileme bunu kurtaramıyordu çünkü OPTIONS içermiyordu",
+      "Düzeltme: clearScreen() içine MSP_DP_OPTIONS (mod=HD_5320, kanvasımız 53x20 ile birebir aynı) eklendi. clearScreen() açılış, splash sonu ve 'gözlük geri geldi' (processIncoming() _forceFullRedraw) yollarının tek ortak noktası olduğu için tek eklemeyle üçü de kapsandı",
+      "OSD seri portuna RX tampon boyutu (512B) tanımlandı — önceden yalnızca TX (2048B) ayarlanıyordu, RX varsayılan (küçük) boyutta kalıyordu; gözlükten gelen yoğun MSP sorgu trafiğinde taşma riskini azaltmak için eklendi",
+      "OSD'de yanlışlıkla iki kez tanımlanmış 'UYDU SAYISI' bloğu (kopya kod) kaldırıldı; dönüşümlü eleman çiziminde gereksiz bir sıra tüketiyordu",
+      "OSD periyodik tam kare yenilemesi iNav ile birebir aynı davranışa çevrildi: iNav'ın 'msp_displayport_fullframe_interval' özelliği (settings.yaml, varsayılan 10 desisaniye = 1 sn) gözlüğe düzenli aralıklarla GERÇEK MSP_DP_CLEAR_SCREEN gönderip mevcut içeriği aynı turda geri yolluyor — amacı tam olarak 'OSD artifacting'i (uzun menzilde link kenarındaki bozulmayı) azaltmak. Bizde önceden yalnızca yerel gölge tamponu sıfırlanıyordu (gözlüğe gerçek bir CLEAR_SCREEN gitmiyordu), aralık da 5 sn'ydi. Artık 1 sn'de bir gerçek CLEAR_SCREEN gönderiliyor; yerel içerik (_scr) SİLİNMİYOR, bu yüzden ekran birkaç tur içinde (INAV gibi) geri doluyor, görünür sıçrama olmuyor. iNav gibi bu periyodik yol MSP_DP_OPTIONS göndermiyor (o yalnızca açılış/splash/gözlük-geri-geldi anlarında clearScreen() üzerinden gidiyor) — link kenarında/geçici bozulmada gözlüğün compositor durumunu erkenden tazeleyerek OSD'nin son karede kalıcı donmasına karşı ek bir savunma katmanı"
+    ]
+  },
+  {
     "date": "2026-08-06",
     "items": [
       "RTH tırmanma fazına atlama eşiği eklendi: hedef irtifa ile mevcut irtifa arasındaki fark artık mutlak metre cinsinden (varsayılan 10 m) karşılaştırılıyor; eskiden hedefin %90'ı gibi yüzdesel bir eşik kullanılıyordu, bu da düşük hedef irtifalarda dar, yüksek hedeflerde gereksiz geniş bir bant bırakıyordu. Eşik 'Parametreler' sayfasından RTH_CLIMB_SKIP_M adıyla değiştirilebiliyor",
