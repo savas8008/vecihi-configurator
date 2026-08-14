@@ -95,6 +95,46 @@ Kısa anahtar (`<key>`) firmware'deki JSON alanıyla **birebir aynı** olmalı;
 
 ---
 
+## Simülatör (SITL) Sayfası
+
+`configurator.html` → sol menü **Simülatör (SITL)**. Uçağın gerçek uçuş
+yazılımı WebAssembly'ye derlenip tarayıcıda koşar; bu repoda **kaynak yok**,
+yalnızca derlenmiş çıktı (`assets/sitl/sitl.js`) durur. Kaynağı ve derleme
+betiği firmware reposundadır: `vecihi/sitl/` → `build_wasm.sh`.
+
+| Dosya | Ne |
+|---|---|
+| `assets/js/sitl.js` | Sayfa mantığı: WASM yükleme, senaryo formu, kare döngüsü, harita/3B, canlı RC |
+| `assets/sitl/sitl.js` | **Üretilmiş** WASM motoru (~180 KB, elle düzenlenmez) |
+| `configurator.html` | `#sitlPage` bloğu + `.nav-always` menü öğesi |
+| `assets/css/style.css` | `.sitl-*` sınıfları |
+
+### Bilinmesi gerekenler
+
+- **`.nav-always` / `.page-always`:** SITL, bağlantı durumundan bağımsız
+  görünen tek sayfadır. Diğer sayfalar ya online ya offline; SITL ikisidir de
+  (senaryo modu bağlantısız, canlı kumanda kart bağlıyken). `page_management.js`
+  bu iki sınıfı özel olarak ele alır — bağlanınca sayfadan atmaz, menüden
+  gizlemez. Yeni "her iki durumda da çalışan" bir sayfa eklenirse aynı yol.
+- **`sitl_page_data` diye bir firmware komutu YOKTUR.** `managePageStreams()`
+  içinde `sitl` bilinçli olarak dışarıda bırakıldı; simülasyon tarayıcıda koşar,
+  karttan yalnızca alıcı akışı okunur.
+- **Canlı kanal girdisi** `serial_communication.js` → `case 'receiver'` içinden
+  `onReceiverStreamForSitl()` ile gelir. Alıcı akışını başlatan tek yer
+  `startPageSpecificStream('sitl')`'dir (600 ms gecikmeli) — başka yerden de
+  göndermeyin, firmware'in tek `current_command` bayrağına aynı anda iki komut
+  gitmiş olur.
+- **WASM motoru sayfaya girilince dinamik `<script>` ile yüklenir**, `sw.js`
+  listesinde bilerek yoktur (ilk açılışta 180 KB indirmemek için).
+- **Firmware'de imza/global değiştiyse WASM yeniden derlenmeli**, yoksa sayfa
+  eski ikiliyi koşturmaya devam eder.
+
+⚠️ **Güvenlik metnini zayıflatmayın:** canlı kumanda modunda kart kendi uçuş
+mantığını da koşar ve arm switch'i açılınca motor/servo çıkışları gerçekten
+canlanır. "PERVANEYİ SÖKÜN" uyarısı anahtar açılınca görünür olmalıdır.
+
+---
+
 ## Tespit Edilen Eksikleri Kaydetme
 
 Bu repoda bir iş sırasında tespit edilen ama o an kapsam dışı bırakılan eksikler

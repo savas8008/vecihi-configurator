@@ -740,8 +740,10 @@ function handleStreamData(streamType, streamData) {
         case 'pwm':        
             if (typeof handlePwmStream === 'function') handlePwmStream(streamData); 
             break;
-        case 'receiver':   
-            if (typeof handleReceiverStream === 'function') handleReceiverStream(streamData); 
+        case 'receiver':
+            if (typeof handleReceiverStream === 'function') handleReceiverStream(streamData);
+            // SITL sayfasi canli kumanda girdisi olarak ayni akisi kullanir
+            if (typeof onReceiverStreamForSitl === 'function') onReceiverStreamForSitl(streamData);
             break;
         case 'gyro':       
             if (typeof handleGyroStream === 'function') handleGyroStream(streamData); 
