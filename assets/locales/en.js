@@ -96,6 +96,10 @@ window.VECIHI_LOCALE_EN = {
     "ro_att_err": "Attitude estimate error",
     "true": "true",
     "est": "estimated",
+    "cfg_title": "Settings to fly with",
+    "cfg_hint": "By default the simulation runs on factory values — not the PID, mode assignments and mixer on your board. To fly with your own settings, connect the board and press the button below.",
+    "cfg_load": "Load settings from board",
+    "cfg_default": "Back to defaults",
     "limits": "Limits: the physics model targets behavioural/mode fidelity and is not calibrated against real flight data. The barometer is not simulated and there is no out-the-window view. Board PWM timing, NVS, OSD and loop jitter are outside this simulation — a tune that flies well in SITL may not behave identically on hardware."
   },
   "kml": {

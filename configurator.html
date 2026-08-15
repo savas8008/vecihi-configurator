@@ -479,6 +479,22 @@
                                     </div>
                                 </div>
 
+                                <!-- ---------- Kart ayarları ---------- -->
+                                <div class="sitl-card">
+                                    <div class="sitl-card-title">
+                                        <i class="bi bi-cpu me-2"></i><span data-i18n="sitl.cfg_title">Uçulacak ayarlar</span>
+                                        <span id="sitlConfigStatus" class="sitl-cfg-badge">Varsayılan ayarlar</span>
+                                    </div>
+                                    <p class="sitl-hint" data-i18n="sitl.cfg_hint">Simülasyon varsayılan olarak fabrika değerleriyle koşar — sizin kartınızdaki PID, mod atamaları ve mikser değil. Kendi ayarlarınızla uçmak için karta bağlanıp aşağıdaki düğmeye basın.</p>
+                                    <div class="d-flex gap-2 mt-2">
+                                        <button class="btn btn-sm btn-primary" onclick="sitlLoadBoardConfig()">
+                                            <i class="bi bi-download me-1"></i> <span data-i18n="sitl.cfg_load">Kartın ayarlarını yükle</span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="sitlUseDefaultConfig()" data-i18n="sitl.cfg_default">Varsayılana dön</button>
+                                    </div>
+                                    <div id="sitlConfigSummary" class="sitl-cfg-summary" style="display:none;"></div>
+                                </div>
+
                                 <!-- ---------- Canlı kumanda ---------- -->
                                 <div class="sitl-card">
                                     <div class="sitl-card-title"><i class="bi bi-controller me-2"></i><span data-i18n="sitl.live">Gerçek kumandayla uç</span></div>

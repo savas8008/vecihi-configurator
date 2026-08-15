@@ -96,6 +96,10 @@ window.VECIHI_LOCALE_TR = {
     "ro_att_err": "Tutum kestirim hatası",
     "true": "gerçek",
     "est": "kestirim",
+    "cfg_title": "Uçulacak ayarlar",
+    "cfg_hint": "Simülasyon varsayılan olarak fabrika değerleriyle koşar — sizin kartınızdaki PID, mod atamaları ve mikser değil. Kendi ayarlarınızla uçmak için karta bağlanıp aşağıdaki düğmeye basın.",
+    "cfg_load": "Kartın ayarlarını yükle",
+    "cfg_default": "Varsayılana dön",
     "limits": "Sınırlar: fizik modeli davranış/mod doğruluğu için tasarlandı, gerçek uçuş verisiyle kalibre edilmedi. Barometre simüle edilmiyor, dışarı-bakış görüntü yok. Kartın PWM zamanlaması, NVS, OSD ve döngü titremesi bu simülasyona dahil değildir — SITL'de düzgün uçan bir ayar donanımda birebir aynı davranmayabilir."
   },
   "kml": {

@@ -126,6 +126,17 @@ betiği firmware reposundadır: `vecihi/sitl/` → `build_wasm.sh`.
   gitmiş olur.
 - **WASM motoru sayfaya girilince dinamik `<script>` ile yüklenir**, `sw.js`
   listesinde bilerek yoktur (ilk açılışta 180 KB indirmemek için).
+- **Kart ayarları aktarımı** (`sitlLoadBoardConfig()`): `param_list` ile 172
+  parametre, `modes_page_data` ile mod switch atamaları okunup WASM'e verilir.
+  İki komut **sırayla** gönderilir (firmware'in tek `current_command` bayrağı) —
+  birincisi tamamlanmadan ikincisi yollanmaz. `paramList` gönderim öncesi
+  boşaltılır; aksi halde kullanıcı Parametreler sayfasını daha önce ziyaret
+  ettiyse "doldu mu" kontrolü hiçbir zaman sağlanmaz.
+  Yükleme yapılmazsa simülasyon **fabrika değerleriyle** koşar ve uçak
+  yalnızca formdaki tek moda geçebilir — kullanıcı bunu "modlar çalışmıyor"
+  diye algılıyor, o yüzden rozet ve başlangıç uyarısı önemlidir.
+- **Arm kanalı aktarılamaz** — firmware onu hiçbir okuma komutuyla vermiyor
+  (`vecihi/GOREVLER.md` B45). Sayfadaki alan elle doldurulur.
 - **Firmware'de imza/global değiştiyse WASM yeniden derlenmeli**, yoksa sayfa
   eski ikiliyi koşturmaya devam eder.
 

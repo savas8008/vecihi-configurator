@@ -3744,3 +3744,32 @@ label.small.text-muted,
     .sitl-view-grid { grid-template-columns: 1fr; }
     .sitl-map       { height: 320px; }
 }
+
+/* SITL — kart ayarları kartı */
+.sitl-cfg-badge {
+    float: right;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--color-warning);
+}
+.sitl-cfg-summary {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.7rem;
+}
+.sitl-cfg-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 2px 0;
+}
+.sitl-cfg-row > span { color: var(--color-secondary); white-space: nowrap; }
+.sitl-cfg-row > b    { text-align: right; font-weight: 600; }
+.sitl-cfg-modes {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255,255,255,0.08);
+}
+.sitl-cfg-modes > span { display: block; color: var(--color-secondary); margin-bottom: 2px; }
+.sitl-cfg-modes > b    { font-weight: 600; line-height: 1.5; word-break: break-word; }

@@ -28,6 +28,11 @@ let sitlLastFrameMs = 0;
 let sitlTickAccum = 0;         // artakalan simulasyon zamani (sn)
 let sitlDt = 0.002;
 
+// Kart ayarlari yuklendi mi? false ise simulasyon config_types.h'deki
+// DERLEME-ZAMANI varsayilanlariyla kosar (kullanicinin PID/mod ayarlari degil).
+let sitlBoardConfigLoaded = false;
+let sitlConfigLoading = false;
+
 let sitlLiveInput = false;     // gercek kumandadan surulsun mu
 let sitlLiveChannels = null;   // son gelen 16 kanal
 let sitlChannelPtr = 0;        // WASM heap'inde 16*int4 tampon
@@ -88,12 +93,17 @@ async function sitlLoadModule() {
             setChannels: sitlModule.cwrap('sitl_set_channels', null, ['number', 'number']),
             stateJson:   sitlModule.cwrap('sitl_state_json', 'string', []),
             events:      sitlModule.cwrap('sitl_events', 'string', []),
-            kml:         sitlModule.cwrap('sitl_kml', 'string', [])
+            kml:         sitlModule.cwrap('sitl_kml', 'string', []),
+            setParam:    sitlModule.cwrap('sitl_set_param', 'number', ['string', 'number']),
+            setMode:     sitlModule.cwrap('sitl_set_mode', 'number', ['string', 'number', 'number', 'number']),
+            resetConfig: sitlModule.cwrap('sitl_reset_config', null, []),
+            configJson:  sitlModule.cwrap('sitl_config_json', 'string', [])
         };
         // Kanal tamponu bir kez ayrilir (her karede malloc yapmamak icin).
         sitlChannelPtr = sitlModule._malloc(16 * 4);
         sitlLoading = false;
         sitlSetStatus('ready');
+        sitlRenderConfigSummary();
         return true;
     } catch (e) {
         sitlLoading = false;
@@ -101,6 +111,169 @@ async function sitlLoadModule() {
         sitlLog('Simülasyon motoru yüklenemedi: ' + e.message, 'error');
         return false;
     }
+}
+
+// ==================== KART AYARLARINI AKTARMA ====================
+
+/**
+ * @brief Bir kosul saglanana kadar bekler (yoklama).
+ */
+function sitlWaitFor(kosul, timeoutMs, araMs) {
+    return new Promise((resolve) => {
+        const t0 = performance.now();
+        const tik = () => {
+            if (kosul()) return resolve(true);
+            if (performance.now() - t0 > timeoutMs) return resolve(false);
+            setTimeout(tik, araMs || 100);
+        };
+        tik();
+    });
+}
+
+/**
+ * @brief Kartin ayarlarini okuyup simulasyona aktarir.
+ *
+ * Iki ayri kaynak var, cunku firmware bunlari farkli sakliyor:
+ *   1. param_list      -> param_table.cpp'deki 172 parametre (PID, rate, nav,
+ *                         mikser, TECS, launch, land...). SITL ayni tabloyu
+ *                         derliyor, yani ayri bir eslestirme listesi yok.
+ *   2. modes_page_data -> ucus modu switch atamalari. Bunlar param tablosunda
+ *                         DEGIL; NVS'e ayri bir JSON olarak yaziliyor.
+ *
+ * Arm kanali (config.rc.ch_arm) hicbir okuma komutuyla disari verilmiyor
+ * (bkz. GOREVLER.md B45), o yuzden sayfadaki alandan elle giriliyor.
+ */
+async function sitlLoadBoardConfig() {
+    if (sitlConfigLoading) return;
+    if (typeof isConnected === 'undefined' || !isConnected) {
+        sitlLog('Kart ayarlarını almak için önce üst menüden karta bağlanın.', 'warning');
+        return;
+    }
+    if (!await sitlLoadModule()) return;
+
+    sitlConfigLoading = true;
+    sitlSetConfigStatus('loading');
+    try {
+        // Once temiz sayfa: onceki yukleme uzerine binmesin.
+        sitlApi.resetConfig();
+
+        // --- 1) Parametre tablosu ---
+        sitlLog('Kart ayarları isteniyor: parametre tablosu…', 'info');
+        if (typeof paramList === 'undefined') {
+            throw new Error('parameters.js yüklenmemiş');
+        }
+        // Listeyi bosalt ki "doldu mu" kontrolu guvenilir olsun — kullanici
+        // Parametreler sayfasini daha once ziyaret ettiyse liste zaten dolu
+        // olur ve "arttı mı" kontrolu hicbir zaman saglanmazdi.
+        paramList = [];
+        sendCommand('param_list');
+        const paramOk = await sitlWaitFor(() => paramList && paramList.length > 0, 8000, 150);
+
+        let uygulanan = 0, taninmayan = 0;
+        if (paramOk) {
+            paramList.forEach(p => {
+                if (!p || typeof p.n !== 'string') return;
+                if (sitlApi.setParam(p.n, Number(p.v)) === 1) uygulanan++;
+                else taninmayan++;
+            });
+            sitlLog(`${uygulanan} parametre aktarıldı` +
+                    (taninmayan ? ` (${taninmayan} tanesi SITL'in tablosunda yok — firmware sürümü farklı olabilir)` : ''),
+                    taninmayan ? 'warning' : 'info');
+        } else {
+            sitlLog('Parametre tablosu alınamadı (zaman aşımı).', 'error');
+        }
+
+        // --- 2) Ucus modu atamalari ---
+        // Firmware tek current_command bayragi kullaniyor; param_list bitmeden
+        // ikinci komutu gondermemek icin buraya kadar bekledik.
+        sitlLog('Kart ayarları isteniyor: uçuş modları…', 'info');
+        if (typeof activeFlightModes !== 'undefined') activeFlightModes = {};
+        sendCommand('modes_page_data');
+        const modeOk = await sitlWaitFor(
+            () => typeof activeFlightModes !== 'undefined' && activeFlightModes &&
+                  Object.keys(activeFlightModes).length > 0,
+            5000, 150);
+
+        let modAdedi = 0;
+        if (modeOk) {
+            Object.keys(activeFlightModes).forEach(key => {
+                const m = activeFlightModes[key];
+                if (!m || typeof m !== 'object') return;
+                const ch = parseInt(m.channel, 10);
+                if (!isFinite(ch) || ch < 1) return;         // atanmamis mod
+                const mn = parseInt(m.min, 10), mx = parseInt(m.max, 10);
+                if (sitlApi.setMode(key.toUpperCase(), ch, isFinite(mn) ? mn : 1300,
+                                    isFinite(mx) ? mx : 1700) === 1) modAdedi++;
+            });
+            sitlLog(`${modAdedi} uçuş modu ataması aktarıldı.`, 'info');
+        } else {
+            sitlLog('Uçuş modu atamaları alınamadı (zaman aşımı).', 'error');
+        }
+
+        sitlBoardConfigLoaded = (uygulanan > 0 || modAdedi > 0);
+        sitlSetConfigStatus(sitlBoardConfigLoaded ? 'board' : 'error');
+        sitlRenderConfigSummary();
+
+        if (sitlBoardConfigLoaded && modAdedi === 0) {
+            sitlLog('Uyarı: karttan hiçbir mod ataması gelmedi. Uçuş Modları sayfasından ' +
+                    'switch atamalarınızı yapıp kaydedin, yoksa uçak MANUAL\'de kalır.', 'warning');
+        }
+    } catch (e) {
+        sitlLog('Ayar aktarımı başarısız: ' + e.message, 'error');
+        sitlSetConfigStatus('error');
+    } finally {
+        sitlConfigLoading = false;
+    }
+}
+
+/**
+ * @brief Varsayılan (derleme-zamanı) ayarlara döner.
+ */
+function sitlUseDefaultConfig() {
+    if (!sitlApi) return;
+    sitlApi.resetConfig();
+    sitlBoardConfigLoaded = false;
+    sitlSetConfigStatus('default');
+    sitlRenderConfigSummary();
+    sitlLog('Varsayılan ayarlara dönüldü (config_types.h derleme-zamanı değerleri).', 'info');
+}
+
+function sitlSetConfigStatus(state) {
+    const el = document.getElementById('sitlConfigStatus');
+    if (!el) return;
+    const map = {
+        default: ['Varsayılan ayarlar', 'var(--color-warning)'],
+        loading: ['Kart ayarları okunuyor…', 'var(--color-info)'],
+        board:   ['Kart ayarları yüklü', 'var(--color-success)'],
+        error:   ['Okunamadı — varsayılanlar geçerli', 'var(--color-danger)']
+    };
+    const m = map[state] || map.default;
+    el.textContent = m[0];
+    el.style.color = m[1];
+}
+
+/**
+ * @brief Simülasyonun O AN kullandığı ayarların özetini gösterir.
+ */
+function sitlRenderConfigSummary() {
+    const box = document.getElementById('sitlConfigSummary');
+    if (!box || !sitlApi) return;
+    let c;
+    try { c = JSON.parse(sitlApi.configJson()); } catch (e) { return; }
+
+    const modes = Object.keys(c.modes || {});
+    const modeText = modes.length
+        ? modes.map(k => `${k}: k${c.modes[k].ch} (${c.modes[k].min}-${c.modes[k].max})`).join(' · ')
+        : 'Hiçbir moda switch atanmamış — uçak MANUAL\'de kalır';
+
+    box.innerHTML =
+        `<div class="sitl-cfg-row"><span>PID roll</span><b>P ${c.pid.roll_p} / I ${c.pid.roll_i} / D ${c.pid.roll_d} / FF ${c.pid.roll_ff}</b></div>` +
+        `<div class="sitl-cfg-row"><span>PID pitch</span><b>P ${c.pid.pitch_p} / I ${c.pid.pitch_i} / D ${c.pid.pitch_d} / FF ${c.pid.pitch_ff}</b></div>` +
+        `<div class="sitl-cfg-row"><span>Level P</span><b>${c.pid.level_p}</b></div>` +
+        `<div class="sitl-cfg-row"><span>Maks. hız (°/s)</span><b>R ${c.rates.roll} / P ${c.rates.pitch} / Y ${c.rates.yaw}</b></div>` +
+        `<div class="sitl-cfg-row"><span>Gövde / stall</span><b>${c.airframe} · ${c.stall_kmh} km/h</b></div>` +
+        `<div class="sitl-cfg-modes"><span>Mod atamaları</span><b>${modeText}</b></div>`;
+    box.style.display = '';
 }
 
 // ==================== SENARYO ====================
@@ -143,6 +316,9 @@ function sitlBuildScenario() {
         climb_phase_s: num('sitlClimbPhase', 150),
         input: {
             live: sitlLiveInput,
+            // Kart ayarlari yuklendiyse senaryonun "mode" alanini bir kanala
+            // BAGLAMA — kullanicinin kendi switch atamalari gecerli olsun.
+            board_modes: sitlBoardConfigLoaded,
             arm_channel: Math.round(num('sitlArmChannel', 5)),
             mode_channel: Math.round(num('sitlModeChannel', 6))
         }
@@ -164,6 +340,10 @@ async function sitlStart() {
 
     const sc = sitlBuildScenario();
 
+    if (!sitlBoardConfigLoaded) {
+        sitlLog('Dikkat: kart ayarları yüklü değil — simülasyon varsayılan PID/mod ' +
+                'değerleriyle koşuyor, sizin ayarlarınızla değil.', 'warning');
+    }
     if (sitlLiveInput && !sitlLiveChannels) {
         sitlLog('Canlı kumanda seçili ama karttan alıcı verisi gelmiyor. ' +
                 'Kartı bağlayın; sayfa açıkken alıcı akışı otomatik başlar.', 'warning');
@@ -558,6 +738,7 @@ function sitlDownloadKml() {
 function initSitlPage() {
     sitlInit3D();
     sitlUpdateButtons();
+    sitlSetConfigStatus(sitlBoardConfigLoaded ? 'board' : 'default');
     if (!sitlModule && !sitlLoading) {
         sitlLoadModule();
     }
