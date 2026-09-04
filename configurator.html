@@ -410,131 +410,52 @@
                         </div>
 
                         <div class="sitl-layout">
-                            <!-- ---------- SOL: senaryo ayarları ---------- -->
+                            <!-- ---------- SOL: kart & kalkış ---------- -->
                             <div class="sitl-col-form">
-                                <div class="sitl-card">
-                                    <div class="sitl-card-title"><i class="bi bi-sliders me-2"></i><span data-i18n="sitl.scenario">Senaryo</span></div>
-
-                                    <label class="sitl-label" data-i18n="sitl.mode">Uçuş modu</label>
-                                    <select id="sitlMode" class="form-select form-select-sm mb-2">
-                                        <option value="ANGLE" selected>ANGLE</option>
-                                        <option value="MANUAL">MANUAL</option>
-                                        <option value="HORIZON">HORIZON</option>
-                                        <option value="ACRO">ACRO</option>
-                                        <option value="CRUISE">CRUISE</option>
-                                        <option value="ALTHOLD">ALTHOLD</option>
-                                        <option value="LOITER">LOITER</option>
-                                        <option value="RTH">RTH</option>
-                                        <option value="LAUNCH">LAUNCH</option>
-                                        <option value="WAYPOINT">WAYPOINT</option>
-                                        <option value="LAND_ASSIST">LAND_ASSIST</option>
-                                    </select>
-
-                                    <div class="sitl-grid2">
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.home_lat">Ev enlem</label>
-                                            <input id="sitlHomeLat" type="number" step="0.000001" value="39.925000" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.home_lon">Ev boylam</label>
-                                            <input id="sitlHomeLon" type="number" step="0.000001" value="32.866000" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.home_alt">Yer irtifası (m)</label>
-                                            <input id="sitlHomeAlt" type="number" step="1" value="100" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.heading">Kalkış yönü (°)</label>
-                                            <input id="sitlHeading" type="number" step="1" value="90" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.start_alt">Başlangıç irtifa farkı (m)</label>
-                                            <input id="sitlStartAlt" type="number" step="1" value="0" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.duration">Süre (s)</label>
-                                            <input id="sitlDuration" type="number" step="10" value="300" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.wind_speed">Rüzgâr (m/s)</label>
-                                            <input id="sitlWindSpeed" type="number" step="0.5" value="0" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.wind_dir">Rüzgârın geldiği yön (°)</label>
-                                            <input id="sitlWindDir" type="number" step="5" value="0" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="sitl-label" data-i18n="sitl.climb_phase">Tırmanış fazı (s)</label>
-                                            <input id="sitlClimbPhase" type="number" step="10" value="150" class="form-control form-control-sm">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-check form-switch mt-2">
-                                        <input class="form-check-input" type="checkbox" id="sitlArm" checked>
-                                        <label class="form-check-label small" for="sitlArm" data-i18n="sitl.arm">Arm açık başlasın</label>
-                                    </div>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="sitlAutoLaunch">
-                                        <label class="form-check-label small" for="sitlAutoLaunch" data-i18n="sitl.auto_launch">Arm sonrası LAUNCH sekansı</label>
-                                    </div>
-                                </div>
-
                                 <!-- ---------- Kart ayarları ---------- -->
                                 <div class="sitl-card">
                                     <div class="sitl-card-title">
                                         <i class="bi bi-cpu me-2"></i><span data-i18n="sitl.cfg_title">Uçulacak ayarlar</span>
-                                        <span id="sitlConfigStatus" class="sitl-cfg-badge">Varsayılan ayarlar</span>
+                                        <span id="sitlConfigStatus" class="sitl-cfg-badge">Bağlı değil</span>
                                     </div>
-                                    <p class="sitl-hint" data-i18n="sitl.cfg_hint">Simülasyon varsayılan olarak fabrika değerleriyle koşar — sizin kartınızdaki PID, mod atamaları ve mikser değil. Kendi ayarlarınızla uçmak için karta bağlanıp aşağıdaki düğmeye basın.</p>
+                                    <p class="sitl-hint" data-i18n="sitl.cfg_hint">Karta bağlanınca PID, mikser, navigasyon ve uçuş modu switch atamalarınız otomatik yüklenir — burada uçan, kendi uçağınızdır.</p>
                                     <div class="d-flex gap-2 mt-2">
                                         <button class="btn btn-sm btn-primary" onclick="sitlLoadBoardConfig()">
-                                            <i class="bi bi-download me-1"></i> <span data-i18n="sitl.cfg_load">Kartın ayarlarını yükle</span>
+                                            <i class="bi bi-arrow-repeat me-1"></i> <span data-i18n="sitl.cfg_reload">Ayarları yeniden yükle</span>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="sitlUseDefaultConfig()" data-i18n="sitl.cfg_default">Varsayılana dön</button>
                                     </div>
                                     <div id="sitlConfigSummary" class="sitl-cfg-summary" style="display:none;"></div>
                                 </div>
 
-                                <!-- ---------- Canlı kumanda ---------- -->
+                                <!-- ---------- Kalkış noktası ---------- -->
                                 <div class="sitl-card">
-                                    <div class="sitl-card-title"><i class="bi bi-controller me-2"></i><span data-i18n="sitl.live">Gerçek kumandayla uç</span></div>
-                                    <p class="sitl-hint" data-i18n="sitl.live_hint">Alıcı uçuş kartına, kart da USB ile bilgisayara bağlı olmalı. Kanallar kartın kendi alıcısından okunur — CRSF/SBUS ayrıştırma, kanal haritası ve yumuşatma gerçek firmware üzerinden geçer.</p>
+                                    <div class="sitl-card-title"><i class="bi bi-geo-alt me-2"></i><span data-i18n="sitl.launch_point">Kalkış noktası</span></div>
+                                    <p class="sitl-hint" data-i18n="sitl.launch_point_hint">Haritada bir nokta seçin. "Başlat" gerçek bir salla-bırak fırlatışı gibi davranır: kumandanın gaz kolu rölantideyken basarsanız uçak zorla arm olur ve LAUNCH sekansı otomatik başlar.</p>
+                                    <div class="sitl-launch-coords"><i class="bi bi-crosshair me-1"></i><span id="sitlLaunchLat">39.925000</span>, <span id="sitlLaunchLon">32.866000</span></div>
+                                </div>
 
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="sitlLiveToggle" onchange="sitlToggleLiveInput(this.checked)">
-                                        <label class="form-check-label small" for="sitlLiveToggle" data-i18n="sitl.live_toggle">Canlı kumanda girdisi</label>
-                                    </div>
+                                <!-- ---------- Gerçek kumanda ---------- -->
+                                <div class="sitl-card">
+                                    <div class="sitl-card-title"><i class="bi bi-controller me-2"></i><span data-i18n="sitl.live">Gerçek kumandayla uçuyorsunuz</span></div>
+                                    <p class="sitl-hint" data-i18n="sitl.live_hint">Uçuş modları, arm switch'i ve stickler doğrudan kumandanızdan okunur — CRSF/SBUS ayrıştırma, kanal haritası ve yumuşatma gerçek firmware üzerinden geçer.</p>
 
-                                    <div id="sitlPropWarning" class="sitl-danger-box" style="display:none;">
+                                    <div id="sitlPropWarning" class="sitl-danger-box">
                                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
                                         <span data-i18n="sitl.prop_warning"><strong>PERVANEYİ SÖKÜN.</strong> Kart kendi uçuş mantığını da çalıştırıyor; arm switch'ini açtığınızda kartın motor/servo çıkışları gerçekten canlanır.</span>
                                     </div>
 
-                                    <div id="sitlLiveChannelBox" style="display:none;">
-                                        <div class="sitl-grid2 mt-2">
-                                            <div>
-                                                <label class="sitl-label" data-i18n="sitl.arm_channel">Arm kanalı</label>
-                                                <input id="sitlArmChannel" type="number" min="1" max="16" value="5" class="form-control form-control-sm">
-                                            </div>
-                                            <div>
-                                                <label class="sitl-label" data-i18n="sitl.mode_channel">Mod kanalı</label>
-                                                <input id="sitlModeChannel" type="number" min="1" max="16" value="6" class="form-control form-control-sm">
-                                            </div>
-                                        </div>
-                                        <div class="sitl-rx-status">
-                                            <span data-i18n="sitl.rx_status">Alıcı akışı:</span> <span id="sitlRxStatus">—</span>
-                                        </div>
-                                        <div class="sitl-rx-bars">
-                                            <div class="sitl-rx-row"><span>1</span><div class="sitl-rx-track"><div id="sitlRxBar1" class="sitl-rx-fill"></div></div><b id="sitlRxVal1">—</b></div>
-                                            <div class="sitl-rx-row"><span>2</span><div class="sitl-rx-track"><div id="sitlRxBar2" class="sitl-rx-fill"></div></div><b id="sitlRxVal2">—</b></div>
-                                            <div class="sitl-rx-row"><span>3</span><div class="sitl-rx-track"><div id="sitlRxBar3" class="sitl-rx-fill"></div></div><b id="sitlRxVal3">—</b></div>
-                                            <div class="sitl-rx-row"><span>4</span><div class="sitl-rx-track"><div id="sitlRxBar4" class="sitl-rx-fill"></div></div><b id="sitlRxVal4">—</b></div>
-                                            <div class="sitl-rx-row"><span>5</span><div class="sitl-rx-track"><div id="sitlRxBar5" class="sitl-rx-fill"></div></div><b id="sitlRxVal5">—</b></div>
-                                            <div class="sitl-rx-row"><span>6</span><div class="sitl-rx-track"><div id="sitlRxBar6" class="sitl-rx-fill"></div></div><b id="sitlRxVal6">—</b></div>
-                                            <div class="sitl-rx-row"><span>7</span><div class="sitl-rx-track"><div id="sitlRxBar7" class="sitl-rx-fill"></div></div><b id="sitlRxVal7">—</b></div>
-                                            <div class="sitl-rx-row"><span>8</span><div class="sitl-rx-track"><div id="sitlRxBar8" class="sitl-rx-fill"></div></div><b id="sitlRxVal8">—</b></div>
-                                        </div>
-                                        <p class="sitl-hint" data-i18n="sitl.rx_map_hint">Hangi kanalın hangi switch olduğunu görmek için kumandadaki anahtarı hareket ettirin; yukarıda oynayan çubuk o kanaldır.</p>
+                                    <div class="sitl-rx-status">
+                                        <span data-i18n="sitl.rx_status">Alıcı akışı:</span> <span id="sitlRxStatus">—</span>
+                                    </div>
+                                    <div class="sitl-rx-bars">
+                                        <div class="sitl-rx-row"><span>1</span><div class="sitl-rx-track"><div id="sitlRxBar1" class="sitl-rx-fill"></div></div><b id="sitlRxVal1">—</b></div>
+                                        <div class="sitl-rx-row"><span>2</span><div class="sitl-rx-track"><div id="sitlRxBar2" class="sitl-rx-fill"></div></div><b id="sitlRxVal2">—</b></div>
+                                        <div class="sitl-rx-row"><span>3</span><div class="sitl-rx-track"><div id="sitlRxBar3" class="sitl-rx-fill"></div></div><b id="sitlRxVal3">—</b></div>
+                                        <div class="sitl-rx-row"><span>4</span><div class="sitl-rx-track"><div id="sitlRxBar4" class="sitl-rx-fill"></div></div><b id="sitlRxVal4">—</b></div>
+                                        <div class="sitl-rx-row"><span>5</span><div class="sitl-rx-track"><div id="sitlRxBar5" class="sitl-rx-fill"></div></div><b id="sitlRxVal5">—</b></div>
+                                        <div class="sitl-rx-row"><span>6</span><div class="sitl-rx-track"><div id="sitlRxBar6" class="sitl-rx-fill"></div></div><b id="sitlRxVal6">—</b></div>
+                                        <div class="sitl-rx-row"><span>7</span><div class="sitl-rx-track"><div id="sitlRxBar7" class="sitl-rx-fill"></div></div><b id="sitlRxVal7">—</b></div>
+                                        <div class="sitl-rx-row"><span>8</span><div class="sitl-rx-track"><div id="sitlRxBar8" class="sitl-rx-fill"></div></div><b id="sitlRxVal8">—</b></div>
                                     </div>
                                 </div>
                             </div>
@@ -556,6 +477,11 @@
                                         <input class="form-check-input" type="checkbox" id="sitlFollow" checked>
                                         <label class="form-check-label small" for="sitlFollow" data-i18n="sitl.follow">Takip et</label>
                                     </div>
+                                    <div class="form-check form-switch ms-2 mb-0">
+                                        <input class="form-check-input" type="checkbox" id="sitlSound" checked>
+                                        <label class="form-check-label small" for="sitlSound" title="Motor sesi (gaza bağlı)"><i class="bi bi-volume-up"></i></label>
+                                    </div>
+                                    <button id="sitlBtnMapFull" class="btn btn-sm btn-outline-light" onclick="sitlToggleMapExpand()" title="Haritayı büyüt"><i class="bi bi-arrows-fullscreen"></i></button>
                                     <button class="btn btn-sm btn-outline-light ms-auto" onclick="sitlDownloadKml()"><i class="bi bi-download me-1"></i> KML</button>
                                 </div>
 
@@ -567,22 +493,15 @@
                                         <div class="sitl-readouts">
                                             <div class="sitl-ro"><span data-i18n="sitl.ro_time">Süre</span><b id="sitlT">—</b></div>
                                             <div class="sitl-ro"><span data-i18n="sitl.ro_mode">Mod</span><b id="sitlMode2">—</b></div>
-                                            <div class="sitl-ro"><span data-i18n="sitl.ro_la">İniş fazı</span><b id="sitlLaState">—</b></div>
                                             <div class="sitl-ro"><span data-i18n="sitl.ro_armed">Durum</span><b id="sitlArmed">—</b></div>
-                                            <div class="sitl-ro"><span data-i18n="sitl.ro_alt">İrtifa (kestirim)</span><b id="sitlAlt">—</b></div>
-                                            <div class="sitl-ro"><span data-i18n="sitl.ro_alt_true">İrtifa (gerçek)</span><b id="sitlAltTrue">—</b></div>
+                                            <div class="sitl-ro"><span data-i18n="sitl.ro_alt">İrtifa</span><b id="sitlAlt">—</b></div>
                                             <div class="sitl-ro"><span data-i18n="sitl.ro_as">Hava hızı</span><b id="sitlAirspeed">—</b></div>
                                             <div class="sitl-ro"><span data-i18n="sitl.ro_dist">Eve mesafe</span><b id="sitlDist">—</b></div>
                                             <div class="sitl-ro"><span data-i18n="sitl.ro_thr">Gaz (PWM)</span><b id="sitlThrottle">—</b></div>
-                                            <div class="sitl-ro"><span data-i18n="sitl.ro_wind">Rüzgâr (tahmin)</span><b id="sitlWind">—</b></div>
-                                            <div class="sitl-ro"><span data-i18n="sitl.ro_wind_true">Rüzgâr (gerçek)</span><b id="sitlWindTrue">—</b></div>
-                                            <div class="sitl-ro sitl-ro-wide"><span data-i18n="sitl.ro_att_err">Tutum kestirim hatası</span><b id="sitlAttErr">—</b></div>
-                                        </div>
-                                        <div class="sitl-att-table">
-                                            <div><span>Roll</span><b id="sitlRoll">—</b><i id="sitlERoll">—</i></div>
-                                            <div><span>Pitch</span><b id="sitlPitch">—</b><i id="sitlEPitch">—</i></div>
-                                            <div><span>Yaw</span><b id="sitlYaw">—</b><i>—</i></div>
-                                            <div class="sitl-att-head"><span></span><b data-i18n="sitl.true">gerçek</b><i data-i18n="sitl.est">kestirim</i></div>
+                                            <div class="sitl-ro"><span data-i18n="sitl.ro_wind">Rüzgâr</span><b id="sitlWind">—</b></div>
+                                            <div class="sitl-ro"><span data-i18n="sitl.ro_roll">Roll</span><b id="sitlERoll">—</b></div>
+                                            <div class="sitl-ro"><span data-i18n="sitl.ro_pitch">Pitch</span><b id="sitlEPitch">—</b></div>
+                                            <div class="sitl-ro"><span data-i18n="sitl.ro_yaw">Yaw</span><b id="sitlEYaw">—</b></div>
                                         </div>
                                     </div>
                                 </div>

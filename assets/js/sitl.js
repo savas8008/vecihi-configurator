@@ -33,20 +33,29 @@ let sitlDt = 0.002;
 let sitlBoardConfigLoaded = false;
 let sitlConfigLoading = false;
 
-let sitlLiveInput = false;     // gercek kumandadan surulsun mu
+// Kumanda her zaman canli surer — senaryo/betik girdisi yok (bkz. sohbet:
+// "panel uzerinden ucus yonetmek mantikli olmuyor" tasarim degisikligi).
 let sitlLiveChannels = null;   // son gelen 16 kanal
 let sitlChannelPtr = 0;        // WASM heap'inde 16*int4 tampon
 let sitlLastRxMs = 0;          // son alici paketinin zamani (tazelik gostergesi)
+
+// Kalkis noktasi: kullanici haritada tiklayip secer (yoksa varsayilan kullanilir).
+let sitlSelectedHome = { lat: 39.925, lon: 32.866 };
 
 // Gorsellestirme
 let sitlMap = null, sitlTrackLine = null, sitlPlaneMarker = null, sitlHomeMarker = null;
 let sitlTrack = [];
 let sitl3D = null;             // {scene, camera, renderer, model}
 let sitlMapFollow = true;
+let sitlMapExpanded = false;
+
+// Motor sesi (throttle'a bagli, Web Audio API — dosya gerektirmez)
+let sitlSoundEnabled = true;
+let sitlAudioCtx = null;
+let sitlAudioNodes = null;     // {osc1, osc2, osc2Gain, filter, gain}
 
 const SITL_MODE_NAMES = ['MANUAL','ANGLE','HORIZON','ACRO','RTH','LAUNCH','FAILSAFE',
                          'CRUISE','ALTHOLD','LOITER','AUTOTUNE','WAYPOINT','LAND_ASSIST','GCS'];
-const SITL_LA_NAMES = ['IDLE','ENROUTE','WIND_DETECT','DOWNWIND','BASE_LEG','FINAL','FLARE','BITTI'];
 
 // ==================== WASM YUKLEME ====================
 
@@ -91,6 +100,7 @@ async function sitlLoadModule() {
             tick:        sitlModule.cwrap('sitl_tick', 'number', []),
             totalTicks:  sitlModule.cwrap('sitl_total_ticks', 'number', []),
             setChannels: sitlModule.cwrap('sitl_set_channels', null, ['number', 'number']),
+            forceArm:    sitlModule.cwrap('sitl_force_arm', 'number', []),
             stateJson:   sitlModule.cwrap('sitl_state_json', 'string', []),
             events:      sitlModule.cwrap('sitl_events', 'string', []),
             kml:         sitlModule.cwrap('sitl_kml', 'string', []),
@@ -141,7 +151,8 @@ function sitlWaitFor(kosul, timeoutMs, araMs) {
  *                         DEGIL; NVS'e ayri bir JSON olarak yaziliyor.
  *
  * Arm kanali (config.rc.ch_arm) hicbir okuma komutuyla disari verilmiyor
- * (bkz. GOREVLER.md B45), o yuzden sayfadaki alandan elle giriliyor.
+ * (bkz. GOREVLER.md B45) — bu yuzden "Baslat" arm'i kanal okuyarak degil,
+ * dogrudan stick_force_arm()'i cagirarak yapiyor (bkz. sitlStart()).
  */
 async function sitlLoadBoardConfig() {
     if (sitlConfigLoading) return;
@@ -226,26 +237,14 @@ async function sitlLoadBoardConfig() {
     }
 }
 
-/**
- * @brief Varsayılan (derleme-zamanı) ayarlara döner.
- */
-function sitlUseDefaultConfig() {
-    if (!sitlApi) return;
-    sitlApi.resetConfig();
-    sitlBoardConfigLoaded = false;
-    sitlSetConfigStatus('default');
-    sitlRenderConfigSummary();
-    sitlLog('Varsayılan ayarlara dönüldü (config_types.h derleme-zamanı değerleri).', 'info');
-}
-
 function sitlSetConfigStatus(state) {
     const el = document.getElementById('sitlConfigStatus');
     if (!el) return;
     const map = {
-        default: ['Varsayılan ayarlar', 'var(--color-warning)'],
+        default: ['Bağlı değil', 'var(--color-secondary)'],
         loading: ['Kart ayarları okunuyor…', 'var(--color-info)'],
         board:   ['Kart ayarları yüklü', 'var(--color-success)'],
-        error:   ['Okunamadı — varsayılanlar geçerli', 'var(--color-danger)']
+        error:   ['Okunamadı — tekrar deneyin', 'var(--color-danger)']
     };
     const m = map[state] || map.default;
     el.textContent = m[0];
@@ -279,58 +278,37 @@ function sitlRenderConfigSummary() {
 // ==================== SENARYO ====================
 
 /**
- * @brief Formdaki alanlardan senaryo JSON'u uretir (sitl/scenarios/*.json semasi).
+ * @brief Sabit/canli senaryo JSON'u uretir (sitl/scenarios/*.json semasi).
+ *
+ * Artik bir "senaryo formu" yok — mod, ruzgar, sure, tirmanis fazi gibi
+ * SITL-ozel kavramlar kaldirildi. Ucus TAMAMEN gercek kumandanizdan (mod
+ * switch'leri dahil) ve karttan yuklenen gercek ayarlardan yonetiliyor.
+ * Tek kullanici girdisi: haritada tiklanan kalkis noktasi (sitlSelectedHome).
  */
 function sitlBuildScenario() {
-    const num = (id, def) => {
-        const el = document.getElementById(id);
-        const v = el ? parseFloat(el.value) : NaN;
-        return isFinite(v) ? v : def;
-    };
-    const chk = (id, def) => {
-        const el = document.getElementById(id);
-        return el ? el.checked : def;
-    };
-    const str = (id, def) => {
-        const el = document.getElementById(id);
-        return el && el.value ? el.value : def;
-    };
-
-    const sc = {
+    return {
         home: {
-            lat: num('sitlHomeLat', 39.925),
-            lon: num('sitlHomeLon', 32.866),
-            alt: num('sitlHomeAlt', 100),
-            heading: num('sitlHeading', 90),
-            start_alt_offset_m: num('sitlStartAlt', 0)
+            lat: sitlSelectedHome.lat,
+            lon: sitlSelectedHome.lon,
+            alt: 100,
+            heading: 90,
+            start_alt_offset_m: 0
         },
-        wind: {
-            speed_ms: num('sitlWindSpeed', 0),
-            from_deg: num('sitlWindDir', 0)
-        },
-        mode: str('sitlMode', 'ANGLE'),
-        duration_s: num('sitlDuration', 300),
+        wind: { speed_ms: 0, from_deg: 0 },
+        mode: 'MANUAL',       // gercek kumanda + kart config'i mod secimini yapiyor
+        duration_s: 3600,     // pratikte sinirsiz — Durdur'a basana/zemin temasina kadar
         dt_s: 0.002,
-        arm: chk('sitlArm', true),
-        auto_launch: chk('sitlAutoLaunch', false),
-        climb_phase_s: num('sitlClimbPhase', 150),
+        arm: false,           // arm artik sitlStart()'ta forceArm() ile (salla-birak)
+        auto_launch: true,    // LAUNCH sekansi force-arm sonrasi otomatik tetiklenir
         input: {
-            live: sitlLiveInput,
-            // Kart ayarlari yuklendiyse senaryonun "mode" alanini bir kanala
-            // BAGLAMA — kullanicinin kendi switch atamalari gecerli olsun.
+            live: true,
+            // Kart ayarlari yuklendiyse (her zaman hedeflenen durum) mod
+            // switch atamalarina DOKUNMA — kullanicinin kendi switch'leri gecerli.
             board_modes: sitlBoardConfigLoaded,
-            arm_channel: Math.round(num('sitlArmChannel', 5)),
-            mode_channel: Math.round(num('sitlModeChannel', 6))
+            arm_channel: 5,   // kullanilmiyor (forceArm kanal bilmeden calisir), alan gerekli
+            mode_channel: 6   // kullanilmiyor (mode='MANUAL' -> hicbir kanala baglanmaz)
         }
     };
-
-    // Waypoint modunda haritadan/waypoint sayfasindan gelen noktalar
-    if (sc.mode === 'WAYPOINT' && typeof waypoints !== 'undefined' && Array.isArray(waypoints) && waypoints.length) {
-        sc.waypoints = waypoints.map(w => ({
-            lat: w.lat, lon: w.lon, alt: w.alt || 50, task: w.task || 'CRUISE'
-        }));
-    }
-    return sc;
 }
 
 // ==================== CALISTIRMA ====================
@@ -338,23 +316,57 @@ function sitlBuildScenario() {
 async function sitlStart() {
     if (!await sitlLoadModule()) return;
 
-    const sc = sitlBuildScenario();
-
+    if (typeof isConnected === 'undefined' || !isConnected) {
+        sitlLog('Önce üst menüden karta bağlanın.', 'warning');
+        return;
+    }
     if (!sitlBoardConfigLoaded) {
-        sitlLog('Dikkat: kart ayarları yüklü değil — simülasyon varsayılan PID/mod ' +
-                'değerleriyle koşuyor, sizin ayarlarınızla değil.', 'warning');
-    }
-    if (sitlLiveInput && !sitlLiveChannels) {
-        sitlLog('Canlı kumanda seçili ama karttan alıcı verisi gelmiyor. ' +
-                'Kartı bağlayın; sayfa açıkken alıcı akışı otomatik başlar.', 'warning');
+        sitlLog('Kart ayarları henüz yüklü değil — önce yükleniyor…', 'info');
+        await sitlLoadBoardConfig();
+        if (!sitlBoardConfigLoaded) {
+            sitlLog('Kart ayarları yüklenemedi — Başlat iptal edildi.', 'error');
+            return;
+        }
     }
 
+    const sc = sitlBuildScenario();
     sitlApi.init(JSON.stringify(sc));
     sitlDt = sitlApi.dt() || 0.002;
+
+    // GPS/irtifa kestiricisinin ilk gercek orneği alması için tek tick ilerlet
+    // — force-arm'in kullandigi setHomePositionToCurrent() bundan once
+    // anlamli bir konum bulamaz (bkz. sohbet: SitlCore::step() ilk tick'te
+    // her zaman "GPS taze" kabul eder).
+    sitlApi.step(1);
+
+    // En guncel canli kanallari HEMEN uygula — force-arm'in throttle
+    // kontrolu (rolantide mi?) gercek kumandanin O ANKI durumuna baksin,
+    // sitlFrame()'in bir sonraki karesini beklemesin.
+    if (sitlLiveChannels) {
+        const heap = sitlModule.HEAP32;
+        const base = sitlChannelPtr >> 2;
+        for (let i = 0; i < 16; i++) heap[base + i] = sitlLiveChannels[i] | 0;
+        sitlApi.setChannels(sitlChannelPtr, 16);
+    } else {
+        sitlLog('Karttan alıcı verisi gelmiyor — kumandanız açık ve karta bağlı mı?', 'warning');
+    }
+
+    // "Başlat" = salla-bırak: throttle rölantideyse zorla arm eder, LAUNCH
+    // sekansını tetikler. Kanal bilmesi gerekmez (bkz. GOREVLER.md B45).
+    const armed = sitlApi.forceArm();
+    if (!armed) {
+        sitlLog('Arm edilemedi: kumandanın gaz kolu rölantide olmalı (gerçek salla-bırak güvenliği).', 'warning');
+        return;
+    }
+
     sitlStarted = true;
     sitlRunning = true;
     sitlTickAccum = 0;
     sitlLastFrameMs = performance.now();
+
+    // Ses baglamini kullanici jesti (bu tiklama) icinde kur/uyandir —
+    // tarayicilarin otomatik oynatma kisitlamasi boyle en guvenilir asilir.
+    sitlEnsureAudio();
 
     // Iz ve harita sifirla
     sitlTrack = [];
@@ -364,8 +376,7 @@ async function sitlStart() {
 
     sitlClearEvents();
     sitlDrainEvents();
-    sitlLog(`Senaryo başlatıldı: ${sc.mode}, rüzgâr ${sc.wind.speed_ms} m/s@${sc.wind.from_deg}°` +
-            (sitlLiveInput ? ' — CANLI KUMANDA' : ''), 'info');
+    sitlLog('Fırlatıldı — LAUNCH sekansı başlıyor.', 'info');
     sitlSetStatus('running');
     sitlUpdateButtons();
 
@@ -382,6 +393,7 @@ function sitlPause() {
         sitlSetStatus('running');
     } else {
         sitlSetStatus('paused');
+        sitlStopEngineSound();
     }
     sitlUpdateButtons();
 }
@@ -392,6 +404,7 @@ function sitlStop() {
     if (sitlRafId) { cancelAnimationFrame(sitlRafId); sitlRafId = null; }
     sitlSetStatus('ready');
     sitlUpdateButtons();
+    sitlStopEngineSound();
 }
 
 /**
@@ -409,7 +422,7 @@ function sitlFrame(nowMs) {
     sitlLastFrameMs = nowMs;
 
     // Canli RC: son gelen kanallari simulasyona yaz.
-    if (sitlLiveInput && sitlLiveChannels) {
+    if (sitlLiveChannels) {
         const heap = sitlModule.HEAP32;
         const base = sitlChannelPtr >> 2;
         for (let i = 0; i < 16; i++) heap[base + i] = sitlLiveChannels[i] | 0;
@@ -473,26 +486,6 @@ function onReceiverStreamForSitl(data) {
     sitlRenderChannels(data);
 }
 
-function sitlToggleLiveInput(on) {
-    sitlLiveInput = !!on;
-    const warn = document.getElementById('sitlPropWarning');
-    if (warn) warn.style.display = sitlLiveInput ? '' : 'none';
-    const box = document.getElementById('sitlLiveChannelBox');
-    if (box) box.style.display = sitlLiveInput ? '' : 'none';
-
-    if (sitlLiveInput) {
-        if (typeof isConnected !== 'undefined' && isConnected) {
-            // Alici akisini baslat — kart USB modundayken de alicisini okumaya
-            // devam eder (main.cpp: receiver_read() kosulsuz cagrilir).
-            if (typeof sendCommand === 'function') sendCommand('start_receiver_stream');
-            sitlLog('Canlı kumanda açık. PERVANEYİ SÖKTÜĞÜNÜZDEN EMİN OLUN — ' +
-                    'arm switch\'i açınca kartın çıkışları gerçekten canlanır.', 'warning');
-        } else {
-            sitlLog('Canlı kumanda için önce üst menüden karta bağlanın.', 'warning');
-        }
-    }
-}
-
 // ==================== GORSELLESTIRME ====================
 
 function sitlInitMap(lat, lon) {
@@ -507,14 +500,31 @@ function sitlInitMap(lat, lon) {
         sitlTrackLine = L.polyline([], { color: '#4ade80', weight: 3 }).addTo(sitlMap);
         sitlHomeMarker = L.circleMarker([lat, lon], {
             radius: 6, color: '#fb923c', fillColor: '#fb923c', fillOpacity: 0.9
-        }).addTo(sitlMap).bindTooltip('EV');
+        }).addTo(sitlMap).bindTooltip('KALKIŞ');
         sitlPlaneMarker = L.circleMarker([lat, lon], {
             radius: 7, color: '#818cf8', fillColor: '#818cf8', fillOpacity: 1
         }).addTo(sitlMap);
+        // Kalkis noktasini haritadan sec: tiklanan yere kalkis isaretcisi
+        // tasinir, sitlStart() bir sonraki calistirmada bu noktayi kullanir.
+        sitlMap.on('click', sitlOnMapClick);
     } else {
         sitlMap.setView([lat, lon], 16);
     }
     setTimeout(() => sitlMap && sitlMap.invalidateSize(), 150);
+}
+
+/**
+ * @brief Haritaya tiklandiginda kalkis noktasini gunceller (simulasyon
+ *        kosarken degil — o an ucan ucagi yeniden konumlandirmak anlamsiz).
+ */
+function sitlOnMapClick(e) {
+    if (sitlRunning) return;
+    sitlSelectedHome = { lat: e.latlng.lat, lon: e.latlng.lng };
+    if (sitlHomeMarker) sitlHomeMarker.setLatLng(e.latlng);
+    const latEl = document.getElementById('sitlLaunchLat');
+    const lonEl = document.getElementById('sitlLaunchLon');
+    if (latEl) latEl.textContent = e.latlng.lat.toFixed(6);
+    if (lonEl) lonEl.textContent = e.latlng.lng.toFixed(6);
 }
 
 function sitlInit3D() {
@@ -549,8 +559,13 @@ function sitlInit3D() {
  * @brief Ucagi tutum acilariyla dondurur.
  *
  * Model konvansiyonu (bkz. aircraft_model.js): burun +Z, kanatlar ±X, ust +Y.
- * Bu yuzden yaw -> Y ekseni, pitch -> X, roll -> Z; isaretler ekrandaki
- * hareket sag-el kuraliyla ucagin gercek hareketini izleyecek sekilde secildi.
+ * Kamera `sitlInit3D()`'de position=(0,2.2,-6.5) + lookAt(0,0,0) — bu kurulumda
+ * THREE'nin lookAt taban vektörleri world +X'i EKRAN SOLUNA, world -X'i EKRAN
+ * SAĞINA haritalıyor (bkz. sohbet: three.js r128 ile ampirik doğrulandı,
+ * Object3D.applyMatrix4 + Vector3.project). Önceki `-s.roll` işareti bunu
+ * hesaba katmıyordu: gerçek bir sağ bankada (roll>0) ekranda SOL taraf aşağı
+ * gidiyor, kullanıcıya sol banka gibi görünüyordu (haritadaki sağa dönüşle
+ * çelişiyordu). İşaret ters çevrildi.
  */
 function sitlRender3D(s) {
     if (!sitl3D) return;
@@ -559,7 +574,7 @@ function sitlRender3D(s) {
     sitl3D.model.rotation.order = 'YXZ';
     sitl3D.model.rotation.y = -s.yaw * d2r;
     sitl3D.model.rotation.x =  s.pitch * d2r;
-    sitl3D.model.rotation.z = -s.roll * d2r;
+    sitl3D.model.rotation.z =  s.roll * d2r;
     sitl3D.renderer.render(sitl3D.scene, sitl3D.camera);
 }
 
@@ -592,30 +607,16 @@ function sitlRender() {
 
     set('sitlT', f(s.t, 1) + ' s');
     set('sitlMode2', SITL_MODE_NAMES[s.mode] || s.mode);
-    set('sitlLaState', SITL_LA_NAMES[s.la] || s.la);
     set('sitlAlt', f(s.ealt, 1) + ' m');
-    set('sitlAltTrue', f(s.alt, 1) + ' m');
     set('sitlAirspeed', f(s.as, 1) + ' m/s');
     set('sitlDist', f(s.dist, 0) + ' m');
     set('sitlThrottle', s.m1);
-    set('sitlWind', f(s.wind, 1) + ' m/s' + (s.windValid ? '' : ' (gecersiz)'));
-    set('sitlWindTrue', f(s.windTrue, 1) + ' m/s');
-    set('sitlRoll', f(s.roll, 1) + '°');
-    set('sitlPitch', f(s.pitch, 1) + '°');
-    set('sitlYaw', f(s.yaw, 1) + '°');
+    set('sitlWind', f(s.wind, 1) + ' m/s' + (s.windValid ? '' : ' (geçersiz)'));
+    // Kestirim (gercek telemetride goreceginiz deger) — TRUE/fizik ground-truth
+    // degerleri (SITL'e ozel debug bilgisi) artik gosterilmiyor.
     set('sitlERoll', f(s.eroll, 1) + '°');
     set('sitlEPitch', f(s.epitch, 1) + '°');
-
-    // Tutum kestirimi ile gercek arasindaki fark — SITL'de en onemli saglik
-    // gostergesi (bkz. sitl/KULLANIM.md "TRUE ile EST").
-    const attErr = Math.max(Math.abs(s.roll - s.eroll), Math.abs(s.pitch - s.epitch));
-    const errEl = document.getElementById('sitlAttErr');
-    if (errEl) {
-        errEl.textContent = f(attErr, 1) + '°';
-        errEl.style.color = attErr > 10 ? 'var(--color-danger)'
-                          : attErr > 4  ? 'var(--color-warning)'
-                          : 'var(--color-success)';
-    }
+    set('sitlEYaw', f(s.eyaw < 0 ? s.eyaw + 360 : s.eyaw, 1) + '°');
 
     const armEl = document.getElementById('sitlArmed');
     if (armEl) {
@@ -634,16 +635,112 @@ function sitlRender() {
 
     sitlRender3D(s);
 
+    sitlUpdateEngineSound(s.m1, !!s.armed);
+
     // Canli kumanda tazeligi
-    if (sitlLiveInput) {
-        const age = performance.now() - sitlLastRxMs;
-        const rxEl = document.getElementById('sitlRxStatus');
-        if (rxEl) {
-            if (!sitlLiveChannels) { rxEl.textContent = 'veri yok'; rxEl.style.color = 'var(--color-danger)'; }
-            else if (age > 1000)   { rxEl.textContent = `bayat (${(age/1000).toFixed(1)} s)`; rxEl.style.color = 'var(--color-warning)'; }
-            else                   { rxEl.textContent = 'canli'; rxEl.style.color = 'var(--color-success)'; }
-        }
+    const age = performance.now() - sitlLastRxMs;
+    const rxEl = document.getElementById('sitlRxStatus');
+    if (rxEl) {
+        if (!sitlLiveChannels) { rxEl.textContent = 'veri yok'; rxEl.style.color = 'var(--color-danger)'; }
+        else if (age > 1000)   { rxEl.textContent = `bayat (${(age/1000).toFixed(1)} s)`; rxEl.style.color = 'var(--color-warning)'; }
+        else                   { rxEl.textContent = 'canlı'; rxEl.style.color = 'var(--color-success)'; }
     }
+}
+
+// ==================== MOTOR SESİ ====================
+// Gaza (motor1 PWM) bağlı, dosya gerektirmeyen basit bir "drone" — iki
+// detune edilmiş osilatör (temel + 1.5 harmonik) + alçak geçiren filtre.
+// Gerçek bir motor örneklemesi değil, ama boşta/tam gazda perde ve tını
+// belirgin şekilde değişiyor.
+
+function sitlEnsureAudio() {
+    if (sitlAudioCtx || !sitlSoundEnabled) return;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    try {
+        sitlAudioCtx = new Ctx();
+
+        const gain = sitlAudioCtx.createGain();
+        gain.gain.value = 0;
+
+        const filter = sitlAudioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 400;
+        filter.Q.value = 0.7;
+
+        const osc1 = sitlAudioCtx.createOscillator();
+        osc1.type = 'sawtooth';
+        osc1.frequency.value = 55;
+
+        const osc2 = sitlAudioCtx.createOscillator();
+        osc2.type = 'square';
+        osc2.frequency.value = 55 * 1.5;
+        const osc2Gain = sitlAudioCtx.createGain();
+        osc2Gain.gain.value = 0.3;
+
+        osc1.connect(filter);
+        osc2.connect(osc2Gain).connect(filter);
+        filter.connect(gain).connect(sitlAudioCtx.destination);
+
+        osc1.start();
+        osc2.start();
+
+        sitlAudioNodes = { osc1, osc2, osc2Gain, filter, gain };
+    } catch (e) {
+        sitlAudioCtx = null;
+        sitlAudioNodes = null;
+    }
+    if (sitlAudioCtx && sitlAudioCtx.state === 'suspended') {
+        sitlAudioCtx.resume().catch(() => {});
+    }
+}
+
+/**
+ * @brief Motor PWM'ine (1000-2000) göre motor sesinin perdesini/sesini günceller.
+ * @param {number} motor1_us Motor1 PWM değeri (sitlApi.stateJson()'daki "m1")
+ * @param {boolean} armed Kilitli değilse ses kısılır (motor gerçekte dönmüyor)
+ */
+function sitlUpdateEngineSound(motor1_us, armed) {
+    if (!sitlSoundEnabled || !sitlAudioCtx || !sitlAudioNodes) return;
+    const thr = Math.max(0, Math.min(1, ((motor1_us || 1000) - 1000) / 1000));
+    const now = sitlAudioCtx.currentTime;
+    const targetGain = armed ? (0.025 + thr * 0.09) : 0;
+    const baseFreq = 50 + thr * 130;   // 50..180 Hz temel ton
+
+    sitlAudioNodes.gain.gain.setTargetAtTime(targetGain, now, 0.08);
+    sitlAudioNodes.osc1.frequency.setTargetAtTime(baseFreq, now, 0.08);
+    sitlAudioNodes.osc2.frequency.setTargetAtTime(baseFreq * 1.5, now, 0.08);
+    sitlAudioNodes.filter.frequency.setTargetAtTime(350 + thr * 1600, now, 0.08);
+}
+
+function sitlStopEngineSound() {
+    if (sitlAudioCtx && sitlAudioNodes) {
+        sitlAudioNodes.gain.gain.setTargetAtTime(0, sitlAudioCtx.currentTime, 0.05);
+    }
+}
+
+function sitlToggleSound(on) {
+    sitlSoundEnabled = !!on;
+    if (sitlSoundEnabled) sitlEnsureAudio();
+    else sitlStopEngineSound();
+}
+
+// ==================== HARİTA BÜYÜT ====================
+
+function sitlToggleMapExpand() {
+    sitlMapExpanded = !sitlMapExpanded;
+    const el = document.getElementById('sitlMap');
+    const btn = document.getElementById('sitlBtnMapFull');
+    if (el) el.classList.toggle('sitl-map-expanded', sitlMapExpanded);
+    if (btn) {
+        btn.innerHTML = sitlMapExpanded
+            ? '<i class="bi bi-fullscreen-exit"></i>'
+            : '<i class="bi bi-arrows-fullscreen"></i>';
+        btn.title = sitlMapExpanded ? 'Haritayı küçült' : 'Haritayı büyüt';
+    }
+    // CSS gecis suresi (0.25s) bitmeden invalidateSize cagirilirsa Leaflet
+    // eski boyuta gore hesaplar ve karolar yanlis hizalanir/gri kalir.
+    setTimeout(() => sitlMap && sitlMap.invalidateSize(), 260);
 }
 
 function sitlRenderChannels(data) {
@@ -742,13 +839,24 @@ function initSitlPage() {
     if (!sitlModule && !sitlLoading) {
         sitlLoadModule();
     }
-    if (sitlMap) setTimeout(() => sitlMap.invalidateSize(), 150);
+
+    // Harita önceden yalnızca sitlStart() içinde kuruluyordu — "Başlat"a
+    // basılmadan sayfaya girildiğinde #sitlMap boş bir kutu olarak kalıyor,
+    // bu da "harita yüklenmiyor" izlenimi veriyordu. Seçili (veya varsayılan)
+    // kalkış noktasıyla temel haritayı hemen göster.
+    sitlInitMap(sitlSelectedHome.lat, sitlSelectedHome.lon);
+
+    // Karta bağlıysa ayarları otomatik yükle — kullanıcının artık ayrı bir
+    // "yükle" adımı atmasına gerek yok. Zaten yüklüyse tekrar sormaz.
+    if (typeof isConnected !== 'undefined' && isConnected && !sitlBoardConfigLoaded && !sitlConfigLoading) {
+        sitlLoadBoardConfig();
+    }
 
     // NOT: alici akisini burada baslatmiyoruz. page_management.js sayfa
     // degisiminde once tum stream'leri durduruyor, sonra 600 ms gecikmeyle
-    // startPageSpecificStream('sitl') icinde canli kumanda acikken
-    // start_receiver_stream gonderiyor. Burada da gondermek, firmware'in tek
-    // current_command bayragina ayni anda iki komut yollamak olurdu.
+    // startPageSpecificStream('sitl') icinde start_receiver_stream gonderiyor.
+    // Burada da gondermek, firmware'in tek current_command bayragina ayni
+    // anda iki komut yollamak olurdu.
 
     const speedSel = document.getElementById('sitlSpeed');
     if (speedSel && !speedSel._sitlBound) {
@@ -763,5 +871,11 @@ function initSitlPage() {
     if (followChk && !followChk._sitlBound) {
         followChk._sitlBound = true;
         followChk.addEventListener('change', () => { sitlMapFollow = followChk.checked; });
+    }
+    const soundChk = document.getElementById('sitlSound');
+    if (soundChk && !soundChk._sitlBound) {
+        soundChk._sitlBound = true;
+        sitlSoundEnabled = soundChk.checked;
+        soundChk.addEventListener('change', () => sitlToggleSound(soundChk.checked));
     }
 }

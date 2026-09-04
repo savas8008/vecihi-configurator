@@ -57,8 +57,8 @@ function changePage(targetPage) {
         if (typeof initFirmwarePage === 'function') initFirmwarePage();
     }
     if (targetPage === 'sitl') {
-        // SITL bağlantı gerektirmez (senaryo modu); canlı kumanda seçiliyse
-        // initSitlPage() alıcı akışını kendisi yeniden başlatır.
+        // SITL bağlantı gerektirmez ama tam uçuş için gerekir (kart config'i
+        // + gerçek kumanda). Bağlıysa initSitlPage() ayarları otomatik yükler.
         if (typeof initSitlPage === 'function') initSitlPage();
     }
     if (targetPage === 'kml') {
@@ -192,11 +192,10 @@ function startPageSpecificStream(page) {
 
         case 'sitl':
             // Simülasyon tarayıcıda koşar; karttan yalnızca alıcı kanalları
-            // okunur ve o da sadece "canlı kumanda" açıkken gerekir.
-            if (typeof sitlLiveInput !== 'undefined' && sitlLiveInput) {
-                log('Bağlam: SITL -> Canlı kumanda için Receiver Stream Başlatılıyor', 'info');
-                sendCommand('start_receiver_stream');
-            }
+            // okunur. Kumanda her zaman canlı sürer (senaryo/betik girdisi
+            // yok), o yüzden bağlıyken koşulsuz başlatılır.
+            log('Bağlam: SITL -> Gerçek kumanda için Receiver Stream Başlatılıyor', 'info');
+            sendCommand('start_receiver_stream');
             break;
 
         case 'blackbox':
