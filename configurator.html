@@ -266,8 +266,8 @@
                         <!-- BAĞLANTISIZ ARAÇLAR — bağlıyken JS ile gizlenir -->
                         <li class="nav-item nav-offline"><a class="nav-link active" href="#" data-page="home"><i class="bi bi-usb-plug me-2"></i> <span data-i18n="nav.home">Konfiguratör</span></a></li>
                         <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="firmware"><i class="bi bi-cpu me-2"></i> <span data-i18n="nav.firmware">Firmware</span></a></li>
-                        <li class="nav-item nav-offline"><a class="nav-link" id="btnGroundControlOffline" href="#" onclick="window.open('elrs_backpack.html','_blank');return false;"><i class="bi bi-broadcast-pin me-2"></i> <span data-i18n="nav.ground_control">Yer Kontrol</span></a></li>
-                        <li class="nav-item nav-always"><a class="nav-link" href="#" data-page="sitl"><i class="bi bi-joystick me-2"></i> <span data-i18n="nav.sitl">Simülatör (SITL)</span></a></li>
+                        <li class="nav-item nav-always"><a class="nav-link" id="btnGroundControlOffline" href="#" onclick="window.open('elrs_backpack.html','_blank');return false;"><i class="bi bi-broadcast-pin me-2"></i> <span data-i18n="nav.ground_control">Yer Kontrol</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="sitl"><i class="bi bi-joystick me-2"></i> <span data-i18n="nav.sitl">Simülatör (SITL)</span></a></li>
                         <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="kml"><i class="bi bi-globe2 me-2"></i> <span data-i18n="nav.kml">Log → KML</span></a></li>
                         <li class="nav-item nav-offline"><a class="nav-link" href="#" data-page="docs"><i class="bi bi-book me-2"></i> <span data-i18n="nav.docs">Dokümanlar</span></a></li>
                     </ul>
@@ -393,7 +393,7 @@
                 </div>
 
                 <!-- ======= OFFLINE SAYFA: Simülatör (SITL) ======= -->
-                <div id="sitlPage" class="page page-always">
+                <div id="sitlPage" class="page">
                     <div class="panel">
                         <div class="prompt-links-header">
                             <div class="prompt-links-icon" style="background:rgba(129,140,248,0.15);">

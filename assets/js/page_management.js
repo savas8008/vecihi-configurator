@@ -461,7 +461,9 @@ function updateConnectionStatus() {
     // Navigasyon menüsü: online↔offline görünürlük
     document.querySelectorAll('.nav-link[data-page]').forEach(nav => {
         const navPage = nav.getAttribute('data-page');
-        // .nav-always: bağlantı durumundan bağımsız görünen öğeler (SITL).
+        // .nav-always: bağlantı durumundan bağımsız görünen öğeler (Yer Kontrol —
+        // uçak havadayken USB bağlantısı zaten mümkün değil, ELRS Backpack
+        // üzerinden kablosuz bağlanır; ayrı bir sekmede açılır, .page değildir).
         const isAlwaysNav = nav.closest('.nav-always') !== null;
         const isOfflineNav = !isAlwaysNav
                           && (nav.closest('.nav-offline') !== null
@@ -519,9 +521,10 @@ function updateConnectionStatus() {
     // Sayfa görünürlüğü
     document.querySelectorAll('.page').forEach(page => {
         const isOfflinePg = page.classList.contains('page-offline');
-        // .page-always: bağlantı durumundan bağımsız, aktifse görünür (SITL —
-        // hem senaryo modunda bağlantısız, hem canlı kumanda için kart bağlıyken
-        // kullanılır).
+        // .page-always: bağlantı durumundan bağımsız, aktifse görünür. Şu an
+        // hiçbir sayfa kullanmıyor (Yer Kontrol .page değil, ayrı sekmede açılır;
+        // SITL artık gerçek bağlantı gerektirdiği için normal "online" sayfa) —
+        // gelecekte "her iki durumda da çalışan" bir sayfa için hazır kalsın.
         if (page.classList.contains('page-always')) {
             page.style.display = page.classList.contains('active') ? 'block' : 'none';
             return;

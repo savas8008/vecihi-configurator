@@ -689,6 +689,7 @@ function handlePageData(pageType, pageData) {
             break;
         case 'outputs':
             if (typeof handleOutputsPageData === 'function') handleOutputsPageData(pageData);
+            if (typeof onOutputsPageDataForSitl === 'function') onOutputsPageDataForSitl(pageData);
             break;
         case 'mixer':
             if (typeof handleMixerPageData === 'function') handleMixerPageData(pageData);

@@ -106,7 +106,7 @@ betiği firmware reposundadır: `vecihi/sitl/` → `build_wasm.sh`.
 |---|---|
 | `assets/js/sitl.js` | Sayfa mantığı: WASM yükleme, kart config aktarımı, kare döngüsü, harita/3B, canlı RC |
 | `assets/sitl/sitl.js` | **Üretilmiş** WASM motoru (~200 KB, elle düzenlenmez) |
-| `configurator.html` | `#sitlPage` bloğu + `.nav-always` menü öğesi |
+| `configurator.html` | `#sitlPage` bloğu (normal "online" sayfa — bkz. aşağı) |
 | `assets/css/style.css` | `.sitl-*` sınıfları |
 
 ### Tasarım (2026-09-04'te değişti): senaryo formu yok, tamamen gerçek uçuş
@@ -142,9 +142,16 @@ ediyor. Kaldırılan yalnızca **tarayıcı sayfasının** senaryo formuydu.
 
 ### Bilinmesi gerekenler
 
-- **`.nav-always` / `.page-always`:** SITL, bağlantı durumundan bağımsız
-  görünen tek sayfadır. `page_management.js` bu iki sınıfı özel olarak ele
-  alır — bağlanınca sayfadan atmaz, menüden gizlemez.
+- **`.nav-always` artık SITL'de DEĞİL, Yer Kontrol'de.** SITL yeni tasarımda
+  (yukarı bkz.) gerçekten bağlantı gerektiriyor — karta bağlıysa ayarları
+  otomatik yüklüyor, "Başlat" gerçek canlı kumandaya bakıyor. Bu yüzden artık
+  **normal bir "online" sayfa**: menüde ve içerikte yalnızca bağlıyken
+  görünür, `page-always`/`nav-always` sınıfı YOK. Bunun yerine "Yer Kontrol"
+  menü öğesi `nav-always` oldu (2026-09-04) — uçak havadayken (elrs_backpack.html
+  ELRS Backpack üzerinden kablosuz bağlanır) configurator'ın kendi USB
+  bağlantısı zaten mümkün değil, o yüzden bu öğe bağlantı durumundan bağımsız
+  görünmeli. Yer Kontrol bir `.page` değildir (`window.open()` ile ayrı sekmede
+  açılır), bu yüzden yalnızca `nav-always` gerekiyor, `page-always` gerekmiyor.
 - **`sitl_page_data` diye bir firmware komutu YOKTUR.** `managePageStreams()`
   içinde `sitl` bilinçli olarak dışarıda bırakıldı; simülasyon tarayıcıda koşar,
   karttan yalnızca alıcı akışı okunur.

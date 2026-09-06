@@ -39,6 +39,14 @@ let sitlLiveChannels = null;   // son gelen 16 kanal
 let sitlChannelPtr = 0;        // WASM heap'inde 16*int4 tampon
 let sitlLastRxMs = 0;          // son alici paketinin zamani (tazelik gostergesi)
 
+// Son gelen outputs_page_data (govde tipi + servo min/mid/max/reverse).
+// param_list/modes_page_data'nin aksine bu alanlar hep bir varsayilanla dolu
+// geldigi icin (orn. selectedAircraft='v-tail') "doldu mu" kontrolu global
+// degiskeni sifirlayip poll etmekle guvenilir olmuyor — bunun yerine
+// serial_communication.js'in 'outputs' page_data'sini yakaladigi anda
+// dogrudan bu degiskene yazan bir hook (onOutputsPageDataForSitl) kullanilir.
+let sitlOutputsData = null;
+
 // Kalkis noktasi: kullanici haritada tiklayip secer (yoksa varsayilan kullanilir).
 let sitlSelectedHome = { lat: 39.925, lon: 32.866 };
 
@@ -106,6 +114,7 @@ async function sitlLoadModule() {
             kml:         sitlModule.cwrap('sitl_kml', 'string', []),
             setParam:    sitlModule.cwrap('sitl_set_param', 'number', ['string', 'number']),
             setMode:     sitlModule.cwrap('sitl_set_mode', 'number', ['string', 'number', 'number', 'number']),
+            setAircraftType: sitlModule.cwrap('sitl_set_aircraft_type', 'number', ['string']),
             resetConfig: sitlModule.cwrap('sitl_reset_config', null, []),
             configJson:  sitlModule.cwrap('sitl_config_json', 'string', [])
         };
@@ -221,7 +230,35 @@ async function sitlLoadBoardConfig() {
             sitlLog('Uçuş modu atamaları alınamadı (zaman aşımı).', 'error');
         }
 
-        sitlBoardConfigLoaded = (uygulanan > 0 || modAdedi > 0);
+        // --- 3) Gövde tipi ---
+        // param_list'te YOK (string alan) — ayrı komutla (outputs_page_data)
+        // çekilip setAircraftType() ile uygulanır. Bu aktarılmadan SITL her
+        // zaman "v-tail" varsayılanıyla koşuyordu: karttaki gerçek gövde tipi
+        // farklıysa (ör. flying-wing/conventional), mikser + fizik un-mix'i
+        // farklı yüzeyleri karıştırıyordu.
+        //
+        // NOT: servo_values (min/mid/max/reverse) da buradan çekilip ayrı bir
+        // setServo() ile aktarılıyordu — GERİ ALINDI (bkz. sohbet). Bu alanlar
+        // src/pwm_output.cpp'de sadece SAKLANIYOR, hiçbir çıkışı etkilemiyor;
+        // reverse'i SITL fiziğine de uygulamak (ayrıca denendi) yanlış bir
+        // varsayıma dayanıyordu ve roll/pitch'i pozitif geri beslemeyle
+        // sarmal sapmaya sokuyordu.
+        sitlLog('Kart ayarları isteniyor: gövde tipi…', 'info');
+        sitlOutputsData = null;
+        sendCommand('outputs_page_data');
+        const outputsOk = await sitlWaitFor(() => sitlOutputsData !== null, 5000, 150);
+
+        let outputsApplied = false;
+        if (outputsOk && sitlOutputsData && sitlOutputsData.aircraft_type) {
+            outputsApplied = sitlApi.setAircraftType(sitlOutputsData.aircraft_type) === 1;
+            sitlLog(outputsApplied
+                    ? `Gövde tipi (${sitlOutputsData.aircraft_type}) aktarıldı.`
+                    : 'Gövde tipi verisi geldi ama işlenemedi.', outputsApplied ? 'info' : 'warning');
+        } else {
+            sitlLog('Gövde tipi alınamadı (zaman aşımı) — varsayılan "v-tail" ile kalır.', 'warning');
+        }
+
+        sitlBoardConfigLoaded = (uygulanan > 0 || modAdedi > 0 || outputsApplied);
         sitlSetConfigStatus(sitlBoardConfigLoaded ? 'board' : 'error');
         sitlRenderConfigSummary();
 
@@ -299,7 +336,13 @@ function sitlBuildScenario() {
         duration_s: 3600,     // pratikte sinirsiz — Durdur'a basana/zemin temasina kadar
         dt_s: 0.002,
         arm: false,           // arm artik sitlStart()'ta forceArm() ile (salla-birak)
-        auto_launch: true,    // LAUNCH sekansi force-arm sonrasi otomatik tetiklenir
+        // auto_launch KASITLI OLARAK YOK: alan hic gecmezse SitlCore, kartin
+        // kendi LNCH_AUTO_ARM ayarina (yuklenmisse) dokunmuyor (bkz. scenario.h
+        // -1 sentinel'i). Eskiden burada sabit "true" vardi — kartin gercek
+        // ayarindan bagimsiz HER canli SITL ucusunu LAUNCH moduna zorluyordu;
+        // LAUNCH gercek bir el firlatmasi (ivme darbesi) gerektirdiginden
+        // ucak throttle=1000'de sonsuza dek L_READY'de kilitleniyordu (bkz.
+        // sohbet — ayrica SitlCore'a sentetik firlatma darbesi de eklendi).
         input: {
             live: true,
             // Kart ayarlari yuklendiyse (her zaman hedeflenen durum) mod
@@ -486,6 +529,16 @@ function onReceiverStreamForSitl(data) {
     sitlRenderChannels(data);
 }
 
+/**
+ * @brief serial_communication.js'in 'outputs' page_data'sını yakaladığı anda
+ *        çağrılır (bkz. handlePageData 'outputs' case'i). sitlLoadBoardConfig()
+ *        bunu sendCommand('outputs_page_data') sonrası poll eder.
+ * @param {Object} data outputs_page_data JSON'u (aircraft_type, servo_values, ...)
+ */
+function onOutputsPageDataForSitl(data) {
+    sitlOutputsData = data;
+}
+
 // ==================== GORSELLESTIRME ====================
 
 function sitlInitMap(lat, lon) {
@@ -566,6 +619,16 @@ function sitlInit3D() {
  * hesaba katmıyordu: gerçek bir sağ bankada (roll>0) ekranda SOL taraf aşağı
  * gidiyor, kullanıcıya sol banka gibi görünüyordu (haritadaki sağa dönüşle
  * çelişiyordu). İşaret ters çevrildi.
+ *
+ * `rotation.x = -s.pitch` (bkz. sohbet, roll'dan AYRI bir hata): bu, kamera
+ * kurulumundan bağımsız, saf 'YXZ' Euler/rotasyon matrisi matematiğinden
+ * çıkan bir işaret hatasıydı — kamera açısıyla ilgisi yok (roll'un aksine,
+ * dikey eksen kameranın hangi yönden baktığından etkilenmez). Rx(θ), model
+ * burnu (0,0,1)'i (0,-sinθ,cosθ)'ya taşır: `rotation.x = +pitch` ile pozitif
+ * pitch (fizikte "burun yukarı", tırmanış) burnun Y bileşenini NEGATİF yapıp
+ * görsel olarak burnu AŞAĞI gösteriyordu — pilot burun kaldırdığını görürken
+ * uçak aslında (görselde) burun eğiyormuş gibi çiziliyordu. İşaret ters
+ * çevrildi; artık pozitif pitch modelin burnunu gerçekten yukarı kaldırıyor.
  */
 function sitlRender3D(s) {
     if (!sitl3D) return;
@@ -573,7 +636,7 @@ function sitlRender3D(s) {
     sitl3D.model.rotation.set(0, 0, 0);
     sitl3D.model.rotation.order = 'YXZ';
     sitl3D.model.rotation.y = -s.yaw * d2r;
-    sitl3D.model.rotation.x =  s.pitch * d2r;
+    sitl3D.model.rotation.x = -s.pitch * d2r;
     sitl3D.model.rotation.z =  s.roll * d2r;
     sitl3D.renderer.render(sitl3D.scene, sitl3D.camera);
 }
