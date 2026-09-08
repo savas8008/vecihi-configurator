@@ -109,6 +109,7 @@ async function sitlLoadModule() {
             totalTicks:  sitlModule.cwrap('sitl_total_ticks', 'number', []),
             setChannels: sitlModule.cwrap('sitl_set_channels', null, ['number', 'number']),
             forceArm:    sitlModule.cwrap('sitl_force_arm', 'number', []),
+            triggerThrow:sitlModule.cwrap('sitl_trigger_throw', 'number', []),
             stateJson:   sitlModule.cwrap('sitl_state_json', 'string', []),
             events:      sitlModule.cwrap('sitl_events', 'string', []),
             kml:         sitlModule.cwrap('sitl_kml', 'string', []),
@@ -419,11 +420,24 @@ async function sitlStart() {
 
     sitlClearEvents();
     sitlDrainEvents();
-    sitlLog('Fırlatıldı — LAUNCH sekansı başlıyor.', 'info');
+    sitlLog('Arm edildi. Kumandada gazı yarım gaza alın, hazır olduğunuzda "Salla"ya basın.', 'info');
     sitlSetStatus('running');
     sitlUpdateButtons();
 
     if (!sitlRafId) sitlRafId = requestAnimationFrame(sitlFrame);
+}
+
+/**
+ * @brief "Salla" düğmesi: pilot yarım gaza aldıktan SONRA, istediği anda
+ *        fırlatma darbesini tetikler (bkz. sohbet — eskiden bu, throttle'ın
+ *        1100'ü geçtiği anla kenetliydi, kullanıcının kontrolünde değildi).
+ */
+function sitlTriggerThrow() {
+    if (!sitlApi || !sitlStarted) return;
+    const ok = sitlApi.triggerThrow();
+    if (!ok) {
+        sitlLog('Şimdi anlamsız — önce gazı yarım gaza alıp LAUNCH: HAZIR durumuna gelmeli.', 'warning');
+    }
 }
 
 function sitlPause() {
@@ -864,6 +878,7 @@ function sitlUpdateButtons() {
     const start = document.getElementById('sitlBtnStart');
     const pause = document.getElementById('sitlBtnPause');
     const stop  = document.getElementById('sitlBtnStop');
+    const shake = document.getElementById('sitlBtnShake');
     if (start) start.disabled = sitlStarted && sitlRunning;
     if (pause) {
         pause.disabled = !sitlStarted;
@@ -872,6 +887,10 @@ function sitlUpdateButtons() {
             : '<i class="bi bi-play-fill me-1"></i> Devam';
     }
     if (stop) stop.disabled = !sitlStarted;
+    // Ne zaman anlamli oldugunu (LAUNCH: HAZIR) WASM zaten triggerThrow()
+    // icinde kontrol ediyor (bkz. sitlTriggerThrow) — burada sadece
+    // simulasyon kosarken tiklanabilir olmasi yeterli.
+    if (shake) shake.disabled = !(sitlStarted && sitlRunning);
 }
 
 // ==================== KML ====================
