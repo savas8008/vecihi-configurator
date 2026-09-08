@@ -2929,7 +2929,8 @@ label.small.text-muted,
 }
 
 /* Offline sayfalar: tam panel içinde padding ile */
-.page-offline {
+.page-offline,
+.page-always {
     padding: 8px 4px;
 }
 
@@ -3591,3 +3592,195 @@ label.small.text-muted,
 }
 .param-save-btn .param-save-label { margin-left: 5px; font-size: 0.72rem; font-weight: 600; }
 @media (max-width: 1200px) { .param-save-btn .param-save-label { display: none; } }
+
+/* ==================== SITL (Simülatör) Sayfası ==================== */
+
+.sitl-status-label { font-size: 0.68rem; color: var(--color-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+.sitl-status-val   { font-size: 0.92rem; font-weight: 600; }
+
+.sitl-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, 360px) 1fr;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.sitl-card {
+    background: var(--bg-panel-2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+.sitl-card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--color-brand-blue);
+}
+.sitl-label {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--color-secondary);
+    margin-bottom: 2px;
+}
+.sitl-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sitl-hint  { font-size: 0.7rem; color: var(--color-secondary); margin: 6px 0 0; line-height: 1.45; }
+
+.sitl-danger-box {
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid var(--color-danger);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    color: #fecaca;
+}
+
+.sitl-launch-coords {
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-top: 8px;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+.sitl-rx-status { font-size: 0.72rem; margin-top: 8px; color: var(--color-secondary); }
+.sitl-rx-bars   { margin-top: 6px; }
+.sitl-rx-row    { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; font-size: 0.68rem; }
+.sitl-rx-row > span { width: 12px; color: var(--color-secondary); }
+.sitl-rx-row > b    { width: 38px; text-align: right; font-weight: 500; }
+.sitl-rx-track  { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+.sitl-rx-fill   { height: 100%; width: 0; background: linear-gradient(90deg, #0d6efd, #0dcaf0); transition: width 60ms linear; }
+
+.sitl-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.sitl-speed-sel { width: auto; min-width: 140px; }
+
+.sitl-view-grid {
+    display: grid;
+    grid-template-columns: 1fr minmax(240px, 300px);
+    gap: 10px;
+}
+.sitl-map {
+    height: 420px;
+    border-radius: 10px;
+    background: var(--bg-panel-3);
+    border: 1px solid rgba(255,255,255,0.07);
+    transition: height 0.25s ease;
+}
+.sitl-map.sitl-map-expanded {
+    height: 75vh;
+}
+.sitl-side { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.sitl-3d {
+    height: 170px;
+    border-radius: 10px;
+    background: var(--bg-panel-3);
+    border: 1px solid rgba(255,255,255,0.07);
+    overflow: hidden;
+}
+.sitl-stall-badge {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: var(--color-danger);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+}
+
+.sitl-readouts { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.sitl-ro {
+    background: var(--bg-panel-2);
+    border-radius: 6px;
+    padding: 5px 7px;
+    display: flex;
+    flex-direction: column;
+}
+.sitl-ro-wide { grid-column: 1 / -1; }
+.sitl-ro > span { font-size: 0.62rem; color: var(--color-secondary); }
+.sitl-ro > b    { font-size: 0.85rem; font-weight: 600; }
+
+.sitl-att-table {
+    background: var(--bg-panel-2);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.72rem;
+}
+.sitl-att-table > div { display: flex; justify-content: space-between; padding: 1px 0; }
+.sitl-att-table > div > span { color: var(--color-secondary); width: 46px; }
+.sitl-att-table > div > b { width: 62px; text-align: right; font-weight: 600; }
+.sitl-att-table > div > i { width: 62px; text-align: right; font-style: normal; color: var(--color-brand-blue); }
+.sitl-att-head { border-top: 1px solid rgba(255,255,255,0.08); margin-top: 3px; padding-top: 3px !important; }
+.sitl-att-head > b, .sitl-att-head > i { font-size: 0.62rem !important; color: var(--color-secondary) !important; font-weight: 400 !important; }
+
+.sitl-log {
+    margin-top: 10px;
+    height: 140px;
+    overflow-y: auto;
+    background: var(--bg-panel-3);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.7rem;
+    line-height: 1.5;
+}
+.sitl-log-line    { white-space: pre-wrap; word-break: break-word; }
+.sitl-log-info    { color: #cbd5e1; }
+.sitl-log-warning { color: var(--color-warning); }
+.sitl-log-error   { color: var(--color-danger); }
+
+.sitl-limits {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    color: var(--color-secondary);
+    line-height: 1.5;
+    background: rgba(129,140,248,0.07);
+    border-left: 3px solid var(--color-brand-blue);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 10px;
+}
+
+@media (max-width: 1200px) {
+    .sitl-layout    { grid-template-columns: 1fr; }
+    .sitl-view-grid { grid-template-columns: 1fr; }
+    .sitl-map       { height: 320px; }
+}
+
+/* SITL — kart ayarları kartı */
+.sitl-cfg-badge {
+    float: right;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--color-warning);
+}
+.sitl-cfg-summary {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.7rem;
+}
+.sitl-cfg-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 2px 0;
+}
+.sitl-cfg-row > span { color: var(--color-secondary); white-space: nowrap; }
+.sitl-cfg-row > b    { text-align: right; font-weight: 600; }
+.sitl-cfg-modes {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255,255,255,0.08);
+}
+.sitl-cfg-modes > span { display: block; color: var(--color-secondary); margin-bottom: 2px; }
+.sitl-cfg-modes > b    { font-weight: 600; line-height: 1.5; word-break: break-word; }

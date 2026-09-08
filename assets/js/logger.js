@@ -51,12 +51,6 @@
             });
             filterLogs();
         }
-        function clearLogs() {
-            if (logContainer.children.length > 0) {
-                logContainer.innerHTML = '';
-                log('🗑️ Loglar temizlendi', 'warning');
-            }
-        }
         function clearAllLogs() {
             if (confirm('Tüm loglar ve istatistikler silinecek. Emin misiniz?')) {
                 logContainer.innerHTML = '';

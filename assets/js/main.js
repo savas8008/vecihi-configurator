@@ -161,16 +161,12 @@ function setupEventListeners() {
         });
     });
 
-    // --- Log Sayfası ---
-    $('btnSendCommand').addEventListener('click', sendCommandFromInput);
-    $('btnLogClear').addEventListener('click', clearLogs);
-    $('btnLogClearAll').addEventListener('click', clearAllLogs);
-    $('btnLogExport').addEventListener('click', exportLogs);
-    $('logLevelFilter').addEventListener('change', filterLogs);
-    $('autoScroll').addEventListener('change', toggleAutoScroll);
-    $('pauseLogs').addEventListener('change', togglePauseLogs);
-    $('btnLogSearch').addEventListener('click', searchLogs);
-    $('btnClearSearch').addEventListener('click', clearSearch);
+    // Log sayfası dinleyicileri BURADA DEĞİL — configurator.html'in sonundaki
+    // satır-içi <script> bloğu (btnSendCommand/btnLogClearAll/... civarı) bunları
+    // zaten bağlıyor; o blok DOMContentLoaded'dan önce (HTML parse sırasında)
+    // çalıştığı için burada tekrar bağlamak çift dinleyici (ör. "Temizle"nin iki
+    // kez onay sorması) yaratırdı. `logSearch` Enter kısayolu istisna — o inline
+    // blokta yok, o yüzden burada kalmalı.
     $('logSearch').addEventListener('keypress', (e) => e.key === 'Enter' && searchLogs());
 }
 

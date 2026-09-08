@@ -7,7 +7,7 @@
  * Web Serial API çalışmak için HTTPS veya localhost gerektirir.
  */
 
-const CACHE_NAME = 'vecihi-v3';
+const CACHE_NAME = 'vecihi-v4';
 
 // Önbelleğe alınacak statik dosyalar
 const STATIC_ASSETS = [
@@ -35,6 +35,11 @@ const STATIC_ASSETS = [
   './assets/js/outputs.js',
   './assets/js/outputs_page.js',
   './assets/js/firmware.js',
+  './assets/js/sitl.js',
+  // NOT: './assets/sitl/sitl.js' (WASM motoru, ~180 KB) bilerek listede DEGIL —
+  // yalnizca SITL sayfasina girilince dinamik <script> ile yukleniyor, boylece
+  // ilk acilista indirilmiyor. Cevrimdisi kullanim icin tarayici onu ilk
+  // ziyaretten sonra kendi HTTP onbelleginden servis eder.
 ];
 
 // Install: Statik varlıkları önbelleğe al

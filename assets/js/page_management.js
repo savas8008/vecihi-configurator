@@ -56,6 +56,11 @@ function changePage(targetPage) {
     if (targetPage === 'firmware') {
         if (typeof initFirmwarePage === 'function') initFirmwarePage();
     }
+    if (targetPage === 'sitl') {
+        // SITL bağlantı gerektirmez ama tam uçuş için gerekir (kart config'i
+        // + gerçek kumanda). Bağlıysa initSitlPage() ayarları otomatik yükler.
+        if (typeof initSitlPage === 'function') initSitlPage();
+    }
     if (targetPage === 'kml') {
         // Leaflet harita varsa invalidate
         if (typeof _kmlMap !== 'undefined' && _kmlMap) {
@@ -104,7 +109,9 @@ function managePageStreams(page) {
             // Parametre tablosu ayri protokol kullanir (param_list, parcali dump)
             if (typeof requestParamList === 'function') requestParamList();
             else sendCommand('param_list');
-        } else if (page !== 'sensors' && page !== 'blackbox') {
+        } else if (page !== 'sensors' && page !== 'blackbox' && page !== 'sitl') {
+            // sitl: firmware'de 'sitl_page_data' diye bir komut YOK — simülasyon
+            // tarayıcıda koşar, karttan yalnızca alıcı akışı okunur.
             // blackbox: firmware'de 'blackbox_page_data' diye bir komut YOK.
             // Uçuş kaydı sayfaya girince otomatik çekilmez — kullanıcı "Logu Oku"
             // butonuna basınca tek seferlik 'dump' gönderilir (dump uzun sürer,
@@ -181,6 +188,14 @@ function startPageSpecificStream(page) {
         case 'firmware':
             log('Bağlam: Firmware -> Versiyon bilgisi yükleniyor', 'info');
             if (typeof initFirmwarePage === 'function') initFirmwarePage();
+            break;
+
+        case 'sitl':
+            // Simülasyon tarayıcıda koşar; karttan yalnızca alıcı kanalları
+            // okunur. Kumanda her zaman canlı sürer (senaryo/betik girdisi
+            // yok), o yüzden bağlıyken koşulsuz başlatılır.
+            log('Bağlam: SITL -> Gerçek kumanda için Receiver Stream Başlatılıyor', 'info');
+            sendCommand('start_receiver_stream');
             break;
 
         case 'blackbox':
@@ -391,11 +406,17 @@ function updateConnectionStatus() {
     }
 
     // Offline sayfalar: bağlantısız da çalışır
-    const OFFLINE_PAGES = new Set(['kml', 'firmware', 'docs']);
+    const OFFLINE_PAGES = new Set(['kml', 'firmware', 'docs', 'sitl']);
     const offlinePageActive = OFFLINE_PAGES.has(currentPage);
 
+    // Bağlantı kurulunca sayfadan ATILMAYACAK olanlar. SITL hem bağlantısız
+    // (senaryo modu) hem de kart bağlıyken (gerçek kumandadan canlı kanal
+    // girdisi) kullanılır; kullanıcıyı sensörlere atmak tam da bu iş akışını
+    // bozar — kartı zaten SITL için bağlamıştır.
+    const KEEP_ON_CONNECT = new Set(['sitl']);
+
     // 2. Bağlantı durumu değişince otomatik sayfa yönlendir
-    if (connected && offlinePageActive) {
+    if (connected && offlinePageActive && !KEEP_ON_CONNECT.has(currentPage)) {
         changePage('sensors');
         return;
     }
@@ -440,10 +461,21 @@ function updateConnectionStatus() {
     // Navigasyon menüsü: online↔offline görünürlük
     document.querySelectorAll('.nav-link[data-page]').forEach(nav => {
         const navPage = nav.getAttribute('data-page');
-        const isOfflineNav = nav.closest('.nav-offline') !== null
-                          || ['kml','firmware','docs'].includes(navPage);
+        // .nav-always: bağlantı durumundan bağımsız görünen öğeler (Yer Kontrol —
+        // uçak havadayken USB bağlantısı zaten mümkün değil, ELRS Backpack
+        // üzerinden kablosuz bağlanır; ayrı bir sekmede açılır, .page değildir).
+        const isAlwaysNav = nav.closest('.nav-always') !== null;
+        const isOfflineNav = !isAlwaysNav
+                          && (nav.closest('.nav-offline') !== null
+                              || ['kml','firmware','docs'].includes(navPage));
 
-        if (isOfflineNav) {
+        if (isAlwaysNav) {
+            nav.style.display = '';
+            nav.style.opacity = '1';
+            nav.style.pointerEvents = 'auto';
+            nav.style.cursor = 'pointer';
+            nav.classList.toggle('active', navPage === currentPage);
+        } else if (isOfflineNav) {
             // Offline öğeler: sadece bağlantısız iken
             nav.style.display = connected ? 'none' : '';
             if (!connected) {
@@ -489,6 +521,14 @@ function updateConnectionStatus() {
     // Sayfa görünürlüğü
     document.querySelectorAll('.page').forEach(page => {
         const isOfflinePg = page.classList.contains('page-offline');
+        // .page-always: bağlantı durumundan bağımsız, aktifse görünür. Şu an
+        // hiçbir sayfa kullanmıyor (Yer Kontrol .page değil, ayrı sekmede açılır;
+        // SITL artık gerçek bağlantı gerektirdiği için normal "online" sayfa) —
+        // gelecekte "her iki durumda da çalışan" bir sayfa için hazır kalsın.
+        if (page.classList.contains('page-always')) {
+            page.style.display = page.classList.contains('active') ? 'block' : 'none';
+            return;
+        }
 
         if (!connected) {
             // Bağlantısız: sadece aktif offline sayfayı göster

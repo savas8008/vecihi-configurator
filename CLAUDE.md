@@ -95,6 +95,100 @@ Kısa anahtar (`<key>`) firmware'deki JSON alanıyla **birebir aynı** olmalı;
 
 ---
 
+## Simülatör (SITL) Sayfası
+
+`configurator.html` → sol menü **Simülatör (SITL)**. Uçağın gerçek uçuş
+yazılımı WebAssembly'ye derlenip tarayıcıda koşar; bu repoda **kaynak yok**,
+yalnızca derlenmiş çıktı (`assets/sitl/sitl.js`) durur. Kaynağı ve derleme
+betiği firmware reposundadır: `vecihi/sitl/` → `build_wasm.sh`.
+
+| Dosya | Ne |
+|---|---|
+| `assets/js/sitl.js` | Sayfa mantığı: WASM yükleme, kart config aktarımı, kare döngüsü, harita/3B, canlı RC |
+| `assets/sitl/sitl.js` | **Üretilmiş** WASM motoru (~200 KB, elle düzenlenmez) |
+| `configurator.html` | `#sitlPage` bloğu (normal "online" sayfa — bkz. aşağı) |
+| `assets/css/style.css` | `.sitl-*` sınıfları |
+
+### Tasarım (2026-09-04'te değişti): senaryo formu yok, tamamen gerçek uçuş
+
+Önceden sayfada bir "senaryo formu" vardı (uçuş modu select, ev konumu,
+rüzgar, süre, tırmanış fazı, arm/auto-launch anahtarları, ayrı bir "canlı
+kumanda" açma-kapama anahtarı). Bu **kaldırıldı** — kullanıcı geri bildirimi:
+"panelden uçuş yönetmek mantıklı olmuyor, mod seçmek bir şey ifade etmiyor."
+
+Yeni akış:
+1. Sayfaya girilince karta bağlıysa `sitlLoadBoardConfig()` **otomatik**
+   çalışır (kullanıcı butona basmaz).
+2. Kumanda **her zaman canlı** sürer — ayrı bir "canlı kumanda" anahtarı yok,
+   `sitlBuildScenario()` her zaman `input.live=true` gönderir. Uçuş modu
+   seçimi tamamen gerçek switch'lerinizden gelir.
+3. Kullanıcı haritada bir noktaya **tıklayarak** kalkış konumunu seçer
+   (`sitlOnMapClick()` → `sitlSelectedHome`).
+4. **"Başlat" = salla-bırak.** Kanal bilmeden (arm kanalı okunamıyor, bkz.
+   aşağı) zorla arm eden gerçek `stick_force_arm()`'ı çağırır — throttle
+   kumandada rölantide değilse arm reddedilir (gerçek güvenlik: `sitl_wasm.cpp`
+   → `sitl_force_arm()` → `SitlCore::forceArm()`). Arm olunca
+   `config.nav.auto_launch_on_arm=true` sayesinde LAUNCH sekansı otomatik
+   başlar — ayrı bir "auto launch" anahtarı yok.
+5. Okuma paneli sadeleştirildi: "İniş fazı" (la_state), TRUE/EST çift
+   sütunları (irtifa, rüzgar, tutum hatası) kaldırıldı — yalnızca **kestirim**
+   (gerçek telemetride görünecek değerler) gösteriliyor. TRUE/ground-truth
+   karşılaştırması artık yalnızca komut satırı (`sitl.exe`) çıktısında var.
+
+**Komut satırı (`vecihi/sitl/scenarios/*.json` + `sitl.exe`) DEĞİŞMEDİ** —
+senaryo dosyası şeması, mod seçimi, `climb_phase_s` vb. hâlâ orada; geliştirici
+regresyon testi (ör. RTH/LAND_ASSIST hata avlama) o yoldan yapılmaya devam
+ediyor. Kaldırılan yalnızca **tarayıcı sayfasının** senaryo formuydu.
+
+### Bilinmesi gerekenler
+
+- **`.nav-always` artık SITL'de DEĞİL, Yer Kontrol'de.** SITL yeni tasarımda
+  (yukarı bkz.) gerçekten bağlantı gerektiriyor — karta bağlıysa ayarları
+  otomatik yüklüyor, "Başlat" gerçek canlı kumandaya bakıyor. Bu yüzden artık
+  **normal bir "online" sayfa**: menüde ve içerikte yalnızca bağlıyken
+  görünür, `page-always`/`nav-always` sınıfı YOK. Bunun yerine "Yer Kontrol"
+  menü öğesi `nav-always` oldu (2026-09-04) — uçak havadayken (elrs_backpack.html
+  ELRS Backpack üzerinden kablosuz bağlanır) configurator'ın kendi USB
+  bağlantısı zaten mümkün değil, o yüzden bu öğe bağlantı durumundan bağımsız
+  görünmeli. Yer Kontrol bir `.page` değildir (`window.open()` ile ayrı sekmede
+  açılır), bu yüzden yalnızca `nav-always` gerekiyor, `page-always` gerekmiyor.
+- **`sitl_page_data` diye bir firmware komutu YOKTUR.** `managePageStreams()`
+  içinde `sitl` bilinçli olarak dışarıda bırakıldı; simülasyon tarayıcıda koşar,
+  karttan yalnızca alıcı akışı okunur.
+- **Canlı kanal girdisi** `serial_communication.js` → `case 'receiver'` içinden
+  `onReceiverStreamForSitl()` ile gelir. Alıcı akışını başlatan tek yer
+  `startPageSpecificStream('sitl')`'dir (600 ms gecikmeli, artık koşulsuz
+  gönderiyor) — başka yerden göndermeyin, firmware'in tek `current_command`
+  bayrağına aynı anda iki komut gitmiş olur.
+- **WASM motoru sayfaya girilince dinamik `<script>` ile yüklenir**, `sw.js`
+  listesinde bilerek yoktur (ilk açılışta ~200 KB indirmemek için).
+- **Kart ayarları aktarımı** (`sitlLoadBoardConfig()`, artık otomatik
+  tetiklenir): `param_list` ile 172 parametre, `modes_page_data` ile mod
+  switch atamaları okunup WASM'e verilir. İki komut **sırayla** gönderilir
+  (firmware'in tek `current_command` bayrağı) — birincisi tamamlanmadan
+  ikincisi yollanmaz.
+- **Arm kanalı aktarılamaz** — firmware onu hiçbir okuma komutuyla vermiyor
+  (`vecihi/GOREVLER.md` B45). Bu yüzden "Başlat" kanal-tabanlı arm YERİNE
+  `sitl_force_arm()` (→ gerçek `stick_force_arm()`) kullanıyor — hangi
+  kanalın arm switch'i olduğunu bilmeye gerek yok, throttle rölantide mi
+  kontrolü yeterli.
+- **`board_modes` mantığı** (`sitl/scenarios/scenario.cpp`
+  `activate_scenario_mode()`): kart config'i yüklüyken bir modun switch
+  atamasına yalnızca **gerçekten atanmışsa** (channel≥1) dokunmuyor;
+  atanmamışsa yine de zorla aktive ediyor. Bu ayrım önemli — tersi (her
+  zaman dokunma) test edilmek istenen ama karttan atanmamış bir modun asla
+  devreye girmemesine yol açar (bkz. sohbet: LAND_ASSIST'in sonsuza dek
+  ANGLE'da takılı kalması).
+- **Firmware'de imza/global değiştiyse WASM yeniden derlenmeli**, yoksa sayfa
+  eski ikiliyi koşturmaya devam eder.
+
+⚠️ **Güvenlik metnini zayıflatmayın:** kart kendi uçuş mantığını da koşar ve
+arm switch'i açılınca (ya da "Başlat"a basılınca) motor/servo çıkışları
+gerçekten canlanır. "PERVANEYİ SÖKÜN" uyarısı sayfada her zaman görünür
+olmalı — artık bir anahtara bağlı değil.
+
+---
+
 ## Tespit Edilen Eksikleri Kaydetme
 
 Bu repoda bir iş sırasında tespit edilen ama o an kapsam dışı bırakılan eksikler
