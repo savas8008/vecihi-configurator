@@ -628,6 +628,66 @@
             background: var(--primary-pale); color: var(--primary); border: 1px solid var(--primary-mid);
         }
         .tile-source-badge.local { background: var(--green-pale); color: var(--green); border-color: var(--green-mid); }
+
+        /* ── DEBUG KONSOLU ── */
+        .debug-panel {
+            margin: 0 14px 14px;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #0b0f14;
+        }
+        .debug-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 14px;
+            background: #111827;
+            color: #94a3b8;
+            cursor: pointer;
+            user-select: none;
+        }
+        .debug-header:hover { background: #16202f; }
+        .debug-title {
+            display: flex; align-items: center; gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; font-weight: 600; letter-spacing: .3px;
+        }
+        .debug-badge {
+            background: #1e293b; color: #94a3b8; border-radius: 10px;
+            padding: 1px 8px; font-size: 10px; font-family: 'JetBrains Mono', monospace;
+        }
+        .debug-actions { display: flex; align-items: center; gap: 10px; }
+        .debug-btn {
+            background: transparent; border: 1px solid #334155; color: #94a3b8;
+            border-radius: 6px; padding: 3px 9px; font-size: 11px; cursor: pointer;
+        }
+        .debug-btn:hover { background: #1e293b; color: #e2e8f0; }
+        .debug-body {
+            max-height: 240px; overflow-y: auto;
+            padding: 8px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px; line-height: 1.7;
+        }
+        .debug-panel.collapsed .debug-body { display: none; }
+        .debug-panel.collapsed #debugChevron { transform: rotate(180deg); }
+        .debug-line { white-space: pre-wrap; word-break: break-word; }
+        .debug-line .dt { color: #475569; margin-right: 8px; }
+        .debug-line .dm { color: #cbd5e1; }
+        .debug-line.lvl-ok   .dm { color: #4ade80; }
+        .debug-line.lvl-warn .dm { color: #fbbf24; }
+        .debug-line.lvl-err  .dm { color: #f87171; }
+        .debug-line.lvl-data .dm { color: #38bdf8; }
+        .debug-line.lvl-tx   .dm { color: #c084fc; }
+
+        /* ── ARAZİ RADARI ── */
+        #terrainRadarCanvas { display: block; margin: 0 auto; background: #04140c; border-radius: 8px; }
+        .terrain-warn {
+            margin-top: 10px; text-align: center; font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
+            background: var(--surface-2); color: var(--text-2);
+        }
+        .terrain-warn.safe   { background: var(--green-pale);  color: var(--green); }
+        .terrain-warn.warn   { background: var(--yellow-pale); color: var(--yellow); }
+        .terrain-warn.danger { background: var(--red-pale);    color: var(--red); }
     </style>
 </head>
 <body>
@@ -953,8 +1013,29 @@
             </div>
         </div>
 
+        <!-- Arazi Radarı -->
+        <div class="card card-slate">
+            <div class="card-head"><i class="bi bi-broadcast"></i> Arazi Radarı (Heading)</div>
+            <div class="card-body">
+                <canvas id="terrainRadarCanvas" width="280" height="190"></canvas>
+                <div class="terrain-warn" id="terrainWarnText">Konum/heading bekleniyor...</div>
+            </div>
+        </div>
+
     </div>
 </div><!-- /main -->
+
+<!-- ── DEBUG KONSOLU ── -->
+<div class="debug-panel" id="debugPanel">
+    <div class="debug-header" onclick="toggleDebugPanel()">
+        <div class="debug-title"><i class="bi bi-terminal-fill"></i> Debug Konsolu <span class="debug-badge" id="debugCount">0</span></div>
+        <div class="debug-actions">
+            <button class="debug-btn" onclick="event.stopPropagation(); clearDebugLog();"><i class="bi bi-trash3"></i> Temizle</button>
+            <i class="bi bi-chevron-up" id="debugChevron"></i>
+        </div>
+    </div>
+    <div class="debug-body" id="debugBody"></div>
+</div>
 
 <script>
 // ============================================================
@@ -987,6 +1068,37 @@ let mapCentered = false;
 // GCS kontrolü state
 let gcsActive = false;
 let _requestedModeIdx = -1; // Kullanıcının tıkladığı ama henüz uçaktan onaylanmamış mod
+
+// ============================================================
+//  DEBUG KONSOLU — bağlantı aşamaları, proxy süreçleri, uçaktan gelen veriler
+// ============================================================
+let _debugCount = 0;
+const _debugPrev = { flightMode: null, armed: null, failsafe: null, gcsActive: null };
+
+function debugLog(message, level = 'info') {
+    const body = document.getElementById('debugBody');
+    if (!body) return;
+    const line = document.createElement('div');
+    line.className = 'debug-line lvl-' + level;
+    const dt = document.createElement('span'); dt.className = 'dt';
+    dt.textContent = new Date().toLocaleTimeString('tr-TR', { hour12: false });
+    const dm = document.createElement('span'); dm.className = 'dm';
+    dm.textContent = message;
+    line.append(dt, dm);
+    body.appendChild(line);
+    while (body.children.length > 300) body.removeChild(body.firstChild);
+    body.scrollTop = body.scrollHeight;
+    const badge = document.getElementById('debugCount');
+    if (badge) badge.textContent = ++_debugCount;
+}
+function toggleDebugPanel() {
+    document.getElementById('debugPanel').classList.toggle('collapsed');
+}
+function clearDebugLog() {
+    document.getElementById('debugBody').innerHTML = '';
+    _debugCount = 0;
+    document.getElementById('debugCount').textContent = '0';
+}
 
 const telemetry = {
     roll: 0, pitch: 0, yaw: 0,
@@ -1134,9 +1246,28 @@ function renderAll() {
     renderWind();
     renderChannels();
     renderFailsafe();
+    updateTerrainRadar();
 }
 
 function renderStatus() {
+    // Uçaktan gelen veride anlamlı değişiklikleri debug konsoluna yaz
+    if (telemetry.flightMode !== _debugPrev.flightMode) {
+        if (_debugPrev.flightMode !== null) debugLog(`[RX] Uçuş modu: ${_debugPrev.flightMode} → ${telemetry.flightMode}`, 'data');
+        _debugPrev.flightMode = telemetry.flightMode;
+    }
+    if (telemetry.armed !== _debugPrev.armed) {
+        if (_debugPrev.armed !== null) debugLog(`[RX] ${telemetry.armed ? 'ARM edildi' : 'DISARM edildi'}`, telemetry.armed ? 'warn' : 'data');
+        _debugPrev.armed = telemetry.armed;
+    }
+    if (telemetry.failsafe !== _debugPrev.failsafe) {
+        if (_debugPrev.failsafe !== null) debugLog(`[RX] Failsafe ${telemetry.failsafe ? 'BAŞLADI' : 'temizlendi'}`, telemetry.failsafe ? 'err' : 'ok');
+        _debugPrev.failsafe = telemetry.failsafe;
+    }
+    if (telemetry.gcsActive !== _debugPrev.gcsActive) {
+        if (_debugPrev.gcsActive !== null) debugLog(`[RX] GCS switch ${telemetry.gcsActive ? 'AÇIK — YKİ kontrolde' : 'KAPALI — kumanda kontrolde'}`, 'data');
+        _debugPrev.gcsActive = telemetry.gcsActive;
+    }
+
     const el   = document.getElementById('flightModeBadge');
     const mode = telemetry.flightMode;
     el.textContent = mode;
@@ -1429,6 +1560,201 @@ function drawWindCompass(dir, valid) {
 }
 
 // ============================================================
+//  ARAZİ RADARI — heading yönünde arazi yüksekliği uyarısı
+// ============================================================
+// Fiziksel bir mesafe sensörü yok; uçağın GPS konumu+heading'i (COG) ile
+// Open-Meteo'nun ücretsiz yükseklik API'sinden alınan arazi rakımı
+// karşılaştırılıyor. Sonuçlar IndexedDB'de önbelleklenir — bölge internet
+// varken bir kez taranırsa, backpack'in WiFi'sine bağlıyken (internetsiz)
+// sahada da önbellekten çalışmaya devam eder.
+const TERRAIN_RAY_ANGLES = [-30, -15, 0, 15, 30];               // heading'e göre derece
+const TERRAIN_RANGES_M   = [500, 1000, 1500, 2500, 3500, 5000]; // metre
+const TERRAIN_GRID_DEG   = 0.0015;   // ~150m — önbellek çözünürlüğü
+const TERRAIN_REFETCH_DIST_M      = 300;
+const TERRAIN_REFETCH_HEADING_DEG = 15;
+const TERRAIN_REFETCH_MS          = 60000;
+
+let _terrainDb = null;
+let _terrainLast = { lat: null, lon: null, cog: null, t: 0 };
+let _terrainProfile = null; // [{angle, points:[{dist, elev}]}]
+let _terrainFetchInFlight = false;
+
+function _openTerrainDb() {
+    if (_terrainDb) return Promise.resolve(_terrainDb);
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open('vecihi-elevation', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('points');
+        req.onsuccess = e => { _terrainDb = e.target.result; resolve(_terrainDb); };
+        req.onerror = reject;
+    });
+}
+function _gridKey(lat, lon) {
+    const glat = Math.round(lat / TERRAIN_GRID_DEG) * TERRAIN_GRID_DEG;
+    const glon = Math.round(lon / TERRAIN_GRID_DEG) * TERRAIN_GRID_DEG;
+    return { key: glat.toFixed(4) + ',' + glon.toFixed(4), lat: glat, lon: glon };
+}
+function _terrainDbGet(key) {
+    return _openTerrainDb().then(db => new Promise((resolve) => {
+        const req = db.transaction('points', 'readonly').objectStore('points').get(key);
+        req.onsuccess = () => resolve(req.result !== undefined ? req.result : null);
+        req.onerror = () => resolve(null);
+    })).catch(() => null);
+}
+function _terrainDbSet(key, elevation) {
+    _openTerrainDb().then(db => {
+        db.transaction('points', 'readwrite').objectStore('points').put(elevation, key);
+    }).catch(() => {});
+}
+
+function haversineM(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const φ1 = lat1*Math.PI/180, φ2 = lat2*Math.PI/180;
+    const dφ = (lat2-lat1)*Math.PI/180, dλ = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
+    return 2*R*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+// Enlem/boylam + açı(derece) + mesafe(m) → hedef nokta (küresel Dünya yaklaşımı)
+function destinationPoint(lat, lon, bearingDeg, distM) {
+    const R = 6371000;
+    const δ = distM / R, θ = bearingDeg * Math.PI / 180;
+    const φ1 = lat * Math.PI / 180, λ1 = lon * Math.PI / 180;
+    const φ2 = Math.asin(Math.sin(φ1)*Math.cos(δ) + Math.cos(φ1)*Math.sin(δ)*Math.cos(θ));
+    const λ2 = λ1 + Math.atan2(Math.sin(θ)*Math.sin(δ)*Math.cos(φ1), Math.cos(δ)-Math.sin(φ1)*Math.sin(φ2));
+    return { lat: φ2*180/Math.PI, lon: ((λ2*180/Math.PI)+540)%360-180 };
+}
+
+async function fetchElevations(points) {
+    const results = new Array(points.length).fill(null);
+    const missing = [];
+    for (let i = 0; i < points.length; i++) {
+        const cached = await _terrainDbGet(points[i].key);
+        if (cached !== null) results[i] = cached; else missing.push(i);
+    }
+    if (missing.length === 0 || !navigator.onLine) return results;
+
+    try {
+        const lats = missing.map(i => points[i].lat.toFixed(4)).join(',');
+        const lons = missing.map(i => points[i].lon.toFixed(4)).join(',');
+        const resp = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lons}`);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        missing.forEach((idx, j) => {
+            const elev = data.elevation && data.elevation[j];
+            if (typeof elev === 'number') { results[idx] = elev; _terrainDbSet(points[idx].key, elev); }
+        });
+        debugLog(`[Radar] ${missing.length} arazi noktası indirildi`, 'ok');
+    } catch (e) {
+        debugLog(`[Radar] Arazi verisi alınamadı (çevrimdışı olabilir): ${e.message}`, 'warn');
+    }
+    return results;
+}
+
+async function updateTerrainRadar() {
+    const t = telemetry;
+    const hasPos = t.lat !== null && Math.abs(t.lat) > 0.001;
+    if (!hasPos || _terrainFetchInFlight) return;
+
+    const now = Date.now();
+    const moved = _terrainLast.lat === null ? Infinity : haversineM(_terrainLast.lat, _terrainLast.lon, t.lat, t.lon);
+    const hDiff = _terrainLast.cog === null ? Infinity : Math.min(Math.abs(t.cog - _terrainLast.cog), 360 - Math.abs(t.cog - _terrainLast.cog));
+    if (moved < TERRAIN_REFETCH_DIST_M && hDiff < TERRAIN_REFETCH_HEADING_DEG && (now - _terrainLast.t) < TERRAIN_REFETCH_MS) return;
+
+    _terrainFetchInFlight = true;
+    _terrainLast = { lat: t.lat, lon: t.lon, cog: t.cog, t: now };
+
+    const rayPoints = TERRAIN_RAY_ANGLES.map(angleOffset => {
+        const bearing = (t.cog + angleOffset + 360) % 360;
+        return TERRAIN_RANGES_M.map(dist => {
+            const dest = destinationPoint(t.lat, t.lon, bearing, dist);
+            const g = _gridKey(dest.lat, dest.lon);
+            return { dist, lat: g.lat, lon: g.lon, key: g.key };
+        });
+    });
+    const flat = rayPoints.flat();
+    const elevations = await fetchElevations(flat);
+
+    let idx = 0;
+    _terrainProfile = TERRAIN_RAY_ANGLES.map((angleOffset, ri) => ({
+        angle: angleOffset,
+        points: rayPoints[ri].map(p => ({ dist: p.dist, elev: elevations[idx++] }))
+    }));
+    _terrainFetchInFlight = false;
+    drawTerrainRadar();
+}
+
+function drawTerrainRadar() {
+    const canvas = document.getElementById('terrainRadarCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height, cx = w/2, cy = h - 12;
+    const maxRange = TERRAIN_RANGES_M[TERRAIN_RANGES_M.length-1];
+    const maxR = h - 24;
+
+    ctx.fillStyle = '#04140c'; ctx.fillRect(0,0,w,h);
+
+    ctx.strokeStyle = 'rgba(74,222,128,.25)'; ctx.lineWidth = 1;
+    ctx.font = '9px JetBrains Mono, monospace'; ctx.fillStyle = 'rgba(74,222,128,.55)'; ctx.textAlign = 'center';
+    TERRAIN_RANGES_M.forEach(rangeM => {
+        const rr = (rangeM/maxRange) * maxR;
+        ctx.beginPath(); ctx.arc(cx, cy, rr, (-135)*Math.PI/180, (-45)*Math.PI/180); ctx.stroke();
+        ctx.fillText((rangeM/1000).toFixed(1)+'km', cx + Math.cos(-45*Math.PI/180)*rr, cy + Math.sin(-45*Math.PI/180)*rr);
+    });
+    [-45,45].forEach(a => {
+        const rad = (a-90)*Math.PI/180;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(rad)*maxR, cy+Math.sin(rad)*maxR); ctx.stroke();
+    });
+    ctx.strokeStyle = 'rgba(74,222,128,.7)';
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx, cy-maxR); ctx.stroke();
+    ctx.fillStyle = '#4ade80';
+    ctx.beginPath(); ctx.moveTo(cx,cy-8); ctx.lineTo(cx-6,cy+4); ctx.lineTo(cx+6,cy+4); ctx.closePath(); ctx.fill();
+
+    if (!_terrainProfile) {
+        ctx.fillStyle = 'rgba(148,163,184,.8)'; ctx.font = '11px JetBrains Mono, monospace';
+        ctx.fillText('Arazi verisi bekleniyor...', cx, cy - maxR/2);
+        updateTerrainWarnText(null);
+        return;
+    }
+
+    const aircraftAlt = telemetry.gpsAlt;
+    // En yakın tehlike/dikkat noktası öncelikli: uzaktaki daha yüksek bir tepe
+    // yerine, önce karşılaşılacak engeli göstermek daha kullanışlı.
+    let nearestDanger = null, nearestCaution = null;
+    _terrainProfile.forEach(ray => {
+        const rad = (ray.angle-90)*Math.PI/180;
+        ray.points.forEach(p => {
+            if (typeof p.elev !== 'number' || !aircraftAlt) return;
+            const diff = p.elev - aircraftAlt; // + ise arazi uçaktan yüksek
+            const rr = (p.dist/maxRange) * maxR;
+            const px = cx + Math.cos(rad)*rr, py = cy + Math.sin(rad)*rr;
+            const color = diff >= 0 ? '#f87171' : diff > -100 ? '#fbbf24' : 'rgba(74,222,128,.7)';
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2); ctx.fill();
+            if (diff >= 0 && (nearestDanger === null || p.dist < nearestDanger.dist)) nearestDanger = { dist: p.dist, diff };
+            else if (diff > -100 && (nearestCaution === null || p.dist < nearestCaution.dist)) nearestCaution = { dist: p.dist, diff };
+        });
+    });
+    updateTerrainWarnText(nearestDanger || nearestCaution);
+}
+
+function updateTerrainWarnText(worst) {
+    const el = document.getElementById('terrainWarnText');
+    if (!el) return;
+    if (!telemetry.gpsAlt || !_terrainProfile) {
+        el.textContent = 'GPS irtifası veya arazi verisi bekleniyor...';
+        el.className = 'terrain-warn';
+    } else if (!worst) {
+        el.textContent = 'Önde yüksek arazi yok';
+        el.className = 'terrain-warn safe';
+    } else if (worst.diff >= 0) {
+        el.textContent = `⚠ ${Math.round(worst.dist)}m'de +${Math.round(worst.diff)}m arazi (irtifa altında/eşit!)`;
+        el.className = 'terrain-warn danger';
+    } else {
+        el.textContent = `${Math.round(worst.dist)}m'de arazi ${Math.round(-worst.diff)}m altında — dikkat`;
+        el.className = 'terrain-warn warn';
+    }
+}
+
+// ============================================================
 //  MAP
 // ============================================================
 let _activeTileLayer = null;
@@ -1522,11 +1848,15 @@ function selectMode(btn) {
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active', 'pending', 'confirmed'));
     btn.classList.add('pending');
     if (isReady()) {
+        debugLog(`[TX] Mod isteği gönderildi: ${btn.dataset.mode}`, 'tx');
         sendRaw(buildModePacket(idx).buffer);
+    } else {
+        debugLog(`[TX] Mod isteği gönderilemedi (bağlantı yok): ${btn.dataset.mode}`, 'warn');
     }
 }
 
 function handleAck(seq, result) {
+    debugLog(`[RX] ACK seq=${seq} → ${result === 0 ? 'kabul edildi' : 'reddedildi (' + result + ')'}`, result === 0 ? 'data' : 'warn');
     const el = document.getElementById('ackToast');
     if (!el) return;
     el.textContent = result === 0 ? '✓ Komut iletildi' : '✗ Komut reddedildi';
@@ -1565,7 +1895,8 @@ function sendCmdRetry(buildFn, retries = 4, interval = 150) {
 }
 
 function sendCmd(type, data = {}) {
-    if (!isReady()) return;
+    if (!isReady()) { debugLog(`[TX] Komut gönderilemedi (bağlantı yok): ${type}`, 'warn'); return; }
+    debugLog(`[TX] Komut gönderildi: ${type}`, 'tx');
     switch (type) {
         case 'FORCE_ARM': sendCmdRetry(() => buildCmdPacket(0x03, new Uint8Array([1]))); break;
         case 'RTH':       sendCmdRetry(() => buildModePacket(6)); break;
@@ -1580,6 +1911,23 @@ function sendCmd(type, data = {}) {
 // ============================================================
 //  BAĞLANTI MOD SEÇİCİ
 // ============================================================
+// Sayfa açılır açılmaz yerel launcher'a (tools/ground_control_launcher.py,
+// bkz. tools/start_ground_control.cmd) proxy'yi başlatması için istek gönderir.
+// Launcher çalışmıyorsa sessizce yoksayılır — proxy elle de başlatılabilir.
+function tryAutoLaunchProxy() {
+    debugLog('[Proxy] Launcher\'a başlatma isteği gönderiliyor (127.0.0.1:8766)...', 'info');
+    fetch('http://127.0.0.1:8766/launch-ground-control', { method: 'POST' })
+        .then(async r => {
+            const d = await r.json().catch(() => ({}));
+            if (r.ok && d.ok) {
+                debugLog(`[Proxy] ${(d.launched || []).join(', ') || 'başlatıldı'}`, 'ok');
+            } else {
+                debugLog(`[Proxy] Başlatma başarısız: ${d.error || 'bilinmeyen hata'}`, 'err');
+            }
+        })
+        .catch(() => debugLog("[Proxy] Launcher servisi kapalı — tools\\start_ground_control.cmd çalıştırın veya proxy'yi elle başlatın.", 'warn'));
+}
+
 function setConnMode(mode) {
     if (isConnected) return;
     connMode = mode;
@@ -1783,6 +2131,7 @@ function setStatus(state, text) {
     const dot = document.getElementById('statusDot');
     dot.className = 'status-dot' + (state==='connected'?' ok': state==='connecting'?' warn':'');
     document.getElementById('statusText').textContent = text;
+    debugLog(text, state === 'connected' ? 'ok' : state === 'connecting' ? 'info' : 'warn');
 }
 
 function startPktRate() {
@@ -1896,9 +2245,11 @@ function clearSavedTiles() {
         .catch(() => alert('Silme işlemi başarısız oldu.'));
 }
 window.addEventListener('DOMContentLoaded', () => {
+    tryAutoLaunchProxy();
     initMap();
     drawHorizon(0, 0);
     drawWindCompass(0, false);
+    drawTerrainRadar();
     renderChannels();
     // 50Hz stick heartbeat — Web Worker (sekme arkaplanda olsa bile throttle edilmez)
     // gcsActive=false iken paket gönderilmez: YKİ, GCS switch kapalıyken yalnızca telemetri izler.

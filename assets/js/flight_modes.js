@@ -32,7 +32,7 @@ const modeDefinitions = [
     { key: 'rth',         name: 'RTH (Eve Dön)',                cat: 'nav',    requiresGps: true,  colorRgb: '16,185,129',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'waypoint',    name: 'WAYPOINT',                     cat: 'nav',    requiresGps: true,  colorRgb: '0,161,38',    defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'land_assist', name: 'LAND ASSIST (İniş Asistanı)', cat: 'nav',    requiresGps: true,  colorRgb: '234,179,8',   defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
-    { key: 'gcs',         name: 'GCS KONTROL (Yer İstasyonu)', cat: 'nav',    requiresGps: true,  colorRgb: '168,85,247',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
+    { key: 'gcs',         name: 'GCS KONTROL (Yer İstasyonu)', cat: 'nav',    requiresGps: false, colorRgb: '168,85,247',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'cruise',      name: 'CRUISE',                       cat: 'nav',    requiresGps: false, colorRgb: '99,102,241',  defaultMin: 1500, defaultMax: 1700, defaultCh: 0 },
     { key: 'althold',     name: 'ALTITUDE HOLD',                cat: 'nav',    requiresGps: false, colorRgb: '6,182,212',   defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
     { key: 'loiter',      name: 'LOITER (Sabit Daire)',          cat: 'nav',    requiresGps: true,  colorRgb: '132,204,22',  defaultMin: 1800, defaultMax: 2100, defaultCh: 0 },
