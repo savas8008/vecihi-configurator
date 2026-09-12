@@ -674,10 +674,29 @@ function sitlPushTrackPoint(lat, lon) {
     sitlTrackLine.setLatLngs(sitlTrack);
 }
 
+// Simule durumu ~10 Hz'de karta geri gonderir: kart, gercek ucustaki AYNI
+// MAVLink telemetri vericisiyle (receiver.cpp) bunu alici->RF->kumanda->
+// backpack->Yer Kontrol zincirine basar — GCS sayfasi kaynagin simule
+// oldugunu hic bilmez. Push kesilirse kart 500ms sonra gercek sensor
+// verisine otomatik doner (bkz. vecihi/src/receiver.cpp: sitl_override_fresh).
+let _lastSitlPushMs = 0;
+function sitlPushTelemetryToBoard(s, nowMs) {
+    if (!isConnected) return;
+    if (nowMs - _lastSitlPushMs < 100) return;
+    _lastSitlPushMs = nowMs;
+    sendCommand('SITL_PUSH_TELEMETRY ' + JSON.stringify({
+        lat: s.lat, lon: s.lon, alt: s.ealt,
+        roll: s.eroll, pitch: s.epitch, yaw: s.eyaw,
+        armed: !!s.armed, mode: s.mode,
+        windSpeed: s.wind, windDir: s.windDir, windValid: !!s.windValid
+    }));
+}
+
 function sitlRender() {
     if (!sitlApi) return;
     let s;
     try { s = JSON.parse(sitlApi.stateJson()); } catch (e) { return; }
+    sitlPushTelemetryToBoard(s, performance.now());
 
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
     const f = (v, d) => (typeof v === 'number' ? v.toFixed(d) : '—');
