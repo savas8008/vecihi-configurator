@@ -25,6 +25,37 @@ let sitlStarted = false;       // init edildi mi
 let sitlSpeed = 1.0;           // duvar saati carpani (0 = sinirsiz)
 let sitlRafId = null;
 let sitlLastFrameMs = 0;
+
+// Sekme arka plana alininca requestAnimationFrame durur (tarayici throttle
+// eder) — ama artik SITL, kart uzerinden gercek GCS sayfasina telemetri
+// basiyor (bkz. sitlPushTelemetryToBoard), bu yuzden arka planda durmasi
+// kabul edilemez. elrs_backpack.html'deki 50Hz stick zamanlayicisinin ayni
+// sorunu inline Web Worker ile cozdugu desen burada da kullaniliyor: Worker'in
+// kendi setInterval'i throttle edilmiyor, gorunurken hala rAF (~60Hz) kullanilir.
+const _sitlBgWorkerCode = 'setInterval(function(){ postMessage(1); }, 100);';
+let _sitlBgWorker = null;
+
+function sitlStartBgDriver() {
+    if (_sitlBgWorker) return;
+    const blob = new Blob([_sitlBgWorkerCode], { type: 'application/javascript' });
+    _sitlBgWorker = new Worker(URL.createObjectURL(blob));
+    _sitlBgWorker.onmessage = () => sitlFrame(performance.now());
+}
+function sitlStopBgDriver() {
+    if (_sitlBgWorker) { _sitlBgWorker.terminate(); _sitlBgWorker = null; }
+}
+// Her sitlFrame() cagrisinda kendi kendini duzeltir: gorunurken rAF'a,
+// gizliyken Worker suruculere gecer. Ayri bir visibilitychange dinleyicisine
+// gerek yok.
+function sitlScheduleNext() {
+    if (document.hidden) {
+        sitlRafId = null;
+        sitlStartBgDriver();
+    } else {
+        sitlStopBgDriver();
+        sitlRafId = requestAnimationFrame(sitlFrame);
+    }
+}
 let sitlTickAccum = 0;         // artakalan simulasyon zamani (sn)
 let sitlDt = 0.002;
 
@@ -108,6 +139,7 @@ async function sitlLoadModule() {
             tick:        sitlModule.cwrap('sitl_tick', 'number', []),
             totalTicks:  sitlModule.cwrap('sitl_total_ticks', 'number', []),
             setChannels: sitlModule.cwrap('sitl_set_channels', null, ['number', 'number']),
+            setGcsOverride: sitlModule.cwrap('sitl_set_gcs_override', null, ['number', 'number', 'number', 'number', 'number', 'number']),
             forceArm:    sitlModule.cwrap('sitl_force_arm', 'number', []),
             triggerThrow:sitlModule.cwrap('sitl_trigger_throw', 'number', []),
             stateJson:   sitlModule.cwrap('sitl_state_json', 'string', []),
@@ -424,7 +456,7 @@ async function sitlStart() {
     sitlSetStatus('running');
     sitlUpdateButtons();
 
-    if (!sitlRafId) sitlRafId = requestAnimationFrame(sitlFrame);
+    if (!sitlRafId && !_sitlBgWorker) sitlScheduleNext();
 }
 
 /**
@@ -446,7 +478,7 @@ function sitlPause() {
     if (sitlRunning) {
         sitlLastFrameMs = performance.now();
         sitlTickAccum = 0;
-        if (!sitlRafId) sitlRafId = requestAnimationFrame(sitlFrame);
+        if (!sitlRafId && !_sitlBgWorker) sitlScheduleNext();
         sitlSetStatus('running');
     } else {
         sitlSetStatus('paused');
@@ -459,20 +491,24 @@ function sitlStop() {
     sitlRunning = false;
     sitlStarted = false;
     if (sitlRafId) { cancelAnimationFrame(sitlRafId); sitlRafId = null; }
+    sitlStopBgDriver();
     sitlSetStatus('ready');
     sitlUpdateButtons();
     sitlStopEngineSound();
 }
 
 /**
- * @brief Her animasyon karesinde cagrilir: gecen duvar saati kadar tick kosar.
+ * @brief Her karede cagrilir: gecen duvar saati kadar tick kosar.
  *
- * Sekme arka plana alininca requestAnimationFrame durur ve simulasyon da
- * duraklar — bir simulator icin dogru davranis (gercek uçaga komut GITMIYOR,
- * bu yuzden elrs_backpack.html'deki Web Worker geregi burada yok).
+ * Gorunurken requestAnimationFrame (~60Hz), sekme arka plana alininca Web
+ * Worker metronomu (~10Hz, throttle edilmez) tarafindan tetiklenir — bkz.
+ * sitlScheduleNext(). SITL artik gercek karttan GCS sayfasina telemetri
+ * bastigindan (sitlPushTelemetryToBoard), arka planda durmasi o akisi da
+ * keserdi; elrs_backpack.html'deki 50Hz stick zamanlayicisinin ayni sorunu
+ * Web Worker ile cozdugu desenin ayni buraya da uygulandi.
  */
 function sitlFrame(nowMs) {
-    sitlRafId = requestAnimationFrame(sitlFrame);
+    sitlScheduleNext();
     if (!sitlRunning || !sitlStarted) return;
 
     const wallDt = Math.min((nowMs - sitlLastFrameMs) / 1000, 0.25); // uzun donmalarda sicrama yapma
@@ -536,11 +572,25 @@ function sitlFrame(nowMs) {
  * @brief Karttan gelen alici akisini yakalar (serial_communication.js cagirir).
  * @param {Array<number>} data 16 kanal PWM degeri
  */
-function onReceiverStreamForSitl(data) {
+function onReceiverStreamForSitl(data, meta) {
     if (!Array.isArray(data) || data.length < 4) return;
     sitlLiveChannels = data;
     sitlLastRxMs = performance.now();
     sitlRenderChannels(data);
+
+    // Gercek Yer Kontrol (GCS) sayfasindan RF/backpack uzerinden karta ulasan
+    // mod/stick komutlari — ayni akisin kardeş alanlarinda (bkz.
+    // receiver.cpp: send_receiver_data()) tasiniyor. WASM'in paylasilan
+    // flight_modes.cpp'si bunlari gercek uçustaki AYNI mod-arbitraj/setpoint
+    // mantigiyla isler, burada yeni kontrol kodu yazilmiyor.
+    if (meta && sitlApi && sitlApi.setGcsOverride && Array.isArray(meta.gcsOverride)) {
+        sitlApi.setGcsOverride(
+            meta.gcsMode | 0,
+            meta.gcsOverride[0] | 0, meta.gcsOverride[1] | 0,
+            meta.gcsOverride[2] | 0, meta.gcsOverride[3] | 0,
+            meta.gcsFresh ? 1 : 0
+        );
+    }
 }
 
 /**

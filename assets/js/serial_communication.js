@@ -651,7 +651,7 @@ function handleStandardJsonData(data) {
         return;
     }
     if (data.stream_data) {
-        handleStreamData(data.stream_data.type, data.stream_data.data);
+        handleStreamData(data.stream_data.type, data.stream_data.data, data.stream_data);
         return;
     }
     if (data.status) {
@@ -731,20 +731,23 @@ function handlePageData(pageType, pageData) {
 /**
  * @brief Stream verilerini ilgili handler'a yönlendirir
  * @param {string} streamType - Stream tipi
- * @param {Object} streamData - Stream verileri
+ * @param {Object} streamData - Stream verileri (data alanı)
+ * @param {Object} [raw] - Ham stream_data nesnesi (data'nın kardeş alanları
+ *   için — örn. 'receiver' akışındaki gcsMode/gcsOverride/gcsFresh, SITL'in
+ *   GCS override'ı için kullanır)
  */
-function handleStreamData(streamType, streamData) {
+function handleStreamData(streamType, streamData, raw) {
     switch (streamType) {
-        case 'quaternion': 
-            if (typeof handleQuaternionStream === 'function') handleQuaternionStream(streamData); 
+        case 'quaternion':
+            if (typeof handleQuaternionStream === 'function') handleQuaternionStream(streamData);
             break;
-        case 'pwm':        
-            if (typeof handlePwmStream === 'function') handlePwmStream(streamData); 
+        case 'pwm':
+            if (typeof handlePwmStream === 'function') handlePwmStream(streamData);
             break;
         case 'receiver':
             if (typeof handleReceiverStream === 'function') handleReceiverStream(streamData);
             // SITL sayfasi canli kumanda girdisi olarak ayni akisi kullanir
-            if (typeof onReceiverStreamForSitl === 'function') onReceiverStreamForSitl(streamData);
+            if (typeof onReceiverStreamForSitl === 'function') onReceiverStreamForSitl(streamData, raw);
             break;
         case 'gyro':       
             if (typeof handleGyroStream === 'function') handleGyroStream(streamData); 
