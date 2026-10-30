@@ -13,6 +13,33 @@ const FIRMWARE_PUBLIC_BASE = 'https://savas8008.github.io/vecihi-public/';
 const FIRMWARE_MANIFEST_URL = FIRMWARE_PUBLIC_BASE + 'manifest.json';
 const FIRMWARE_VERSIONS_URL = FIRMWARE_PUBLIC_BASE + 'versions.json';
 
+// Bu configurator'ın flaşlamasına izin verilen firmware ana sürümü.
+// serial_communication.js'deki COMPATIBLE_FIRMWARE_MAJOR'dan okunur — böylece
+// aynı dosya hem kökteki (v2) hem /v1/ arşivindeki configurator'da doğru
+// sürüm ailesini seçer. Kök manifest.json her zaman "en son sürüm"ü gösterdiği
+// için (bkz. vecihi CI), arşiv configurator'ın onu kullanması yanlış ana sürümü
+// flaşlatırdı; manifest bu yüzden versions.json'dan seçiliyor.
+const FIRMWARE_TARGET_MAJOR = (typeof COMPATIBLE_FIRMWARE_MAJOR !== 'undefined') ? COMPATIBLE_FIRMWARE_MAJOR : 1;
+
+function firmwareMajorOf(version) {
+    return parseInt(String(version || '').split('.')[0], 10);
+}
+
+/**
+ * @brief versions.json'ı çeker; bu configurator'ın ana sürümüne ait girdileri
+ *        (en yeni en üstte) ve diğerlerini ayrı ayrı döndürür.
+ */
+async function fetchFirmwareVersions() {
+    const response = await fetch(FIRMWARE_VERSIONS_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const versions = await response.json();
+    if (!Array.isArray(versions)) throw new Error('Geçersiz liste');
+    return {
+        compatible: versions.filter(v => firmwareMajorOf(v.version) === FIRMWARE_TARGET_MAJOR),
+        others: versions.filter(v => firmwareMajorOf(v.version) !== FIRMWARE_TARGET_MAJOR)
+    };
+}
+
 /**
  * @brief Firmware manifest bilgilerini yükler ve UI'ı günceller
  */
@@ -23,7 +50,15 @@ async function loadFirmwareInfo() {
     if (!versionEls.length) return;
 
     try {
-        const response = await fetch(FIRMWARE_MANIFEST_URL, { cache: 'no-store' });
+        // Bu ana sürümün en yeni manifest'i; listede yoksa (ör. v2 configurator
+        // yayında ama 2.0 firmware henüz derlenmedi) kök manifest'e düşülür.
+        let manifestUrl = FIRMWARE_MANIFEST_URL;
+        try {
+            const { compatible } = await fetchFirmwareVersions();
+            if (compatible.length) manifestUrl = FIRMWARE_PUBLIC_BASE + compatible[0].manifest;
+        } catch (e) { /* kök manifest'le devam */ }
+
+        const response = await fetch(manifestUrl, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const manifest = await response.json();
@@ -87,18 +122,22 @@ async function loadFirmwareVersions() {
     if (!selects.length) return;
 
     try {
-        const response = await fetch(FIRMWARE_VERSIONS_URL, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const versions = await response.json();
-        if (!Array.isArray(versions) || versions.length === 0) throw new Error('Boş liste');
+        const { compatible, others } = await fetchFirmwareVersions();
+        // Yalnızca bu configurator'ın ana sürümü listelenir. Hiç yoksa (geçiş anı:
+        // configurator yeni ana sürüme geçti ama firmware henüz yayınlanmadı) diğer
+        // sürümler etiketlenerek gösterilir — bağlanınca sürüm kontrolü kullanıcıyı
+        // uygun configurator'a yönlendirir.
+        const versions = compatible.length ? compatible : others;
+        if (versions.length === 0) throw new Error('Boş liste');
 
         selects.forEach(select => {
             select.innerHTML = '';
             versions.forEach(entry => {
                 const option = document.createElement('option');
                 option.value = FIRMWARE_PUBLIC_BASE + entry.manifest;
-                option.textContent = `v${entry.version} — ${entry.date || '—'}`;
+                const foreign = firmwareMajorOf(entry.version) !== FIRMWARE_TARGET_MAJOR;
+                option.textContent = `v${entry.version} — ${entry.date || '—'}` +
+                    (foreign ? ` (bu configurator v${FIRMWARE_TARGET_MAJOR}.x içindir)` : '');
                 select.appendChild(option);
             });
             select.disabled = false;

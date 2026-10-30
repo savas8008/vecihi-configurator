@@ -23,7 +23,7 @@ let postConnectDataTimer = null;     // Bağlantı sonrası veri gelmezse uçuş
 // Bu configurator'ın konuştuğu firmware ana sürümü. Yalnızca MAJOR (ilk nokta öncesi)
 // kısmı karşılaştırılır — MINOR/PATCH değişiklikleri wire format'ı bozmadığı sürece
 // bu sabiti güncellemeye gerek yoktur.
-const COMPATIBLE_FIRMWARE_MAJOR = 1;
+const COMPATIBLE_FIRMWARE_MAJOR = 2;
 let _versionWarningShown = false; // Bağlantı başına tek uyarı göster
 
 // === CFG_SET / CFG_COMMIT ACK MEKANİZMASI ===
@@ -474,17 +474,27 @@ function handleStandardJsonData(data) {
         // --- SÜRÜM UYUMLULUK KONTROLÜ ---
         // Cihaz her bağlantıda kendi firmware_version'ını bildirir; MAJOR kısmı
         // bu configurator'ın desteklediğinden farklıysa kullanıcı uyarılır (bağlantı kesilmez).
-        if (sensors.firmware_version && !_versionWarningShown) {
+        // firmware_version alanı 1.3'te eklendi; göndermeyen kart 1.3 öncesidir (v1.x).
+        if (!_versionWarningShown) {
+            if (!sensors.firmware_version) sensors.firmware_version = '1.x (<1.3)';
             const deviceMajor = parseInt(String(sensors.firmware_version).split('.')[0], 10);
             if (!isNaN(deviceMajor) && deviceMajor !== COMPATIBLE_FIRMWARE_MAJOR) {
                 _versionWarningShown = true;
                 log(`⚠️ Sürüm uyumsuzluğu: cihaz v${sensors.firmware_version}, configurator v${COMPATIBLE_FIRMWARE_MAJOR}.x ile uyumlu`, 'warning');
                 if (typeof showModal === 'function') {
+                    // Cihaz eski (v1.x) ise arşivlenmiş uyumlu configurator'a yönlendir
+                    // (bkz. /v1/ klasörü — v2 öncesi son configurator anlık görüntüsü).
+                    const olderHint = deviceMajor < COMPATIBLE_FIRMWARE_MAJOR
+                        ? `<p class="small"><a href="v1/configurator.html">v${deviceMajor}.x için arşivlenmiş configurator'a geçin</a>
+                             ya da bağlantıyı kesip Firmware sekmesinden v${COMPATIBLE_FIRMWARE_MAJOR}.x'e yükseltin
+                             (ayarlarınız otomatik taşınır).</p>`
+                        : '';
                     showModal(
                         'Sürüm Uyumsuzluğu',
                         `<div class="text-center">
                             <p>Bağlı cihaz <strong>firmware v${sensors.firmware_version}</strong> kullanıyor, bu configurator ise <strong>v${COMPATIBLE_FIRMWARE_MAJOR}.x</strong> ile uyumlu.</p>
                             <p class="small">Devam edebilirsiniz ancak bazı ayarlar hatalı görünebilir veya kaydedilemeyebilir. Lütfen bu firmware sürümüne uygun configurator'ı kullanın.</p>
+                            ${olderHint}
                         </div>`,
                         'warning'
                     );

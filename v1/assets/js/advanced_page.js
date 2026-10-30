@@ -1,0 +1,845 @@
+// Copyright (c) 2024-2026 savas8008 - All Rights Reserved
+// Bu dosyanın izinsiz kopyalanması, değiştirilmesi veya dağıtılması yasaktır.
+
+/**
+ * @file advanced_page.js
+ * @brief Gelişmiş ayarlar sayfası yönetimi
+ * Vecihi Configurator için modüler JS
+ */
+
+// === GLOBAL DEĞİŞKENLER ===
+
+let advancedConfig = {
+    filters: {
+        gyro_lpf_hz: 60,
+        rpm_filter_enabled: true,
+        gyro_lpf_enabled: true,
+        rpm_min_freq: 100,
+        rpm_max_freq: 400,
+        rpm_bw_percent: 0.2
+    },
+    mahony: {
+        kp: 2.0,
+        ki: 0.05,
+        accel_lpf_hz: 3.0,
+        centrifugal_fade: 20.0
+    },
+    nav: { 
+        // Temel Ayarlar
+        rth_altitude: 50, 
+        max_bank_angle: 45, 
+        cruise_throttle: 1450, 
+        
+        // Navigasyon ve Stall
+        rth_radius: 50,
+        loiter_direction: 1,
+        stall_speed_kmh: 29.0,
+        climb_throttle: 1700,
+        descend_throttle: 1100,
+        
+        // Navigasyon PID
+        nav_p: 1.5, 
+        nav_i: 0.05, 
+        nav_d: 0.0,
+
+        // GPS Donanım
+        has_gps: false,
+        gps_protocol: 0,
+
+        // Launch
+        launch_throttle: 1700,
+        launch_angle: 20,
+        launch_time: 2000,
+        auto_launch_on_arm: true,
+        disarm_on_landing: true,
+        lock_disarm_while_flying: true
+    },
+    misc: {
+        tpa: 0.00,
+        esc_hz: 50,
+        servo_hz: 50
+    },
+    // Altitude & GPS Karışımı
+    alt_config: { 
+        baro_p: 1.0, 
+        acc_z_p: 1.5, 
+        acc_z_i: 0.1, 
+        use_gps: true, 
+        gps_weight: 0.05 
+    },
+    // Kart Hizalama
+    calib_extra: {
+        trim_roll: 0.0,
+        trim_pitch: 0.0
+    },
+    // Waypoint misyon genel
+    nav_wp: {
+        wp_capture_radius: 25
+    },
+    // Flaperon
+    flaperon_offset: 150,
+    // Sanal Akım Sensörü
+    virt_current: {
+        scale:   30.0,
+        idle:     0.5,
+        calib:    1.0,
+        cap_mah: 2200
+    },
+    // Batarya Donanımı
+    battery: {
+        adc_pin:    -1,
+        adc_scale:  11.0,
+        cell_min_v: 3.0,
+        cell_max_v: 4.2
+    },
+    // İniş Asistanı Ayarları
+    land_assist: {
+        circuit_alt: 50,
+        final_approach_distance: 0,
+        circuit_width: 60,
+        flare_alt: 3.0,
+        flare_throttle: 1000,
+        flare_pitch_deg: 4.0,
+        flare_alt_margin: 1.0,
+        stick_cancel_thr: 100,
+        thr_cancel_thr: 1150,
+        min_wind_speed: 2.0,
+        manual_runway_hdg: 0.0
+    },
+};
+
+// === VERİ İŞLEME ===
+
+/**
+ * @brief ESP'den gelen advanced sayfa verilerini işler
+ * @param {Object} data - Gelen veri objesi
+ */
+function handleAdvancedPageData(data) {
+    // 1) Filtreler (kısmi veri gelirse default kaybolmasın)
+    if (data.filters) {
+        advancedConfig.filters = Object.assign({}, advancedConfig.filters, data.filters);
+    }
+
+    // 2) Mahony
+    if (data.mahony) {
+        advancedConfig.mahony = Object.assign({}, advancedConfig.mahony, data.mahony);
+    }
+
+    // 3) Nav
+    if (data.nav) {
+        advancedConfig.nav = Object.assign({}, advancedConfig.nav, data.nav);
+    }
+
+    // 4) Misc
+    if (data.misc) {
+        advancedConfig.misc = Object.assign({}, advancedConfig.misc, data.misc);
+    }
+
+    // 5) Altitude config
+    if (data.alt_config) {
+        advancedConfig.alt_config = Object.assign({}, advancedConfig.alt_config, data.alt_config);
+    }
+
+    // 6) Trim
+    if (data.calib_extra) {
+        advancedConfig.calib_extra = Object.assign({}, advancedConfig.calib_extra, data.calib_extra);
+    }
+
+    // 7) Nav waypoint
+    if (data.nav_wp) {
+        advancedConfig.nav_wp = Object.assign({}, advancedConfig.nav_wp, data.nav_wp);
+    }
+
+    // 8) Landing Assist
+    if (data.land_assist) {
+        advancedConfig.land_assist = Object.assign({}, advancedConfig.land_assist, data.land_assist);
+    }
+
+    // 9) Flaperon Offset
+    if (data.flaperon_offset !== undefined) {
+        advancedConfig.flaperon_offset = data.flaperon_offset;
+    }
+
+    // 10) Sanal Akım Sensörü
+    if (data.virt_current) {
+        advancedConfig.virt_current = Object.assign({}, advancedConfig.virt_current, data.virt_current);
+    }
+
+    // 11) Batarya Donanımı
+    if (data.battery) {
+        advancedConfig.battery = Object.assign({}, advancedConfig.battery, data.battery);
+    }
+
+    // 12) Kamikaze
+    if (data.kamikaze) {
+        advancedConfig.kamikaze = Object.assign({}, advancedConfig.kamikaze, data.kamikaze);
+        const setElVal = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v; };
+        setElVal('km_def_dive_angle',    data.kamikaze.dive_angle);
+        setElVal('km_def_alt_offset',    data.kamikaze.alt_offset);
+        setElVal('km_def_trigger_alt',   data.kamikaze.trigger_alt);
+        setElVal('km_def_mission_servo', data.kamikaze.mission_servo);
+    }
+
+    // 13) Pitot
+    if (data.pitot) {
+        const enEl = document.getElementById('pitotEnabled');
+        const scEl = document.getElementById('pitotScale');
+        if (enEl) enEl.checked = !!data.pitot.enabled;
+        if (scEl && data.pitot.scale !== undefined) scEl.value = data.pitot.scale.toFixed(2);
+    }
+
+    updateAdvancedUI();
+}
+
+// === UI GÜNCELLEME ===
+
+/**
+ * @brief advancedConfig objesindeki verileri UI'a yansıtır
+ */
+function updateAdvancedUI() {
+    const getEl = (id) => document.getElementById(id);
+
+    const setVal = (id, v) => {
+        const el = getEl(id);
+        if (!el || v === undefined || v === null) return;
+        el.value = v;
+    };
+
+    const setChk = (id, v) => {
+        const el = getEl(id);
+        if (!el || v === undefined || v === null) return;
+        el.checked = !!v;
+    };
+
+    // --- Filters ---
+    if (advancedConfig.filters) {
+        const f = advancedConfig.filters;
+        setChk("inp_gyro_lpf_enabled", f.gyro_lpf_enabled);
+        setVal("inp_gyro_lpf_hz", f.gyro_lpf_hz);
+        setChk("inp_rpm_filter_enabled", f.rpm_filter_enabled);
+        setVal("inp_rpm_min_freq", f.rpm_min_freq);
+        setVal("inp_rpm_max_freq", f.rpm_max_freq);
+        setVal("inp_rpm_bw_percent", f.rpm_bw_percent);
+    }
+
+    // --- Mahony ---
+    if (advancedConfig.mahony) {
+        setVal("inp_mahony_kp", advancedConfig.mahony.kp);
+        setVal("inp_mahony_ki", advancedConfig.mahony.ki);
+        setVal("inp_accel_lpf_hz", advancedConfig.mahony.accel_lpf_hz);
+    }
+
+    // --- Nav ---
+    if (advancedConfig.nav) {
+        const n = advancedConfig.nav;
+
+        // Angle mode limitleri
+        setVal("inp_ang_lim_roll", n.ang_lim_roll);
+        setVal("inp_ang_lim_pitch", n.ang_lim_pitch);
+
+        // Auto launch
+        setChk("inp_auto_launch_on_arm", n.auto_launch_on_arm);
+        setChk("inp_disarm_on_landing", n.disarm_on_landing);
+        setChk("inp_lock_disarm_while_flying", n.lock_disarm_while_flying);
+        setVal("inp_launch_acc_threshold", n.launch_acc_threshold);
+        setVal("inp_launch_throttle", n.launch_throttle);
+        setVal("inp_launch_time", n.launch_time);
+        setVal("inp_launch_altitude", n.launch_altitude);
+        setVal("inp_launch_angle", n.launch_angle);
+        setVal("inp_launch_spool_time", n.launch_spool_time);
+
+        // Stall koruması
+        setVal("inp_stall_speed_kmh", n.stall_speed_kmh);
+
+        // GPS donanım
+        setChk("inp_has_gps", n.has_gps);
+        toggleGpsSettings();
+        setVal("inp_gps_proto", n.gps_protocol);
+        setVal("inp_mag_align", n.mag_align);
+
+        // GPS güvenlik
+        setVal("inp_gps_min_sats", n.gps_min_sats);
+        setVal("inp_gps_min_fix_type", n.gps_min_fix_type);
+
+        // RTH
+        setVal("inp_nav_rth_alt", n.rth_altitude);
+        setVal("inp_nav_radius", n.rth_radius);
+        setVal("inp_nav_loiter_dir", n.loiter_direction);
+        setVal("inp_nav_max_dist", n.max_distance);
+        setChk("inp_nav_climb_first", n.climb_first);
+
+        // Nav açı limitleri
+        setVal("inp_nav_max_bank_roll", n.max_bank_angle_roll);
+        setVal("inp_nav_max_bank_pitch", n.max_bank_angle_pitch);
+        setVal("inp_nav_max_climb", n.max_climb);
+        setVal("inp_nav_max_dive", n.max_dive);
+
+        // Throttle ayarları
+        setVal("inp_nav_min_throttle", n.nav_min_throttle);
+        setVal("inp_nav_descend", n.descend_throttle);
+        setVal("inp_nav_cruise", n.cruise_throttle);
+        setVal("inp_nav_climb", n.climb_throttle);
+        setVal("inp_nav_max_throttle", n.nav_max_throttle);
+
+        // Otopilot kazançları
+        setVal("inp_nav_fw_pitch2thr", n.fw_pitch2thr);
+
+        // L1 navigasyon
+        setVal("inp_nav_l1_period", n.l1_period);
+        setVal("inp_nav_l1_damping", n.l1_damping);
+
+        // Dönüş Telafisi — Yükseklik (load factor, her zaman aktif)
+        setVal("inp_nav_turn_pitch_gain", n.turn_pitch_gain);
+        setVal("inp_nav_turn_throttle_gain", n.turn_throttle_gain);
+
+        // Dönüş Telafisi — Turn Assist (Koordineli Dönüş, opsiyonel)
+        setChk("inp_nav_turn_assist_enabled", n.turn_assist_enabled);
+        setVal("inp_nav_turn_assist_ref_airspeed", n.turn_assist_ref_airspeed_ms);
+        setVal("inp_nav_turn_assist_yaw_gain", n.turn_assist_yaw_gain);
+
+        // TECS (Total Energy Control System, opsiyonel)
+        setChk("inp_nav_use_tecs", n.use_tecs);
+        toggleTecsSettings();
+        setVal("inp_nav_tecs_airspeed_ms", n.tecs_airspeed_ms);
+        setVal("inp_nav_tecs_time_const", n.tecs_time_const);
+        setVal("inp_nav_tecs_thr_damp", n.tecs_thr_damp);
+        setVal("inp_nav_tecs_pitch_damp", n.tecs_pitch_damp);
+        setVal("inp_nav_tecs_integ_gain", n.tecs_integ_gain);
+        setVal("inp_nav_tecs_spd_weight", n.tecs_spd_weight);
+        setVal("inp_nav_tecs_vert_accel_lim", n.tecs_vert_accel_lim);
+        setVal("inp_nav_tecs_pitch_gain", n.tecs_pitch_gain);
+        setVal("inp_nav_tecs_throttle_gain", n.tecs_throttle_gain);
+    }
+
+    // --- Altitude config ---
+    if (advancedConfig.alt_config) {
+        const ac = advancedConfig.alt_config;
+        setChk("inp_alt_has_baro", ac.has_baro);
+        setVal("inp_alt_w_z_baro_p", ac.w_z_baro_p);
+        setVal("inp_alt_w_z_baro_v", ac.w_z_baro_v);
+        setVal("inp_alt_w_z_acc_bias", ac.w_z_acc_bias);
+        setVal("inp_alt_acc_deadzone", ac.acc_deadzone_mss);
+        setVal("inp_alt_acc_lpf", ac.acc_lpf_factor);
+    }
+
+    // --- Misc ---
+    if (advancedConfig.misc) {
+        setVal("inp_esc_hz", advancedConfig.misc.esc_hz);
+        setVal("inp_servo_hz", advancedConfig.misc.servo_hz);
+    }
+
+    // --- Trim ---
+    if (advancedConfig.calib_extra) {
+        setVal("inp_trim_roll", advancedConfig.calib_extra.trim_roll);
+        setVal("inp_trim_pitch", advancedConfig.calib_extra.trim_pitch);
+    }
+
+    // --- Nav Waypoint ---
+    if (advancedConfig.nav_wp) {
+        setVal("inp_wp_capture_radius", advancedConfig.nav_wp.wp_capture_radius);
+    }
+
+    // --- Flaperon ---
+    if (advancedConfig.flaperon_offset !== undefined) {
+        const slider = document.getElementById('flaperonOffsetSlider');
+        const label  = document.getElementById('flaperonOffsetValue');
+        if (slider) {
+            slider.value = advancedConfig.flaperon_offset;
+            updateFlaperonSliderColor(slider);
+        }
+        if (label)  label.textContent = advancedConfig.flaperon_offset;
+    }
+
+    // --- Sanal Akım Sensörü ---
+    if (advancedConfig.virt_current) {
+        const vc = advancedConfig.virt_current;
+        setVal("inp_vc_scale",   vc.scale);
+        setVal("inp_vc_idle",    vc.idle);
+        setVal("inp_vc_calib",   vc.calib);
+        setVal("inp_vc_cap_mah", vc.cap_mah);
+    }
+
+    // --- Batarya Donanımı ---
+    if (advancedConfig.battery) {
+        const b = advancedConfig.battery;
+        setVal("adcVoltagePin",     b.adc_pin);
+        setVal("inp_bat_adc_scale", b.adc_scale);
+        setVal("inp_cell_min_v",    b.cell_min_v);
+        setVal("inp_cell_max_v",    b.cell_max_v);
+    }
+
+    // --- Landing Assist ---
+    if (advancedConfig.land_assist) {
+        const la = advancedConfig.land_assist;
+        setVal("inp_la_circuit_alt", la.circuit_alt);
+        setVal("inp_la_final_approach_distance", la.final_approach_distance);
+        setVal("inp_la_circuit_width", la.circuit_width);
+        setVal("inp_la_flare_alt", la.flare_alt);
+        setVal("inp_la_flare_throttle", la.flare_throttle);
+        setVal("inp_la_flare_pitch_deg", la.flare_pitch_deg);
+        setVal("inp_la_flare_alt_margin", la.flare_alt_margin);
+        setVal("inp_la_stick_cancel_thr", la.stick_cancel_thr);
+        setVal("inp_la_thr_cancel_thr", la.thr_cancel_thr);
+        setVal("inp_la_min_wind_speed", la.min_wind_speed);
+        setVal("inp_la_manual_runway_hdg", la.manual_runway_hdg);
+    }
+
+}
+
+// === KAYDETME ===
+
+/**
+ * @brief UI'daki değerleri toplar ve ESP'ye gönderir
+ */
+function saveAdvancedConfig() {
+    const getEl = (id) => document.getElementById(id);
+
+    const num = (id) => {
+        const el = getEl(id);
+        if (!el) return undefined;
+        const v = parseFloat(el.value);
+        return Number.isFinite(v) ? v : undefined;
+    };
+
+    const int = (id) => {
+        const el = getEl(id);
+        if (!el) return undefined;
+        const v = parseInt(el.value, 10);
+        return Number.isFinite(v) ? v : undefined;
+    };
+
+    const bool = (id) => {
+        const el = getEl(id);
+        if (!el) return undefined;
+        return !!el.checked;
+    };
+
+    const selInt = (id) => {
+        const el = getEl(id);
+        if (!el) return undefined;
+        const v = parseInt(el.value, 10);
+        return Number.isFinite(v) ? v : undefined;
+    };
+
+    const setIf = (obj, key, val) => {
+        if (val !== undefined) obj[key] = val;
+    };
+
+    const cfg = {};
+
+    // -------- Filters --------
+    const filters = {};
+    setIf(filters, "gyro_lpf_enabled", bool("inp_gyro_lpf_enabled"));
+    setIf(filters, "gyro_lpf_hz", num("inp_gyro_lpf_hz"));
+    setIf(filters, "rpm_filter_enabled", bool("inp_rpm_filter_enabled"));
+    setIf(filters, "rpm_min_freq", num("inp_rpm_min_freq"));
+    setIf(filters, "rpm_max_freq", num("inp_rpm_max_freq"));
+    setIf(filters, "rpm_bw_percent", num("inp_rpm_bw_percent"));
+    if (Object.keys(filters).length) cfg.filters = filters;
+
+    // -------- Mahony --------
+    const mahony = {};
+    setIf(mahony, "kp", num("inp_mahony_kp"));
+    setIf(mahony, "ki", num("inp_mahony_ki"));
+    setIf(mahony, "accel_lpf_hz", num("inp_accel_lpf_hz"));
+    if (Object.keys(mahony).length) cfg.mahony = mahony;
+
+    // -------- Nav --------
+    const nav = {};
+
+    // Angle mode limitleri
+    setIf(nav, "ang_lim_roll", int("inp_ang_lim_roll"));
+    setIf(nav, "ang_lim_pitch", int("inp_ang_lim_pitch"));
+
+    // Auto launch
+    setIf(nav, "auto_launch_on_arm", bool("inp_auto_launch_on_arm"));
+    setIf(nav, "disarm_on_landing", bool("inp_disarm_on_landing"));
+    setIf(nav, "lock_disarm_while_flying", bool("inp_lock_disarm_while_flying"));
+    setIf(nav, "launch_acc_threshold", num("inp_launch_acc_threshold"));
+    setIf(nav, "launch_throttle", int("inp_launch_throttle"));
+    setIf(nav, "launch_time", int("inp_launch_time"));
+    setIf(nav, "launch_altitude", int("inp_launch_altitude"));
+    setIf(nav, "launch_angle", int("inp_launch_angle"));
+    setIf(nav, "launch_spool_time", int("inp_launch_spool_time"));
+
+    // Stall koruması
+    setIf(nav, "stall_speed_kmh", num("inp_stall_speed_kmh"));
+
+    // GPS donanım
+    setIf(nav, "has_gps", bool("inp_has_gps"));
+    setIf(nav, "gps_protocol", selInt("inp_gps_proto"));
+    setIf(nav, "mag_align", selInt("inp_mag_align"));
+
+    // GPS güvenlik
+    setIf(nav, "gps_min_sats", int("inp_gps_min_sats"));
+    setIf(nav, "gps_min_fix_type", int("inp_gps_min_fix_type"));
+
+    // RTH & limits
+    setIf(nav, "rth_altitude", int("inp_nav_rth_alt"));
+    setIf(nav, "rth_radius", int("inp_nav_radius"));
+    setIf(nav, "loiter_direction", selInt("inp_nav_loiter_dir"));
+    // Geofence: 0 = sınır yok (kasıtlı), aksi halde min 300m — RTH navigasyonu
+    // daha kısa mesafede güvenilir çalışmaz. Firmware da aynı kuralı uygular
+    // (bkz. vecihi/src/serial_communication.cpp: clamp_geofence_max_distance).
+    let geofenceDist = int("inp_nav_max_dist");
+    if (geofenceDist !== undefined && geofenceDist > 0 && geofenceDist < 300) {
+        geofenceDist = 300;
+        const geofenceEl = getEl("inp_nav_max_dist");
+        if (geofenceEl) geofenceEl.value = geofenceDist;
+    }
+    setIf(nav, "max_distance", geofenceDist);
+    setIf(nav, "climb_first", bool("inp_nav_climb_first"));
+
+    // Nav açı limitleri
+    setIf(nav, "max_bank_angle_roll", int("inp_nav_max_bank_roll"));
+    setIf(nav, "max_bank_angle_pitch", int("inp_nav_max_bank_pitch"));
+    setIf(nav, "max_climb", int("inp_nav_max_climb"));
+    setIf(nav, "max_dive", int("inp_nav_max_dive"));
+
+    // Throttle ayarları
+    setIf(nav, "nav_min_throttle", int("inp_nav_min_throttle"));
+    setIf(nav, "descend_throttle", int("inp_nav_descend"));
+    setIf(nav, "cruise_throttle", int("inp_nav_cruise"));
+    setIf(nav, "climb_throttle", int("inp_nav_climb"));
+    setIf(nav, "nav_max_throttle", int("inp_nav_max_throttle"));
+
+    // Otopilot kazançları
+    setIf(nav, "fw_pitch2thr", num("inp_nav_fw_pitch2thr"));
+
+    // L1 navigasyon
+    setIf(nav, "l1_period", int("inp_nav_l1_period"));
+    setIf(nav, "l1_damping", num("inp_nav_l1_damping"));
+
+    // Dönüş Telafisi — Yükseklik (load factor, her zaman aktif)
+    setIf(nav, "turn_pitch_gain", num("inp_nav_turn_pitch_gain"));
+    setIf(nav, "turn_throttle_gain", num("inp_nav_turn_throttle_gain"));
+
+    // Dönüş Telafisi — Turn Assist (Koordineli Dönüş, opsiyonel)
+    setIf(nav, "turn_assist_enabled", bool("inp_nav_turn_assist_enabled"));
+    setIf(nav, "turn_assist_ref_airspeed_ms", num("inp_nav_turn_assist_ref_airspeed"));
+    setIf(nav, "turn_assist_yaw_gain", num("inp_nav_turn_assist_yaw_gain"));
+
+    // TECS (Total Energy Control System, opsiyonel)
+    setIf(nav, "use_tecs", bool("inp_nav_use_tecs"));
+    setIf(nav, "tecs_airspeed_ms", num("inp_nav_tecs_airspeed_ms"));
+    setIf(nav, "tecs_time_const", num("inp_nav_tecs_time_const"));
+    setIf(nav, "tecs_thr_damp", num("inp_nav_tecs_thr_damp"));
+    setIf(nav, "tecs_pitch_damp", num("inp_nav_tecs_pitch_damp"));
+    setIf(nav, "tecs_integ_gain", num("inp_nav_tecs_integ_gain"));
+    setIf(nav, "tecs_spd_weight", num("inp_nav_tecs_spd_weight"));
+    setIf(nav, "tecs_vert_accel_lim", num("inp_nav_tecs_vert_accel_lim"));
+    setIf(nav, "tecs_pitch_gain", num("inp_nav_tecs_pitch_gain"));
+    setIf(nav, "tecs_throttle_gain", num("inp_nav_tecs_throttle_gain"));
+
+    if (Object.keys(nav).length) cfg.nav = nav;
+
+    // -------- Altitude config --------
+    const alt = {};
+    setIf(alt, "has_baro", bool("inp_alt_has_baro"));
+    setIf(alt, "w_z_baro_p", num("inp_alt_w_z_baro_p"));
+    setIf(alt, "w_z_baro_v", num("inp_alt_w_z_baro_v"));
+    setIf(alt, "w_z_acc_bias", num("inp_alt_w_z_acc_bias"));
+    setIf(alt, "acc_deadzone_mss", num("inp_alt_acc_deadzone"));
+    setIf(alt, "acc_lpf_factor", num("inp_alt_acc_lpf"));
+    if (Object.keys(alt).length) cfg.alt_config = alt;
+
+    // -------- Misc --------
+    const misc = {};
+    setIf(misc, "esc_hz", selInt("inp_esc_hz"));
+    setIf(misc, "servo_hz", selInt("inp_servo_hz"));
+    if (Object.keys(misc).length) cfg.misc = misc;
+
+    // -------- Calibration extras (trim) --------
+    const calib = {};
+    setIf(calib, "trim_roll", num("inp_trim_roll"));
+    setIf(calib, "trim_pitch", num("inp_trim_pitch"));
+    if (Object.keys(calib).length) cfg.calib_extra = calib;
+
+    // -------- Nav Waypoint --------
+    const nav_wp = {};
+    setIf(nav_wp, "wp_capture_radius", int("inp_wp_capture_radius"));
+    if (Object.keys(nav_wp).length) cfg.nav_wp = nav_wp;
+
+    // -------- Flaperon --------
+    const flaperonSlider = document.getElementById('flaperonOffsetSlider');
+    if (flaperonSlider) {
+        cfg.flaperon_offset = parseInt(flaperonSlider.value, 10);
+    }
+
+    // -------- Sanal Akım Sensörü --------
+    const vc = {};
+    setIf(vc, "scale",   num("inp_vc_scale"));
+    setIf(vc, "idle",    num("inp_vc_idle"));
+    setIf(vc, "calib",   num("inp_vc_calib"));
+    setIf(vc, "cap_mah", num("inp_vc_cap_mah"));
+    if (Object.keys(vc).length) cfg.virt_current = vc;
+
+    // -------- Batarya Donanımı --------
+    const bat = {};
+    setIf(bat, "adc_pin",    int("adcVoltagePin"));
+    setIf(bat, "adc_scale",  num("inp_bat_adc_scale"));
+    setIf(bat, "cell_min_v", num("inp_cell_min_v"));
+    setIf(bat, "cell_max_v", num("inp_cell_max_v"));
+    if (Object.keys(bat).length) cfg.battery = bat;
+
+    // -------- Landing Assist --------
+    const la = {};
+    setIf(la, "circuit_alt", int("inp_la_circuit_alt"));
+    setIf(la, "final_approach_distance", int("inp_la_final_approach_distance"));
+    setIf(la, "circuit_width", int("inp_la_circuit_width"));
+    setIf(la, "flare_alt", num("inp_la_flare_alt"));
+    setIf(la, "flare_throttle", int("inp_la_flare_throttle"));
+    setIf(la, "flare_pitch_deg", num("inp_la_flare_pitch_deg"));
+    setIf(la, "flare_alt_margin", num("inp_la_flare_alt_margin"));
+    setIf(la, "stick_cancel_thr", int("inp_la_stick_cancel_thr"));
+    setIf(la, "thr_cancel_thr", int("inp_la_thr_cancel_thr"));
+    setIf(la, "min_wind_speed", num("inp_la_min_wind_speed"));
+    setIf(la, "manual_runway_hdg", num("inp_la_manual_runway_hdg"));
+    if (Object.keys(la).length) cfg.land_assist = la;
+
+    // -------- Kamikaze --------
+    const km = {};
+    setIf(km, "dive_mode",     0);
+    setIf(km, "dive_angle",    num("km_def_dive_angle"));
+    setIf(km, "alt_offset",    num("km_def_alt_offset"));
+    setIf(km, "trigger_alt",   num("km_def_trigger_alt"));
+    setIf(km, "mission_servo", selInt("km_def_mission_servo"));
+    if (Object.keys(km).length) cfg.kamikaze = km;
+
+    const enEl = document.getElementById('pitotEnabled');
+    const scEl = document.getElementById('pitotScale');
+    if (enEl || scEl) {
+        cfg.pitot = {
+            enabled: enEl ? enEl.checked : false,
+            scale:   scEl ? parseFloat(scEl.value) : 1.0
+        };
+    }
+
+    console.log("[ADV] SAVE payload =", cfg);
+    sendCommand(`SAVE_ADVANCED_CONFIG ${JSON.stringify(cfg)}`);
+}
+
+// === YARDIMCI FONKSİYONLAR ===
+
+/**
+ * @brief Slider değerlerini anlık göstermek için (HTML'de oninput ile çağrılıyor)
+ * @param {string} key - Input key'i (inp_ prefix'i olmadan)
+ */
+function updateAdvDisplay(key) {
+    const input = document.getElementById(`inp_${key}`);
+    const display = document.getElementById(`disp_${key}`);
+    if (!input || !display) return;
+
+    const val = parseFloat(input.value);
+
+    // Değişken tipine göre basamak sayısını ayarla
+    switch (key) {
+        case 'alt_w_p':
+        case 'alt_w_v':
+            display.textContent = val.toFixed(1);
+            break;
+        case 'alt_w_bias':
+            display.textContent = val.toFixed(3);
+            break;
+        case 'alt_lpf':
+        case 'alt_dzone':
+            display.textContent = val.toFixed(2);
+            break;
+        default:
+            display.textContent = input.value;
+    }
+}
+
+/**
+ * @brief Kalibrasyon sonucu bildirimi — hesaplanan değer ilgili alana yazıldı,
+ *        ancak henüz karta kaydedilmedi. Kullanıcıyı "Tercihleri Kaydet" için uyarır.
+ */
+function showCalibAppliedModal(fieldName, value) {
+    const msg = `Kalibrasyon katsayısı hesaplandı ve <strong>${fieldName}</strong> alanına ` +
+                `<strong>${value}</strong> olarak girildi.<br><br>` +
+                `<span class="text-warning">Değer henüz uçuş kartına yazılmadı — ` +
+                `<strong>Tercihleri Kaydet</strong> butonuna basmayı unutmayın.</span>`;
+    if (typeof showModal === 'function') {
+        showModal('Kalibrasyon Uygulandı', msg, 'warning');
+    } else {
+        alert(`Kalibrasyon katsayısı hesaplandı ve ${fieldName} alanına ${value} olarak girildi. ` +
+              `Tercihleri Kaydet butonuna basmayı unutmayın.`);
+    }
+}
+
+function showCalibErrorModal(msg) {
+    if (typeof showModal === 'function') showModal('Eksik Değer', msg, 'error');
+    else alert(msg);
+}
+
+function computeVoltageCalib() {
+    const shown  = parseFloat(document.getElementById('inp_calib_volt_shown').value);
+    const actual = parseFloat(document.getElementById('inp_calib_volt_actual').value);
+    const curScale = parseFloat(document.getElementById('inp_bat_adc_scale').value) || 11.0;
+    if (!Number.isFinite(shown) || !Number.isFinite(actual) || shown <= 0 || actual <= 0) {
+        showCalibErrorModal('Lütfen her iki voltaj alanını da geçerli bir değerle doldurun.');
+        return;
+    }
+    const newScale = Math.round(curScale * (actual / shown) * 1000) / 1000;
+    document.getElementById('inp_bat_adc_scale').value = newScale.toFixed(3);
+    showCalibAppliedModal('Ölçek Faktörü', newScale.toFixed(3));
+}
+window.computeVoltageCalib = computeVoltageCalib;
+
+function computeCurrentCalib() {
+    const reported = parseFloat(document.getElementById('inp_calib_reported_mah').value);
+    const actual   = parseFloat(document.getElementById('inp_calib_actual_mah').value);
+    const curCalib = parseFloat(document.getElementById('inp_vc_calib').value) || 1.0;
+    if (!Number.isFinite(reported) || !Number.isFinite(actual) || reported <= 0 || actual <= 0) {
+        showCalibErrorModal('Lütfen her iki mAh alanını da geçerli bir değerle doldurun.');
+        return;
+    }
+    const newCalib = Math.round(curCalib * (actual / reported) * 1000) / 1000;
+    document.getElementById('inp_vc_calib').value = newCalib.toFixed(3);
+    showCalibAppliedModal('Kalibrasyon', newCalib.toFixed(3));
+}
+window.computeCurrentCalib = computeCurrentCalib;
+
+function updateFlaperonSliderColor(slider) {
+    const val = parseFloat(slider.value);
+    const min = parseFloat(slider.min);
+    const max = parseFloat(slider.max);
+    const range = max - min;
+    const centerPct = ((0 - min) / range * 100).toFixed(1);
+    const valPct    = ((val   - min) / range * 100).toFixed(1);
+    if (val >= 0) {
+        slider.style.background = `linear-gradient(to right, rgba(0,0,0,0.15) ${centerPct}%, #0ea5e9 ${centerPct}%, #0ea5e9 ${valPct}%, rgba(0,0,0,0.15) ${valPct}%)`;
+    } else {
+        slider.style.background = `linear-gradient(to right, rgba(0,0,0,0.15) ${valPct}%, #f59e0b ${valPct}%, #f59e0b ${centerPct}%, rgba(0,0,0,0.15) ${centerPct}%)`;
+    }
+}
+window.updateFlaperonSliderColor = updateFlaperonSliderColor;
+
+function toggleGpsSettings() {
+    const isChecked = document.getElementById('inp_has_gps')?.checked;
+    const settingsDiv = document.getElementById('gps_hardware_settings');
+    if (settingsDiv) {
+        settingsDiv.style.display = isChecked ? 'block' : 'none';
+    }
+}
+
+function toggleTecsSettings() {
+    const isChecked = document.getElementById('inp_nav_use_tecs')?.checked;
+    const settingsDiv = document.getElementById('tecs_settings');
+    if (settingsDiv) {
+        settingsDiv.style.display = isChecked ? 'block' : 'none';
+    }
+    // Pitch→Gaz (fw_pitch2thr) TECS'in alternatifi — TECS açıkken gizlenir, kapalıyken görünür
+    const pitch2thrDiv = document.getElementById('fw_pitch2thr_settings');
+    if (pitch2thrDiv) {
+        pitch2thrDiv.style.display = isChecked ? 'none' : 'block';
+    }
+}
+window.toggleTecsSettings = toggleTecsSettings;
+
+/**
+ * @brief Waypoint sayfasındaki katlanabilir bölümü aç/kapat
+ */
+function toggleWpSection(bodyId) {
+    const body = document.getElementById(bodyId);
+    if (!body) return;
+    const chevronId = bodyId.replace('-body', '-chevron');
+    const chevron = document.getElementById(chevronId);
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? '' : 'none';
+    if (chevron) chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+}
+
+// === PİTOT TÜPÜ FONKSİYONLARI ===
+function handlePitotPageData(data) {
+    var el = function(id) { return document.getElementById(id); };
+    if (!data) return;
+    var enabled = el('pitotEnabled');
+    var scale   = el('pitotScale');
+    if (enabled) enabled.checked = !!data.enabled;
+    if (scale)   scale.value     = (data.scale !== undefined) ? data.scale.toFixed(2) : '1.00';
+}
+
+function savePitotConfig() {
+    var enabled = document.getElementById('pitotEnabled');
+    var scale   = document.getElementById('pitotScale');
+    if (!enabled || !scale) return;
+    var payload = JSON.stringify({
+        command: 'SAVE_PITOT_CONFIG',
+        enabled: enabled.checked,
+        scale:   parseFloat(scale.value)
+    });
+    if (typeof sendCommand === 'function') sendCommand(payload);
+}
+
+// === DIŞA AKTARILAN FONKSİYONLAR ===
+window.handleAdvancedPageData = handleAdvancedPageData;
+window.updateAdvancedUI = updateAdvancedUI;
+window.saveAdvancedConfig = saveAdvancedConfig;
+window.updateAdvDisplay = updateAdvDisplay;
+window.toggleGpsSettings = toggleGpsSettings;
+window.toggleWpSection = toggleWpSection;
+window.handlePitotPageData = handlePitotPageData;
+window.savePitotConfig = savePitotConfig;
+
+// advancedConfig'i dışarıdan erişilebilir yap
+window.advancedConfig = advancedConfig;
+
+function initThrottleUI() {
+  const safetyCheck = document.getElementById('safetyCheck');
+  const throttleSlider = document.getElementById('throttleSlider');
+  const throttleValueEl = document.getElementById('throttleValue');
+  const warn = document.getElementById('safetyWarning');
+
+  let lastSentAt = 0;
+  let lastLogAt = 0;
+  const SEND_PERIOD_MS = 80;
+  const LOG_PERIOD_MS  = 400; // log spam olmasın
+
+  function sendThrottleNow(val) {
+    if (!isConnected || !writer) return;
+    if (!safetyCheck.checked) return;
+
+    sendCommand(`THROTTLE ${val}`);
+
+    const now = Date.now();
+    if (now - lastLogAt >= LOG_PERIOD_MS) {
+      lastLogAt = now;
+      log(`📤 THROTTLE ${val}`, 'command'); // log sayfasında görünür
+    }
+  }
+
+  throttleSlider.disabled = true;
+
+  safetyCheck.addEventListener('change', () => {
+    safetyChecked = safetyCheck.checked;   // <-- global güncelle
+    updateSafetyWarning();                 // <-- yazı doğru olsun
+
+    const armed = safetyCheck.checked;
+    throttleSlider.disabled = !armed;
+    if (warn) warn.style.display = armed ? 'none' : 'block';
+
+    if (armed) {
+     
+      sendThrottleNow(parseInt(throttleSlider.value, 10));
+    } else {
+
+      sendCommand('THROTTLE 1000');
+
+
+      throttleSlider.value = 1000;
+      throttleValueEl.textContent = '1000';
+    }
+  });
+
+  throttleSlider.addEventListener('input', () => {
+    const v = parseInt(throttleSlider.value, 10);
+    throttleValueEl.textContent = String(v);
+
+    const now = Date.now();
+    if (now - lastSentAt >= SEND_PERIOD_MS) {
+      lastSentAt = now;
+      sendThrottleNow(v);
+    }
+  });
+}

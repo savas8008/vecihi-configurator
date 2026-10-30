@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vecihi Yer Kontrol İstasyonu</title>
+    <meta name="description" content="Vecihi uçuş kontrolcüsü yer kontrol istasyonu">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        :root {
+            --bg:           #b8c9d8;
+            --surface:      #ffffff;
+            --surface-2:    #f8fafc;
+            --border:       #e2e8f0;
+            --border-strong:#cbd5e1;
+            --text:         #0f172a;
+            --text-2:       #334155;
+            --muted:        #64748b;
+            --primary:      #2563eb;
+            --primary-hover:#1d4ed8;
+            --primary-pale: #eff6ff;
+            --primary-mid:  #bfdbfe;
+            --green:        #16a34a;
+            --green-pale:   #f0fdf4;
+            --green-mid:    #bbf7d0;
+            --yellow:       #d97706;
+            --yellow-pale:  #fffbeb;
+            --red:          #dc2626;
+            --red-pale:     #fef2f2;
+            --red-mid:      #fecaca;
+            --purple:       #7c3aed;
+            --purple-pale:  #f5f3ff;
+            --cyan:         #0891b2;
+            --orange:       #ea580c;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+            --shadow:       0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+            --shadow-md:    0 10px 15px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.05);
+            --radius:       12px;
+            --radius-sm:    8px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            min-height: 100vh;
+            padding-bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--primary);
+            flex-shrink: 0;
+            letter-spacing: -0.3px;
+        }
+        .brand-icon {
+            width: 32px; height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+        .brand-sub { font-size: 10px; color: var(--muted); font-weight: 400; }
+
+        .conn-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+        .conn-group {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--surface-2);
+        }
+        .conn-label {
+            padding: 6px 10px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            background: var(--surface-2);
+            border-right: 1px solid var(--border);
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+        .conn-input {
+            border: none;
+            background: var(--surface);
+            color: var(--text);
+            padding: 6px 10px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            width: 130px;
+        }
+        .conn-input.short { width: 64px; }
+        .conn-input.tiny  { width: 52px; }
+        .conn-input:focus { background: var(--primary-pale); }
+
+        .btn-connect {
+            padding: 7px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-connect.idle       { background: var(--primary); color: #fff; }
+        .btn-connect.idle:hover { background: var(--primary-hover); }
+        .btn-connect.live       { background: var(--red); color: #fff; }
+        .btn-connect.live:hover { background: #b91c1c; }
+
+        .conn-mode-tabs {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--surface-2);
+        }
+        .conn-mode-tab {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .conn-mode-tab.active { background: var(--primary); color: #fff; }
+        .conn-mode-tab:not(.active):hover { background: var(--primary-pale); color: var(--primary); }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            color: var(--muted);
+            margin-left: auto;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+            flex-shrink: 0;
+        }
+        .status-dot.ok   { background: var(--green); box-shadow: 0 0 0 3px var(--green-mid); }
+        .status-dot.warn { background: var(--yellow); animation: blink 1s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 5px 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-chip b { color: var(--text-2); font-weight: 600; }
+        .stat-chip i { font-size: 12px; }
+
+        /* ── MAIN GRID ── */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            padding: 14px;
+            flex: 1;
+            align-items: start;
+        }
+        @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
+
+        /* ── COLUMN HEADERS ── */
+        .col-heading {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 0 2px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .col-heading i { font-size: 13px; }
+        .col-heading.send { color: var(--primary); }
+        .col-heading.recv { color: var(--green); }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .card-head {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .3px;
+            color: var(--text-2);
+        }
+        .card-head i { font-size: 14px; color: var(--primary); }
+        .card-head .badge-sm {
+            margin-left: auto;
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+        .badge-send { background: var(--primary-pale); color: var(--primary); border: 1px solid var(--primary-mid); }
+        .badge-recv { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+        .card-body { padding: 14px; }
+
+        /* ── FLIGHT MODE SELECTOR ── */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .mode-btn {
+            padding: 9px 6px;
+            font-size: 11px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text-2);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+            text-align: center;
+            letter-spacing: .2px;
+        }
+        .mode-btn:hover { border-color: var(--primary-mid); background: var(--primary-pale); color: var(--primary); }
+        .mode-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(37,99,235,.35);
+        }
+        .mode-btn.mode-danger.active  { background: var(--red);    border-color: var(--red);    box-shadow: 0 2px 8px rgba(220,38,38,.35); }
+        .mode-btn.mode-warning.active { background: var(--yellow);  border-color: var(--yellow);  color: #fff; }
+        .mode-btn.mode-purple.active  { background: var(--purple);  border-color: var(--purple); }
+        .mode-btn.mode-orange.active  { background: var(--orange);  border-color: var(--orange); }
+        /* GCS mod butonları: pending=kırmızı, confirmed=yeşil */
+        .mode-btn.pending   { border-color: var(--red);   background: var(--red-pale);   color: var(--red);   animation: blink .6s infinite; }
+        .mode-btn.confirmed { border-color: var(--green); background: var(--green-pale);  color: var(--green); font-weight: 700; }
+
+
+        /* ── STICKS ── */
+        .stick-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .stick-item {
+            display: grid;
+            grid-template-columns: 60px 1fr 52px;
+            align-items: center;
+            gap: 10px;
+        }
+        .stick-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-2);
+        }
+        .stick-label small {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--muted);
+        }
+        input[type=range].stick-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            cursor: pointer;
+        }
+        input[type=range].stick-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(37,99,235,.5);
+            cursor: pointer;
+            transition: transform .1s;
+        }
+        input[type=range].stick-slider::-webkit-slider-thumb:active { transform: scale(1.2); }
+        input[type=range].stick-slider.thr::-webkit-slider-thumb { background: var(--orange); box-shadow: 0 1px 4px rgba(234,88,12,.5); }
+        .stick-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-2);
+            text-align: right;
+        }
+        .stick-center-note {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 2px;
+            grid-column: 2 / 4;
+            font-style: italic;
+        }
+
+        /* ── QUICK COMMANDS ── */
+        .cmd-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .cmd-btn {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text-2);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cmd-btn i { font-size: 13px; }
+        .cmd-btn:hover { background: var(--primary-pale); border-color: var(--primary-mid); color: var(--primary); }
+        .cmd-btn.danger { border-color: var(--red-mid); color: var(--red); background: var(--red-pale); }
+        .cmd-btn.danger:hover { background: var(--red); color: #fff; }
+        .cmd-btn.success { border-color: var(--green-mid); color: var(--green); background: var(--green-pale); }
+        .cmd-btn.success:hover { background: var(--green); color: #fff; }
+
+        /* ── WIND COMPASS ── */
+        #windCanvas { display: block; margin: 0 auto; }
+        .wind-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .wind-stat-box {
+            text-align: center;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+        }
+        .wind-stat-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+        .wind-stat-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; color: var(--text); }
+        .wind-stat-unit { font-size: 10px; color: var(--muted); }
+        .wind-invalid { color: var(--muted) !important; }
+
+        /* ── FLIGHT MODE BADGE ── */
+        .mode-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .mode-badge {
+            flex: 1;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-align: center;
+            border: 2px solid var(--border);
+            color: var(--muted);
+            background: var(--surface-2);
+            transition: all .3s;
+        }
+        .mode-badge.m-manual  { border-color: var(--border-strong); color: var(--text-2); background: var(--surface-2); }
+        .mode-badge.m-angle,
+        .mode-badge.m-horizon { border-color: var(--green); color: var(--green); background: var(--green-pale); }
+        .mode-badge.m-cruise,
+        .mode-badge.m-althold { border-color: var(--purple); color: var(--purple); background: var(--purple-pale); }
+        .mode-badge.m-rth     { border-color: var(--orange); color: var(--orange); background: #fff7ed; }
+        .mode-badge.m-launch  { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-pale); }
+        .mode-badge.m-failsafe{ border-color: var(--red); color: var(--red); background: var(--red-pale); animation: blink .5s infinite; }
+        .mode-badge.m-waypoint{ border-color: var(--cyan); color: var(--cyan); background: #ecfeff; }
+        .mode-badge.m-gcs     { border-color: var(--primary); color: var(--primary); background: var(--primary-pale); animation: blink .7s infinite; }
+
+        .arm-badge {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 2px solid;
+        }
+        .arm-badge.armed    { border-color: var(--red); color: var(--red); background: var(--red-pale); }
+        .arm-badge.disarmed { border-color: var(--border-strong); color: var(--muted); background: var(--surface-2); }
+
+        /* ── ATTITUDE ── */
+        .attitude-wrap { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        #horizonCanvas {
+            display: block;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+        }
+        .euler-grid { flex: 1; min-width: 110px; display: flex; flex-direction: column; gap: 8px; }
+        .euler-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .euler-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+        .euler-val { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: var(--text); }
+
+        /* ── LINK QUALITY ── */
+        .link-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .metric-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .metric-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+        .metric-val { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700; color: var(--text); line-height: 1; }
+        .metric-unit { font-size: 10px; color: var(--muted); margin-top: 2px; }
+        .metric-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 7px; overflow: hidden; }
+        .metric-bar-fill { height: 100%; border-radius: 2px; transition: width .3s, background .3s; }
+
+        /* ── GPS ── */
+        #mapContainer { width: 100%; height: 260px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
+        .leaflet-container { background: #e8edf3 !important; }
+        .gps-fix-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-bottom: 10px;
+        }
+        .fix-none { background: var(--red-pale);   color: var(--red);   border: 1px solid var(--red-mid); }
+        .fix-2d   { background: var(--yellow-pale); color: var(--yellow); border: 1px solid #fde68a; }
+        .fix-3d   { background: var(--green-pale);  color: var(--green);  border: 1px solid var(--green-mid); }
+        .gps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .gps-item-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+        .gps-item-val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; color: var(--text); }
+
+        /* ── ALTITUDE / VARIO ── */
+        .alt-vario { display: flex; gap: 10px; }
+        .alt-box { flex: 1; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+        .alt-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+        .alt-val { font-family: 'JetBrains Mono', monospace; font-size: 30px; font-weight: 700; color: var(--text); line-height: 1; }
+        .alt-unit { font-size: 11px; color: var(--muted); margin-top: 3px; }
+        .vario-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-top: 8px; overflow: hidden; position: relative; }
+        .vario-bar { position: absolute; top:0; bottom:0; left:50%; width:0; border-radius:3px; transition: width .2s; }
+        .vario-up   { background: var(--green); }
+        .vario-down { background: var(--red); right:50%; left:auto; }
+
+        /* ── RC CHANNELS ── */
+        .ch-scroll { max-height: 200px; overflow-y: auto; }
+        .ch-scroll::-webkit-scrollbar { width: 3px; }
+        .ch-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+        .ch-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .ch-name { width: 52px; font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; flex-shrink: 0; font-weight: 600; }
+        .ch-track { flex:1; height:8px; background:var(--border); border-radius:4px; position:relative; overflow:hidden; }
+        .ch-bar { position:absolute; top:0; bottom:0; left:50%; background:var(--primary); border-radius:4px; transition:width .1s; width:0; }
+        .ch-bar.active { background: var(--cyan); }
+        .ch-center { position:absolute; top:0; bottom:0; left:50%; width:1px; background:var(--border-strong); }
+        .ch-val { width:36px; font-size:10px; color:var(--text-2); font-family:'JetBrains Mono',monospace; text-align:right; font-weight:600; }
+
+        /* ── FAILSAFE OVERLAY ── */
+        #failsafeOverlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(220,38,38,.12);
+            border: 4px solid var(--red);
+            pointer-events: none; z-index: 9999;
+            animation: fs-blink .5s infinite;
+        }
+        @keyframes fs-blink {
+            0%,100%{border-color:var(--red);background:rgba(220,38,38,.12)}
+            50%{border-color:rgba(220,38,38,.3);background:transparent}
+        }
+        #failsafeOverlay .fs-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            font-size: 48px; font-weight: 900; color: var(--red); letter-spacing: 8px;
+            font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 20px rgba(220,38,38,.5);
+        }
+
+        /* divider */
+        .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+        /* ── PANEL RENK TEMALARı ── */
+        /* Her kart: border + arka plan tonu + header tonu */
+
+        .card-blue   { border-color: #93c5fd; background: #eff6ff; }
+        .card-blue   .card-head { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+        .card-blue   .card-head i { color: #2563eb; }
+        .card-blue   .divider { background: #bfdbfe; }
+
+        .card-purple { border-color: #c4b5fd; background: #f5f3ff; }
+        .card-purple .card-head { background: #ede9fe; border-color: #c4b5fd; color: #5b21b6; }
+        .card-purple .card-head i { color: #7c3aed; }
+        .card-purple .divider { background: #ddd6fe; }
+        .card-purple input[type=range].stick-slider { background: #ddd6fe; }
+        .card-purple input[type=range].stick-slider::-webkit-slider-thumb { background: #7c3aed; box-shadow: 0 1px 4px rgba(124,58,237,.5); }
+
+        .card-green  { border-color: #86efac; background: #f0fdf4; }
+        .card-green  .card-head { background: #dcfce7; border-color: #86efac; color: #15803d; }
+        .card-green  .card-head i { color: #16a34a; }
+
+        .card-cyan   { border-color: #67e8f9; background: #ecfeff; }
+        .card-cyan   .card-head { background: #cffafe; border-color: #67e8f9; color: #0e7490; }
+        .card-cyan   .card-head i { color: #0891b2; }
+
+        .card-amber  { border-color: #fcd34d; background: #fffbeb; }
+        .card-amber  .card-head { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+        .card-amber  .card-head i { color: #d97706; }
+
+        .card-indigo { border-color: #a5b4fc; background: #eef2ff; }
+        .card-indigo .card-head { background: #e0e7ff; border-color: #a5b4fc; color: #3730a3; }
+        .card-indigo .card-head i { color: #4338ca; }
+
+        .card-orange { border-color: #fdba74; background: #fff7ed; }
+        .card-orange .card-head { background: #ffedd5; border-color: #fdba74; color: #9a3412; }
+        .card-orange .card-head i { color: #ea580c; }
+
+        .card-teal   { border-color: #5eead4; background: #f0fdfa; }
+        .card-teal   .card-head { background: #ccfbf1; border-color: #5eead4; color: #0f766e; }
+        .card-teal   .card-head i { color: #0d9488; }
+
+        .card-sky    { border-color: #7dd3fc; background: #f0f9ff; }
+        .card-sky    .card-head { background: #e0f2fe; border-color: #7dd3fc; color: #075985; }
+        .card-sky    .card-head i { color: #0284c7; }
+
+        .card-slate  { border-color: #94a3b8; background: #f8fafc; }
+        .card-slate  .card-head { background: #f1f5f9; border-color: #94a3b8; color: #334155; }
+        .card-slate  .card-head i { color: #64748b; }
+
+        .map-modal-btn {
+            padding: 3px 8px; font-size: 10px; font-weight: 600;
+            border-radius: 6px; border: 1px solid var(--border-strong);
+            background: var(--surface); color: var(--text-2); cursor: pointer;
+            transition: all .15s; white-space: nowrap;
+        }
+        .map-modal-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+        .tile-source-badge {
+            font-size: 9px; padding: 1px 6px; border-radius: 8px; font-weight: 700;
+            background: var(--primary-pale); color: var(--primary); border: 1px solid var(--primary-mid);
+        }
+        .tile-source-badge.local { background: var(--green-pale); color: var(--green); border-color: var(--green-mid); }
+
+        /* ── DEBUG KONSOLU ── */
+        .debug-panel {
+            margin: 0 14px 14px;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #0b0f14;
+        }
+        .debug-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 14px;
+            background: #111827;
+            color: #94a3b8;
+            cursor: pointer;
+            user-select: none;
+        }
+        .debug-header:hover { background: #16202f; }
+        .debug-title {
+            display: flex; align-items: center; gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; font-weight: 600; letter-spacing: .3px;
+        }
+        .debug-badge {
+            background: #1e293b; color: #94a3b8; border-radius: 10px;
+            padding: 1px 8px; font-size: 10px; font-family: 'JetBrains Mono', monospace;
+        }
+        .debug-actions { display: flex; align-items: center; gap: 10px; }
+        .debug-btn {
+            background: transparent; border: 1px solid #334155; color: #94a3b8;
+            border-radius: 6px; padding: 3px 9px; font-size: 11px; cursor: pointer;
+        }
+        .debug-btn:hover { background: #1e293b; color: #e2e8f0; }
+        .debug-body {
+            max-height: 240px; overflow-y: auto;
+            padding: 8px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px; line-height: 1.7;
+        }
+        .debug-panel.collapsed .debug-body { display: none; }
+        .debug-panel.collapsed #debugChevron { transform: rotate(180deg); }
+        .debug-line { white-space: pre-wrap; word-break: break-word; }
+        .debug-line .dt { color: #475569; margin-right: 8px; }
+        .debug-line .dm { color: #cbd5e1; }
+        .debug-line.lvl-ok   .dm { color: #4ade80; }
+        .debug-line.lvl-warn .dm { color: #fbbf24; }
+        .debug-line.lvl-err  .dm { color: #f87171; }
+        .debug-line.lvl-data .dm { color: #38bdf8; }
+        .debug-line.lvl-tx   .dm { color: #c084fc; }
+
+        /* ── ARAZİ RADARI ── */
+        #terrainRadarCanvas { display: block; margin: 0 auto; background: #04140c; border-radius: 8px; }
+        .terrain-warn {
+            margin-top: 10px; text-align: center; font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
+            background: var(--surface-2); color: var(--text-2);
+        }
+        .terrain-warn.safe   { background: var(--green-pale);  color: var(--green); }
+        .terrain-warn.warn   { background: var(--yellow-pale); color: var(--yellow); }
+        .terrain-warn.danger { background: var(--red-pale);    color: var(--red); }
+    </style>
+</head>
+<body>
+
+<!-- FAILSAFE OVERLAY -->
+<div id="failsafeOverlay"><div class="fs-text">!! FAILSAFE !!</div></div>
+
+<!-- ── HEADER ── -->
+<header class="header">
+    <div class="brand">
+        <div class="brand-icon"><i class="bi bi-broadcast-pin"></i></div>
+        <div>
+            Vecihi Yer Kontrol
+            <div class="brand-sub">Ground Control Station</div>
+        </div>
+    </div>
+
+    <div class="conn-row">
+        <div class="conn-mode-tabs">
+            <button class="conn-mode-tab active" id="tabWs" onclick="setConnMode('ws')">
+                <i class="bi bi-globe2"></i> WebSocket
+            </button>
+            <button class="conn-mode-tab" id="tabSerial" onclick="setConnMode('serial')">
+                <i class="bi bi-usb-symbol"></i> Serial
+            </button>
+        </div>
+
+        <div id="panelWs" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="conn-group">
+                <span class="conn-label">IP</span>
+                <input type="text" id="inputIP" class="conn-input" value="127.0.0.1">
+            </div>
+            <div class="conn-group">
+                <span class="conn-label">Port</span>
+                <input type="text" id="inputPort" class="conn-input short" value="8765">
+            </div>
+            <div class="conn-group">
+                <span class="conn-label">Path</span>
+                <input type="text" id="inputPath" class="conn-input tiny" value="/">
+            </div>
+        </div>
+
+        <div id="panelSerial" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="conn-group">
+                <span class="conn-label">Baud</span>
+                <select id="inputBaud" class="conn-input short" style="width:90px;">
+                    <option value="115200" selected>115200</option>
+                    <option value="230400">230400</option>
+                    <option value="460800">460800</option>
+                    <option value="921600">921600</option>
+                </select>
+            </div>
+            <span id="serialPortName" style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;"></span>
+        </div>
+
+        <button id="btnConnect" class="btn-connect idle" onclick="toggleConnection()">
+            <i class="bi bi-plug-fill"></i> Bağlan
+        </button>
+    </div>
+
+    <div class="status-pill">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Bağlantı yok</span>
+    </div>
+</header>
+
+<!-- ── STATS BAR ── -->
+<div class="stats-bar">
+    <div class="stat-chip"><i class="bi bi-clock"></i> Son paket: <b id="lastPacketAge">--</b></div>
+    <div class="stat-chip"><i class="bi bi-activity"></i> Paket/s: <b id="pktRate">0</b></div>
+    <div class="stat-chip"><i class="bi bi-wifi"></i> RF Mod: <b id="rfModeLabel">--</b></div>
+    <div class="stat-chip"><i class="bi bi-lightning-charge"></i> TX Güç: <b id="txPowerLabel">--</b></div>
+    <div class="stat-chip"><i class="bi bi-reception-4"></i> Anten: <b id="antennaLabel">--</b></div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+    <!-- ══════════════ SOL: KONTROL PANELİ ══════════════ -->
+    <div class="left-col">
+        <div class="col-heading send"><i class="bi bi-arrow-up-circle-fill"></i> Uçağa Gönder</div>
+
+        <!-- Uçuş Modu Seçimi -->
+        <div class="card card-blue">
+            <div class="card-head">
+                <i class="bi bi-toggles"></i> Uçuş Modu Seçimi
+            </div>
+            <div class="card-body">
+                <div class="mode-grid">
+                    <button class="mode-btn" data-mode="MANUAL" onclick="selectMode(this)">MANUAL</button>
+                    <button class="mode-btn" data-mode="ANGLE"  onclick="selectMode(this)">ANGLE</button>
+                    <button class="mode-btn" data-mode="HORIZON" onclick="selectMode(this)">HORIZON</button>
+                    <button class="mode-btn mode-purple" data-mode="CRUISE"  onclick="selectMode(this)">CRUISE</button>
+                    <button class="mode-btn mode-purple" data-mode="ALTHOLD" onclick="selectMode(this)">ALTHOLD</button>
+                    <button class="mode-btn mode-orange" data-mode="RTH"     onclick="selectMode(this)">RTH</button>
+                    <button class="mode-btn mode-warning" data-mode="LAUNCH"   onclick="selectMode(this)">LAUNCH</button>
+                    <button class="mode-btn" data-mode="WAYPOINT" onclick="selectMode(this)">WAYPNT</button>
+                    <button class="mode-btn mode-danger" data-mode="ACRO"     onclick="selectMode(this)">ACRO</button>
+                </div>
+                <div class="divider"></div>
+                <div style="font-size:10px;color:var(--muted);text-align:center;">
+                    <i class="bi bi-info-circle"></i>
+                    Mod değişikliği proxy üzerinden iletilir
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Hızlı Komutlar -->
+        <div class="card card-green">
+            <div class="card-head">
+                <i class="bi bi-lightning-charge-fill"></i> Hızlı Komutlar
+            </div>
+            <div class="card-body">
+                <div class="cmd-grid">
+                    <button class="cmd-btn" onclick="sendCmd('RTH')">
+                        <i class="bi bi-house-fill"></i> Eve Dön
+                    </button>
+                    <button class="cmd-btn" onclick="sendCmd('THROTTLE_STOP')">
+                        <i class="bi bi-stop-circle"></i> Gaz Kes
+                    </button>
+                    <button class="cmd-btn" onclick="sendCmd('FORCE_ARM')">
+                        <i class="bi bi-exclamation-triangle"></i> Force ARM
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPS Harita -->
+        <div class="card card-teal">
+            <div class="card-head">
+                <i class="bi bi-geo-alt-fill"></i> GPS Harita
+                <span id="tileSourceBadge" class="tile-source-badge" style="margin-left:8px;">OSM</span>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:8px;margin-bottom:0;">
+                    <button class="map-modal-btn" id="mapSaveBtn" onclick="saveMapArea()"><i class="bi bi-cloud-download"></i> Kaydet</button>
+                    <button class="map-modal-btn" onclick="clearSavedTiles()" style="color:var(--red,#ef4444)"><i class="bi bi-trash"></i></button>
+                    <div id="gpsFix" class="gps-fix-badge fix-none" style="margin-bottom:0;">
+                        <i class="bi bi-circle-fill" style="font-size:7px;"></i> FIX YOK
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" style="padding:10px;">
+                <div id="mapContainer"></div>
+                <div class="gps-grid" style="margin-top:10px;">
+                    <div>
+                        <div class="gps-item-label">Enlem</div>
+                        <div class="gps-item-val" id="gpsLat">--</div>
+                    </div>
+                    <div>
+                        <div class="gps-item-label">Boylam</div>
+                        <div class="gps-item-val" id="gpsLon">--</div>
+                    </div>
+                    <div>
+                        <div class="gps-item-label">Uydu</div>
+                        <div class="gps-item-val" id="gpsSats">--</div>
+                    </div>
+                    <div>
+                        <div class="gps-item-label">Yön (COG)</div>
+                        <div class="gps-item-val" id="gpsCog">--°</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sanal Stickler -->
+        <div class="card card-purple">
+            <div class="card-head"><i class="bi bi-joystick"></i> Sanal Stickler</div>
+            <div class="card-body">
+                <div class="stick-row">
+                    <div class="stick-item">
+                        <span class="stick-label">Roll<small>Aileron</small></span>
+                        <input type="range" class="stick-slider" id="sRoll" min="1000" max="2000" value="1500"
+                               oninput="updateStick('roll',this.value)"
+                               onmouseup="centerStick('sRoll')" ontouchend="centerStick('sRoll')">
+                        <span class="stick-val" id="vRoll">1500</span>
+                    </div>
+                    <div class="stick-item">
+                        <span class="stick-label">Pitch<small>Elevator</small></span>
+                        <input type="range" class="stick-slider" id="sPitch" min="1000" max="2000" value="1500"
+                               oninput="updateStick('pitch',this.value)"
+                               onmouseup="centerStick('sPitch')" ontouchend="centerStick('sPitch')">
+                        <span class="stick-val" id="vPitch">1500</span>
+                    </div>
+                    <div class="stick-item">
+                        <span class="stick-label">Thr<small>Gaz</small></span>
+                        <input type="range" class="stick-slider thr" id="sThr" min="1000" max="2000" value="1000"
+                               oninput="updateStick('throttle',this.value)">
+                        <span class="stick-val" id="vThr">1000</span>
+                    </div>
+                    <div class="stick-item">
+                        <span class="stick-label">Yaw<small>Rudder</small></span>
+                        <input type="range" class="stick-slider" id="sYaw" min="1000" max="2000" value="1500"
+                               oninput="updateStick('yaw',this.value)"
+                               onmouseup="centerStick('sYaw')" ontouchend="centerStick('sYaw')">
+                        <span class="stick-val" id="vYaw">1500</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════ SAĞ: TELEMETRİ ══════════════ -->
+    <div class="right-col">
+        <div class="col-heading recv"><i class="bi bi-arrow-down-circle-fill"></i> Uçaktan Gelen</div>
+
+        <!-- Attitude -->
+        <div class="card card-indigo">
+            <div class="card-head"><i class="bi bi-crosshair2"></i> Attitude</div>
+            <div class="card-body">
+                <div class="attitude-wrap">
+                    <canvas id="horizonCanvas" width="200" height="200"></canvas>
+                    <div class="euler-grid">
+                        <div class="euler-box">
+                            <span class="euler-label">Roll</span>
+                            <span class="euler-val" id="rollVal">0.0°</span>
+                        </div>
+                        <div class="euler-box">
+                            <span class="euler-label">Pitch</span>
+                            <span class="euler-val" id="pitchVal">0.0°</span>
+                        </div>
+                        <div class="euler-box">
+                            <span class="euler-label">Yaw</span>
+                            <span class="euler-val" id="yawVal">0.0°</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Uçuş Modu + ARM -->
+        <div class="card card-amber">
+            <div class="card-head"><i class="bi bi-airplane-fill"></i> Durum</div>
+            <div class="card-body">
+                <div class="mode-display">
+                    <div class="mode-badge" id="flightModeBadge">--</div>
+                    <div class="arm-badge disarmed" id="armBadge">DISARMED</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- İrtifa & Vario -->
+        <div class="card card-orange">
+            <div class="card-head"><i class="bi bi-bar-chart-fill"></i> İrtifa & Variometre</div>
+            <div class="card-body">
+                <div class="alt-vario">
+                    <div class="alt-box">
+                        <div class="alt-label">İrtifa</div>
+                        <div class="alt-val" id="altValue">0</div>
+                        <div class="alt-unit">metre</div>
+                    </div>
+                    <div class="alt-box">
+                        <div class="alt-label">Vario</div>
+                        <div class="alt-val" id="varioValue">0.0</div>
+                        <div class="alt-unit">m/s</div>
+                        <div class="vario-bar-wrap">
+                            <div class="vario-bar vario-up" id="varioBarUp"></div>
+                        </div>
+                    </div>
+                    <div class="alt-box">
+                        <div class="alt-label">GPS İrt.</div>
+                        <div class="alt-val" id="gpsAltVal">--</div>
+                        <div class="alt-unit">metre</div>
+                    </div>
+                    <div class="alt-box">
+                        <div class="alt-label">Hız</div>
+                        <div class="alt-val" id="speedVal">--</div>
+                        <div class="alt-unit">km/h</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Link Kalitesi -->
+        <div class="card card-sky">
+            <div class="card-head"><i class="bi bi-wifi"></i> Link Kalitesi</div>
+            <div class="card-body">
+                <div class="link-grid">
+                    <div class="metric-box">
+                        <div class="metric-label">UL RSSI</div>
+                        <div class="metric-val" id="rssiDbm">-</div>
+                        <div class="metric-unit">dBm</div>
+                        <div class="metric-bar"><div class="metric-bar-fill" id="rssiBar" style="width:0%"></div></div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Link LQ</div>
+                        <div class="metric-val" id="lqValue">-</div>
+                        <div class="metric-unit">%</div>
+                        <div class="metric-bar"><div class="metric-bar-fill" id="lqBar" style="width:0%"></div></div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">UL SNR</div>
+                        <div class="metric-val" id="snrValue">-</div>
+                        <div class="metric-unit">dB</div>
+                        <div class="metric-bar"><div class="metric-bar-fill" id="snrBar" style="width:0%"></div></div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">DL RSSI</div>
+                        <div class="metric-val" id="dlRssi">-</div>
+                        <div class="metric-unit">dBm</div>
+                        <div class="metric-bar"><div class="metric-bar-fill" id="dlRssiBar" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rüzgar Tahmini -->
+        <div class="card card-cyan">
+            <div class="card-head"><i class="bi bi-wind"></i> Rüzgar Tahmini</div>
+            <div class="card-body">
+                <canvas id="windCanvas" width="180" height="180"></canvas>
+                <div class="wind-stats">
+                    <div class="wind-stat-box">
+                        <div class="wind-stat-label">Hız</div>
+                        <div class="wind-stat-val" id="windSpeed">--</div>
+                        <div class="wind-stat-unit">m/s</div>
+                    </div>
+                    <div class="wind-stat-box">
+                        <div class="wind-stat-label">Yön</div>
+                        <div class="wind-stat-val" id="windDir">--</div>
+                        <div class="wind-stat-unit">derece</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arazi Radarı -->
+        <div class="card card-slate">
+            <div class="card-head"><i class="bi bi-broadcast"></i> Arazi Radarı (Heading)</div>
+            <div class="card-body">
+                <canvas id="terrainRadarCanvas" width="280" height="190"></canvas>
+                <div class="terrain-warn" id="terrainWarnText">Konum/heading bekleniyor...</div>
+            </div>
+        </div>
+
+    </div>
+</div><!-- /main -->
+
+<!-- ── DEBUG KONSOLU ── -->
+<div class="debug-panel" id="debugPanel">
+    <div class="debug-header" onclick="toggleDebugPanel()">
+        <div class="debug-title"><i class="bi bi-terminal-fill"></i> Debug Konsolu <span class="debug-badge" id="debugCount">0</span></div>
+        <div class="debug-actions">
+            <button class="debug-btn" onclick="event.stopPropagation(); clearDebugLog();"><i class="bi bi-trash3"></i> Temizle</button>
+            <i class="bi bi-chevron-up" id="debugChevron"></i>
+        </div>
+    </div>
+    <div class="debug-body" id="debugBody"></div>
+</div>
+
+<script>
+// ============================================================
+//  CRSF CONSTANTS
+// ============================================================
+const CRSF_SYNC       = 0xC8;
+const CRSF_GPS        = 0x02;
+const CRSF_VARIO      = 0x07;
+const CRSF_BATTERY    = 0x08;
+const CRSF_LINK_STATS = 0x14;
+const CRSF_RC_CHAN    = 0x16;
+const CRSF_ATTITUDE   = 0x1E;
+const CRSF_FLTMODE    = 0x21;
+
+const RF_MODES  = ['4Hz','25Hz','50Hz','100Hz','150Hz','200Hz','250Hz','500Hz','D250Hz','D500Hz'];
+const TX_POWERS = ['10mW','25mW','50mW','100mW','250mW','500mW','1W','2W'];
+
+// ============================================================
+//  STATE
+// ============================================================
+let ws = null, isConnected = false, reconnectTimer = null;
+let reconnectDelay = 2000, userDisconnected = false;
+let connMode = 'ws'; // 'ws' | 'serial'
+let serialPort = null, serialWriter = null, serialReader = null, serialReadLoopActive = false;
+let rxBuf = new Uint8Array(512), rxLen = 0;
+let lastPacketTime = null, pktCount = 0, pktRateTimer = null, pktCountLast = 0;
+let mapInstance = null, mapMarker = null, mapPolyline = null, mapTrail = [];
+let mapCentered = false;
+
+// GCS kontrolü state
+let gcsActive = false;
+let _requestedModeIdx = -1; // Kullanıcının tıkladığı ama henüz uçaktan onaylanmamış mod
+
+// ============================================================
+//  DEBUG KONSOLU — bağlantı aşamaları, proxy süreçleri, uçaktan gelen veriler
+// ============================================================
+let _debugCount = 0;
+const _debugPrev = { flightMode: null, armed: null, failsafe: null, gcsActive: null };
+
+function debugLog(message, level = 'info') {
+    const body = document.getElementById('debugBody');
+    if (!body) return;
+    const line = document.createElement('div');
+    line.className = 'debug-line lvl-' + level;
+    const dt = document.createElement('span'); dt.className = 'dt';
+    dt.textContent = new Date().toLocaleTimeString('tr-TR', { hour12: false });
+    const dm = document.createElement('span'); dm.className = 'dm';
+    dm.textContent = message;
+    line.append(dt, dm);
+    body.appendChild(line);
+    while (body.children.length > 300) body.removeChild(body.firstChild);
+    body.scrollTop = body.scrollHeight;
+    const badge = document.getElementById('debugCount');
+    if (badge) badge.textContent = ++_debugCount;
+}
+function toggleDebugPanel() {
+    document.getElementById('debugPanel').classList.toggle('collapsed');
+}
+function clearDebugLog() {
+    document.getElementById('debugBody').innerHTML = '';
+    _debugCount = 0;
+    document.getElementById('debugCount').textContent = '0';
+}
+
+const telemetry = {
+    roll: 0, pitch: 0, yaw: 0,
+    lat: null, lon: null, speed: 0, cog: 0, gpsAlt: 0, sats: 0,
+    alt: 0, vario: 0,
+    rssi1: -100, rssi2: -100, lq: 0, snr: 0,
+    antenna: 0, rfMode: 0, txPower: 0,
+    dlRssi: 0, dlLq: 0, dlSnr: 0,
+    windSpeed: 0, windDir: 0, windValid: false,
+    flightMode: '--', armed: false, failsafe: false, gcsActive: false,
+    channels: new Array(16).fill(1500)
+};
+
+const controls = { roll: 1500, pitch: 1500, throttle: 1000, yaw: 1500 };
+
+// ============================================================
+//  CRC8 DVB-S2
+// ============================================================
+function crsf_crc8(data, start, len) {
+    let crc = 0;
+    for (let i = start; i < start + len; i++) {
+        let b = data[i];
+        for (let j = 0; j < 8; j++) {
+            const mix = (crc ^ b) & 0x80;
+            crc = (crc << 1) & 0xFF;
+            if (mix) crc ^= 0xD5;
+            b = (b << 1) & 0xFF;
+        }
+    }
+    return crc;
+}
+
+// ============================================================
+//  FRAME PARSER
+// ============================================================
+function processBytes(newBytes) {
+    for (let i = 0; i < newBytes.length; i++) {
+        if (rxLen < rxBuf.length) rxBuf[rxLen++] = newBytes[i];
+    }
+    while (rxLen > 2) {
+        if (rxBuf[0] !== CRSF_SYNC) {
+            let idx = -1;
+            for (let i = 1; i < rxLen; i++) { if (rxBuf[i] === CRSF_SYNC) { idx = i; break; } }
+            if (idx < 0) { rxLen = 0; break; }
+            rxBuf.copyWithin(0, idx, rxLen); rxLen -= idx; continue;
+        }
+        const frameLen = rxBuf[1], totalLen = frameLen + 2;
+        if (frameLen < 2 || frameLen > 62) { rxBuf.copyWithin(0,1,rxLen); rxLen--; continue; }
+        if (rxLen < totalLen) break;
+        if (crsf_crc8(rxBuf, 2, frameLen - 1) === rxBuf[totalLen - 1]) {
+            dispatchFrame(rxBuf[2], rxBuf.slice(3, totalLen - 1));
+            pktCount++; lastPacketTime = Date.now();
+        }
+        rxBuf.copyWithin(0, totalLen, rxLen); rxLen -= totalLen;
+    }
+}
+
+function dispatchFrame(type, p) {
+    switch (type) {
+        case CRSF_GPS:        parseGPS(p);       break;
+        case CRSF_VARIO:      parseVario(p);     break;
+        case CRSF_BATTERY:    parseBattery(p);   break;
+        case CRSF_LINK_STATS: parseLinkStats(p); break;
+        case CRSF_RC_CHAN:    parseRCChannels(p);break;
+        case CRSF_ATTITUDE:   parseAttitude(p);  break;
+        case CRSF_FLTMODE:    parseFlightMode(p);break;
+    }
+    renderAll();
+}
+
+// ============================================================
+//  PARSERS
+// ============================================================
+const readBE32  = (p,i) => ((p[i]<<24)|(p[i+1]<<16)|(p[i+2]<<8)|p[i+3])|0;
+const readBE16u = (p,i) => ((p[i]<<8)|p[i+1])>>>0;
+const readBE16s = (p,i) => { const v=readBE16u(p,i); return v>=0x8000?v-0x10000:v; };
+
+function parseGPS(p) {
+    if (p.length < 15) return;
+    telemetry.lat    = readBE32(p,0) / 1e7;
+    telemetry.lon    = readBE32(p,4) / 1e7;
+    telemetry.speed  = readBE16u(p,8) / 100.0;
+    telemetry.cog    = readBE16u(p,10) / 100.0;
+    telemetry.gpsAlt = readBE16u(p,12) - 1000;
+    telemetry.sats   = p[14];
+}
+function parseVario(p) {
+    if (p.length < 4) return;
+    telemetry.alt   = readBE16s(p,0) - 1000;
+    telemetry.vario = readBE16s(p,2) / 10.0;
+}
+function parseBattery(p) {
+    if (p.length < 8) return;
+    telemetry.windSpeed = readBE16s(p,0) / 10.0;
+    telemetry.windDir   = readBE16s(p,2) / 10.0;
+    telemetry.windValid = (p[7] === 100);
+}
+function parseLinkStats(p) {
+    if (p.length < 10) return;
+    telemetry.rssi1   = -(p[0]);
+    telemetry.rssi2   = -(p[1]);
+    telemetry.lq      = Math.min(p[2], 100);
+    telemetry.snr     = (p[3] << 24 >> 24);
+    telemetry.antenna = p[4];
+    telemetry.rfMode  = p[5];
+    telemetry.txPower = p[6];
+    telemetry.dlRssi  = -(p[7]);
+    telemetry.dlLq    = p[8];
+    telemetry.dlSnr   = (p[9] << 24 >> 24);
+}
+function parseRCChannels(p) {
+    if (p.length < 22) return;
+    const b = (i) => {
+        const bi = Math.floor(i*11/8), bit = (i*11)%8;
+        return ((p[bi]|(p[bi+1]<<8)|(p[bi+2]<<16)) >> bit) & 0x7FF;
+    };
+    for (let i = 0; i < 16; i++) {
+        telemetry.channels[i] = Math.max(1000, Math.min(2000,
+            Math.round(b(i) * (1000/1792) + 191 * (-1000/1792) + 1000)));
+    }
+}
+function parseAttitude(p) {
+    if (p.length < 6) return;
+    telemetry.pitch = readBE16s(p,0) / 10000.0 * (180/Math.PI);
+    telemetry.roll  = readBE16s(p,2) / 10000.0 * (180/Math.PI);
+    telemetry.yaw   = readBE16s(p,4) / 10000.0 * (180/Math.PI);
+}
+function parseFlightMode(p) {
+    let str = '';
+    for (let i = 0; i < p.length && p[i] !== 0; i++) str += String.fromCharCode(p[i]);
+    telemetry.flightMode = str || '--';
+    telemetry.failsafe   = str.toLowerCase().includes('failsafe');
+    telemetry.armed      = str.toLowerCase() === 'armed' || str.toLowerCase().startsWith('armed ');
+}
+
+// ============================================================
+//  RENDER
+// ============================================================
+function renderAll() {
+    renderStatus();
+    renderLinkStats();
+    renderAttitude();
+    renderGPS();
+    renderVario();
+    renderWind();
+    renderChannels();
+    renderFailsafe();
+    updateTerrainRadar();
+}
+
+function renderStatus() {
+    // Uçaktan gelen veride anlamlı değişiklikleri debug konsoluna yaz
+    if (telemetry.flightMode !== _debugPrev.flightMode) {
+        if (_debugPrev.flightMode !== null) debugLog(`[RX] Uçuş modu: ${_debugPrev.flightMode} → ${telemetry.flightMode}`, 'data');
+        _debugPrev.flightMode = telemetry.flightMode;
+    }
+    if (telemetry.armed !== _debugPrev.armed) {
+        if (_debugPrev.armed !== null) debugLog(`[RX] ${telemetry.armed ? 'ARM edildi' : 'DISARM edildi'}`, telemetry.armed ? 'warn' : 'data');
+        _debugPrev.armed = telemetry.armed;
+    }
+    if (telemetry.failsafe !== _debugPrev.failsafe) {
+        if (_debugPrev.failsafe !== null) debugLog(`[RX] Failsafe ${telemetry.failsafe ? 'BAŞLADI' : 'temizlendi'}`, telemetry.failsafe ? 'err' : 'ok');
+        _debugPrev.failsafe = telemetry.failsafe;
+    }
+    if (telemetry.gcsActive !== _debugPrev.gcsActive) {
+        if (_debugPrev.gcsActive !== null) debugLog(`[RX] GCS switch ${telemetry.gcsActive ? 'AÇIK — YKİ kontrolde' : 'KAPALI — kumanda kontrolde'}`, 'data');
+        _debugPrev.gcsActive = telemetry.gcsActive;
+    }
+
+    const el   = document.getElementById('flightModeBadge');
+    const mode = telemetry.flightMode;
+    el.textContent = mode;
+    el.className = 'mode-badge';
+    const lc = mode.toLowerCase();
+    if      (lc.includes('failsafe')) el.classList.add('m-failsafe');
+    else if (lc.includes('rth'))      el.classList.add('m-rth');
+    else if (lc.includes('cruise'))   el.classList.add('m-cruise');
+    else if (lc.includes('althold'))  el.classList.add('m-althold');
+    else if (lc.includes('horizon'))  el.classList.add('m-horizon');
+    else if (lc.includes('angle'))    el.classList.add('m-angle');
+    else if (lc.includes('launch'))   el.classList.add('m-launch');
+    else if (lc.includes('waypoint')) el.classList.add('m-waypoint');
+    else if (lc.includes('gcs'))      el.classList.add('m-gcs');
+    else if (lc.includes('manual'))   el.classList.add('m-manual');
+
+    gcsActive = telemetry.gcsActive;
+
+    // Mod butonları: confirmed (yeşil) = uçak bu modda, pending (kırmızı) = bekleniyor
+    const currentModeIdx = GCS_MODE_INDEX[telemetry.flightMode] ?? -1;
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        const btnIdx = GCS_MODE_INDEX[btn.dataset.mode] ?? -1;
+        btn.classList.remove('active', 'pending', 'confirmed');
+        if (btnIdx === currentModeIdx) {
+            btn.classList.add('confirmed');
+            if (btnIdx === _requestedModeIdx) _requestedModeIdx = -1; // onaylandı, pending temizle
+        } else if (btnIdx === _requestedModeIdx) {
+            btn.classList.add('pending');
+        }
+    });
+
+    const arm = document.getElementById('armBadge');
+    if (telemetry.armed) {
+        arm.textContent = 'ARMED';
+        arm.className = 'arm-badge armed';
+    } else {
+        arm.textContent = 'DISARMED';
+        arm.className = 'arm-badge disarmed';
+    }
+
+    // Telemetri moduna göre mod butonlarını senkronize et
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', mode.toUpperCase().includes(btn.dataset.mode));
+    });
+}
+
+function colorForPct(pct) {
+    if (pct >= 70) return 'var(--green)';
+    if (pct >= 40) return 'var(--yellow)';
+    return 'var(--red)';
+}
+function setBar(id, pct, color) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.width = pct + '%';
+    el.style.background = color;
+}
+
+function renderLinkStats() {
+    const t = telemetry;
+    const rssi    = Math.max(t.rssi1, t.rssi2);
+    const rssiPct = Math.max(0, Math.min(100, ((rssi+120)/70)*100));
+    document.getElementById('rssiDbm').textContent = rssi;
+    setBar('rssiBar', rssiPct, colorForPct(rssiPct));
+
+    document.getElementById('lqValue').textContent = t.lq;
+    setBar('lqBar', t.lq, colorForPct(t.lq));
+
+    const snrNorm = Math.max(0, Math.min(100, ((t.snr+10)/30)*100));
+    document.getElementById('snrValue').textContent = t.snr;
+    setBar('snrBar', snrNorm, colorForPct(snrNorm));
+
+    const dlPct = Math.max(0, Math.min(100, ((t.dlRssi+120)/70)*100));
+    document.getElementById('dlRssi').textContent = t.dlRssi;
+    setBar('dlRssiBar', dlPct, colorForPct(dlPct));
+
+    document.getElementById('rfModeLabel').textContent  = RF_MODES[t.rfMode]  || t.rfMode;
+    document.getElementById('txPowerLabel').textContent = TX_POWERS[t.txPower] || t.txPower;
+    document.getElementById('antennaLabel').textContent = t.antenna === 0 ? 'A' : 'B';
+}
+
+function renderAttitude() {
+    const t = telemetry;
+    document.getElementById('rollVal').textContent  = t.roll.toFixed(1)  + '°';
+    document.getElementById('pitchVal').textContent = t.pitch.toFixed(1) + '°';
+    document.getElementById('yawVal').textContent   = t.yaw.toFixed(1)   + '°';
+    drawHorizon(t.roll, t.pitch);
+}
+
+function renderGPS() {
+    const t = telemetry;
+    const hasPos = t.lat !== null && Math.abs(t.lat) > 0.001;
+
+    document.getElementById('gpsLat').textContent = hasPos ? t.lat.toFixed(6) : '--';
+    document.getElementById('gpsLon').textContent = hasPos ? t.lon.toFixed(6) : '--';
+    document.getElementById('gpsSats').textContent = t.sats;
+    document.getElementById('gpsCog').textContent  = t.cog.toFixed(1) + '°';
+
+    if (hasPos) updateMap(t.lat, t.lon);
+
+    const fix = document.getElementById('gpsFix');
+    if (t.sats >= 6) {
+        fix.className = 'gps-fix-badge fix-3d';
+        fix.innerHTML = '<i class="bi bi-circle-fill" style="font-size:7px;"></i> 3D FIX';
+    } else if (t.sats >= 4) {
+        fix.className = 'gps-fix-badge fix-2d';
+        fix.innerHTML = '<i class="bi bi-circle-fill" style="font-size:7px;"></i> 2D FIX';
+    } else {
+        fix.className = 'gps-fix-badge fix-none';
+        fix.innerHTML = '<i class="bi bi-circle-fill" style="font-size:7px;"></i> FIX YOK';
+    }
+}
+
+function renderVario() {
+    const t = telemetry;
+    document.getElementById('altValue').textContent   = t.alt.toFixed(0);
+    document.getElementById('gpsAltVal').textContent  = t.gpsAlt;
+    document.getElementById('speedVal').textContent   = (t.speed * 3.6).toFixed(1);
+
+    const vEl = document.getElementById('varioValue');
+    vEl.textContent = t.vario.toFixed(1);
+    vEl.style.color = t.vario >= 0 ? 'var(--green)' : 'var(--red)';
+
+    const pct = Math.min(50, Math.abs(t.vario) / 10 * 50);
+    const bar = document.getElementById('varioBarUp');
+    if (t.vario >= 0) {
+        bar.className = 'vario-bar vario-up';
+        bar.style.width = (pct*2) + '%'; bar.style.left = '50%'; bar.style.right = 'auto';
+    } else {
+        bar.className = 'vario-bar vario-down';
+        bar.style.width = (pct*2) + '%'; bar.style.right = '50%'; bar.style.left = 'auto';
+    }
+}
+
+function renderWind() {
+    const t = telemetry;
+    drawWindCompass(t.windDir, t.windValid);
+    const inv = !t.windValid;
+    document.getElementById('windSpeed').textContent = inv ? '--' : t.windSpeed.toFixed(1);
+    document.getElementById('windDir').textContent   = inv ? '--' : t.windDir.toFixed(0);
+    document.getElementById('windSpeed').className = 'wind-stat-val' + (inv ? ' wind-invalid' : '');
+    document.getElementById('windDir').className   = 'wind-stat-val' + (inv ? ' wind-invalid' : '');
+}
+
+function renderChannels() {
+    const names = ['Roll(A)','Pitch(E)','Thr(T)','Yaw(R)',
+                   'AUX 5','AUX 6','AUX 7','AUX 8',
+                   'AUX 9','AUX10','AUX11','AUX12',
+                   'AUX13','AUX14','AUX15','AUX16'];
+    const c = document.getElementById('channelsContainer');
+    if (!c.dataset.built) {
+        c.dataset.built = '1';
+        c.innerHTML = names.map((n,i) => `
+            <div class="ch-row">
+                <span class="ch-name">${n}</span>
+                <div class="ch-track">
+                    <div class="ch-center"></div>
+                    <div class="ch-bar" id="chBar${i+1}"></div>
+                </div>
+                <span class="ch-val" id="chVal${i+1}">1500</span>
+            </div>`).join('');
+    }
+    telemetry.channels.forEach((val, i) => {
+        const pct = ((val-1000)/1000)*100;
+        const fromCenter = Math.abs(pct-50);
+        const bar = document.getElementById(`chBar${i+1}`);
+        if (bar) {
+            bar.style.width = (fromCenter*2) + '%';
+            bar.style.left  = (pct < 50 ? pct : 50) + '%';
+            bar.className   = 'ch-bar' + (fromCenter > 10 ? ' active' : '');
+        }
+        const v = document.getElementById(`chVal${i+1}`);
+        if (v) v.textContent = val;
+
+    });
+}
+
+function renderFailsafe() {
+    document.getElementById('failsafeOverlay').style.display = telemetry.failsafe ? 'block' : 'none';
+}
+
+// ============================================================
+//  ARTIFICIAL HORIZON
+// ============================================================
+function drawHorizon(roll, pitch) {
+    const canvas = document.getElementById('horizonCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2, r = w/2 - 3;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.clip();
+
+    const skyG = ctx.createLinearGradient(0,0,0,h);
+    skyG.addColorStop(0,'#3b82f6'); skyG.addColorStop(1,'#60a5fa');
+    ctx.fillStyle = skyG; ctx.fillRect(0,0,w,h);
+
+    const pitchOffset = (pitch/45)*(h/4);
+    ctx.save();
+    ctx.translate(cx, cy+pitchOffset);
+    ctx.rotate(-roll*Math.PI/180);
+
+    const grdG = ctx.createLinearGradient(0,0,0,h);
+    grdG.addColorStop(0,'#92400e'); grdG.addColorStop(1,'#78350f');
+    ctx.fillStyle = grdG; ctx.fillRect(-w,0,w*2,h);
+
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(-w,0); ctx.lineTo(w,0); ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1;
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.textAlign = 'right';
+    for (let d = -30; d <= 30; d += 10) {
+        if (d === 0) continue;
+        const y = -(d/45)*(h/4), len = (d%20===0) ? 28 : 16;
+        ctx.beginPath(); ctx.moveTo(-len,y); ctx.lineTo(len,y); ctx.stroke();
+        ctx.fillText(Math.abs(d)+'°', -len-3, y+3);
+    }
+    ctx.restore();
+
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx,cy,4,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-38,cy); ctx.lineTo(cx-10,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+10,cy); ctx.lineTo(cx+38,cy); ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1;
+    for (let a = -60; a <= 60; a += 10) {
+        if (a===0) continue;
+        const rad = (a-90)*Math.PI/180;
+        const ir = r-13, or = r-6;
+        ctx.beginPath();
+        ctx.moveTo(cx+Math.cos(rad)*ir, cy+Math.sin(rad)*ir);
+        ctx.lineTo(cx+Math.cos(rad)*or, cy+Math.sin(rad)*or);
+        ctx.stroke();
+    }
+    ctx.save();
+    ctx.translate(cx,cy); ctx.rotate(-roll*Math.PI/180);
+    ctx.strokeStyle = '#fbbf24'; ctx.fillStyle = '#fbbf24'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0,-(r-13)); ctx.lineTo(-6,-(r-4)); ctx.lineTo(6,-(r-4));
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    ctx.restore();
+}
+
+// ============================================================
+//  WIND COMPASS
+// ============================================================
+function drawWindCompass(dir, valid) {
+    const canvas = document.getElementById('windCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2, r = w/2 - 16;
+
+    ctx.clearRect(0,0,w,h);
+
+    // Background circle
+    ctx.fillStyle = '#f8fafc'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+
+    // Cardinal labels
+    ctx.font = 'bold 10px Inter, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    [['K',0],['D',90],['G',180],['B',270]].forEach(([l,a]) => {
+        const rad = (a-90)*Math.PI/180;
+        ctx.fillStyle = l==='K' ? '#dc2626' : '#94a3b8';
+        ctx.fillText(l, cx+Math.cos(rad)*(r-9), cy+Math.sin(rad)*(r-9));
+    });
+
+    // Tick marks
+    for (let a = 0; a < 360; a += 30) {
+        const rad = (a-90)*Math.PI/180;
+        ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cx+Math.cos(rad)*(r-16), cy+Math.sin(rad)*(r-16));
+        ctx.lineTo(cx+Math.cos(rad)*(r-8),  cy+Math.sin(rad)*(r-8));
+        ctx.stroke();
+    }
+
+    if (valid) {
+        const rad = (dir-90)*Math.PI/180, al = r-24;
+        ctx.save(); ctx.translate(cx,cy); ctx.rotate(rad);
+        ctx.strokeStyle = '#0891b2'; ctx.fillStyle = '#0891b2'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(0,-al); ctx.lineTo(0,al*0.5); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,-al); ctx.lineTo(-7,-al+14); ctx.lineTo(7,-al+14); ctx.closePath(); ctx.fill();
+        ctx.restore();
+    } else {
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('Tahmin yok', cx, cy);
+    }
+}
+
+// ============================================================
+//  ARAZİ RADARI — heading yönünde arazi yüksekliği uyarısı
+// ============================================================
+// Fiziksel bir mesafe sensörü yok; uçağın GPS konumu+heading'i (COG) ile
+// Open-Meteo'nun ücretsiz yükseklik API'sinden alınan arazi rakımı
+// karşılaştırılıyor. Sonuçlar IndexedDB'de önbelleklenir — bölge internet
+// varken bir kez taranırsa, backpack'in WiFi'sine bağlıyken (internetsiz)
+// sahada da önbellekten çalışmaya devam eder.
+const TERRAIN_RAY_ANGLES = [-30, -15, 0, 15, 30];               // heading'e göre derece
+const TERRAIN_RANGES_M   = [500, 1000, 1500, 2500, 3500, 5000]; // metre
+const TERRAIN_GRID_DEG   = 0.0015;   // ~150m — önbellek çözünürlüğü
+const TERRAIN_REFETCH_DIST_M      = 300;
+const TERRAIN_REFETCH_HEADING_DEG = 15;
+const TERRAIN_REFETCH_MS          = 60000;
+
+let _terrainDb = null;
+let _terrainLast = { lat: null, lon: null, cog: null, t: 0 };
+let _terrainProfile = null; // [{angle, points:[{dist, elev}]}]
+let _terrainFetchInFlight = false;
+
+function _openTerrainDb() {
+    if (_terrainDb) return Promise.resolve(_terrainDb);
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open('vecihi-elevation', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('points');
+        req.onsuccess = e => { _terrainDb = e.target.result; resolve(_terrainDb); };
+        req.onerror = reject;
+    });
+}
+function _gridKey(lat, lon) {
+    const glat = Math.round(lat / TERRAIN_GRID_DEG) * TERRAIN_GRID_DEG;
+    const glon = Math.round(lon / TERRAIN_GRID_DEG) * TERRAIN_GRID_DEG;
+    return { key: glat.toFixed(4) + ',' + glon.toFixed(4), lat: glat, lon: glon };
+}
+function _terrainDbGet(key) {
+    return _openTerrainDb().then(db => new Promise((resolve) => {
+        const req = db.transaction('points', 'readonly').objectStore('points').get(key);
+        req.onsuccess = () => resolve(req.result !== undefined ? req.result : null);
+        req.onerror = () => resolve(null);
+    })).catch(() => null);
+}
+function _terrainDbSet(key, elevation) {
+    _openTerrainDb().then(db => {
+        db.transaction('points', 'readwrite').objectStore('points').put(elevation, key);
+    }).catch(() => {});
+}
+
+function haversineM(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const φ1 = lat1*Math.PI/180, φ2 = lat2*Math.PI/180;
+    const dφ = (lat2-lat1)*Math.PI/180, dλ = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
+    return 2*R*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+// Enlem/boylam + açı(derece) + mesafe(m) → hedef nokta (küresel Dünya yaklaşımı)
+function destinationPoint(lat, lon, bearingDeg, distM) {
+    const R = 6371000;
+    const δ = distM / R, θ = bearingDeg * Math.PI / 180;
+    const φ1 = lat * Math.PI / 180, λ1 = lon * Math.PI / 180;
+    const φ2 = Math.asin(Math.sin(φ1)*Math.cos(δ) + Math.cos(φ1)*Math.sin(δ)*Math.cos(θ));
+    const λ2 = λ1 + Math.atan2(Math.sin(θ)*Math.sin(δ)*Math.cos(φ1), Math.cos(δ)-Math.sin(φ1)*Math.sin(φ2));
+    return { lat: φ2*180/Math.PI, lon: ((λ2*180/Math.PI)+540)%360-180 };
+}
+
+async function fetchElevations(points) {
+    const results = new Array(points.length).fill(null);
+    const missing = [];
+    for (let i = 0; i < points.length; i++) {
+        const cached = await _terrainDbGet(points[i].key);
+        if (cached !== null) results[i] = cached; else missing.push(i);
+    }
+    if (missing.length === 0 || !navigator.onLine) return results;
+
+    try {
+        const lats = missing.map(i => points[i].lat.toFixed(4)).join(',');
+        const lons = missing.map(i => points[i].lon.toFixed(4)).join(',');
+        const resp = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lons}`);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        missing.forEach((idx, j) => {
+            const elev = data.elevation && data.elevation[j];
+            if (typeof elev === 'number') { results[idx] = elev; _terrainDbSet(points[idx].key, elev); }
+        });
+        debugLog(`[Radar] ${missing.length} arazi noktası indirildi`, 'ok');
+    } catch (e) {
+        debugLog(`[Radar] Arazi verisi alınamadı (çevrimdışı olabilir): ${e.message}`, 'warn');
+    }
+    return results;
+}
+
+async function updateTerrainRadar() {
+    const t = telemetry;
+    const hasPos = t.lat !== null && Math.abs(t.lat) > 0.001;
+    if (!hasPos || _terrainFetchInFlight) return;
+
+    const now = Date.now();
+    const moved = _terrainLast.lat === null ? Infinity : haversineM(_terrainLast.lat, _terrainLast.lon, t.lat, t.lon);
+    const hDiff = _terrainLast.cog === null ? Infinity : Math.min(Math.abs(t.cog - _terrainLast.cog), 360 - Math.abs(t.cog - _terrainLast.cog));
+    if (moved < TERRAIN_REFETCH_DIST_M && hDiff < TERRAIN_REFETCH_HEADING_DEG && (now - _terrainLast.t) < TERRAIN_REFETCH_MS) return;
+
+    _terrainFetchInFlight = true;
+    _terrainLast = { lat: t.lat, lon: t.lon, cog: t.cog, t: now };
+
+    const rayPoints = TERRAIN_RAY_ANGLES.map(angleOffset => {
+        const bearing = (t.cog + angleOffset + 360) % 360;
+        return TERRAIN_RANGES_M.map(dist => {
+            const dest = destinationPoint(t.lat, t.lon, bearing, dist);
+            const g = _gridKey(dest.lat, dest.lon);
+            return { dist, lat: g.lat, lon: g.lon, key: g.key };
+        });
+    });
+    const flat = rayPoints.flat();
+    const elevations = await fetchElevations(flat);
+
+    let idx = 0;
+    _terrainProfile = TERRAIN_RAY_ANGLES.map((angleOffset, ri) => ({
+        angle: angleOffset,
+        points: rayPoints[ri].map(p => ({ dist: p.dist, elev: elevations[idx++] }))
+    }));
+    _terrainFetchInFlight = false;
+    drawTerrainRadar();
+}
+
+function drawTerrainRadar() {
+    const canvas = document.getElementById('terrainRadarCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height, cx = w/2, cy = h - 12;
+    const maxRange = TERRAIN_RANGES_M[TERRAIN_RANGES_M.length-1];
+    const maxR = h - 24;
+
+    ctx.fillStyle = '#04140c'; ctx.fillRect(0,0,w,h);
+
+    ctx.strokeStyle = 'rgba(74,222,128,.25)'; ctx.lineWidth = 1;
+    ctx.font = '9px JetBrains Mono, monospace'; ctx.fillStyle = 'rgba(74,222,128,.55)'; ctx.textAlign = 'center';
+    TERRAIN_RANGES_M.forEach(rangeM => {
+        const rr = (rangeM/maxRange) * maxR;
+        ctx.beginPath(); ctx.arc(cx, cy, rr, (-135)*Math.PI/180, (-45)*Math.PI/180); ctx.stroke();
+        ctx.fillText((rangeM/1000).toFixed(1)+'km', cx + Math.cos(-45*Math.PI/180)*rr, cy + Math.sin(-45*Math.PI/180)*rr);
+    });
+    [-45,45].forEach(a => {
+        const rad = (a-90)*Math.PI/180;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(rad)*maxR, cy+Math.sin(rad)*maxR); ctx.stroke();
+    });
+    ctx.strokeStyle = 'rgba(74,222,128,.7)';
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx, cy-maxR); ctx.stroke();
+    ctx.fillStyle = '#4ade80';
+    ctx.beginPath(); ctx.moveTo(cx,cy-8); ctx.lineTo(cx-6,cy+4); ctx.lineTo(cx+6,cy+4); ctx.closePath(); ctx.fill();
+
+    if (!_terrainProfile) {
+        ctx.fillStyle = 'rgba(148,163,184,.8)'; ctx.font = '11px JetBrains Mono, monospace';
+        ctx.fillText('Arazi verisi bekleniyor...', cx, cy - maxR/2);
+        updateTerrainWarnText(null);
+        return;
+    }
+
+    const aircraftAlt = telemetry.gpsAlt;
+    // En yakın tehlike/dikkat noktası öncelikli: uzaktaki daha yüksek bir tepe
+    // yerine, önce karşılaşılacak engeli göstermek daha kullanışlı.
+    let nearestDanger = null, nearestCaution = null;
+    _terrainProfile.forEach(ray => {
+        const rad = (ray.angle-90)*Math.PI/180;
+        ray.points.forEach(p => {
+            if (typeof p.elev !== 'number' || !aircraftAlt) return;
+            const diff = p.elev - aircraftAlt; // + ise arazi uçaktan yüksek
+            const rr = (p.dist/maxRange) * maxR;
+            const px = cx + Math.cos(rad)*rr, py = cy + Math.sin(rad)*rr;
+            const color = diff >= 0 ? '#f87171' : diff > -100 ? '#fbbf24' : 'rgba(74,222,128,.7)';
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2); ctx.fill();
+            if (diff >= 0 && (nearestDanger === null || p.dist < nearestDanger.dist)) nearestDanger = { dist: p.dist, diff };
+            else if (diff > -100 && (nearestCaution === null || p.dist < nearestCaution.dist)) nearestCaution = { dist: p.dist, diff };
+        });
+    });
+    updateTerrainWarnText(nearestDanger || nearestCaution);
+}
+
+function updateTerrainWarnText(worst) {
+    const el = document.getElementById('terrainWarnText');
+    if (!el) return;
+    if (!telemetry.gpsAlt || !_terrainProfile) {
+        el.textContent = 'GPS irtifası veya arazi verisi bekleniyor...';
+        el.className = 'terrain-warn';
+    } else if (!worst) {
+        el.textContent = 'Önde yüksek arazi yok';
+        el.className = 'terrain-warn safe';
+    } else if (worst.diff >= 0) {
+        el.textContent = `⚠ ${Math.round(worst.dist)}m'de +${Math.round(worst.diff)}m arazi (irtifa altında/eşit!)`;
+        el.className = 'terrain-warn danger';
+    } else {
+        el.textContent = `${Math.round(worst.dist)}m'de arazi ${Math.round(-worst.diff)}m altında — dikkat`;
+        el.className = 'terrain-warn warn';
+    }
+}
+
+// ============================================================
+//  MAP
+// ============================================================
+let _activeTileLayer = null;
+
+function initMap() {
+    mapInstance = L.map('mapContainer', { zoomControl: true, attributionControl: false }).setView([39.0,35.0], 6);
+    _activeTileLayer = new OfflineTileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
+    const icon = L.divIcon({
+        html: '<div style="width:14px;height:14px;background:#2563eb;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px rgba(37,99,235,.6);"></div>',
+        iconSize: [14,14], iconAnchor: [7,7]
+    });
+    mapMarker = L.marker([39.0,35.0], {icon}).addTo(mapInstance);
+    mapPolyline = L.polyline([], { color: '#2563eb', weight: 2, opacity: .6 }).addTo(mapInstance);
+}
+
+function updateMap(lat, lon) {
+    if (!mapInstance) return;
+    mapMarker.setLatLng([lat,lon]);
+    mapTrail.push([lat,lon]);
+    if (mapTrail.length > 600) mapTrail.shift();
+    mapPolyline.setLatLngs(mapTrail);
+    if (!mapCentered) { mapInstance.setView([lat,lon],15); mapCentered = true; }
+}
+
+// ============================================================
+//  XFlight GCS Protokol — MAVLink v2 zarflı (msg_id 150-153)
+// ============================================================
+const GCS_MODE_INDEX = {
+    'MANUAL':0,'ANGLE':1,'ACRO':2,'HORIZON':3,'CRUISE':4,
+    'ALTHOLD':5,'RTH':6,'GCS':7,'LAUNCH':8,'WAYPOINT':9,'LAND_ASSIST':10
+};
+
+let _gcsSeq = 0;
+let _gcsMode = 1; // aktif mod index (default: ANGLE)
+
+function _mavX25(data, crcExtra) {
+    let crc = 0xFFFF;
+    for (let i = 0; i < data.length; i++) {
+        let t = (data[i] ^ (crc & 0xFF)) & 0xFF;
+        t = (t ^ ((t << 4) & 0xFF)) & 0xFF;
+        crc = ((crc >> 8) ^ ((t << 8) & 0xFFFF) ^ ((t << 3) & 0xFFFF) ^ ((t >> 4) & 0xFFFF)) & 0xFFFF;
+    }
+    let t = (crcExtra ^ (crc & 0xFF)) & 0xFF;
+    t = (t ^ ((t << 4) & 0xFF)) & 0xFF;
+    return ((crc >> 8) ^ ((t << 8) & 0xFFFF) ^ ((t << 3) & 0xFFFF) ^ ((t >> 4) & 0xFFFF)) & 0xFFFF;
+}
+
+function _buildV2Frame(msgId, payload, crcExtra) {
+    const n = payload.length;
+    const f = new Uint8Array(12 + n);
+    f[0]=0xFD; f[1]=n; f[2]=0; f[3]=0;
+    f[4]=_gcsSeq++&0xFF; f[5]=255; f[6]=190;
+    f[7]=msgId&0xFF; f[8]=0; f[9]=0;
+    f.set(payload, 10);
+    const crc = _mavX25(f.slice(1, 10+n), crcExtra);
+    f[10+n]=crc&0xFF; f[11+n]=(crc>>8)&0xFF;
+    return f;
+}
+
+function buildStickPacket(rollPwm, pitchPwm, throttlePwm, yawPwm) {
+    const p = new Uint8Array(9);
+    const clamp = (v,lo,hi) => Math.min(hi, Math.max(lo, Math.round(v)));
+    const wr16 = (off, v) => { p[off]=v&0xFF; p[off+1]=(v>>8)&0xFF; };
+    p[0] = _gcsMode;
+    wr16(1, clamp(rollPwm,     1000, 2000));
+    wr16(3, clamp(pitchPwm,    1000, 2000));
+    wr16(5, clamp(throttlePwm, 1000, 2000));
+    wr16(7, clamp(yawPwm,      1000, 2000));
+    return _buildV2Frame(150, p, 0);
+}
+
+function buildModePacket(modeIdx) {
+    return _buildV2Frame(151, new Uint8Array([modeIdx & 0xFF]), 0);
+}
+
+function buildCmdPacket(cmdId, cmdPayload) {
+    const p = new Uint8Array(2 + cmdPayload.length);
+    p[0]=cmdId; p[1]=cmdPayload.length;
+    p.set(cmdPayload, 2);
+    return _buildV2Frame(152, p, 0);
+}
+
+// ============================================================
+//  CONTROLS (sol panel)
+// ============================================================
+function selectMode(btn) {
+    const idx = GCS_MODE_INDEX[btn.dataset.mode] ?? 1;
+    _gcsMode = idx;
+    _requestedModeIdx = idx;
+    // Hepsini temizle, tıklananı kırmızı (pending) yap
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active', 'pending', 'confirmed'));
+    btn.classList.add('pending');
+    if (isReady()) {
+        debugLog(`[TX] Mod isteği gönderildi: ${btn.dataset.mode}`, 'tx');
+        sendRaw(buildModePacket(idx).buffer);
+    } else {
+        debugLog(`[TX] Mod isteği gönderilemedi (bağlantı yok): ${btn.dataset.mode}`, 'warn');
+    }
+}
+
+function handleAck(seq, result) {
+    debugLog(`[RX] ACK seq=${seq} → ${result === 0 ? 'kabul edildi' : 'reddedildi (' + result + ')'}`, result === 0 ? 'data' : 'warn');
+    const el = document.getElementById('ackToast');
+    if (!el) return;
+    el.textContent = result === 0 ? '✓ Komut iletildi' : '✗ Komut reddedildi';
+    el.style.background = result === 0 ? 'var(--green)' : 'var(--red)';
+    el.style.display = 'block';
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
+function updateStick(axis, val) {
+    controls[axis] = parseInt(val);
+    const ids = { roll:'vRoll', pitch:'vPitch', throttle:'vThr', yaw:'vYaw' };
+    document.getElementById(ids[axis]).textContent = val;
+    sendStickUpdate();
+}
+
+function centerStick(sliderId) {
+    const el = document.getElementById(sliderId);
+    el.value = 1500;
+    const axis = { sRoll:'roll', sPitch:'pitch', sYaw:'yaw' }[sliderId];
+    if (axis) { controls[axis] = 1500; document.getElementById({ sRoll:'vRoll', sPitch:'vPitch', sYaw:'vYaw' }[sliderId]).textContent = 1500; }
+    sendStickUpdate();
+}
+
+function sendStickUpdate() {
+    if (!isReady()) return;
+    sendRaw(buildStickPacket(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
+}
+
+function sendCmdRetry(buildFn, retries = 4, interval = 150) {
+    for (let i = 0; i < retries; i++) {
+        setTimeout(() => {
+            if (isReady()) sendRaw(buildFn().buffer);
+        }, i * interval);
+    }
+}
+
+function sendCmd(type, data = {}) {
+    if (!isReady()) { debugLog(`[TX] Komut gönderilemedi (bağlantı yok): ${type}`, 'warn'); return; }
+    debugLog(`[TX] Komut gönderildi: ${type}`, 'tx');
+    switch (type) {
+        case 'FORCE_ARM': sendCmdRetry(() => buildCmdPacket(0x03, new Uint8Array([1]))); break;
+        case 'RTH':       sendCmdRetry(() => buildModePacket(6)); break;
+        case 'SET_HOME':  sendCmdRetry(() => buildCmdPacket(0x05, new Uint8Array([]))); break;
+        default:          if (connMode === 'ws' && ws) ws.send(JSON.stringify({ type, ...data }));
+    }
+}
+
+
+// ============================================================
+//  WEBSOCKET
+// ============================================================
+//  BAĞLANTI MOD SEÇİCİ
+// ============================================================
+// Sayfa açılır açılmaz yerel launcher'a (tools/ground_control_launcher.py,
+// bkz. tools/start_ground_control.cmd) proxy'yi başlatması için istek gönderir.
+// Launcher çalışmıyorsa sessizce yoksayılır — proxy elle de başlatılabilir.
+function tryAutoLaunchProxy() {
+    debugLog('[Proxy] Launcher\'a başlatma isteği gönderiliyor (127.0.0.1:8766)...', 'info');
+    fetch('http://127.0.0.1:8766/launch-ground-control', { method: 'POST' })
+        .then(async r => {
+            const d = await r.json().catch(() => ({}));
+            if (r.ok && d.ok) {
+                debugLog(`[Proxy] ${(d.launched || []).join(', ') || 'başlatıldı'}`, 'ok');
+            } else {
+                debugLog(`[Proxy] Başlatma başarısız: ${d.error || 'bilinmeyen hata'}`, 'err');
+            }
+        })
+        .catch(() => debugLog("[Proxy] Launcher servisi kapalı — tools\\start_ground_control.cmd çalıştırın veya proxy'yi elle başlatın.", 'warn'));
+}
+
+function setConnMode(mode) {
+    if (isConnected) return;
+    connMode = mode;
+    document.getElementById('tabWs').classList.toggle('active', mode === 'ws');
+    document.getElementById('tabSerial').classList.toggle('active', mode === 'serial');
+    document.getElementById('panelWs').style.display     = mode === 'ws'     ? 'flex' : 'none';
+    document.getElementById('panelSerial').style.display = mode === 'serial' ? 'flex' : 'none';
+}
+
+// ============================================================
+//  UNIFIED SEND
+// ============================================================
+function isReady() { return isConnected; }
+
+function sendRaw(bytes) {
+    if (!isConnected) return;
+    if (connMode === 'ws') {
+        if (ws && ws.readyState === WebSocket.OPEN) ws.send(bytes);
+    } else if (connMode === 'serial' && serialWriter) {
+        serialWriter.write(bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes);
+    }
+}
+
+// ============================================================
+function toggleConnection() { isConnected ? disconnect() : connect(); }
+
+function connect() {
+    if (connMode === 'serial') { connectSerial(); return; }
+    userDisconnected = false; reconnectDelay = 2000;
+    clearTimeout(reconnectTimer);
+    const ip = document.getElementById('inputIP').value.trim();
+    const pt = document.getElementById('inputPort').value.trim();
+    const ph = document.getElementById('inputPath').value.trim() || '/';
+    const url = `ws://${ip}:${pt}${ph}`;
+    setStatus('connecting', `Bağlanıyor → ${url}`);
+
+    ws = new WebSocket(url);
+    ws.binaryType = 'arraybuffer';
+
+    ws.onopen = () => {
+        isConnected = true; rxLen = 0;
+        setStatus('connected', `Bağlı → ${url}`);
+        const btn = document.getElementById('btnConnect');
+        btn.innerHTML = '<i class="bi bi-x-circle-fill"></i> Bağlantıyı Kes';
+        btn.className = 'btn-connect live';
+        startPktRate();
+    };
+    ws.onmessage = (ev) => {
+        if (ev.data instanceof ArrayBuffer) {
+            processBytes(new Uint8Array(ev.data));
+        } else if (typeof ev.data === 'string') {
+            try {
+                const d = JSON.parse(ev.data);
+                if (d.type === 'crsf' && d.data) processBytes(new Uint8Array(d.data));
+                else if (d.type === 'mavlink_telemetry' && d.data) applyPatch(d.data);
+                else if (d.type === 'ack') handleAck(d.seq, d.result);
+            } catch(_) {}
+        }
+    };
+    ws.onerror  = () => { setStatus('disconnected', 'Bağlantı hatası'); isConnected = false; };
+    ws.onclose  = () => {
+        if (isConnected) setStatus('disconnected', 'Bağlantı kapandı');
+        isConnected = false;
+        const btn = document.getElementById('btnConnect');
+        btn.innerHTML = '<i class="bi bi-plug-fill"></i> Bağlan';
+        btn.className = 'btn-connect idle';
+        stopPktRate();
+        if (!userDisconnected) {
+            reconnectDelay = Math.min(reconnectDelay * 1.5, 15000);
+            setStatus('connecting', `Yeniden bağlanıyor... (${Math.round(reconnectDelay/1000)}s)`);
+            reconnectTimer = setTimeout(connect, reconnectDelay);
+        }
+    };
+}
+
+async function connectSerial() {
+    if (!('serial' in navigator)) {
+        setStatus('disconnected', 'Web Serial API desteklenmiyor (Chrome/Edge gerekli)');
+        return;
+    }
+    try {
+        serialPort = await navigator.serial.requestPort();
+        const baud = parseInt(document.getElementById('inputBaud').value) || 115200;
+        await serialPort.open({ baudRate: baud });
+        serialWriter = serialPort.writable.getWriter();
+        isConnected = true; rxLen = 0;
+        const info = serialPort.getInfo();
+        const portLabel = info.usbVendorId ? `VID:${info.usbVendorId.toString(16).toUpperCase()}` : 'COM';
+        document.getElementById('serialPortName').textContent = portLabel;
+        setStatus('connected', `Bağlı → Serial @${baud}`);
+        const btn = document.getElementById('btnConnect');
+        btn.innerHTML = '<i class="bi bi-x-circle-fill"></i> Bağlantıyı Kes';
+        btn.className = 'btn-connect live';
+        startPktRate();
+        serialReadLoopActive = true;
+        _serialReadLoop();
+    } catch(e) {
+        setStatus('disconnected', `Serial hata: ${e.message}`);
+    }
+}
+
+// Serial okuyucu için JSON frame tamponu
+// ESP32-C3 bridge protokolü: CRSF ham bytes + [0xAB][LEN_L][LEN_H][JSON] frame
+let _serialJsonBuf = null, _serialJsonExpect = 0, _serialJsonPos = 0;
+let _serialFrameState = 0; // 0=normal, 1=magic_seen, 2=len_l, 3=collecting_json
+
+function _processSerialBytes(bytes) {
+    for (let i = 0; i < bytes.length; i++) {
+        const b = bytes[i];
+        if (_serialFrameState === 0) {
+            if (b === 0xAB) {
+                _serialFrameState = 1;
+            } else {
+                // CRSF ham byte - processBytes'a gönder
+                const single = new Uint8Array(1);
+                single[0] = b;
+                processBytes(single);
+            }
+        } else if (_serialFrameState === 1) {
+            // LEN_L
+            _serialJsonExpect = b;
+            _serialFrameState = 2;
+        } else if (_serialFrameState === 2) {
+            // LEN_H
+            _serialJsonExpect |= (b << 8);
+            _serialJsonBuf = new Uint8Array(_serialJsonExpect);
+            _serialJsonPos = 0;
+            _serialFrameState = 3;
+        } else if (_serialFrameState === 3) {
+            _serialJsonBuf[_serialJsonPos++] = b;
+            if (_serialJsonPos >= _serialJsonExpect) {
+                // JSON frame tamamlandı
+                try {
+                    const str = new TextDecoder().decode(_serialJsonBuf);
+                    const d = JSON.parse(str);
+                    if (d.type === 'crsf' && d.data) processBytes(new Uint8Array(d.data));
+                    else if (d.type === 'mavlink_telemetry' && d.data) applyPatch(d.data);
+                    else if (d.type === 'ack') handleAck(d.seq, d.result);
+                } catch(_) {}
+                _serialFrameState = 0;
+                _serialJsonBuf = null;
+            }
+        }
+    }
+}
+
+async function _serialReadLoop() {
+    const reader = serialPort.readable.getReader();
+    serialReader = reader;
+    _serialFrameState = 0;
+    try {
+        while (serialReadLoopActive) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            if (value) _processSerialBytes(value);
+        }
+    } catch(_) {}
+    finally { reader.releaseLock(); serialReader = null; }
+    if (isConnected) _onSerialDisconnected();
+}
+
+function _onSerialDisconnected() {
+    isConnected = false;
+    setStatus('disconnected', 'Serial bağlantı kapandı');
+    const btn = document.getElementById('btnConnect');
+    btn.innerHTML = '<i class="bi bi-plug-fill"></i> Bağlan';
+    btn.className = 'btn-connect idle';
+    stopPktRate();
+}
+
+function disconnect() {
+    userDisconnected = true; clearTimeout(reconnectTimer);
+    if (connMode === 'serial') {
+        serialReadLoopActive = false;
+        if (serialWriter) { try { serialWriter.releaseLock(); } catch(_) {} serialWriter = null; }
+        if (serialPort)   { try { serialPort.close(); } catch(_) {} serialPort = null; }
+        document.getElementById('serialPortName').textContent = '';
+    } else {
+        if (ws) { ws.close(); ws = null; }
+    }
+    isConnected = false;
+    setStatus('disconnected', 'Bağlantı kesildi');
+    const btn = document.getElementById('btnConnect');
+    btn.innerHTML = '<i class="bi bi-plug-fill"></i> Bağlan';
+    btn.className = 'btn-connect idle';
+    stopPktRate();
+}
+
+function applyPatch(data) {
+    Object.entries(data).forEach(([k,v]) => {
+        if (k === 'channels' && Array.isArray(v)) v.forEach((ch,i) => { if (i < 16 && Number.isFinite(ch)) telemetry.channels[i] = Math.round(ch); });
+        else if (k in telemetry) telemetry[k] = v;
+    });
+    pktCount++; lastPacketTime = Date.now(); renderAll();
+}
+
+// ============================================================
+//  STATUS + PKT RATE
+// ============================================================
+function setStatus(state, text) {
+    const dot = document.getElementById('statusDot');
+    dot.className = 'status-dot' + (state==='connected'?' ok': state==='connecting'?' warn':'');
+    document.getElementById('statusText').textContent = text;
+    debugLog(text, state === 'connected' ? 'ok' : state === 'connecting' ? 'info' : 'warn');
+}
+
+function startPktRate() {
+    pktCountLast = pktCount;
+    pktRateTimer = setInterval(() => {
+        document.getElementById('pktRate').textContent = pktCount - pktCountLast;
+        pktCountLast = pktCount;
+        if (lastPacketTime) {
+            document.getElementById('lastPacketAge').textContent =
+                ((Date.now()-lastPacketTime)/1000).toFixed(1) + 's';
+        }
+    }, 1000);
+}
+function stopPktRate() {
+    if (pktRateTimer) { clearInterval(pktRateTimer); pktRateTimer = null; }
+    document.getElementById('pktRate').textContent = '0';
+    document.getElementById('lastPacketAge').textContent = '--';
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+// ============================================================
+//  MAP — OFFLINE (IndexedDB, yerleşik — CDN gerektirmez)
+// ============================================================
+const OfflineTileLayer = L.TileLayer.extend({
+    _idb: null,
+    _openDb: function() {
+        if (this._idb) return Promise.resolve(this._idb);
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open('vecihi-tiles', 1);
+            req.onupgradeneeded = e => e.target.result.createObjectStore('tiles');
+            req.onsuccess = e => { this._idb = e.target.result; resolve(this._idb); };
+            req.onerror = reject;
+        });
+    },
+    createTile: function(coords, done) {
+        const img = document.createElement('img');
+        img.setAttribute('role', 'presentation');
+        const key = coords.z + '/' + coords.x + '/' + coords.y;
+        const networkUrl = this.getTileUrl(coords);
+        this._openDb().then(db => {
+            const req = db.transaction('tiles').objectStore('tiles').get(key);
+            req.onsuccess = e => {
+                if (e.target.result) {
+                    img.src = URL.createObjectURL(e.target.result);
+                    done(null, img);
+                } else {
+                    fetch(networkUrl).then(r => r.blob()).then(blob => {
+                        const tx = db.transaction('tiles', 'readwrite');
+                        tx.objectStore('tiles').put(blob, key);
+                        img.src = URL.createObjectURL(blob);
+                        done(null, img);
+                    }).catch(() => { img.src = networkUrl; done(null, img); });
+                }
+            };
+            req.onerror = () => { img.src = networkUrl; done(null, img); };
+        }).catch(() => { img.src = networkUrl; done(null, img); });
+        return img;
+    },
+    getTileKeys: function(bounds, minZ, maxZ) {
+        const tiles = [];
+        for (let z = minZ; z <= maxZ; z++) {
+            const min = this._map.project(bounds.getNorthWest(), z).divideBy(256).floor();
+            const max = this._map.project(bounds.getSouthEast(), z).divideBy(256).floor();
+            for (let x = min.x; x <= max.x; x++) {
+                for (let y = min.y; y <= max.y; y++) {
+                    tiles.push({x, y, z, key: z+'/'+x+'/'+y});
+                }
+            }
+        }
+        return tiles;
+    },
+
+    clearAllTiles: function() {
+        return this._openDb().then(db => new Promise((res, rej) => {
+            const r = db.transaction('tiles', 'readwrite').objectStore('tiles').clear();
+            r.onsuccess = res; r.onerror = rej;
+        }));
+    }
+});
+
+let _mapSaveTotal = 0;
+
+function _setMapBadge(text, state) {
+    const b = document.getElementById('tileSourceBadge');
+    if (!b) return;
+    b.textContent = text;
+    b.className = 'tile-source-badge' + (state === 'saved' ? ' local' : '');
+}
+
+function saveMapArea() {
+    if (!mapInstance || !_activeTileLayer) return;
+    _setMapBadge('Önbellekleniyor…', 'saving');
+    const btn = document.getElementById('mapSaveBtn');
+    if (btn) btn.disabled = true;
+    // Görünümdeki tile'ları yeniden yükle; createTile onları IndexedDB'ye kaydeder.
+    // OSM toplu indirmeye izin vermez — haritayı gezince tile'lar otomatik kaydedilir.
+    _activeTileLayer.redraw();
+    setTimeout(() => {
+        _setMapBadge('Kaydedildi ✓', 'saved');
+        if (btn) btn.disabled = false;
+        setTimeout(() => _setMapBadge('OSM', ''), 2500);
+    }, 1500);
+}
+
+function clearSavedTiles() {
+    if (!confirm('Tarayıcıda saklanan tüm harita tile\'larını silmek istiyor musunuz?')) return;
+    (_activeTileLayer ? _activeTileLayer.clearAllTiles() : Promise.resolve())
+        .then(() => { _setMapBadge('OSM', ''); alert('Kayıtlı harita verileri silindi.'); })
+        .catch(() => alert('Silme işlemi başarısız oldu.'));
+}
+window.addEventListener('DOMContentLoaded', () => {
+    tryAutoLaunchProxy();
+    initMap();
+    drawHorizon(0, 0);
+    drawWindCompass(0, false);
+    drawTerrainRadar();
+    renderChannels();
+    // 50Hz stick heartbeat — Web Worker (sekme arkaplanda olsa bile throttle edilmez)
+    // gcsActive=false iken paket gönderilmez: YKİ, GCS switch kapalıyken yalnızca telemetri izler.
+    const _keepaliveWorker = new Worker(URL.createObjectURL(
+        new Blob(['setInterval(()=>postMessage(0),20)'], {type:'application/javascript'})
+    ));
+    _keepaliveWorker.onmessage = () => {
+        if (isReady() && gcsActive) {
+            sendRaw(buildStickPacket(controls.roll, controls.pitch, controls.throttle, controls.yaw).buffer);
+        }
+    };
+});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(r => console.log('[SW] Kayıt:', r.scope))
+            .catch(e => console.warn('[SW] Hata:', e));
+    });
+}
+</script>
+
+<div id="ackToast" style="display:none;position:fixed;bottom:20px;right:20px;
+     padding:10px 18px;border-radius:8px;color:#fff;font-weight:600;
+     font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);
+     transition:opacity .3s;"></div>
+
+<!-- ── MAP MANAGEMENT MODAL ── -->
+
+
+
+</body>
+</html>

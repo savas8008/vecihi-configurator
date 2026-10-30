@@ -1,5 +1,21 @@
 [
   {
+    "date": "2026-09-18",
+    "items": [
+      "v2.0 sürüm dönümü: firmware v1.3'e kadar uyumlu olan configurator, kendi origin'i içinde /v1/ altında değişmeden arşivlendi. Bu configurator artık yalnızca firmware v2.x ile tam uyumlu (COMPATIBLE_FIRMWARE_MAJOR=2)",
+      "Sürüm uyumsuzluğu uyarısına gerçek yönlendirme linki eklendi: v1.x firmware bağlandığında uyarı penceresi artık '/v1/configurator.html' arşivine tıklanabilir bir link veriyor (önceden yalnızca metinle 'uygun configurator'ı kullanın' deniyordu, gidilecek bir adres yoktu). Arşivlenmiş v1 kopyası da simetrik şekilde v2+ cihaz bağlanırsa güncel configurator'a geri link veriyor",
+      "Firmware yükleme sekmesi artık yalnızca bu configurator'ın ana sürümüne ait firmware'leri listeliyor ve yüklüyor: v1 arşivi her zaman v1.x (şu an 1.3), güncel configurator v2.x yükler. Önceden ikisi de kök manifest'i (her zaman en son sürüm) kullandığı için v1 arşivinden de 2.0 flaşlanırdı",
+      "firmware_version alanı göndermeyen 1.3 öncesi kartlar artık v1.x olarak tanınıp v1 arşivine yönlendiriliyor (önceden uyarısız bağlanıyordu)",
+      "v1 ve v2 configurator'ın service worker'ları artık birbirinin çevrimdışı önbelleğini silmiyor"
+    ]
+  },
+  {
+    "date": "2026-09-16",
+    "items": [
+      "Rüzgar tahmincisinin sabit yan rüzgarda (crosswind) kalıcı yaw bias öğrenmesine yol açan hatası giderildi ve gerçek uçuşta doğrulandı. Üç düzeltme birlikte: (1) wind_estimator.update() artık INAV'daki gibi yalnızca gerçek yeni bir GPS örneği geldiğinde çalışıyor — önceden her IMU turunda çağrıldığı için iki GPS paketi arasında donmuş hız verisiyle 'rüzgar' hesaplanıyor, dönüşlerde uçağın kendi yer hızına yakınsıyordu; (2) ilk geçerli örneği %100 ağırlıkla kabul eden özel dal kaldırıldı, artık ilk örnek dahil her zaman aynı %98/%2 EMA uygulanıyor — tek gürültülü bir örneğin dakikalarca kalıcı tahmine oturmasını önlüyor; (3) tahminci artık yalnızca uçuş sırasında (is_flying) çalışıyor, yerde/elde taşırken tutum değişse bile beslenmiyor. SITL'de (land_assist_circuit.json, gerçek rüzgar 5 m/s) sonuç 20.6 m/s'den 4.5 m/s'ye (%10 hata) indi"
+    ]
+  },
+  {
     "date": "2026-08-14",
     "items": [
       "SITL (uçuş simülatörü) artık configurator'ın içinde: sol menüde 'Simülatör (SITL)' sayfası açıldı. Uçağın GERÇEK uçuş yazılımı (control_loop, navigation, flight_modes, attitude_mahony, altitude_manager, wind_estimator, control_outputs, imu_handler, tecs_manager, pid_autotune_fw) WebAssembly'ye derlenip tarayıcıda koşuyor — taklit bir model değil, uçaktakiyle aynı kaynak kod. Senaryo formdan kuruluyor, uçuş canlı izleniyor, iz KML olarak indirilebiliyor. Öncesinde SITL yalnızca Windows'ta komut satırından çalışıyor, senaryolar elle JSON düzenlenerek hazırlanıyor ve sonuç ancak uçuş bittikten sonra Google Earth'te görülebiliyordu",

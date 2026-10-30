@@ -7,7 +7,7 @@
  * Web Serial API çalışmak için HTTPS veya localhost gerektirir.
  */
 
-const CACHE_NAME = 'vecihi-v4';
+const CACHE_NAME = 'vecihi-v5';
 
 // Önbelleğe alınacak statik dosyalar
 const STATIC_ASSETS = [
@@ -57,7 +57,8 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((key) => key !== CACHE_NAME)
+          // /v1/ arşivi aynı origin'de kendi SW'ı ve önbelleğiyle yaşıyor — dokunma.
+          .filter((key) => key !== CACHE_NAME && !key.startsWith('vecihi-v1-archive'))
           .map((key) => caches.delete(key))
       )
     ).then(() => self.clients.claim())
