@@ -34,6 +34,7 @@ const STATIC_ASSETS = [
   './assets/js/waypoint.js',
   './assets/js/outputs.js',
   './assets/js/outputs_page.js',
+  './assets/js/pin_scan.js',
   './assets/js/firmware.js',
   './assets/js/sitl.js',
   // NOT: './assets/sitl/sitl.js' (WASM motoru, ~180 KB) bilerek listede DEGIL —

@@ -26,6 +26,15 @@ let postConnectDataTimer = null;     // Bağlantı sonrası veri gelmezse uçuş
 const COMPATIBLE_FIRMWARE_MAJOR = 2;
 let _versionWarningShown = false; // Bağlantı başına tek uyarı göster
 
+// i18n yardımcısı: I18N yüklüyse çeviriyi, değilse Türkçe yedeği döndürür;
+// "{ad}" yer tutucularını vars ile doldurur.
+function _vT(key, fallback, vars) {
+    let s = (typeof I18N !== 'undefined' && I18N && typeof I18N.t === 'function') ? I18N.t(key) : key;
+    if (!s || s === key) s = fallback;
+    for (const k in (vars || {})) s = s.split('{' + k + '}').join(vars[k]);
+    return s;
+}
+
 // === CFG_SET / CFG_COMMIT ACK MEKANİZMASI ===
 let _cfgPending = null; // { resolve, reject, timeout }
 
@@ -467,6 +476,15 @@ function handleStandardJsonData(data) {
     // YENİ EKLENEN KISIM: EL SIKIŞMA VE SENSÖR KONTROLÜ
     // ==========================================
 
+    // Pin taraması yanıtları (pin_scan.js)
+    if (data.scan_i2c || data.scan_gps || data.scan_rx) {
+        if (typeof handlePinScanResult === 'function') {
+            const kind = data.scan_i2c ? 'i2c' : data.scan_gps ? 'gps' : 'rx';
+            handlePinScanResult(kind, data.scan_i2c || data.scan_gps || data.scan_rx);
+        }
+        return;
+    }
+
     // 2. ADIM: Sensör statüsü geldi mi?
     if (data.stream_data && data.stream_data.type === 'init_status') {
         const sensors = data.stream_data.data;
@@ -480,20 +498,19 @@ function handleStandardJsonData(data) {
             const deviceMajor = parseInt(String(sensors.firmware_version).split('.')[0], 10);
             if (!isNaN(deviceMajor) && deviceMajor !== COMPATIBLE_FIRMWARE_MAJOR) {
                 _versionWarningShown = true;
-                log(`⚠️ Sürüm uyumsuzluğu: cihaz v${sensors.firmware_version}, configurator v${COMPATIBLE_FIRMWARE_MAJOR}.x ile uyumlu`, 'warning');
+                const vars = { dev: sensors.firmware_version, major: COMPATIBLE_FIRMWARE_MAJOR, dev_major: deviceMajor };
+                log(_vT('version.mismatch_log', '⚠️ Sürüm uyumsuzluğu: cihaz v{dev}, configurator v{major}.x ile uyumlu', vars), 'warning');
                 if (typeof showModal === 'function') {
                     // Cihaz eski (v1.x) ise arşivlenmiş uyumlu configurator'a yönlendir
                     // (bkz. /v1/ klasörü — v2 öncesi son configurator anlık görüntüsü).
                     const olderHint = deviceMajor < COMPATIBLE_FIRMWARE_MAJOR
-                        ? `<p class="small"><a href="v1/configurator.html">v${deviceMajor}.x için arşivlenmiş configurator'a geçin</a>
-                             ya da bağlantıyı kesip Firmware sekmesinden v${COMPATIBLE_FIRMWARE_MAJOR}.x'e yükseltin
-                             (ayarlarınız otomatik taşınır).</p>`
+                        ? `<p class="small">${_vT('version.older_hint', "<a href=\"v1/configurator.html\">v{dev_major}.x için arşivlenmiş configurator'a geçin</a> ya da bağlantıyı kesip Firmware sekmesinden v{major}.x'e yükseltin (ayarlarınız otomatik taşınır).", vars)}</p>`
                         : '';
                     showModal(
-                        'Sürüm Uyumsuzluğu',
+                        _vT('version.mismatch_title', 'Sürüm Uyumsuzluğu'),
                         `<div class="text-center">
-                            <p>Bağlı cihaz <strong>firmware v${sensors.firmware_version}</strong> kullanıyor, bu configurator ise <strong>v${COMPATIBLE_FIRMWARE_MAJOR}.x</strong> ile uyumlu.</p>
-                            <p class="small">Devam edebilirsiniz ancak bazı ayarlar hatalı görünebilir veya kaydedilemeyebilir. Lütfen bu firmware sürümüne uygun configurator'ı kullanın.</p>
+                            <p>${_vT('version.mismatch_body', 'Bağlı cihaz <strong>firmware v{dev}</strong> kullanıyor, bu configurator ise <strong>v{major}.x</strong> ile uyumlu.', vars)}</p>
+                            <p class="small">${_vT('version.mismatch_note', "Devam edebilirsiniz ancak bazı ayarlar hatalı görünebilir veya kaydedilemeyebilir. Lütfen bu firmware sürümüne uygun configurator'ı kullanın.")}</p>
                             ${olderHint}
                         </div>`,
                         'warning'
@@ -637,6 +654,9 @@ function handleStandardJsonData(data) {
                     </li>` : ''}
                 `;
             }
+
+            // IMU yok / GPS pini atanmamış → kartın pinleri kendisinin araması önerilir
+            if (typeof renderSensorModalScanOffers === 'function') renderSensorModalScanOffers(sensors);
 
             // Modalı göster
             if (modalEl) {

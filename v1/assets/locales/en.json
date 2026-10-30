@@ -661,5 +661,17 @@
     "status_summary": "Ready — {slow} flight records, {fast} filter records",
     "range_label": "Time range",
     "range_all": "All"
+  },
+  "version": {
+    "mismatch_title": "Version Mismatch",
+    "mismatch_log": "⚠️ Version mismatch: device v{dev}, configurator is compatible with v{major}.x",
+    "mismatch_body": "The connected device runs <strong>firmware v{dev}</strong>, but this configurator is compatible with <strong>v{major}.x</strong>.",
+    "mismatch_note": "You can continue, but some settings may display incorrectly or fail to save. Please use the configurator that matches this firmware version.",
+    "older_hint": "<a href=\"v1/configurator.html\">Switch to the archived configurator for v{dev_major}.x</a>, or disconnect and upgrade to v{major}.x from the Firmware tab (your settings are migrated automatically).",
+    "newer_hint": "<a href=\"../configurator.html\">Switch to the current configurator</a> (for v{dev_major}.x).",
+    "v1_banner": "This is an archived configurator compatible with <strong>firmware v1.x</strong>. If your device runs v2.x, <a href=\"../configurator.html\" style=\"color:#7ec8ff;\">switch to the current configurator</a>. Going back from v2.x to 1.3 resets PID, filter, navigation and altitude settings to defaults.",
+    "fw_other_major": "(this configurator is for v{major}.x)",
+    "fw_list_failed": "Could not load version list",
+    "fw_unreachable": "Unreachable"
   }
 }

@@ -21,6 +21,15 @@ const FIRMWARE_VERSIONS_URL = FIRMWARE_PUBLIC_BASE + 'versions.json';
 // flaşlatırdı; manifest bu yüzden versions.json'dan seçiliyor.
 const FIRMWARE_TARGET_MAJOR = (typeof COMPATIBLE_FIRMWARE_MAJOR !== 'undefined') ? COMPATIBLE_FIRMWARE_MAJOR : 1;
 
+// i18n yardımcısı: I18N yüklüyse çeviriyi, değilse Türkçe yedeği döndürür;
+// "{ad}" yer tutucularını vars ile doldurur.
+function _vT(key, fallback, vars) {
+    let s = (typeof I18N !== 'undefined' && I18N && typeof I18N.t === 'function') ? I18N.t(key) : key;
+    if (!s || s === key) s = fallback;
+    for (const k in (vars || {})) s = s.split('{' + k + '}').join(vars[k]);
+    return s;
+}
+
 function firmwareMajorOf(version) {
     return parseInt(String(version || '').split('.')[0], 10);
 }
@@ -76,7 +85,7 @@ async function loadFirmwareInfo() {
         });
     } catch (err) {
         versionEls.forEach(versionEl => {
-            versionEl.textContent = 'Bağlanamadı';
+            versionEl.textContent = _vT('version.fw_unreachable', 'Bağlanamadı');
             versionEl.className = 'badge bg-danger firmware-version';
         });
         dateEls.forEach(dateEl => {
@@ -135,9 +144,9 @@ async function loadFirmwareVersions() {
             versions.forEach(entry => {
                 const option = document.createElement('option');
                 option.value = FIRMWARE_PUBLIC_BASE + entry.manifest;
-                const foreign = firmwareMajorOf(entry.version) !== FIRMWARE_TARGET_MAJOR;
-                option.textContent = `v${entry.version} — ${entry.date || '—'}` +
-                    (foreign ? ` (bu configurator v${FIRMWARE_TARGET_MAJOR}.x içindir)` : '');
+                option.dataset.version = entry.version;
+                option.dataset.date = entry.date || '—';
+                labelFirmwareOption(option);
                 select.appendChild(option);
             });
             select.disabled = false;
@@ -145,12 +154,40 @@ async function loadFirmwareVersions() {
         });
     } catch (err) {
         selects.forEach(select => {
-            select.innerHTML = '<option value="">Sürüm listesi yüklenemedi</option>';
+            select.innerHTML = '';
+            const option = document.createElement('option');
+            option.value = '';
+            option.dataset.failed = '1';
+            labelFirmwareOption(option);
+            select.appendChild(option);
             select.disabled = true;
         });
         console.warn('[Firmware] versions.json yüklenemedi:', err);
     }
 }
+
+/**
+ * @brief Sürüm seçeneğinin metnini o anki dile göre yazar (seçimi değiştirmez)
+ */
+function labelFirmwareOption(option) {
+    if (option.dataset.failed) {
+        option.textContent = _vT('version.fw_list_failed', 'Sürüm listesi yüklenemedi');
+        return;
+    }
+    const foreign = firmwareMajorOf(option.dataset.version) !== FIRMWARE_TARGET_MAJOR;
+    option.textContent = `v${option.dataset.version} — ${option.dataset.date}` +
+        (foreign ? ' ' + _vT('version.fw_other_major', '(bu configurator v{major}.x içindir)',
+                             { major: FIRMWARE_TARGET_MAJOR }) : '');
+}
+
+// EN/TR düğmesi: listeyi yeniden çekmeden yalnızca metinleri çevir —
+// kullanıcının seçtiği sürüm ve flash düğmesi olduğu gibi kalır.
+document.addEventListener('i18n:changed', () => {
+    document.querySelectorAll('.firmware-version-select option').forEach(labelFirmwareOption);
+    document.querySelectorAll('.firmware-version.bg-danger').forEach(el => {
+        el.textContent = _vT('version.fw_unreachable', 'Bağlanamadı');
+    });
+});
 
 /**
  * @brief Flash wrapper'ını bağlantı durumuna göre günceller

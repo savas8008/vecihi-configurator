@@ -1,5 +1,18 @@
 [
   {
+    "date": "2026-10-31",
+    "items": [
+      "IMU ve GPS pinleri artık otomatik bulunabiliyor: IMU Sensör Pinleri ve GPS Bağlantı Pinleri bölümlerine (ve sensör hatası penceresine) 'Otomatik Bul' butonu eklendi. Kart, IMU'yu (MPU6050 / LSM6DSM, varsa BMP180) ve GPS'in veri hattını kendisi arıyor; bulunan pinler kullanıcı onaylayınca kaydediliyor. Hızlı tarama hiçbir pini sürmeden yalnızca pull-up'lı hatları dener; bulamazsa onayla tüm boştaki pinler denenebilir. Motor/servo/aux/ADC pinleri ile flash, PSRAM ve USB pinlerine hiçbir koşulda dokunulmaz, kollar açıkken tarama reddedilir",
+      "Alıcı pinleri de otomatik bulunabiliyor: Kumanda sayfasındaki Alıcı Bağlantı Pinleri bölümüne 'Otomatik Bul' eklendi. Kart sinyal taşıyan pinleri dinleyip protokolü çerçeve imzasından tanıyor — SBUS (düz/ters), CRSF/ELRS (CRC8 doğrulamalı) ve MAVLink ELRS — ve pinle birlikte protokolü de tek kayıtta kaydediyor. TX pini CRSF'de alıcıya DEVICE_PING gönderilerek, MAVLink ELRS'te alıcının RADIO_STATUS mesajındaki tampon doluluğu (txbuf) izlenerek doğrulanıyor; bu adım için kumandanın açık ve alıcıya bağlı olması gerekiyor (bağlantı yokken ELRS alıcısı karttan gelen veriyi kabul etmiyor). SBUS tek yönlü olduğundan TX aranmıyor",
+      "Alıcı pini atanmamışken (-1) alıcı UART'ı artık açılmıyor: önceden çekirdeğin varsayılanı olan GPIO16/17'ye (S3'te native USB hatları 19/20'ye) bağlanıp kullanıcının hiç atamadığı GPIO17'yi UART TX olarak sürüyordu",
+      "I2C taraması sertleştirildi (gerçek kartta bulunan hatalar): önceki denemenin pini GPIO matrisinde SCL olarak kalıp yanlış pini (ör. GPIO4 yerine GPIO0) buldurabiliyordu — her denemeden sonra pinler matristen ayrılıyor; LOW'da takılı hatlar sahte 'MPU6050' sonucu veriyordu — boşta hat ve ayrılmış adres kontrolü eklendi; sinyal taşıyan pinler (ör. alıcının hattı) I2C sürücüsünü çift başına ~3 sn kilitliyordu — bu pinler önceden ayıklanıyor. Hızlı tarama 10 sn'den 46 ms'ye indi",
+      "Yeni kurulumda GPS pinleri atanmamışken (-1) kartın anlamsız mesajlar basması/yeniden başlaması giderildi: GPS başlatması pinsiz çağrıldığında UART1 çekirdeğin varsayılanı olan GPIO9/10'a, yani ESP32'nin SPI flash hatlarına bağlanıyordu; baud taraması flash'a veri basıyordu. Pin atanmamışsa GPS artık hiç başlatılmıyor",
+      "Yeni kurulumda konfiguratörü dolduran '[E][Wire.cpp] requestFrom(): i2cWriteReadNonStop returned Error -1' seli giderildi: IMU yokken ana döngü her turda (saniyede ~150 kez) yanıt vermeyen sensörü okumaya çalışıyor, çekirdek bu hatayı doğrudan USB seri hattına yazıyordu. Bu satırlar kartın JSON yanıtlarının ORTASINA girip konfiguratörün mesajları ayrıştıramamasına yol açıyordu. Okuma artık yalnızca bulunmuş bir sensör için yapılıyor ve çekirdek logları derlemede kapatıldı (CORE_DEBUG_LEVEL=0)",
+      "IMU bulunamadığında ana döngü her 5 turda bir I2C kurtarma çalıştırıp kayıtlı (yanlış) pinleri sürekli sürmeyi bıraktı; kurtarma yalnızca açılışta bulunmuş bir sensör için çalışıyor",
+      "init_status mesajı artık GPS pinlerinin atanıp atanmadığını ve kayıtlı I2C pinlerini bildiriyor — konfiguratör 'GPS yok' ile 'GPS pini hiç seçilmemiş' durumunu ayırt edip tarama öneriyor"
+    ]
+  },
+  {
     "date": "2026-09-18",
     "items": [
       "v2.0 sürüm dönümü: firmware v1.3'e kadar uyumlu olan configurator, kendi origin'i içinde /v1/ altında değişmeden arşivlendi. Bu configurator artık yalnızca firmware v2.x ile tam uyumlu (COMPATIBLE_FIRMWARE_MAJOR=2)",

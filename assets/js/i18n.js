@@ -50,6 +50,12 @@ const I18N = (() => {
             const val = t(el.getAttribute('data-i18n'));
             if (val !== el.getAttribute('data-i18n')) setTextKeepIcon(el, val);
         });
+        // İçinde link/vurgu olan metinler (yalnızca kendi locale dosyalarımızdan gelir)
+        document.querySelectorAll('[data-i18n-html]').forEach(el => {
+            const key = el.getAttribute('data-i18n-html');
+            const val = t(key);
+            if (val !== key) el.innerHTML = val;
+        });
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
             const val = t(el.getAttribute('data-i18n-placeholder'));
             if (val !== el.getAttribute('data-i18n-placeholder')) el.placeholder = val;
@@ -259,6 +265,8 @@ const I18N = (() => {
         applyPageMap();
         updateToggleBtn();
         document.documentElement.setAttribute('lang', lang === 'tr' ? 'tr' : 'en');
+        // JS ile üretilen metinler (ör. firmware sürüm listesi) yeniden çizilsin
+        document.dispatchEvent(new CustomEvent('i18n:changed', { detail: { lang } }));
     }
 
     // -------------------------------------------------------------------------

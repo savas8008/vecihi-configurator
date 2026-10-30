@@ -26,6 +26,15 @@ let postConnectDataTimer = null;     // Bağlantı sonrası veri gelmezse uçuş
 const COMPATIBLE_FIRMWARE_MAJOR = 1;
 let _versionWarningShown = false; // Bağlantı başına tek uyarı göster
 
+// i18n yardımcısı: I18N yüklüyse çeviriyi, değilse Türkçe yedeği döndürür;
+// "{ad}" yer tutucularını vars ile doldurur.
+function _vT(key, fallback, vars) {
+    let s = (typeof I18N !== 'undefined' && I18N && typeof I18N.t === 'function') ? I18N.t(key) : key;
+    if (!s || s === key) s = fallback;
+    for (const k in (vars || {})) s = s.split('{' + k + '}').join(vars[k]);
+    return s;
+}
+
 // === CFG_SET / CFG_COMMIT ACK MEKANİZMASI ===
 let _cfgPending = null; // { resolve, reject, timeout }
 
@@ -478,18 +487,19 @@ function handleStandardJsonData(data) {
             const deviceMajor = parseInt(String(sensors.firmware_version).split('.')[0], 10);
             if (!isNaN(deviceMajor) && deviceMajor !== COMPATIBLE_FIRMWARE_MAJOR) {
                 _versionWarningShown = true;
-                log(`⚠️ Sürüm uyumsuzluğu: cihaz v${sensors.firmware_version}, configurator v${COMPATIBLE_FIRMWARE_MAJOR}.x ile uyumlu`, 'warning');
+                const vars = { dev: sensors.firmware_version, major: COMPATIBLE_FIRMWARE_MAJOR, dev_major: deviceMajor };
+                log(_vT('version.mismatch_log', '⚠️ Sürüm uyumsuzluğu: cihaz v{dev}, configurator v{major}.x ile uyumlu', vars), 'warning');
                 if (typeof showModal === 'function') {
                     // Bu dosya /v1/ arşivinde çalışıyor — cihaz daha yeniyse (v2+)
                     // güncel configurator'a (site kökü) geri link veriyoruz.
                     const newerHint = deviceMajor > COMPATIBLE_FIRMWARE_MAJOR
-                        ? `<p class="small"><a href="../configurator.html">Güncel configurator'a geçin</a> (v${deviceMajor}.x için).</p>`
+                        ? `<p class="small">${_vT('version.newer_hint', "<a href=\"../configurator.html\">Güncel configurator'a geçin</a> (v{dev_major}.x için).", vars)}</p>`
                         : '';
                     showModal(
-                        'Sürüm Uyumsuzluğu',
+                        _vT('version.mismatch_title', 'Sürüm Uyumsuzluğu'),
                         `<div class="text-center">
-                            <p>Bağlı cihaz <strong>firmware v${sensors.firmware_version}</strong> kullanıyor, bu configurator ise <strong>v${COMPATIBLE_FIRMWARE_MAJOR}.x</strong> ile uyumlu.</p>
-                            <p class="small">Devam edebilirsiniz ancak bazı ayarlar hatalı görünebilir veya kaydedilemeyebilir. Lütfen bu firmware sürümüne uygun configurator'ı kullanın.</p>
+                            <p>${_vT('version.mismatch_body', 'Bağlı cihaz <strong>firmware v{dev}</strong> kullanıyor, bu configurator ise <strong>v{major}.x</strong> ile uyumlu.', vars)}</p>
+                            <p class="small">${_vT('version.mismatch_note', "Devam edebilirsiniz ancak bazı ayarlar hatalı görünebilir veya kaydedilemeyebilir. Lütfen bu firmware sürümüne uygun configurator'ı kullanın.")}</p>
                             ${newerHint}
                         </div>`,
                         'warning'

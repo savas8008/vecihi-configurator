@@ -722,5 +722,17 @@ window.VECIHI_LOCALE_TR = {
     "status_summary": "Hazır — {slow} uçuş kaydı, {fast} filtre kaydı",
     "range_label": "Zaman aralığı",
     "range_all": "Tümü"
+  },
+  "version": {
+    "mismatch_title": "Sürüm Uyumsuzluğu",
+    "mismatch_log": "⚠️ Sürüm uyumsuzluğu: cihaz v{dev}, configurator v{major}.x ile uyumlu",
+    "mismatch_body": "Bağlı cihaz <strong>firmware v{dev}</strong> kullanıyor, bu configurator ise <strong>v{major}.x</strong> ile uyumlu.",
+    "mismatch_note": "Devam edebilirsiniz ancak bazı ayarlar hatalı görünebilir veya kaydedilemeyebilir. Lütfen bu firmware sürümüne uygun configurator'ı kullanın.",
+    "older_hint": "<a href=\"v1/configurator.html\">v{dev_major}.x için arşivlenmiş configurator'a geçin</a> ya da bağlantıyı kesip Firmware sekmesinden v{major}.x'e yükseltin (ayarlarınız otomatik taşınır).",
+    "newer_hint": "<a href=\"../configurator.html\">Güncel configurator'a geçin</a> (v{dev_major}.x için).",
+    "v1_banner": "Bu, <strong>firmware v1.x</strong> ile uyumlu arşivlenmiş bir configurator sürümüdür. Cihazınız v2.x çalıştırıyorsa <a href=\"../configurator.html\" style=\"color:#7ec8ff;\">güncel configurator'a geçin</a>. v2.x'ten 1.3'e geri dönmek PID, filtre, navigasyon ve irtifa ayarlarını varsayılana döndürür.",
+    "fw_other_major": "(bu configurator v{major}.x içindir)",
+    "fw_list_failed": "Sürüm listesi yüklenemedi",
+    "fw_unreachable": "Bağlanamadı"
   }
 };
