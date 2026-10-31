@@ -47,6 +47,7 @@
 <script src="assets/js/flight_modes.js"></script>
 <script src="assets/js/outputs_page.js"></script>
 <script src="assets/js/pin_scan.js"></script>
+<script src="assets/js/hardware_page.js"></script>
 <script src="assets/js/settings_backup.js"></script>
 <script src="assets/js/kml_converter.js"></script>
 <script src="assets/js/changelog.js"></script>
@@ -231,6 +232,7 @@
                 <div class="sidebar rounded p-3">
                     <ul class="nav flex-column">
                         <li class="nav-item"><a class="nav-link" href="#" data-page="sensors"><i class="bi bi-radar me-2"></i> <span data-i18n="nav.sensors">Sensörler</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="hardware"><i class="bi bi-motherboard me-2"></i> <span data-i18n="nav.hardware">Donanım</span></a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="calibration"><i class="bi bi-tools me-2"></i> <span data-i18n="nav.calibration">Kalibrasyon</span></a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="mixer"><i class="bi bi-sliders me-2"></i> <span data-i18n="nav.mixer">Mikser</span></a></li>
                         <li class="nav-item"><a class="nav-link" href="#" data-page="gps"><i class="bi bi-geo-alt me-2"></i> <span data-i18n="nav.gps">Navigasyon & GPS</span></a></li>
@@ -776,41 +778,184 @@
   </div>
 </div>
 
+<!-- ================== DONANIM SAYFASI ==================
+     Sensör ve haberleşme pinleri tek yerde (hardware_page.js). Seçim kutuları
+     eski sayfalardaki KİMLİKLERİYLE taşındı — outputs_page_data'yı dolduran
+     handleOutputsPageData() değişmeden çalışır. Motor/servo/aux pinleri
+     Mikser sayfasında kalır; çakışma kontrolü onları da okur. -->
+<div id="hardware" class="page">
+  <div class="panel p-3">
+    <h2 class="panel-title"><i class="bi bi-motherboard"></i> <span data-i18n="hardware.title">Donanım</span></h2>
+    <p class="small text-secondary mb-3" data-i18n="hardware.intro">Sensörlerin ve haberleşme modüllerinin bağlı olduğu pinler. "Otomatik Bul" kartın kendisine aratır ve bulduğunu forma doldurur; değişiklikler en alttaki Kaydet ile tek seferde uygulanır.</p>
+
+    <div class="row g-3 hw-grid">
+
+      <!-- IMU / I2C hattı -->
+      <div class="col-lg-6">
+        <div class="pin-acc-wrap h-100">
+          <div class="pin-acc-header">
+            <span class="pin-acc-title"><i class="bi bi-cpu"></i> <span data-i18n="hardware.i2c_title">IMU, Barometre, Pitot (I2C)</span></span>
+            <span class="hw-status ms-auto" id="hwst-i2c"></span>
+          </div>
+          <div class="pin-acc-body open">
+            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
+              <div class="pin-box">
+                <label class="port-label d-block mb-1">SDA</label>
+                <select class="form-select form-select-sm pin-select" id="i2cSdaPin" style="min-width:150px;"></select>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1">SCL</label>
+                <select class="form-select form-select-sm pin-select" id="i2cSclPin" style="min-width:150px;"></select>
+              </div>
+              <button class="btn btn-outline-info btn-sm" data-scan-btn="i2c" onclick="startPinScan('i2c')">
+                <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.i2c_btn">IMU Pinlerini Otomatik Bul</span>
+              </button>
+            </div>
+            <div class="small" data-scan-result="i2c"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GPS -->
+      <div class="col-lg-6">
+        <div class="pin-acc-wrap h-100">
+          <div class="pin-acc-header">
+            <span class="pin-acc-title"><i class="bi bi-geo-alt"></i> <span data-i18n="hardware.gps_title">GPS (UART)</span></span>
+            <span class="hw-status ms-auto" id="hwst-gps"></span>
+          </div>
+          <div class="pin-acc-body open">
+            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="hardware.lbl_gps_rx">RX (GPS → ESP)</label>
+                <select class="form-select form-select-sm pin-select" id="gpsRxPin" style="min-width:150px;"></select>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="hardware.lbl_gps_tx">TX (ESP → GPS)</label>
+                <select class="form-select form-select-sm pin-select" id="gpsTxPin" style="min-width:150px;"></select>
+              </div>
+              <button class="btn btn-outline-info btn-sm" data-scan-btn="gps" onclick="startPinScan('gps')">
+                <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.gps_btn">GPS Pinlerini Otomatik Bul</span>
+              </button>
+            </div>
+            <div class="small" data-scan-result="gps"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alıcı -->
+      <div class="col-lg-6">
+        <div class="pin-acc-wrap h-100">
+          <div class="pin-acc-header">
+            <span class="pin-acc-title"><i class="bi bi-broadcast-pin"></i> <span data-i18n="hardware.rx_title">Alıcı (UART)</span></span>
+            <span class="hw-status ms-auto" id="hwst-rx"></span>
+          </div>
+          <div class="pin-acc-body open">
+            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="hardware.lbl_rx_rx">RX (Alıcı → ESP)</label>
+                <select class="form-select form-select-sm pin-select" id="rxRxPin" style="min-width:150px;"></select>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="hardware.lbl_rx_tx">TX (ESP → Alıcı)</label>
+                <select class="form-select form-select-sm pin-select" id="rxTxPin" style="min-width:150px;"></select>
+              </div>
+              <button class="btn btn-outline-info btn-sm" data-scan-btn="rx" onclick="startPinScan('rx')">
+                <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.rx_btn">Alıcı Pinlerini Otomatik Bul</span>
+              </button>
+            </div>
+            <div class="small text-light mb-1" id="hwRxProto"></div>
+            <div class="small" data-scan-result="rx"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OSD -->
+      <div class="col-lg-6">
+        <div class="pin-acc-wrap h-100">
+          <div class="pin-acc-header">
+            <span class="pin-acc-title"><i class="bi bi-display"></i> <span data-i18n="hardware.osd_title">OSD (UART)</span></span>
+          </div>
+          <div class="pin-acc-body open">
+            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="hardware.lbl_osd_tx">TX (ESP → OSD)</label>
+                <select class="form-select form-select-sm pin-select" id="osdTxPin" style="min-width:150px;"></select>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="hardware.lbl_osd_rx">RX (OSD → ESP)</label>
+                <select class="form-select form-select-sm pin-select" id="osdRxPin" style="min-width:150px;"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Batarya ADC -->
+      <div class="col-lg-6">
+        <div class="pin-acc-wrap h-100">
+          <div class="pin-acc-header">
+            <span class="pin-acc-title"><i class="bi bi-battery-half"></i> <span data-i18n="hardware.adc_title">Batarya Voltajı (ADC)</span></span>
+          </div>
+          <div class="pin-acc-body open">
+            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
+              <div class="pin-box">
+                <label class="port-label d-block mb-1">ADC GPIO</label>
+                <select class="form-select form-select-sm pin-select" id="adcVoltagePin" style="min-width:150px;"></select>
+                <small class="text-info mt-1 d-block"><span data-i18n="hardware.adc_hint">Tavsiye: GPIO 34, 35 veya 36 (giriş-only)</span></small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pitot -->
+      <div class="col-lg-6">
+        <div class="pin-acc-wrap h-100">
+          <div class="pin-acc-header">
+            <span class="pin-acc-title"><i class="bi bi-wind"></i> <span data-i18n="advanced.pitot_section">MS4525DO Pitot Tüpü</span></span>
+            <span class="hw-status ms-auto" id="hwst-pitot"></span>
+          </div>
+          <div class="pin-acc-body open">
+            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="advanced.pitot_sensor_label">Pitot Sensörü</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="pitotEnabled">
+                  <label class="form-check-label text-light" for="pitotEnabled" data-i18n="advanced.pitot_enabled">Etkin</label>
+                </div>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="advanced.pitot_scale_label">Ölçek (Scale)</label>
+                <input type="number" class="form-control form-control-sm" id="pitotScale" min="0.5" max="2.0" step="0.01" value="1.00" style="max-width:110px;">
+              </div>
+            </div>
+            <small class="text-secondary d-block" data-i18n="hardware.pitot_hint">Pitot, IMU ile aynı I2C hattına bağlanır (adres 0x28); ayrı pini yoktur. Devre dışıyken hava hızı GPS'ten (sanal) hesaplanır.</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="alert alert-danger py-2 px-3 small mt-3 d-none" id="hwConflict"></div>
+    <div class="d-flex align-items-center gap-3 flex-wrap mt-3">
+      <button type="button" class="btn btn-warning shadow-sm" id="btnSaveHardware" onclick="saveHardwareConfig()">
+        <i class="bi bi-save2 me-2"></i> <span data-i18n="hardware.save">Donanım Ayarlarını Kaydet</span>
+      </button>
+      <div class="hw-reboot-note">
+        <i class="bi bi-arrow-repeat"></i>
+        <span data-i18n="hardware.reboot_note">Kaydedince kart yeniden başlar ve bağlantı kendiliğinden yeniden kurulur.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ================== CALIBRATION PAGE ================== -->
 <div id="calibration" class="page">
 
-  <!-- IMU Sensör Pinleri (I2C) — Accordion -->
-  <div class="pin-acc-wrap mb-3">
-    <div class="pin-acc-header" onclick="togglePinAcc(this)">
-      <span class="pin-acc-title"><i class="bi bi-cpu"></i> IMU Sensör Pinleri (I2C)</span>
-      <span class="pin-acc-badges" id="i2cPinBadges"></span>
-      <i class="bi bi-chevron-down pin-acc-chevron ms-auto"></i>
-    </div>
-    <div class="pin-acc-body">
-      <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
-        <div class="pin-box">
-          <label class="port-label d-block mb-1">SCL</label>
-          <select class="form-select form-select-sm pin-select" id="i2cSclPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="calibration.gpio_scl_hint">Tavsiye: GPIO 22</span></small>
-        </div>
-        <div class="pin-box">
-          <label class="port-label d-block mb-1">SDA</label>
-          <select class="form-select form-select-sm pin-select" id="i2cSdaPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="calibration.gpio_sda_hint">Tavsiye: GPIO 21</span></small>
-        </div>
-        <button class="btn btn-warning btn-sm" onclick="saveI2CPins()">
-          <i class="bi bi-save me-1"></i> <span data-i18n="calibration.pin_save">I2C Pinlerini Kaydet</span>
-        </button>
-        <button class="btn btn-outline-info btn-sm" data-scan-btn="i2c" onclick="startPinScan('i2c')">
-          <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.i2c_btn">IMU Pinlerini Otomatik Bul</span>
-        </button>
-      </div>
-      <div class="small mb-2" data-scan-result="i2c"></div>
-      <div class="pin-reboot-warning">
-        <i class="bi bi-arrow-repeat"></i>
-        Kaydet butonuna basıldığında cihaz <strong>otomatik olarak yeniden başlatılır</strong> ve bağlantı kendiliğinden yeniden kurulur.
-      </div>
-    </div>
+  <div class="hw-moved-note mb-3">
+    <i class="bi bi-motherboard me-1"></i>
+    <span data-i18n="hardware.moved_note">Bağlantı pinleri artık Donanım sayfasında.</span>
+    <a href="#" onclick="changePage('hardware'); return false;" data-i18n="hardware.go">Donanım sayfasına git →</a>
   </div>
 
   <div class="panel p-3">
@@ -997,38 +1142,10 @@
 <!-- GPS & NAVİGASYON SAYFASI -->
 <div id="gps" class="page">
 
-  <!-- GPS Bağlantı Pinleri — Accordion -->
-  <div class="pin-acc-wrap mb-3">
-    <div class="pin-acc-header" onclick="togglePinAcc(this)">
-      <span class="pin-acc-title"><i class="bi bi-geo-alt"></i> GPS Bağlantı Pinleri (UART)</span>
-      <span class="pin-acc-badges" id="gpsPinBadges"></span>
-      <i class="bi bi-chevron-down pin-acc-chevron ms-auto"></i>
-    </div>
-    <div class="pin-acc-body">
-      <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
-        <div class="pin-box">
-          <label class="port-label d-block mb-1">TX (ESP → GPS)</label>
-          <select class="form-select form-select-sm pin-select" id="gpsTxPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="gps.gpio_tx_hint">Tavsiye: GPIO 5</span></small>
-        </div>
-        <div class="pin-box">
-          <label class="port-label d-block mb-1">RX (GPS → ESP)</label>
-          <select class="form-select form-select-sm pin-select" id="gpsRxPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="gps.gpio_rx_hint">Tavsiye: GPIO 18</span></small>
-        </div>
-      </div>
-      <button class="btn btn-warning btn-sm mt-2" onclick="saveGpsPinsOnly()">
-        <i class="bi bi-save me-1"></i> <span data-i18n="gps.pin_save">GPS Pinlerini Kaydet</span>
-      </button>
-      <button class="btn btn-outline-info btn-sm mt-2" data-scan-btn="gps" onclick="startPinScan('gps')">
-        <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.gps_btn">GPS Pinlerini Otomatik Bul</span>
-      </button>
-      <div class="small mt-2" data-scan-result="gps"></div>
-      <div class="pin-reboot-warning">
-        <i class="bi bi-arrow-repeat"></i>
-        Kaydet butonuna basıldığında cihaz <strong>otomatik olarak yeniden başlatılır</strong> ve bağlantı kendiliğinden yeniden kurulur.
-      </div>
-    </div>
+  <div class="hw-moved-note mb-3">
+    <i class="bi bi-motherboard me-1"></i>
+    <span data-i18n="hardware.moved_note">Bağlantı pinleri artık Donanım sayfasında.</span>
+    <a href="#" onclick="changePage('hardware'); return false;" data-i18n="hardware.go">Donanım sayfasına git →</a>
   </div>
 
   <div class="panel p-3">
@@ -1286,7 +1403,7 @@
     <div class="d-flex gap-1 align-items-stretch" style="flex-wrap:nowrap;">
 
       <!-- Motor 1 -->
-      <div class="panel4 output-box" style="flex:1;min-width:0;">
+      <div class="panel4 output-box out-motor" style="flex:1;min-width:0;">
         <div class="output-display h-100">
           <div class="output-title" id="motor1Title">MOTOR 1</div>
           <div class="output-value" id="output1">1000</div>
@@ -1294,7 +1411,7 @@
       </div>
 
       <!-- Motor 2 -->
-      <div class="panel4 output-box" style="flex:1;min-width:0;">
+      <div class="panel4 output-box out-motor" style="flex:1;min-width:0;">
         <div class="output-display h-100">
           <div class="output-title" id="motor2Title">MOTOR 2</div>
           <div class="output-value" id="output2">1000</div>
@@ -1302,7 +1419,7 @@
       </div>
 
       <!-- Servo 1 -->
-      <div class="panel4 output-box" id="servo1Card" style="flex:1;min-width:0;">
+      <div class="panel4 output-box out-servo" id="servo1Card" style="flex:1;min-width:0;">
         <div class="output-display h-100">
           <div class="d-flex justify-content-between align-items-center">
             <div class="output-title" id="servo1Title">SERVO 1</div>
@@ -1313,15 +1430,15 @@
           </div>
           <div class="output-value" id="servo1">1500</div>
           <div class="servo-controls">
-            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo1Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
-            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo1Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
-            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo1Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo1Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo1" data-type="min" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo1Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo1" data-type="mid" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo1Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo1" data-type="max" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
           </div>
         </div>
       </div>
 
       <!-- Servo 2 -->
-      <div class="panel4 output-box" id="servo2Card" style="flex:1;min-width:0;">
+      <div class="panel4 output-box out-servo" id="servo2Card" style="flex:1;min-width:0;">
         <div class="output-display h-100">
           <div class="d-flex justify-content-between align-items-center">
             <div class="output-title" id="servo2Title">SERVO 2</div>
@@ -1332,15 +1449,15 @@
           </div>
           <div class="output-value" id="servo2">1500</div>
           <div class="servo-controls">
-            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo2Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
-            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo2Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
-            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo2Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo2Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo2" data-type="min" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo2Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo2" data-type="mid" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo2Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo2" data-type="max" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
           </div>
         </div>
       </div>
 
       <!-- Servo 3 -->
-      <div class="panel4 output-box" id="servo3Card" style="flex:1;min-width:0;">
+      <div class="panel4 output-box out-servo" id="servo3Card" style="flex:1;min-width:0;">
         <div class="output-display h-100">
           <div class="d-flex justify-content-between align-items-center">
             <div class="output-title" id="servo3Title">SERVO 3</div>
@@ -1351,15 +1468,15 @@
           </div>
           <div class="output-value" id="servo3">1500</div>
           <div class="servo-controls">
-            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo3Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
-            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo3Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
-            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo3Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo3Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo3" data-type="min" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo3Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo3" data-type="mid" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo3Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo3" data-type="max" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
           </div>
         </div>
       </div>
 
       <!-- Servo 4 -->
-      <div class="panel4 output-box" id="servo4Card" style="flex:1;min-width:0;">
+      <div class="panel4 output-box out-servo" id="servo4Card" style="flex:1;min-width:0;">
         <div class="output-display h-100">
           <div class="d-flex justify-content-between align-items-center">
             <div class="output-title" id="servo4Title">SERVO 4</div>
@@ -1370,15 +1487,15 @@
           </div>
           <div class="output-value" id="servo4">1500</div>
           <div class="servo-controls">
-            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo4Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
-            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo4Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
-            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo4Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="down"><i class="bi bi-arrow-down"></i></button><button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="up"><i class="bi bi-arrow-up"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Min:</span><span class="servo-value-display" id="servo4Min">1000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo4" data-type="min" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Mid:</span><span class="servo-value-display" id="servo4Mid">1500</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo4" data-type="mid" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
+            <div class="servo-value-control"><span class="servo-value-label">Max:</span><span class="servo-value-display" id="servo4Max">2000</span><div class="servo-arrows"><button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="down" title="−10 µs"><i class="bi bi-dash-lg"></i></button><button class="servo-arrow" data-servo="servo4" data-type="max" data-direction="up" title="+10 µs"><i class="bi bi-plus-lg"></i></button></div></div>
           </div>
         </div>
       </div>
 
       <!-- 7. Kutu: Motor Kontrol (Slider) -->
-      <div class="panel4 output-box" style="flex:0.85;min-width:0;">
+      <div class="panel4 output-box out-ctrl" style="flex:0.85;min-width:0;">
         <div class="output-title text-center">MOTOR CTRL</div>
         <div class="text-center fw-bold output-value" id="throttleValue">1000</div>
         <div class="d-flex flex-column align-items-center">
@@ -1394,13 +1511,44 @@
 
     </div><!-- d-flex 7 kutu -->
   </div>
+  <!-- 1c) PANEL: Servo Autotrim (firmware: src/servo_autotrim.cpp) -->
+  <div class="panel mb-2 atrim-off" id="atrimPanel">
+    <h2 class="panel-title"><i class="bi bi-sliders2-vertical"></i> <span data-i18n="mixer.atrim_title">Servo Autotrim</span></h2>
+    <div class="alert alert-dark py-2 px-3 small mb-3"><i class="bi bi-info-circle me-1"></i><span data-i18n="mixer.atrim_desc">Açıkken, seçili modlarda düz ve yatay uçarken (çubuklar ortada, roll ve pitch 5°'den küçük) PID'in tuttuğu trim, adım adım servo orta noktalarına (Mid) aktarılır. Değişiklikler disarm'da kaydedilir ve yukarıdaki Mid değerlerinde görünür. Orta nokta 1300-1700 µs ile sınırlıdır; büyük trim hatası ve yanlış ağırlık merkezi mekanik olarak düzeltilmelidir.</span> <a href="https://github.com/savas8008/vecihi-configurator/blob/main/docs/AUTOTRIM.md" target="_blank" data-i18n="mixer.atrim_doc">Ayrıntılı rehber</a></div>
+    <div class="atrim-layout">
+      <div class="atrim-main">
+        <div class="form-check form-switch atrim-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="atrimEnabled">
+          <label class="form-check-label" for="atrimEnabled" data-i18n="mixer.atrim_enable">Uçuşta autotrim etkin</label>
+        </div>
+        <div class="atrim-settings">
+          <label class="port-label" for="atrimRate" data-i18n="mixer.atrim_rate">Dönüş hızı eşiği (°/s)</label>
+          <input type="number" class="form-control form-control-sm atrim-rate" id="atrimRate" min="1" max="60" step="1" value="15">
+        </div>
+      </div>
+      <div class="atrim-settings atrim-modes-wrap">
+        <span class="port-label" data-i18n="mixer.atrim_modes">Çalışacağı uçuş modları</span>
+        <div class="atrim-chips" id="atrimModes">
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode0" data-bit="0" autocomplete="off"><label class="atrim-chip" for="atrimMode0"><i class="bi bi-check-lg"></i>ANGLE</label>
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode1" data-bit="1" autocomplete="off"><label class="atrim-chip" for="atrimMode1"><i class="bi bi-check-lg"></i>HORIZON</label>
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode2" data-bit="2" autocomplete="off"><label class="atrim-chip" for="atrimMode2"><i class="bi bi-check-lg"></i>CRUISE</label>
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode3" data-bit="3" autocomplete="off"><label class="atrim-chip" for="atrimMode3"><i class="bi bi-check-lg"></i>ALTHOLD</label>
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode4" data-bit="4" autocomplete="off"><label class="atrim-chip" for="atrimMode4"><i class="bi bi-check-lg"></i>RTH</label>
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode5" data-bit="5" autocomplete="off"><label class="atrim-chip" for="atrimMode5"><i class="bi bi-check-lg"></i>LOITER</label>
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode6" data-bit="6" autocomplete="off"><label class="atrim-chip" for="atrimMode6"><i class="bi bi-check-lg"></i>WAYPOINT</label>
+        </div>
+        <div class="atrim-note"><i class="bi bi-slash-circle me-1"></i><span data-i18n="mixer.atrim_excluded">MANUAL, ACRO, LAUNCH, iniş asistanı, failsafe, autotune ve GCS modlarında autotrim hiçbir zaman çalışmaz.</span></div>
+      </div>
+    </div>
+  </div>
+
   <!-- 2) PANEL: Yardımcı Çıkışlar (Aux) -->
   <div class="panel mb-4">
     <h2 class="panel-title"><i class="bi bi-broadcast-pin"></i> <span data-i18n="mixer.aux_title">Yardımcı Çıkışlar</span></h2>
     <div class="alert alert-dark py-2 px-3 small mb-3"><i class="bi bi-exclamation-circle me-1"></i><span data-i18n="mixer.aux_desc">Her yardımcı çıkış, seçilen RC kanalını doğrudan belirlenen GPIO pinine iletir (uçuş mikseri dışında). Kamera gimbal, iniş takımı, ışık veya ilave motor için kullanabilirsiniz.</span></div>
     <div class="row g-3">
       <div class="col-12 col-md-6">
-        <div class="panel4 p-3">
+        <div class="panel4 p-3 card-aux">
           <div class="output-title mb-3">AUX 1</div>
           <div class="row g-2">
             <div class="col-12">
@@ -1429,7 +1577,7 @@
         </div>
       </div>
       <div class="col-12 col-md-6">
-        <div class="panel4 p-3">
+        <div class="panel4 p-3 card-aux">
           <div class="output-title mb-3">AUX 2</div>
           <div class="row g-2">
             <div class="col-12">
@@ -1466,7 +1614,7 @@
 
     <div class="row g-3">
       <div class="col-6 col-lg-3">
-        <div class="panel4">
+        <div class="panel4 card-aircraft">
           <div class="aircraft-card active" data-aircraft-type="v-tail">
             <div class="mixer-title">V-TAIL</div>
             <div class="mixer-description" data-i18n="mixer.vtail_desc">V şeklinde kuyruk yapısı</div>
@@ -1475,7 +1623,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel4">
+        <div class="panel4 card-aircraft">
           <div class="aircraft-card" data-aircraft-type="t-tail">
             <div class="mixer-title">T-TAIL</div>
             <div class="mixer-description" data-i18n="mixer.ttail_desc">T şeklinde kuyruk yapısı</div>
@@ -1484,7 +1632,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel4">
+        <div class="panel4 card-aircraft">
           <div class="aircraft-card" data-aircraft-type="no-ruder">
             <div class="mixer-title" data-i18n="mixer.noruder_title">RUDERSIZ</div>
             <div class="mixer-description" data-i18n="mixer.noruder_desc">Ruder olmadan</div>
@@ -1493,7 +1641,7 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="panel4">
+        <div class="panel4 card-aircraft">
           <div class="aircraft-card" data-aircraft-type="delta">
             <div class="mixer-title">DELTA</div>
             <div class="mixer-description" data-i18n="mixer.delta_desc">Delta kanat</div>
@@ -1512,25 +1660,25 @@
     </span></div>
     <div class="row g-3">
       <div class="col-6 col-lg-3">
-        <div class="panel4 p-3 text-center">
+        <div class="panel4 p-3 text-center card-gain">
           <div class="output-title mb-2">ROLL</div>
           <input type="number" class="form-control text-center" id="mixRoll" min="-200" max="200" value="100" step="1">
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel4 p-3 text-center">
+        <div class="panel4 p-3 text-center card-gain">
           <div class="output-title mb-2">PITCH</div>
           <input type="number" class="form-control text-center" id="mixPitch" min="-200" max="200" value="100" step="1">
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel4 p-3 text-center">
+        <div class="panel4 p-3 text-center card-gain">
           <div class="output-title mb-2">YAW</div>
           <input type="number" class="form-control text-center" id="mixYaw" min="-200" max="200" value="100" step="1">
         </div>
       </div>
       <div class="col-6 col-lg-3">
-        <div class="panel4 p-3 text-center">
+        <div class="panel4 p-3 text-center card-gain">
           <div class="output-title mb-2">THROTTLE</div>
           <input type="number" class="form-control text-center" id="mixThrottle" min="-200" max="200" value="100" step="1">
         </div>
@@ -1551,38 +1699,10 @@
 
  <div id="transmitter" class="page">
 
-  <!-- Alıcı Bağlantı Pinleri — Accordion -->
-  <div class="pin-acc-wrap mb-3">
-    <div class="pin-acc-header" onclick="togglePinAcc(this)">
-      <span class="pin-acc-title"><i class="bi bi-broadcast-pin"></i> Alıcı Bağlantı Pinleri (UART)</span>
-      <span class="pin-acc-badges" id="rxPinBadges"></span>
-      <i class="bi bi-chevron-down pin-acc-chevron ms-auto"></i>
-    </div>
-    <div class="pin-acc-body">
-      <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
-        <div class="pin-box">
-          <label class="port-label d-block mb-1">TX (ESP → Alıcı)</label>
-          <select class="form-select form-select-sm pin-select" id="rxTxPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 19</small>
-        </div>
-        <div class="pin-box">
-          <label class="port-label d-block mb-1">RX (Alıcı → ESP)</label>
-          <select class="form-select form-select-sm pin-select" id="rxRxPin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 16</small>
-        </div>
-        <button class="btn btn-warning btn-sm" onclick="saveRxPins()">
-          <i class="bi bi-save me-1"></i> <span data-i18n="transmitter.pin_save">Alıcı Pinlerini Kaydet</span>
-        </button>
-        <button class="btn btn-outline-info btn-sm" data-scan-btn="rx" onclick="startPinScan('rx')">
-          <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.rx_btn">Alıcı Pinlerini Otomatik Bul</span>
-        </button>
-      </div>
-      <div class="small mb-2" data-scan-result="rx"></div>
-      <div class="pin-reboot-warning">
-        <i class="bi bi-arrow-repeat"></i>
-        Kaydet butonuna basıldığında cihaz <strong>otomatik olarak yeniden başlatılır</strong> ve bağlantı kendiliğinden yeniden kurulur.
-      </div>
-    </div>
+  <div class="hw-moved-note mb-3">
+    <i class="bi bi-motherboard me-1"></i>
+    <span data-i18n="hardware.moved_note">Bağlantı pinleri artık Donanım sayfasında.</span>
+    <a href="#" onclick="changePage('hardware'); return false;" data-i18n="hardware.go">Donanım sayfasına git →</a>
   </div>
 
     <div class="panel">
@@ -2129,29 +2249,10 @@
    
 	<div id="advanced" class="page">
 
-  <!-- Batarya ADC Pin — Accordion -->
-  <div class="pin-acc-wrap mb-3">
-    <div class="pin-acc-header" onclick="togglePinAcc(this)">
-      <span class="pin-acc-title"><i class="bi bi-battery-half"></i> Batarya Voltaj Ölçümü (ADC)</span>
-      <span class="pin-acc-badges" id="adcPinBadges"></span>
-      <i class="bi bi-chevron-down pin-acc-chevron ms-auto"></i>
-    </div>
-    <div class="pin-acc-body">
-      <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
-        <div class="pin-box">
-          <label class="port-label d-block mb-1">ADC GPIO Pin</label>
-          <select class="form-select form-select-sm pin-select" id="adcVoltagePin" style="min-width:160px;"></select>
-          <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i><span data-i18n="advanced.adc_pin_hint">Tavsiye: GPIO 34, 35 veya 36 (giriş-only)</span></small>
-        </div>
-      </div>
-      <button class="btn btn-warning btn-sm mt-2" onclick="saveAdcPins()">
-        <i class="bi bi-save me-1"></i> <span data-i18n="advanced.bat_pin_save">ADC Pinlerini Kaydet</span>
-      </button>
-      <div class="pin-reboot-warning">
-        <i class="bi bi-arrow-repeat"></i>
-        Kaydet butonuna basıldığında cihaz <strong>otomatik olarak yeniden başlatılır</strong> ve bağlantı kendiliğinden yeniden kurulur.
-      </div>
-    </div>
+  <div class="hw-moved-note mb-3">
+    <i class="bi bi-motherboard me-1"></i>
+    <span data-i18n="hardware.moved_note">Bağlantı pinleri artık Donanım sayfasında.</span>
+    <a href="#" onclick="changePage('hardware'); return false;" data-i18n="hardware.go">Donanım sayfasına git →</a>
   </div>
 
     <div class="panel">
@@ -2170,9 +2271,6 @@
             </button>
             <button class="adv-tab" data-tab="adv-tab-5" data-cat="safety" onclick="switchAdvTab('adv-tab-5',this)">
                 <i class="bi bi-battery-half"></i> <span data-i18n="advanced.tab_battery">Batarya</span>
-            </button>
-            <button class="adv-tab" data-tab="adv-tab-pitot" data-cat="pitot" onclick="switchAdvTab('adv-tab-pitot',this)">
-                <i class="bi bi-wind"></i> <span data-i18n="advanced.tab_pitot">Pitot Tüpü</span>
             </button>
         </div>
 
@@ -2853,27 +2951,6 @@
                 </div>
             </div>
 
-            <!-- ==================== PİTOT TÜPÜ ==================== -->
-            <div id="adv-tab-pitot" class="adv-tab-pane">
-                <div class="panel4">
-                    <div class="mode-category-title"><i class="bi bi-wind"></i> <span data-i18n="advanced.pitot_section">MS4525DO Pitot Tüpü</span></div>
-                    <div class="row g-3 mt-1">
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small" data-i18n="advanced.pitot_sensor_label">Pitot Sensörü</label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="pitotEnabled">
-                                <label class="form-check-label" for="pitotEnabled" data-i18n="advanced.pitot_enabled">Etkin</label>
-                            </div>
-                            <small class="text-muted d-block mt-1" data-i18n="advanced.pitot_disabled_hint">Devre dışıyken hava hızı GPS bazlı (sanal) hesaplanır.</small>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small" data-i18n="advanced.pitot_scale_label">Ölçek (Scale)</label>
-                            <input type="number" class="form-control form-control-sm" id="pitotScale" min="0.5" max="2.0" step="0.01" value="1.00">
-                            <small class="text-muted d-block mt-1" data-i18n="advanced.pitot_scale_hint">Varsayılan: 1.00 · Tüp açısı veya uzunluk farkı için ince ayar.</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
         </div><!-- /adv-tab-content -->
 
@@ -2902,35 +2979,11 @@ function toggleBatCalc(bodyId, btn) {
 </script>
 
 <div id="osd" class="page">
-    <!-- OSD Bağlantı Pinleri — Accordion -->
-    <div class="pin-acc-wrap mb-3">
-        <div class="pin-acc-header" onclick="togglePinAcc(this)">
-            <span class="pin-acc-title"><i class="bi bi-display"></i> OSD Bağlantı Pinleri (UART)</span>
-            <span class="pin-acc-badges" id="osdPinBadges"></span>
-            <i class="bi bi-chevron-down pin-acc-chevron ms-auto"></i>
-        </div>
-        <div class="pin-acc-body">
-            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
-                <div class="pin-box">
-                    <label class="port-label d-block mb-1">TX (ESP → OSD)</label>
-                    <select class="form-select form-select-sm pin-select" id="osdTxPin" style="min-width:160px;"></select>
-                    <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 17</small>
-                </div>
-                <div class="pin-box">
-                    <label class="port-label d-block mb-1">RX (OSD → ESP)</label>
-                    <select class="form-select form-select-sm pin-select" id="osdRxPin" style="min-width:160px;"></select>
-                    <small class="text-info mt-1 d-block"><i class="bi bi-check-circle me-1"></i>Tavsiye: GPIO 16</small>
-                </div>
-                <button class="btn btn-warning btn-sm" onclick="saveOsdPins()">
-                    <i class="bi bi-save me-1"></i> <span data-i18n="osd.pin_save">OSD Pinlerini Kaydet</span>
-                </button>
-            </div>
-            <div class="pin-reboot-warning">
-                <i class="bi bi-arrow-repeat"></i>
-                Kaydet butonuna basıldığında cihaz <strong>otomatik olarak yeniden başlatılır</strong> ve bağlantı kendiliğinden yeniden kurulur.
-            </div>
-        </div>
-    </div>
+    <div class="hw-moved-note mb-3">
+    <i class="bi bi-motherboard me-1"></i>
+    <span data-i18n="hardware.moved_note">Bağlantı pinleri artık Donanım sayfasında.</span>
+    <a href="#" onclick="changePage('hardware'); return false;" data-i18n="hardware.go">Donanım sayfasına git →</a>
+  </div>
     <div class="panel mb-4">
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
             <div>

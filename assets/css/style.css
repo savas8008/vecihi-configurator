@@ -348,6 +348,44 @@ a:hover {
     align-items: center;
 }
 .pin-reboot-warning i { margin-right: 6px; }
+
+/* === DONANIM SAYFASI === */
+/* Kartlar pin akordeon görünümünü kullanır ama açılıp kapanmaz */
+.hw-grid .pin-acc-header { cursor: default; }
+.hw-grid .pin-acc-header:hover { filter: none; }
+.hw-grid .pin-acc-body.open { max-height: none; }
+.hw-status {
+    font-size: 0.68rem;
+    font-weight: 700;
+    border-radius: 3px;
+    padding: 1px 6px;
+}
+.hw-status:empty { display: none; }
+.hw-status-ok   { background: #198754; color: #fff; }
+.hw-status-warn { background: #ffc107; color: #0d1f2d; }
+.hw-status-err  { background: #dc3545; color: #fff; }
+/* Eski sayfalarda pin bölümünün yerini alan yönlendirme notu */
+.hw-moved-note {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border: 1px dashed rgba(253, 57, 83, 0.45);
+    border-radius: var(--radius-md);
+    color: inherit;
+}
+.hw-moved-note a { margin-left: 6px; }
+/* .pin-reboot-warning ile aynı görünüm; ayrı sınıf çünkü i18n.js o sınıfın
+   metin düğümlerini kendi kalıbına göre yeniden yazıyor */
+.hw-reboot-note {
+    background: rgba(253, 57, 83, 0.15);
+    border: 1px solid rgba(253, 57, 83, 0.35);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    color: #fde68a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 .pin-acc-body .port-label { color: #8ee8e0 !important; font-size: 0.78rem; }
 .pin-acc-body .text-info  { color: #5dd8cc !important; font-size: 0.68rem !important; }
 .pin-box {
@@ -3784,3 +3822,241 @@ label.small.text-muted,
 }
 .sitl-cfg-modes > span { display: block; color: var(--color-secondary); margin-bottom: 2px; }
 .sitl-cfg-modes > b    { font-weight: 600; line-height: 1.5; word-break: break-word; }
+
+/* ============================================
+   MİKSER SAYFASI — tek koyu tema + kategori renk vurgusu
+   Bu sayfadaki .panel4 kartları açık gri temadan çıkarılıp panelin koyu
+   temasına uyduruluyor. Kategori rengi kartın üst kenarında ve canlı
+   değerde görünür: motor turuncu, servo mavi, aux mor, uçak tipi sarı
+   (ana renk), mikser kazancı turkuaz.
+   ============================================ */
+
+#mixer {
+    --mx-card-bg:     rgba(15, 23, 42, 0.72);
+    --mx-card-border: rgba(71, 85, 105, 0.55);
+    --mx-row-bg:      rgba(255, 255, 255, 0.04);
+    --mx-motor:  #fb923c;
+    --mx-servo:  #38bdf8;
+    --mx-ctrl:   #fbbf24;
+    --mx-aux:    #a78bfa;
+    --mx-gain:   #2dd4bf;
+}
+
+/* --- Ortak kart: panel4'ün açık tema değişkenlerini geri al --- */
+#mixer .panel4 {
+    background: var(--mx-card-bg) !important;
+    border: 1px solid var(--mx-card-border);
+    border-top: 3px solid var(--mx-accent, var(--mx-card-border));
+    border-radius: 8px;
+    color: #e2e8f0;
+    --border-default:     var(--mx-card-border);
+    --text-primary:       #e2e8f0;
+    --text-secondary:     #cbd5e1;
+    --t-baslik-color:     #e2e8f0;
+    --t-alt-baslik-color: #e2e8f0;
+    --t-aciklama-color:   #94a3b8;
+}
+#mixer .out-motor  { --mx-accent: var(--mx-motor); }
+#mixer .out-servo  { --mx-accent: var(--mx-servo); }
+#mixer .out-ctrl   { --mx-accent: var(--mx-ctrl); }
+#mixer .card-aux   { --mx-accent: var(--mx-aux); }
+#mixer .card-gain  { --mx-accent: var(--mx-gain); }
+
+#mixer .panel4 .output-title,
+#mixer .panel4 .mixer-title      { color: #e2e8f0 !important; }
+#mixer .panel4 .mixer-description,
+#mixer .panel4 small,
+#mixer .panel4 .text-muted       { color: #94a3b8 !important; }
+#mixer .panel4 label,
+#mixer .panel4 .form-check-label { color: #cbd5e1 !important; }
+#mixer .panel4 .port-label       { color: #94a3b8 !important; }
+#mixer .panel4 .output-display   { background: transparent !important; border: none !important; }
+#mixer .panel4 .safety-warning   { color: #fbbf24 !important; }
+#mixer .panel4 .form-control,
+#mixer .panel4 .form-select {
+    background-color: var(--bg-input) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(100, 116, 139, 0.6) !important;
+}
+#mixer .panel4 .form-control:focus,
+#mixer .panel4 .form-select:focus {
+    border-color: var(--mx-accent, var(--color-primary)) !important;
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.15) !important;
+}
+#mixer .panel4 .form-select {
+    /* koyu zeminde görünür açılır ok */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+
+/* Bilgi kutuları: gri bootstrap alert yerine sayfa temasına uygun */
+#mixer .alert-dark {
+    background: rgba(56, 189, 248, 0.06);
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    border-left: 3px solid rgba(56, 189, 248, 0.55);
+    color: #cbd5e1;
+}
+#mixer .alert-dark a { color: var(--color-primary); }
+
+/* --- Çıkış kutuları --- */
+/* Dar ekranda alt satıra geçebilsin (HTML'deki inline nowrap'ı yener) */
+#mixer .output-box { min-width: 140px !important; flex: 1 1 140px !important; }
+#mixer .panel > .d-flex.gap-1 { flex-wrap: wrap !important; }
+
+#mixer .output-box .output-display {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px !important;
+}
+#mixer .out-motor .output-display { justify-content: center; }
+/* Başlık + Rev anahtarı: başlık sığmazsa alt satıra kayar, kutu taşmaz */
+#mixer .output-display > .d-flex {
+    flex-wrap: wrap;
+    justify-content: center !important;
+    gap: 2px 8px;
+}
+#mixer .output-title {
+    font-size: 0.78rem;
+    line-height: 1.2;
+    letter-spacing: 0.4px;
+    margin: 0;
+}
+#mixer .output-display .form-switch { padding-left: 2.1em; min-height: 0; }
+#mixer .output-display .form-switch .form-check-label { font-size: 0.72rem; }
+/* Canlı PWM değeri — kartın ana değeri, kategori renginde */
+#mixer .panel4 .output-value {
+    font-size: 1.3rem !important;
+    line-height: 1.2;
+    margin: 0 !important;
+    color: var(--mx-accent, #e2e8f0) !important;
+}
+
+/* Min / Mid / Max: tek satır — etiket | değer | − + */
+#mixer .servo-controls { display: flex; flex-direction: column; gap: 4px; }
+#mixer .servo-value-control {
+    display: grid;
+    grid-template-columns: 2.4em 1fr auto;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 4px 3px 8px;
+    border-radius: 6px;
+    background: var(--mx-row-bg);
+}
+#mixer .panel4 .servo-value-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: left;
+    color: #94a3b8;
+}
+#mixer .panel4 .servo-value-display {
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    text-align: right;
+    color: #e2e8f0;
+}
+#mixer .servo-arrows { display: flex; gap: 3px; }
+#mixer .servo-controls button.servo-arrow {
+    width: 26px;
+    height: 24px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #1e293b;
+    border: 1px solid rgba(100, 116, 139, 0.7);
+    border-radius: 5px;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+}
+#mixer .servo-controls button.servo-arrow:hover:not(:disabled) {
+    background: var(--mx-servo);
+    border-color: var(--mx-servo);
+    color: #0f172a;
+}
+#mixer .servo-controls button.servo-arrow:disabled { opacity: 0.3; }
+
+/* --- Uçak tipi kartları: dış panel4 yalnızca yerleşim, kart aircraft-card'ın kendisi --- */
+#mixer .card-aircraft {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+#mixer .aircraft-card {
+    background: var(--mx-card-bg);
+    border: 1px solid var(--mx-card-border);
+    border-radius: 8px;
+    padding: 12px 10px;
+}
+#mixer .aircraft-card:hover {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(211, 188, 15, 0.6);
+}
+#mixer .aircraft-card.active {
+    background: rgba(211, 188, 15, 0.12);
+    border: 1px solid var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary), 0 0 14px var(--color-primary-glow);
+}
+#mixer .aircraft-card .mixer-title       { font-size: 0.95rem; letter-spacing: 0.5px; }
+#mixer .aircraft-card.active .mixer-title { color: var(--color-primary) !important; }
+#mixer .aircraft-card .mixer-description { font-size: 0.72rem; margin-top: 2px; }
+
+/* --- Mikser kazançları --- */
+#mixer .card-gain .form-control { font-family: var(--font-mono); font-size: 1rem; }
+
+/* Sayfa genelinde anahtar etiketleri orantılı */
+#mixer .panel > .form-check.form-switch .form-check-label { font-size: 0.9rem; font-weight: 600; }
+
+/* --- Servo Autotrim paneli --- */
+#atrimPanel .atrim-layout {
+    display: grid;
+    grid-template-columns: minmax(200px, 260px) 1fr;
+    gap: 16px 28px;
+    align-items: start;
+}
+@media (max-width: 720px) {
+    #atrimPanel .atrim-layout { grid-template-columns: 1fr; }
+}
+#atrimPanel .atrim-main { display: flex; flex-direction: column; gap: 12px; }
+#atrimPanel .atrim-switch { margin: 0; }
+#atrimPanel .atrim-switch .form-check-label { font-size: 0.9rem; font-weight: 600; }
+#atrimPanel .atrim-rate {
+    max-width: 90px;
+    background-color: var(--bg-input);
+    color: #e2e8f0;
+    border-color: rgba(100, 116, 139, 0.6);
+    font-family: var(--font-mono);
+}
+#atrimPanel .atrim-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+#atrimPanel .atrim-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(100, 116, 139, 0.6);
+    background: rgba(255, 255, 255, 0.04);
+    color: #cbd5e1 !important;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--transition-fast);
+}
+#atrimPanel .atrim-chip .bi { display: none; }
+#atrimPanel .atrim-chip:hover { border-color: var(--color-primary); }
+#atrimPanel .btn-check:checked + .atrim-chip {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #0f172a !important;
+}
+#atrimPanel .btn-check:checked + .atrim-chip .bi { display: inline; }
+#atrimPanel .btn-check:focus-visible + .atrim-chip { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+#atrimPanel .atrim-note {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+/* Autotrim kapalıyken ayarlar soluk — yine de önceden düzenlenebilir */
+#atrimPanel.atrim-off .atrim-settings { opacity: 0.45; }

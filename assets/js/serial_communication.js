@@ -547,6 +547,8 @@ function handleStandardJsonData(data) {
         // Herhangi bir sensör eksik mi?
         const hasMissingSensor = !sensors.gyro || !sensors.accel || !sensors.baro || !sensors.gps;
 
+        if (typeof updateHardwareStatus === 'function') updateHardwareStatus(sensors);
+
         // GPS donanım durumunu global'e yaz — flight modes disabled/enabled için kaynak
         window.gpsAvailable = !!sensors.gps;
         if (typeof updateNavModesGpsState === 'function') updateNavModesGpsState(!!sensors.gps);
@@ -712,6 +714,8 @@ function handlePageData(pageType, pageData) {
         if (pageType === 'outputs') { hidePageLoading('mixer'); hidePageLoading('gps'); }
         if (pageType === 'advanced') hidePageLoading('gps');
     }
+    // Donanım sayfası outputs/transmitter/pitot verisinden durum çıkarır
+    if (typeof onHardwarePageData === 'function') onHardwarePageData(pageType, pageData);
 
     switch (pageType) {
         case 'calibration': 

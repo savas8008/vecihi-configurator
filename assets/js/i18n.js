@@ -186,7 +186,8 @@ const I18N = (() => {
         ['#btnSaveGps',                                       'gps.btn_save'],
 
         // MİKSER
-        ['#mixer .panel-title',                               'mixer.aircraft_title'],
+        // Uçak tipi başlığı kendi data-i18n'iyle çevrilir; '#mixer .panel-title' sayfadaki
+        // İLK başlığı seçtiği için başka bir panelin başlığına eklenmesine yol açıyordu.
         ['#btnSaveMixer',                                     'mixer.btn_save'],
 
         // KUMANDA

@@ -132,6 +132,48 @@ function handleOutputsPageData(data) {
         const yawThrustEl = document.getElementById('inp_yaw_thrust_mix');
         if (yawThrustEl && data.mixer.yaw_thrust_mix !== undefined) yawThrustEl.checked = !!data.mixer.yaw_thrust_mix;
     }
+
+    // 6. Servo Autotrim — eski firmware bu alanı göndermez, panel varsayılanda kalır
+    if (data.autotrim) {
+        const en = _$('atrimEnabled');
+        if (en) en.checked = !!data.autotrim.enabled;
+        const rate = _$('atrimRate');
+        if (rate && data.autotrim.rate !== undefined) rate.value = data.autotrim.rate;
+        const modes = parseInt(data.autotrim.modes);
+        document.querySelectorAll('.atrim-mode').forEach(cb => {
+            cb.checked = !isNaN(modes) && (modes & (1 << parseInt(cb.dataset.bit))) !== 0;
+        });
+        updateAutotrimPanelState();
+    }
+}
+
+/**
+ * @brief Autotrim kapalıyken mod/eşik ayarlarını soluk gösterir
+ */
+function updateAutotrimPanelState() {
+    const panel = _$('atrimPanel');
+    if (panel) panel.classList.toggle('atrim-off', !_$('atrimEnabled')?.checked);
+}
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'atrimEnabled') updateAutotrimPanelState();
+});
+
+/**
+ * @brief Servo Autotrim panelini MIXER_SAVE yüküne çevirir
+ *        (firmware: serial_communication.cpp save_mixer → config.outputs.servo_autotrim*)
+ */
+function getAutotrimPayload() {
+    let modes = 0;
+    document.querySelectorAll('.atrim-mode').forEach(cb => {
+        if (cb.checked) modes |= (1 << parseInt(cb.dataset.bit));
+    });
+    let rate = parseInt(_$('atrimRate')?.value);
+    if (isNaN(rate)) rate = 15;
+    return {
+        enabled: !!_$('atrimEnabled')?.checked,
+        rate: Math.max(1, Math.min(60, rate)),
+        modes: modes,
+    };
 }
 
 /**
@@ -529,6 +571,7 @@ function saveMixerConfig() {
             aux1: { rc_ch: getAuxRcCh('aux1RcCh') },
             aux2: { rc_ch: getAuxRcCh('aux2RcCh') },
         },
+        autotrim: getAutotrimPayload(),
     };
     _log('📤 Mikser ayarları gönderiliyor...', 'info');
     if (typeof sendCommand === 'function') {

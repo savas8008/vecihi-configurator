@@ -9,9 +9,9 @@
  *   {"command":"SCAN_GPS_PINS","find_tx":false|true} → {"scan_gps":{...}}
  *   {"command":"SCAN_RX_PINS","find_tx":false|true}  → {"scan_rx":{...}}
  *
- * Firmware sonucu KAYDETMEZ. Kullanıcı "Kaydet" deyince yalnızca bulunan pinler
- * kısmi PINS_SAVE ile gönderilir — gyro yokken outputs_page_data hiç istenmediği
- * için pinConfig boş olabilir; tam kayıt (savePinsConfig) motor pinlerini ezerdi.
+ * Ne firmware ne bu dosya sonucu KAYDETMEZ: bulunan pinler Donanım sayfasının
+ * formuna doldurulur, kullanıcı tüm değişiklikleri o sayfanın tek Kaydet'iyle
+ * (hardware_page.js → kısmi PINS_SAVE) uygular; kart bir kez yeniden başlar.
  *
  * Sonuçlar data-scan-result="i2c|gps|rx" taşıyan TÜM kutulara yazılır (pin
  * akordeonu + sensör hata modalı), butonlar data-scan-btn ile kilitlenir.
@@ -74,9 +74,15 @@ function startPinScan(kind, aggressive = false) {
     if (typeof sendCommand === 'function') sendCommand(JSON.stringify(cmd));
 }
 
-function _psSaveButton(kind, label) {
-    return `<button class="btn btn-success btn-sm mt-1" data-scan-btn="${kind}" onclick="applyScannedPins('${kind}')">
-        <i class="bi bi-save me-1"></i>${label}</button>`;
+// Taze bir sonuç işlenirken true; dil değişimi için yeniden çizimde false —
+// o zaman form tekrar doldurulmaz (kullanıcının sonradan yaptığı düzeltme kalır).
+let _psFresh = true;
+
+// Sonucu forma doldurur ve kullanıcıya Kaydet'i hatırlatan notu döndürür.
+function _psFilled(kind) {
+    if (_psFresh) applyScannedPins(kind);
+    return `<div class="text-info mt-1"><i class="bi bi-pencil-square me-1"></i>${
+        _psT('filled', 'Forma dolduruldu — uygulamak için Donanım Ayarlarını Kaydet\'e basın.')}</div>`;
 }
 
 function _psRetryButton(kind, label) {
@@ -91,10 +97,13 @@ function _psList(pins) {
 /**
  * @brief Firmware'den gelen scan_i2c / scan_gps yanıtını işler.
  */
-function handlePinScanResult(kind, res) {
-    clearTimeout(_pinScanTimer[kind]);
-    _psBusy(kind, false);
-    _pinScanLast[kind] = res;
+function handlePinScanResult(kind, res, rerender = false) {
+    _psFresh = !rerender;
+    if (!rerender) {
+        clearTimeout(_pinScanTimer[kind]);
+        _psBusy(kind, false);
+        _pinScanLast[kind] = res;
+    }
 
     if (res.error === 'armed') {
         _psRender(kind, `<span class="text-danger">${_psT('armed', 'Kollar açıkken (ARM) tarama yapılmaz.')}</span>`);
@@ -112,8 +121,8 @@ function handlePinScanResult(kind, res) {
             _psRender(kind, `<div class="text-success"><i class="bi bi-check-circle me-1"></i>${
                 _psT('i2c_found', 'Bulundu: {imu} ({addr}){baro} — SDA GPIO{sda}, SCL GPIO{scl}',
                      { imu: res.imu, addr, baro, sda: res.sda, scl: res.scl })}</div>
-                ${_psSaveButton('i2c', _psT('save', 'Bu pinleri kaydet (kart yeniden başlar)'))}`);
-            if (typeof log === 'function') log(`🔎 IMU bulundu: ${res.imu} SDA=${res.sda} SCL=${res.scl}`, 'success');
+                ${_psFilled('i2c')}`);
+            if (_psFresh && typeof log === 'function') log(`🔎 ${_psT('log_imu', 'IMU bulundu')}: ${res.imu} SDA=${res.sda} SCL=${res.scl}`, 'success');
         } else if (!res.deep) {
             _psRender(kind, `<div class="text-warning">${
                 _psT('i2c_not_found_quick', 'Pull-up direnci olan pinlerde IMU bulunamadı (aday pinler: {pins}).',
@@ -141,18 +150,17 @@ function handlePinScanResult(kind, res) {
              { rx: res.rx, baud: res.baud, proto: res.proto })}</div>`;
     if (res.tx >= 0) {
         html += `<div class="text-success">${_psT('gps_tx_found', 'TX GPIO{tx} — GPS sorguya yanıt verdi', { tx: res.tx })}</div>`;
-        html += _psSaveButton('gps', _psT('save', 'Bu pinleri kaydet (kart yeniden başlar)'));
+        html += _psFilled('gps');
     } else if (!res.find_tx) {
         html += `<div class="text-secondary">${_psT('gps_tx_hint', 'TX pini (ESP → GPS) dinleyerek bulunamaz; GPS\'e sorgu gönderilerek aranmalı.')}</div>`;
         html += _psRetryButton('gps', _psT('find_tx', 'TX pinini de bul'));
     } else {
         html += `<div class="text-warning">${_psT('gps_tx_not_found',
             'TX pini bulunamadı ({n} pin denendi). RX seçildi; TX\'i elle seçip kaydedin.', { n: res.tx_tried })}</div>`;
-        const rxSel = document.getElementById('gpsRxPin');
-        if (rxSel) rxSel.value = res.rx;
+        html += _psFilled('gps');
     }
     _psRender(kind, html);
-    if (typeof log === 'function') log(`🔎 GPS bulundu: RX=${res.rx} TX=${res.tx} @${res.baud}`, 'success');
+    if (_psFresh && typeof log === 'function') log(`🔎 ${_psT('log_gps', 'GPS bulundu')}: RX=${res.rx} TX=${res.tx} @${res.baud}`, 'success');
 }
 
 function _psRenderRx(res) {
@@ -179,86 +187,87 @@ function _psRenderRx(res) {
 
     if (res.protocol === 0) {
         html += `<div class="text-secondary">${_psT('rx_sbus_no_tx', 'SBUS tek yönlüdür, TX pini gerekmez.')}</div>`;
-        html += _psSaveButton('rx', _psT('save', 'Bu pinleri kaydet (kart yeniden başlar)'));
+        html += _psFilled('rx');
     } else if (res.tx >= 0) {
         html += `<div class="text-success">${_psT('rx_tx_found', 'TX GPIO{tx} — alıcı yanıt verdi', { tx: res.tx })}</div>`;
-        html += _psSaveButton('rx', _psT('save', 'Bu pinleri kaydet (kart yeniden başlar)'));
+        html += _psFilled('rx');
     } else {
         html += res.find_tx
             ? `<div class="text-warning">${_psT('rx_tx_not_found',
                 'TX pini doğrulanamadı ({n} pin denendi). Alıcı, kumandaya bağlı değilken karttan gelen veriyi kabul etmez — kumandayı açıp tekrar deneyin.', { n: res.tx_tried })}</div>`
             : `<div class="text-secondary">${_psT('rx_tx_hint', 'TX pini (ESP → alıcı) telemetri için gerekir; alıcıya veri gönderilerek aranır.')}</div>`;
+        html += _psFilled('rx');
         html += _psRetryButton('rx', _psT('find_tx', 'TX pinini de bul'));
-        html += ' ' + _psSaveButton('rx', _psT('rx_save_rx_only', 'Yalnızca RX ve protokolü kaydet'));
     }
     _psRender('rx', html);
-    if (typeof log === 'function') log(`🔎 Alıcı bulundu: ${proto} RX=${res.rx} TX=${res.tx}`, 'success');
+    if (_psFresh && typeof log === 'function') log(`🔎 ${_psT('log_rx', 'Alıcı bulundu')}: ${proto} RX=${res.rx} TX=${res.tx}`, 'success');
 }
 
 /**
- * @brief Son taramanın bulduğu pinleri kısmi PINS_SAVE ile kaydeder.
- *        Firmware kayıttan sonra yeniden başlar.
+ * @brief Son taramanın bulduğu pinleri Donanım sayfasının formuna doldurur.
+ *        Kaydetmez — kayıt hardware_page.js saveHardwareConfig() ile yapılır.
+ *        Bulunamayan TX'e dokunulmaz (kayıtlı değer kalır).
  */
 function applyScannedPins(kind) {
     const res = _pinScanLast[kind];
     if (!res || !res.found) return;
 
-    let pins;
-    const extra = {};
-    if (kind === 'i2c') {
-        pins = { i2c_sda: res.sda, i2c_scl: res.scl };
-    } else if (kind === 'gps') {
-        if (!(res.tx >= 0)) return;
-        pins = { gps_rx: res.rx, gps_tx: res.tx };
-    } else {
-        // TX bulunmadıysa kayıtlı TX'e dokunulmaz; protokol pinle birlikte kaydedilir.
-        pins = { rx_rx: res.rx };
-        if (res.tx >= 0) pins.rx_tx = res.tx;
-        extra.rc_protocol = res.protocol;
-    }
-
-    if (typeof pinConfig !== 'undefined' && pinConfig) Object.assign(pinConfig, pins);
-    const selMap = { i2c_sda: 'i2cSdaPin', i2c_scl: 'i2cSclPin', gps_rx: 'gpsRxPin', gps_tx: 'gpsTxPin',
-                     rx_rx: 'rxRxPin', rx_tx: 'rxTxPin' };
-    Object.keys(pins).forEach(k => {
-        const el = document.getElementById(selMap[k]);
-        if (el) el.value = pins[k];
+    const pins = kind === 'i2c' ? { i2cSdaPin: res.sda, i2cSclPin: res.scl }
+               : kind === 'gps' ? { gpsRxPin: res.rx, gpsTxPin: res.tx }
+               :                  { rxRxPin: res.rx, rxTxPin: res.tx };
+    Object.keys(pins).forEach(id => {
+        const el = document.getElementById(id);
+        if (el && pins[id] >= 0) el.value = pins[id];
     });
-
-    _psBusy(kind, true);
-    _psRender(kind, `<span class="text-info">${_psT('saving', 'Kaydediliyor, kart yeniden başlıyor...')}</span>`);
-    if (typeof log === 'function') log(`📤 Bulunan pinler kaydediliyor: ${JSON.stringify({ pins, ...extra })}`, 'info');
-    if (typeof sendCommand === 'function') sendCommand(`PINS_SAVE ${JSON.stringify({ pins, ...extra })}`);
+    if (kind === 'rx' && typeof setHardwarePendingProtocol === 'function') {
+        setHardwarePendingProtocol(res.protocol);
+    }
+    // Çakışma uyarısını tazele (hardware_page.js 'change' dinliyor)
+    const any = document.getElementById(Object.keys(pins)[0]);
+    if (any) any.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 /**
- * @brief Sensör hata modalına, eksik donanım için tarama önerisini ekler.
- *        serial_communication.js init_status işleyicisinden çağrılır.
+ * @brief Sensör hata modalına, eksik donanım varsa Donanım sayfasına giden
+ *        butonu ekler. serial_communication.js init_status işleyicisinden çağrılır.
  */
+let _psModalSensors = null;
+
 function renderSensorModalScanOffers(sensors) {
     const box = document.getElementById('sensorModalScan');
     if (!box) return;
+    _psModalSensors = sensors;
 
-    const parts = [];
+    const lines = [];
     if (!sensors.gyro) {
-        parts.push(`<div class="mb-2">
-            <div class="small text-light mb-1">${_psT('modal_imu',
-                'IMU yanıt vermiyor (kayıtlı pinler: SDA GPIO{sda}, SCL GPIO{scl}). Kart, IMU\'nun takılı olduğu pinleri kendisi arayabilir.',
-                { sda: sensors.i2c_sda ?? '?', scl: sensors.i2c_scl ?? '?' })}</div>
-            <button class="btn btn-info btn-sm" data-scan-btn="i2c" onclick="startPinScan('i2c')">
-                <i class="bi bi-search me-1"></i>${_psT('i2c_btn', 'IMU Pinlerini Otomatik Bul')}</button>
-            <div class="small mt-1" data-scan-result="i2c"></div>
-        </div>`);
+        lines.push(_psT('modal_imu',
+            'IMU yanıt vermiyor (kayıtlı pinler: SDA GPIO{sda}, SCL GPIO{scl}). Kart, IMU\'nun takılı olduğu pinleri kendisi arayabilir.',
+            { sda: sensors.i2c_sda ?? '?', scl: sensors.i2c_scl ?? '?' }));
     }
     // gps_pins_set yalnızca yeni firmware'de var; yoksa (eski kart) öneri gösterilmez.
     if (!sensors.gps && sensors.gps_pins_set === false) {
-        parts.push(`<div class="mb-2">
-            <div class="small text-light mb-1">${_psT('modal_gps', 'GPS pinleri henüz atanmamış.')}</div>
-            <button class="btn btn-info btn-sm" data-scan-btn="gps" onclick="startPinScan('gps')">
-                <i class="bi bi-search me-1"></i>${_psT('gps_btn', 'GPS Pinlerini Otomatik Bul')}</button>
-            <div class="small mt-1" data-scan-result="gps"></div>
-        </div>`);
+        lines.push(_psT('modal_gps', 'GPS pinleri henüz atanmamış.'));
     }
-    box.innerHTML = parts.join('');
-    box.classList.toggle('d-none', parts.length === 0);
+    box.innerHTML = lines.length ? `
+        ${lines.map(l => `<div class="small text-light mb-1">${l}</div>`).join('')}
+        <button class="btn btn-info btn-sm mt-1" onclick="openHardwareFromModal()">
+            <i class="bi bi-motherboard me-1"></i>${_psT('open_hardware', 'Donanım sayfasını aç — pinleri seç veya otomatik bul')}</button>` : '';
+    box.classList.toggle('d-none', lines.length === 0);
 }
+
+function openHardwareFromModal() {
+    const modalEl = document.getElementById('sensorErrorModal');
+    const inst = modalEl && typeof bootstrap !== 'undefined' ? bootstrap.Modal.getInstance(modalEl) : null;
+    if (inst) inst.hide();
+    if (typeof changePage === 'function') changePage('hardware');
+}
+
+// Dil değişince JS ile üretilen sonuç kutularını ve modal önerisini yeniden
+// çiz. Tarama sürüyorsa (zamanlayıcı bekliyor) o kutuya dokunulmaz.
+document.addEventListener('i18n:changed', () => {
+    ['i2c', 'gps', 'rx'].forEach(kind => {
+        if (_pinScanLast[kind]) handlePinScanResult(kind, _pinScanLast[kind], true);
+    });
+    _psFresh = true;
+    if (_psModalSensors) renderSensorModalScanOffers(_psModalSensors);
+});

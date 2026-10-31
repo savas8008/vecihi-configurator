@@ -105,6 +105,9 @@ function managePageStreams(page) {
         } else if (page === 'osd') {
             sendCommand('osd_page_data');
             setTimeout(() => sendCommand('outputs_page_data'), 200);
+        } else if (page === 'hardware') {
+            // Donanım sayfası: pinler (outputs), alıcı protokolü, pitot
+            if (typeof requestHardwarePageData === 'function') requestHardwarePageData();
         } else if (page === 'parameters') {
             // Parametre tablosu ayri protokol kullanir (param_list, parcali dump)
             if (typeof requestParamList === 'function') requestParamList();

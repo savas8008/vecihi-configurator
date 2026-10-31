@@ -578,6 +578,15 @@ const PARAM_META = {
     OUT_YAW_THRUST: { grp: "out",
         tr: "Çift motorlu fark itkisi ile yaw. YALNIZCA gerçekten iki motorlu kurulumda açın; tek motorda gazın istemsiz oynamasına yol açar.",
         en: "Yaw via differential thrust. Enable ONLY on a genuine twin-motor setup; on a single motor it makes throttle wander." },
+    OUT_AUTOTRIM: { grp: "out",
+        tr: "Sürekli servo autotrim (iNav FW_AUTOTRIM / ArduPlane SERVO_AUTO_TRIM). OUT_ATRIM_MODES ile seçilen modlarda düz ve yatay uçarken (çubuklar ortada, |roll| ve |pitch| < 5°) roll/pitch I-term'ini 0,5 sn'de bir 5 birimlik adımlarla servo orta noktalarına aktarır. Değişen orta noktalar disarm'da kaydedilir; Çıkışlar sayfasındaki Mid değerlerinde görünür. Orta nokta 1300-1700 µs ile sınırlıdır — büyük trim hatası ve yanlış ağırlık merkezi mekanik olarak düzeltilmelidir.",
+        en: "Continuous servo autotrim (iNav FW_AUTOTRIM / ArduPlane SERVO_AUTO_TRIM). While flying straight and level in the modes selected by OUT_ATRIM_MODES (sticks centered, |roll| and |pitch| < 5°) it moves the roll/pitch I-term into the servo midpoints in 5-unit steps every 0.5 s. Changed midpoints are saved on disarm and show up as the Mid values on the Outputs page. Midpoints are limited to 1300-1700 µs — large trim errors and a wrong CG must be fixed mechanically." },
+    OUT_ATRIM_RATE: { grp: "out",
+        tr: "Autotrim yalnızca toplam dönüş hızı (ölçülen ve komut edilen) bu değerin altındayken çalışır (deg/s). iNav servo_autotrim_rotation_limit.",
+        en: "Autotrim only runs while total rotation rate (measured and commanded) is below this value (deg/s). iNav servo_autotrim_rotation_limit." },
+    OUT_ATRIM_MODES: { grp: "out",
+        tr: "Autotrim'in çalışacağı uçuş modları (bit maskesi): 1=ANGLE, 2=HORIZON, 4=CRUISE, 8=ALTHOLD, 16=RTH, 32=LOITER, 64=WAYPOINT; 127 = hepsi. Mikser sayfasındaki Servo Autotrim panelinden işaretlemek daha kolaydır. MANUAL, ACRO, LAUNCH, iniş asistanı, failsafe, autotune ve GCS'de hiçbir zaman çalışmaz.",
+        en: "Flight modes autotrim runs in (bitmask): 1=ANGLE, 2=HORIZON, 4=CRUISE, 8=ALTHOLD, 16=RTH, 32=LOITER, 64=WAYPOINT; 127 = all. Easier to set with the checkboxes in the Servo Autotrim panel on the Mixer page. Never runs in MANUAL, ACRO, LAUNCH, landing assist, failsafe, autotune or GCS." },
 
     // ==================== RF FAILSAFE ====================
     FS_SHORT_MS: { grp: "fs",
