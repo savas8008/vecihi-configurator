@@ -372,11 +372,11 @@ function saveFlightModesConfig() {
     const jsonCommand = `MODES_SAVE ${jsonString}`;
 
     if (typeof sendCommand === 'function') {
-        if (sendCommand(jsonCommand)) {
-            // Başarılı gönderildiyse local değişkeni de güncelle ki UI bozulmasın
-            activeFlightModes = modesData;
-            _log('✅ Uçuş modları kaydedildi.', 'success');
+        if (!sendCommand(jsonCommand)) {
+            _log('❌ Uçuş modları gönderilemedi. Cihaz bağlantısını kontrol edin.', 'error');
         }
+        // Başarı yalnızca ESP32'den MODES_SAVE onayı geldikten sonra gösterilir.
+        // Böylece seri porta yazılması, NVS'ye kaydedilmiş gibi sunulmaz.
     } else {
         console.error("sendCommand fonksiyonu bulunamadı!");
         alert("Bağlantı hatası: Lütfen cihaza bağlı olduğunuzdan emin olun");
