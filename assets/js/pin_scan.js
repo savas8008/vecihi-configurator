@@ -22,6 +22,16 @@
 const _pinScanLast = { i2c: null, gps: null, rx: null, spi: null };
 const _pinScanTimer = { i2c: null, gps: null, rx: null, spi: null };
 const SPI_SCAN_SELECTS = ['imuSpiSckPin', 'imuSpiMisoPin', 'imuSpiMosiPin', 'imuSpiCsPin'];
+
+/**
+ * Taramanın bulduğu barometrenin etiketi, ör. "BMP280 (0x76)". Eski firmware
+ * baro_name göndermez; o sürümler yalnızca BMP180'i tanıdığı için adı odur.
+ */
+function _psBaroLabel(res) {
+    if (!res.baro_name) return 'BMP180';
+    const a = res.baro_addr ? ' (0x' + Number(res.baro_addr).toString(16).toUpperCase() + ')' : '';
+    return res.baro_name + a;
+}
 // Firmware süreleri (kartta ölçüldü): I2C <1 sn; GPS 1.2 sn dinleme + aktif pin
 // başına 4×1.1 sn + TX pin başına ~0.35 sn; alıcı aktif pin başına ~1 sn + TX
 // pin başına ~0.25 sn, sinyalsiz ping yedeği en kötü ~20 sn. Pay bırakılarak:
@@ -133,7 +143,7 @@ function handlePinScanResult(kind, res, rerender = false) {
             : '';
         if (res.found && !res.imu) {
             // Hatta IMU yok (IMU SPI'da) — yalnızca barometre/pitot bulundu
-            const devs = [res.baro ? 'BMP180' : null, res.pitot ? 'Pitot' : null].filter(Boolean).join(' + ');
+            const devs = [res.baro ? _psBaroLabel(res) : null, res.pitot ? 'Pitot' : null].filter(Boolean).join(' + ');
             _psRender(kind, `<div class="text-success"><i class="bi bi-check-circle me-1"></i>${
                 _psT('i2c_found_noimu', 'Bulundu: {devs} (bu hatta IMU yok — IMU SPI\'da olabilir) — SDA GPIO{sda}, SCL GPIO{scl}',
                      { devs, sda: res.sda, scl: res.scl })}</div>
@@ -141,7 +151,7 @@ function handlePinScanResult(kind, res, rerender = false) {
             if (_psFresh && typeof log === 'function') log(`🔎 I2C: ${devs} SDA=${res.sda} SCL=${res.scl}`, 'success');
         } else if (res.found) {
             const addr = '0x' + Number(res.addr).toString(16).toUpperCase();
-            const baro = res.baro ? ' + BMP180' : '';
+            const baro = (res.baro ? ' + ' + _psBaroLabel(res) : '') + (res.pitot ? ' + Pitot' : '');
             _psRender(kind, `<div class="text-success"><i class="bi bi-check-circle me-1"></i>${
                 _psT('i2c_found', 'Bulundu: {imu} ({addr}){baro} — SDA GPIO{sda}, SCL GPIO{scl}',
                      { imu: res.imu, addr, baro, sda: res.sda, scl: res.scl })}</div>
@@ -162,6 +172,11 @@ function handlePinScanResult(kind, res, rerender = false) {
     if (kind === 'rx') { _psRenderRx(res); return; }
 
     if (kind === 'spi') {
+        if (res.error === 'bus_busy') {
+            _psRender(kind, `<span class="text-warning">${_psT('spi_bus_busy',
+                'SPI hattı şu an barometre tarafından kullanılıyor; sıra taraması hattı bozacağı için yapılmadı. SCK/MISO/MOSI zaten belli — IMU için yalnızca IMU CS pinini seçip kaydedin.')}</span>`);
+            return;
+        }
         if (res.error === 'bad_pin') {
             _psRender(kind, `<span class="text-danger">${_psT('spi_bad_pin',
                 'GPIO{pin} taranamaz: başka bir işe (motor/servo/alıcı/GPS/I2C) atanmış ya da bu çipte kullanılamıyor.', { pin: res.pin })}</span>`);

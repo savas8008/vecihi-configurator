@@ -97,6 +97,7 @@ function handleOutputsPageData(data) {
         setVal('imuSpiMisoPin', pinConfig.imu_spi_miso ?? -1);
         setVal('imuSpiMosiPin', pinConfig.imu_spi_mosi ?? -1);
         setVal('imuSpiCsPin',   pinConfig.imu_spi_cs   ?? -1);
+        setVal('baroSpiCsPin',  pinConfig.baro_spi_cs  ?? -1);
 
         // ADC
         setVal('adcVoltagePin', pinConfig.adc_voltage);

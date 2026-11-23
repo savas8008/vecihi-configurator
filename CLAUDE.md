@@ -95,6 +95,27 @@ Kısa anahtar (`<key>`) firmware'deki JSON alanıyla **birebir aynı** olmalı;
 
 ---
 
+## Donanım Sayfası — Sensör Hatları
+
+Sensör kartları **hatta göre** düzenlenir, cihaza göre değil: "I2C Sensör Hattı"
+ve "SPI Sensör Hattı". Kart, hattaki çipi kimliğinden kendisi tanır; kullanıcı
+çip seçmez (firmware: `vecihi/src/baro.cpp`, `sensor_mpu6050.cpp`, `spi_bus.cpp`).
+
+- **I2C:** yalnızca SDA/SCL. Cihazlar adresten tanınır (IMU 0x68/0x69/0x6A,
+  baro 0x76/0x77, pitot 0x28).
+- **SPI:** SCK/MISO/MOSI ortak (`imuSpiSckPin` vb. — kimlikler ve JSON
+  anahtarları tarihsel olarak `imu_spi_*`, değiştirmeyin), her cihazın kendi
+  CS'si: `imuSpiCsPin` (`imu_spi_cs`), `baroSpiCsPin` (`baro_spi_cs`).
+  CS'si seçilen cihaz önce SPI'da, bulunamazsa I2C'de aranır.
+- **Rozetler** (`hardware_page.js` → `_hwBusDevices()`): `init_status`'taki
+  `imu` + `imu_spi`, `baro_name` + `baro_bus` ("i2c"/"spi"), `pitot` alanlarından
+  her hattın cihaz listesi. Eski firmware `baro_name` göndermez → "BARO" yazılır.
+- **Tarama:** `scan_i2c` yanıtındaki `baro_name`/`baro_addr` gösterilir
+  (`pin_scan.js` → `_psBaroLabel()`; eski firmware'de "BMP180"). "IMU SPI
+  Sırasını Bul" yalnızca IMU'yu arar; hat barometre için açıksa firmware
+  `bus_busy` döner.
+- BMP180 ve pitot **yalnızca I2C**'dedir.
+
 ## Simülatör (SITL) Sayfası
 
 `configurator.html` → sol menü **Simülatör (SITL)**. Uçağın gerçek uçuş
