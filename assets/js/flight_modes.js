@@ -106,6 +106,15 @@ function _getCurrentPage() {
  */
 function handleModesPageData(data) {
     if (data && typeof data === 'object') {
+        // Firmware mod listesine '_gps' bilgisini ekler (bir mod değildir):
+        // enabled = Gelişmiş → GPS ayarı, present = açılışta GPS algılandı mı.
+        // Eski firmware bu alanı göndermez; o durumda yalnızca canlı sensör
+        // durumu (window.gpsAvailable) kullanılır.
+        if (data._gps && typeof data._gps === 'object') {
+            window.gpsFeatureEnabled = !!data._gps.enabled;
+            window.gpsAvailable = !!data._gps.present;
+            delete data._gps;
+        }
         activeFlightModes = data;
         _log('✅ Uçuş modları yüklendi.', 'success');
     }
@@ -167,6 +176,8 @@ function renderModesPage() {
                     </select>
                 </div>
 
+                ${def.requiresGps ? `<div class="mode-gps-note" id="gpsnote-${def.key}" style="display:none;"></div>` : ''}
+
                 <div class="range-track-container" id="track-container-${def.key}">
                     <div class="range-fill" id="fill-${def.key}" style="left:0%; width:0%;"></div>
                     <div class="live-marker" id="marker-${def.key}" data-val="1500" style="left: 50%; display: none;"></div>
@@ -191,10 +202,8 @@ function renderModesPage() {
     // UI'ı güncelle
     modeDefinitions.forEach(def => updateModeUI(def.key));
 
-    // GPS durumu zaten biliniyorsa uygula
-    if (typeof window.gpsAvailable !== 'undefined') {
-        updateNavModesGpsState(window.gpsAvailable);
-    }
+    // GPS gerektiren modlar için bilgi notlarını çiz
+    refreshNavModesGpsNotes();
 }
 
 // Global erişim için
@@ -205,25 +214,37 @@ window.renderModesPage = renderModesPage;
 // ============================================================================
 
 /**
- * @brief GPS yoksa requiresGps:true olan nav modlarını disabled yapar
- * @param {boolean} hasGps - GPS fix var mı?
+ * @brief GPS gerektiren nav modları için bilgi notu gösterir — KİLİTLEMEZ.
+ *
+ * iNav tarzı: atama her zaman serbest (GPS sonradan takılabilir/çıkarılabilir).
+ * Güvenlik firmware'de: GPS güvenilir değilken bu modlar ANGLE'a düşer ve
+ * switch'leri açıkken arm reddedilir (flight_modes.cpp arm_blocked_nav_gps,
+ * OSD: "NAV MOD: GPS YOK").
+ */
+function refreshNavModesGpsNotes() {
+    const featureOff = window.gpsFeatureEnabled === false;
+    const notPresent = window.gpsAvailable === false;
+    let msg = '';
+    if (featureOff) {
+        msg = '⚠️ GPS özelliği kapalı (Gelişmiş → GPS). Atayabilirsiniz, ancak GPS açılıp kilitlenmeden bu mod devreye girmez (uçak ANGLE\'da kalır) ve switch\'i açıkken arm edilemez.';
+    } else if (notPresent) {
+        msg = '⚠️ GPS şu an algılanmıyor. Atayabilirsiniz, ancak GPS kilitlenmeden bu mod devreye girmez (uçak ANGLE\'da kalır) ve switch\'i açıkken arm edilemez.';
+    }
+    modeDefinitions.filter(m => m.requiresGps).forEach(def => {
+        const note = document.getElementById(`gpsnote-${def.key}`);
+        if (!note) return;
+        note.textContent = msg;
+        note.style.display = msg ? '' : 'none';
+    });
+}
+
+/**
+ * @brief Canlı sensör durumundan GPS varlığını günceller (serial_communication.js)
+ * @param {boolean} hasGps - GPS modülü algılandı mı?
  */
 function updateNavModesGpsState(hasGps) {
     window.gpsAvailable = hasGps;
-    modeDefinitions.filter(m => m.requiresGps).forEach(def => {
-        const card    = document.getElementById(`card-${def.key}`);
-        const chSel   = document.getElementById(`ch-${def.key}`);
-        const minSldr = document.getElementById(`min-${def.key}`);
-        const maxSldr = document.getElementById(`max-${def.key}`);
-        if (!card) return;
-        if (hasGps) {
-            card.classList.remove('mode-card-disabled');
-            [chSel, minSldr, maxSldr].forEach(el => { if (el) el.disabled = false; });
-        } else {
-            card.classList.add('mode-card-disabled');
-            [chSel, minSldr, maxSldr].forEach(el => { if (el) el.disabled = true; });
-        }
-    });
+    refreshNavModesGpsNotes();
 }
 window.updateNavModesGpsState = updateNavModesGpsState;
 

@@ -29,6 +29,10 @@ const HW_PROTO_LABEL = { 0: 'SBUS', 1: 'CRSF / ELRS', 2: 'MAVLink ELRS' };
 const HW_PIN_FIELDS = [
     ['i2c_sda',     'i2cSdaPin',     'c_i2c_sda', 'I2C SDA'],
     ['i2c_scl',     'i2cSclPin',     'c_i2c_scl', 'I2C SCL'],
+    ['imu_spi_sck',  'imuSpiSckPin',  'c_imu_sck',  'IMU SPI SCK'],
+    ['imu_spi_miso', 'imuSpiMisoPin', 'c_imu_miso', 'IMU SPI MISO'],
+    ['imu_spi_mosi', 'imuSpiMosiPin', 'c_imu_mosi', 'IMU SPI MOSI'],
+    ['imu_spi_cs',   'imuSpiCsPin',   'c_imu_cs',   'IMU SPI CS'],
     ['gps_rx',      'gpsRxPin',      'c_gps_rx',  'GPS RX'],
     ['gps_tx',      'gpsTxPin',      'c_gps_tx',  'GPS TX'],
     ['rx_rx',       'rxRxPin',       'c_rx_rx',   'Alıcı RX'],
@@ -67,11 +71,15 @@ function requestHardwarePageData() {
 function updateHardwareStatus(sensors) {
     if (!sensors) return;
     hwLastSensors = sensors;
-    if (sensors.gyro) {
+    if (sensors.gyro && sensors.imu_spi) {
+        // IMU SPI'da: I2C hattında yalnızca barometre/pitot kalır
+        _hwStatus('hwst-i2c', sensors.baro ? 'ok' : '', sensors.baro ? 'BARO' : '');
+    } else if (sensors.gyro) {
         _hwStatus('hwst-i2c', 'ok', sensors.baro ? 'IMU + BARO' : 'IMU');
     } else {
         _hwStatus('hwst-i2c', 'err', _hwT('st_imu_missing', 'IMU YOK'));
     }
+    _hwRenderSpiStatus();
     if (sensors.gps) _hwStatus('hwst-gps', 'ok', 'OK');
     else if (sensors.gps_pins_set === false) _hwStatus('hwst-gps', 'warn', _hwT('st_unassigned', 'ATANMADI'));
     else _hwStatus('hwst-gps', 'warn', _hwT('st_missing', 'YOK'));
@@ -89,7 +97,21 @@ function onHardwarePageData(pageType, data) {
     if (pageType === 'outputs') {
         _hwCheckConflicts();
         _hwRenderRxStatus();
+        _hwRenderSpiStatus();
     }
+}
+
+/** IMU SPI rozeti: SPI'da bulunduysa çip adı; pinler atanmış ama bulunamadıysa uyarı. */
+function _hwRenderSpiStatus() {
+    const s = hwLastSensors;
+    if (s && s.imu_spi) { _hwStatus('hwst-spi', 'ok', s.imu || 'IMU'); return; }
+    const ids = ['imuSpiSckPin', 'imuSpiMisoPin', 'imuSpiMosiPin', 'imuSpiCsPin'];
+    const allSet = ids.every(id => {
+        const el = document.getElementById(id);
+        return el && parseInt(el.value) >= 0;
+    });
+    if (allSet && s) _hwStatus('hwst-spi', 'warn', _hwT('st_spi_notfound', 'BULUNAMADI'));
+    else _hwStatus('hwst-spi', '', allSet ? '' : _hwT('st_spi_off', 'KULLANILMIYOR'));
 }
 
 function _hwRenderRxStatus() {

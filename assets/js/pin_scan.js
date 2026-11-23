@@ -8,6 +8,8 @@
  *   {"command":"SCAN_I2C_PINS","deep":false|true}   → {"scan_i2c":{...}}
  *   {"command":"SCAN_GPS_PINS","find_tx":false|true} → {"scan_gps":{...}}
  *   {"command":"SCAN_RX_PINS","find_tx":false|true}  → {"scan_rx":{...}}
+ *   {"command":"SCAN_SPI_PINS","p1":..,"p2":..,"p3":..,"p4":..} → {"scan_spi":{...}}
+ *     (seçilen 4 IMU SPI pininin SCK/MISO/MOSI/CS sırasını bulur)
  *
  * Ne firmware ne bu dosya sonucu KAYDETMEZ: bulunan pinler Donanım sayfasının
  * formuna doldurulur, kullanıcı tüm değişiklikleri o sayfanın tek Kaydet'iyle
@@ -17,12 +19,13 @@
  * akordeonu + sensör hata modalı), butonlar data-scan-btn ile kilitlenir.
  */
 
-const _pinScanLast = { i2c: null, gps: null, rx: null };
-const _pinScanTimer = { i2c: null, gps: null, rx: null };
+const _pinScanLast = { i2c: null, gps: null, rx: null, spi: null };
+const _pinScanTimer = { i2c: null, gps: null, rx: null, spi: null };
+const SPI_SCAN_SELECTS = ['imuSpiSckPin', 'imuSpiMisoPin', 'imuSpiMosiPin', 'imuSpiCsPin'];
 // Firmware süreleri (kartta ölçüldü): I2C <1 sn; GPS 1.2 sn dinleme + aktif pin
 // başına 4×1.1 sn + TX pin başına ~0.35 sn; alıcı aktif pin başına ~1 sn + TX
 // pin başına ~0.25 sn, sinyalsiz ping yedeği en kötü ~20 sn. Pay bırakılarak:
-const PIN_SCAN_TIMEOUT_MS = { i2c: 20000, gps: 45000, rx: 60000 };
+const PIN_SCAN_TIMEOUT_MS = { i2c: 20000, gps: 45000, rx: 60000, spi: 8000 };
 const RX_PROTO_LABEL = { 0: 'SBUS', 1: 'CRSF / ELRS', 2: 'MAVLink ELRS' };
 
 function _psT(key, fallback, vars) {
@@ -44,6 +47,17 @@ function _psBusy(kind, busy) {
  *        İkisi de pin SÜRDÜĞÜ için önce kullanıcı onayı alınır.
  */
 function startPinScan(kind, aggressive = false) {
+    // SPI: kullanıcı PCB'deki 4 pini (sırası önemsiz) seçer, kart sırayı bulur.
+    let spiPins = null;
+    if (kind === 'spi') {
+        spiPins = SPI_SCAN_SELECTS.map(id => parseInt(document.getElementById(id)?.value));
+        if (spiPins.some(p => isNaN(p) || p < 0) || new Set(spiPins).size !== 4) {
+            _psRender('spi', `<span class="text-warning">${_psT('spi_need4',
+                'Önce IMU\'nun bağlı olduğu 4 farklı pini seçin (hangisinin SCK/MISO/MOSI/CS olduğu önemli değil).')}</span>`);
+            return;
+        }
+        if (!confirm(_psT('confirm_spi', 'Seçilen 4 pin sırayla SPI olarak denenecek (yaklaşık 0,1 sn). Motor/servo olarak atanmış pinlere dokunulmaz, yine de pervaneleri sökün. Devam edilsin mi?'))) return;
+    }
     if (aggressive) {
         const msg = kind === 'i2c'
             ? _psT('confirm_deep', 'Tüm boştaki pinler sırayla I2C olarak denenecek. Motor/servo olarak atanmış pinlere dokunulmaz, yine de pervaneleri sökün. Devam edilsin mi?')
@@ -55,11 +69,13 @@ function startPinScan(kind, aggressive = false) {
 
     const cmd = kind === 'i2c' ? { command: 'SCAN_I2C_PINS', deep: aggressive }
               : kind === 'gps' ? { command: 'SCAN_GPS_PINS', find_tx: aggressive }
+              : kind === 'spi' ? { command: 'SCAN_SPI_PINS', p1: spiPins[0], p2: spiPins[1], p3: spiPins[2], p4: spiPins[3] }
               :                  { command: 'SCAN_RX_PINS',  find_tx: aggressive };
 
     _psBusy(kind, true);
     _psRender(kind, `<span class="text-info"><span class="spinner-border spinner-border-sm me-1"></span>${
         kind === 'i2c' ? _psT('scanning_i2c', 'IMU aranıyor...')
+      : kind === 'spi' ? _psT('scanning_spi', 'SPI sırası aranıyor...')
       : kind === 'gps' ? _psT('scanning_gps', 'GPS aranıyor (birkaç saniye ile yarım dakika arası sürebilir)...')
       :                  _psT('scanning_rx', 'Alıcı aranıyor (birkaç saniye ile bir dakika arası sürebilir)...')
     }</span>`);
@@ -115,7 +131,15 @@ function handlePinScanResult(kind, res, rerender = false) {
         const busyNote = (res.busy && res.busy.length)
             ? `<div class="text-secondary">${_psT('busy_note', 'Sinyal taşıdığı için atlanan pinler: {pins}', { pins: _psList(res.busy) })}</div>`
             : '';
-        if (res.found) {
+        if (res.found && !res.imu) {
+            // Hatta IMU yok (IMU SPI'da) — yalnızca barometre/pitot bulundu
+            const devs = [res.baro ? 'BMP180' : null, res.pitot ? 'Pitot' : null].filter(Boolean).join(' + ');
+            _psRender(kind, `<div class="text-success"><i class="bi bi-check-circle me-1"></i>${
+                _psT('i2c_found_noimu', 'Bulundu: {devs} (bu hatta IMU yok — IMU SPI\'da olabilir) — SDA GPIO{sda}, SCL GPIO{scl}',
+                     { devs, sda: res.sda, scl: res.scl })}</div>
+                ${_psFilled('i2c')}`);
+            if (_psFresh && typeof log === 'function') log(`🔎 I2C: ${devs} SDA=${res.sda} SCL=${res.scl}`, 'success');
+        } else if (res.found) {
             const addr = '0x' + Number(res.addr).toString(16).toUpperCase();
             const baro = res.baro ? ' + BMP180' : '';
             _psRender(kind, `<div class="text-success"><i class="bi bi-check-circle me-1"></i>${
@@ -136,6 +160,26 @@ function handlePinScanResult(kind, res, rerender = false) {
     }
 
     if (kind === 'rx') { _psRenderRx(res); return; }
+
+    if (kind === 'spi') {
+        if (res.error === 'bad_pin') {
+            _psRender(kind, `<span class="text-danger">${_psT('spi_bad_pin',
+                'GPIO{pin} taranamaz: başka bir işe (motor/servo/alıcı/GPS/I2C) atanmış ya da bu çipte kullanılamıyor.', { pin: res.pin })}</span>`);
+            return;
+        }
+        if (res.found) {
+            const msg = res.already
+                ? _psT('spi_already', 'IMU zaten SPI\'da çalışıyor: {imu} — SCK GPIO{sck}, MISO GPIO{miso}, MOSI GPIO{mosi}, CS GPIO{cs}', res)
+                : _psT('spi_found', 'Bulundu: {imu} — SCK GPIO{sck}, MISO GPIO{miso}, MOSI GPIO{mosi}, CS GPIO{cs}', res);
+            _psRender(kind, `<div class="text-success"><i class="bi bi-check-circle me-1"></i>${msg}</div>${res.already ? '' : _psFilled('spi')}`);
+            if (_psFresh && !res.already && typeof log === 'function')
+                log(`🔎 SPI: ${res.imu} SCK=${res.sck} MISO=${res.miso} MOSI=${res.mosi} CS=${res.cs}`, 'success');
+        } else {
+            _psRender(kind, `<div class="text-danger">${_psT('spi_not_found',
+                'Seçilen 4 pinin hiçbir sırasında MPU yanıt vermedi ({n} sıra denendi). Besleme (3.3V/GND), pin seçimi ve kabloları kontrol edin.', { n: res.tried })}</div>`);
+        }
+        return;
+    }
 
     // GPS
     if (!res.found) {
@@ -213,6 +257,7 @@ function applyScannedPins(kind) {
     if (!res || !res.found) return;
 
     const pins = kind === 'i2c' ? { i2cSdaPin: res.sda, i2cSclPin: res.scl }
+               : kind === 'spi' ? { imuSpiSckPin: res.sck, imuSpiMisoPin: res.miso, imuSpiMosiPin: res.mosi, imuSpiCsPin: res.cs }
                : kind === 'gps' ? { gpsRxPin: res.rx, gpsTxPin: res.tx }
                :                  { rxRxPin: res.rx, rxTxPin: res.tx };
     Object.keys(pins).forEach(id => {
@@ -265,7 +310,7 @@ function openHardwareFromModal() {
 // Dil değişince JS ile üretilen sonuç kutularını ve modal önerisini yeniden
 // çiz. Tarama sürüyorsa (zamanlayıcı bekliyor) o kutuya dokunulmaz.
 document.addEventListener('i18n:changed', () => {
-    ['i2c', 'gps', 'rx'].forEach(kind => {
+    ['i2c', 'gps', 'rx', 'spi'].forEach(kind => {
         if (_pinScanLast[kind]) handlePinScanResult(kind, _pinScanLast[kind], true);
     });
     _psFresh = true;

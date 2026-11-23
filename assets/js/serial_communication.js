@@ -477,6 +477,10 @@ function handleStandardJsonData(data) {
     // ==========================================
 
     // Pin taraması yanıtları (pin_scan.js)
+    if (data.scan_spi) {
+        if (typeof handlePinScanResult === 'function') handlePinScanResult('spi', data.scan_spi);
+        return;
+    }
     if (data.scan_i2c || data.scan_gps || data.scan_rx) {
         if (typeof handlePinScanResult === 'function') {
             const kind = data.scan_i2c ? 'i2c' : data.scan_gps ? 'gps' : 'rx';
@@ -487,6 +491,10 @@ function handleStandardJsonData(data) {
 
     // 2. ADIM: Sensör statüsü geldi mi?
     if (data.stream_data && data.stream_data.type === 'init_status') {
+        // Çipe göre pin listesi (ESP32 / ESP32-S3) — seçim kutuları yeniden doldurulur
+        if (data.stream_data.data && data.stream_data.data.chip && typeof setEspChip === 'function') {
+            setEspChip(data.stream_data.data.chip);
+        }
         const sensors = data.stream_data.data;
 
         // --- SÜRÜM UYUMLULUK KONTROLÜ ---

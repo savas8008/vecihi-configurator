@@ -816,6 +816,41 @@
         </div>
       </div>
 
+      <!-- IMU / SPI hattı (isteğe bağlı) — barometre ve pitot I2C'de kalır -->
+      <div class="col-lg-6">
+        <div class="pin-acc-wrap h-100">
+          <div class="pin-acc-header">
+            <span class="pin-acc-title"><i class="bi bi-cpu"></i> <span data-i18n="hardware.spi_title">IMU (SPI) — isteğe bağlı</span></span>
+            <span class="hw-status ms-auto" id="hwst-spi"></span>
+          </div>
+          <div class="pin-acc-body open">
+            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
+              <div class="pin-box">
+                <label class="port-label d-block mb-1">SCK</label>
+                <select class="form-select form-select-sm pin-select" id="imuSpiSckPin" style="min-width:120px;"></select>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1">MISO</label>
+                <select class="form-select form-select-sm pin-select" id="imuSpiMisoPin" style="min-width:120px;"></select>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1">MOSI</label>
+                <select class="form-select form-select-sm pin-select" id="imuSpiMosiPin" style="min-width:120px;"></select>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1">CS</label>
+                <select class="form-select form-select-sm pin-select" id="imuSpiCsPin" style="min-width:120px;"></select>
+              </div>
+            </div>
+            <button class="btn btn-outline-info btn-sm mb-2" data-scan-btn="spi" onclick="startPinScan('spi')">
+              <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.spi_btn">SPI Sırasını Bul</span>
+            </button>
+            <div class="small mb-2" data-scan-result="spi"></div>
+            <div class="small text-secondary" data-i18n="hardware.spi_hint">MPU6500 / MPU9250 / MPU6000 için. Dört pin de seçiliyse kart açılışta önce SPI'yı dener; IMU bulunamazsa I2C'ye düşer. Barometre ve pitot I2C hattında kalır. Modül bağlantısı: SCL→SCK, SDA→MOSI, AD0→MISO, NCS→CS.</div>
+          </div>
+        </div>
+      </div>
+
       <!-- GPS -->
       <div class="col-lg-6">
         <div class="pin-acc-wrap h-100">
@@ -1529,12 +1564,18 @@
       <div class="atrim-settings atrim-modes-wrap">
         <span class="port-label" data-i18n="mixer.atrim_modes">Çalışacağı uçuş modları</span>
         <div class="atrim-chips" id="atrimModes">
-          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode0" data-bit="0" autocomplete="off"><label class="atrim-chip" for="atrimMode0"><i class="bi bi-check-lg"></i>ANGLE</label>
-          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode1" data-bit="1" autocomplete="off"><label class="atrim-chip" for="atrimMode1"><i class="bi bi-check-lg"></i>HORIZON</label>
-          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode2" data-bit="2" autocomplete="off"><label class="atrim-chip" for="atrimMode2"><i class="bi bi-check-lg"></i>CRUISE</label>
-          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode3" data-bit="3" autocomplete="off"><label class="atrim-chip" for="atrimMode3"><i class="bi bi-check-lg"></i>ALTHOLD</label>
-          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode4" data-bit="4" autocomplete="off"><label class="atrim-chip" for="atrimMode4"><i class="bi bi-check-lg"></i>RTH</label>
-          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode5" data-bit="5" autocomplete="off"><label class="atrim-chip" for="atrimMode5"><i class="bi bi-check-lg"></i>LOITER</label>
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode0" data-bit="0" autocomplete="off"><label class="atrim-chip" for="atrimMode0"><i class="bi bi-check-lg"></i>ANGLE</label>
+
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode1" data-bit="1" autocomplete="off"><label class="atrim-chip" for="atrimMode1"><i class="bi bi-check-lg"></i>HORIZON</label>
+
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode2" data-bit="2" autocomplete="off"><label class="atrim-chip" for="atrimMode2"><i class="bi bi-check-lg"></i>CRUISE</label>
+
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode3" data-bit="3" autocomplete="off"><label class="atrim-chip" for="atrimMode3"><i class="bi bi-check-lg"></i>ALTHOLD</label>
+
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode4" data-bit="4" autocomplete="off"><label class="atrim-chip" for="atrimMode4"><i class="bi bi-check-lg"></i>RTH</label>
+
+          <input type="checkbox" class="btn-check atrim-mode" id="atrimMode5" data-bit="5" autocomplete="off"><label class="atrim-chip" for="atrimMode5"><i class="bi bi-check-lg"></i>LOITER</label>
+
           <input type="checkbox" class="btn-check atrim-mode" id="atrimMode6" data-bit="6" autocomplete="off"><label class="atrim-chip" for="atrimMode6"><i class="bi bi-check-lg"></i>WAYPOINT</label>
         </div>
         <div class="atrim-note"><i class="bi bi-slash-circle me-1"></i><span data-i18n="mixer.atrim_excluded">MANUAL, ACRO, LAUNCH, iniş asistanı, failsafe, autotune ve GCS modlarında autotrim hiçbir zaman çalışmaz.</span></div>
@@ -4220,14 +4261,28 @@ function toggleBatCalc(bodyId, btn) {
         const minGap = 50;
 
         // Global DeÄŸiÅŸkenler
-        const esp32Pins = [
-            -1,
-            0, 1, 2, 3, 4, 5,
-            12, 13, 14, 15, 16, 17, 18, 19,
-            21, 22, 23,
-            25, 26, 27,
-            32, 33, 34, 35, 36, 39
-        ];
+        // Seçilebilir GPIO'lar çipe göre (kart init_status'ta "chip" bildirir;
+        // firmware'deki isValidGPIOPin ile aynı tutulmalı). Bağlantı yokken /
+        // eski firmware'de klasik ESP32 listesi kullanılır.
+        const ESP_PIN_LISTS = {
+            esp32: [
+                -1,
+                0, 1, 2, 3, 4, 5,
+                12, 13, 14, 15, 16, 17, 18, 19,
+                21, 22, 23,
+                25, 26, 27,
+                32, 33, 34, 35, 36, 39
+            ],
+            // ESP32-S3: 19/20 native USB, 22-25 yok, 26-37 flash/PSRAM (N16R8) hariç
+            esp32s3: [
+                -1,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                21,
+                38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48
+            ]
+        };
+        let espChip = 'esp32';
+        let esp32Pins = ESP_PIN_LISTS.esp32;
         const channelOptions = Array.from({length: 16}, (_, i) => `<option value="${i+1}">Kanal ${i+1}</option>`).join('');
 
         // Global DOM Element Referansları
