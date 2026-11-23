@@ -1,5 +1,13 @@
 [
   {
+    "date": "2026-11-23",
+    "items": [
+      "Uçuş modları kaydedilemiyordu ('MODES_SAVE yazma hatası: 0/629 byte') düzeltildi: kartın ayar belleği (NVS) dolmuştu. Ondalıklı (float) ayarlar bellekte gereğinden 3 kat fazla yer kaplıyordu; artık sıkıştırılmış biçimde saklanıyor ve yaklaşık 225 kayıtlık yer açılıyor. Güncellemeden sonraki ilk açılışta mevcut ayarlar otomatik ve kayıpsız olarak yeni biçime çevriliyor; ayarları yeniden girmeniz gerekmiyor",
+      "Bellek dolduğunda verilen hata mesajı artık gerçekten kullanılabilir alanı ve gereken alanı gösteriyor (eski mesaj, hep boş tutulan yedek sayfayı da 'boş' sayarak yanıltıcı bir sayı veriyordu)",
+      "Yeni teşhis komutu NVS_DUMP: Loglar sayfasındaki komut kutusuna yazılınca karttaki tüm kayıtlı ayar anahtarlarını, kapladıkları yeri ve bellek doluluğunu listeliyor. Uçak arm durumundayken çalışmaz"
+    ]
+  },
+  {
     "date": "2026-10-31",
     "items": [
       "Servo autotrim (iNav FW_AUTOTRIM / ArduPlane SERVO_AUTO_TRIM yöntemi): Mikser sayfasına 'Servo Autotrim' paneli eklendi. Açıkken, seçilen uçuş modlarında (ANGLE, HORIZON, CRUISE, ALTHOLD, RTH, LOITER, WAYPOINT — tek tek seçilebilir) düz ve yatay uçarken (çubuklar ortada, roll ve pitch 5°'den küçük, dönüş hızı eşiğin altında) PID'in tuttuğu trim 0,5 sn'de bir küçük adımlarla servo orta noktalarına (Mid) aktarılıyor. Uçuşta flash'a yazılmıyor; değişiklik disarm anında kaydediliyor ve Mid değerlerinde görünüyor. MANUAL, ACRO, LAUNCH, iniş asistanı, failsafe, autotune ve GCS'de hiçbir zaman çalışmıyor. Orta nokta 1300-1700 µs ile sınırlı; varsayılan kapalı. Ayrıntılar: docs/AUTOTRIM.md",
