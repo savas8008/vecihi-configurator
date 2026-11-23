@@ -790,11 +790,11 @@
 
     <div class="row g-3 hw-grid">
 
-      <!-- IMU / I2C hattı -->
+      <!-- I2C sensör hattı — cihazlar adresinden tanınır, cihaz başına pin yok -->
       <div class="col-lg-6">
         <div class="pin-acc-wrap h-100">
           <div class="pin-acc-header">
-            <span class="pin-acc-title"><i class="bi bi-cpu"></i> <span data-i18n="hardware.i2c_title">IMU, Barometre, Pitot (I2C)</span></span>
+            <span class="pin-acc-title"><i class="bi bi-cpu"></i> <span data-i18n="hardware.i2c_title">I2C Sensör Hattı</span></span>
             <span class="hw-status ms-auto" id="hwst-i2c"></span>
           </div>
           <div class="pin-acc-body open">
@@ -808,22 +808,24 @@
                 <select class="form-select form-select-sm pin-select" id="i2cSclPin" style="min-width:150px;"></select>
               </div>
               <button class="btn btn-outline-info btn-sm" data-scan-btn="i2c" onclick="startPinScan('i2c')">
-                <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.i2c_btn">IMU Pinlerini Otomatik Bul</span>
+                <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.i2c_btn">Hattı Otomatik Bul</span>
               </button>
             </div>
-            <div class="small" data-scan-result="i2c"></div>
+            <div class="small mb-2" data-scan-result="i2c"></div>
+            <div class="small text-secondary" data-i18n="hardware.i2c_hint">IMU (MPU6050 / MPU6500 / LSM6DSM), barometre (BMP180 / BMP280 / BME280) ve pitot (MS4525DO) bu hatta bağlanabilir. Kart açılışta hattaki sensörleri adreslerinden kendisi tanır; hangi çipin takılı olduğunu seçmeniz gerekmez.</div>
           </div>
         </div>
       </div>
 
-      <!-- IMU / SPI hattı (isteğe bağlı) — barometre ve pitot I2C'de kalır -->
+      <!-- SPI sensör hattı (isteğe bağlı) — SCK/MISO/MOSI ortak, her cihazın kendi CS'si -->
       <div class="col-lg-6">
         <div class="pin-acc-wrap h-100">
           <div class="pin-acc-header">
-            <span class="pin-acc-title"><i class="bi bi-cpu"></i> <span data-i18n="hardware.spi_title">IMU (SPI) — isteğe bağlı</span></span>
+            <span class="pin-acc-title"><i class="bi bi-cpu"></i> <span data-i18n="hardware.spi_title">SPI Sensör Hattı — isteğe bağlı</span></span>
             <span class="hw-status ms-auto" id="hwst-spi"></span>
           </div>
           <div class="pin-acc-body open">
+            <div class="small text-secondary mb-1" data-i18n="hardware.spi_shared">Ortak hat</div>
             <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
               <div class="pin-box">
                 <label class="port-label d-block mb-1">SCK</label>
@@ -837,16 +839,23 @@
                 <label class="port-label d-block mb-1">MOSI</label>
                 <select class="form-select form-select-sm pin-select" id="imuSpiMosiPin" style="min-width:120px;"></select>
               </div>
+            </div>
+            <div class="small text-secondary mb-1" data-i18n="hardware.spi_cs_group">Cihaz seçme (CS) pinleri — yalnızca SPI'a bağlı cihaz için seçin</div>
+            <div class="d-flex align-items-end gap-3 flex-wrap mb-2">
               <div class="pin-box">
-                <label class="port-label d-block mb-1">CS</label>
+                <label class="port-label d-block mb-1" data-i18n="hardware.lbl_imu_cs">IMU CS</label>
                 <select class="form-select form-select-sm pin-select" id="imuSpiCsPin" style="min-width:120px;"></select>
+              </div>
+              <div class="pin-box">
+                <label class="port-label d-block mb-1" data-i18n="hardware.lbl_baro_cs">Barometre CS</label>
+                <select class="form-select form-select-sm pin-select" id="baroSpiCsPin" style="min-width:120px;"></select>
               </div>
             </div>
             <button class="btn btn-outline-info btn-sm mb-2" data-scan-btn="spi" onclick="startPinScan('spi')">
-              <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.spi_btn">SPI Sırasını Bul</span>
+              <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.spi_btn">IMU SPI Sırasını Bul</span>
             </button>
             <div class="small mb-2" data-scan-result="spi"></div>
-            <div class="small text-secondary" data-i18n="hardware.spi_hint">MPU6500 / MPU9250 / MPU6000 için. Dört pin de seçiliyse kart açılışta önce SPI'yı dener; IMU bulunamazsa I2C'ye düşer. Barometre ve pitot I2C hattında kalır. Modül bağlantısı: SCL→SCK, SDA→MOSI, AD0→MISO, NCS→CS.</div>
+            <div class="small text-secondary" data-i18n="hardware.spi_hint">CS'si seçilen cihaz açılışta önce bu hatta aranır, bulunamazsa I2C hattında aranır. IMU: MPU6500 / MPU9250 / MPU6000 (bağlantı: SCL→SCK, SDA→MOSI, AD0→MISO, NCS→CS). Barometre: BMP280 / BME280 (bağlantı: SCL→SCK, SDA→MOSI, SDO→MISO, CSB→CS). BMP180 ve pitot yalnızca I2C'de çalışır.</div>
           </div>
         </div>
       </div>
@@ -964,7 +973,7 @@
                 <input type="number" class="form-control form-control-sm" id="pitotScale" min="0.5" max="2.0" step="0.01" value="1.00" style="max-width:110px;">
               </div>
             </div>
-            <small class="text-secondary d-block" data-i18n="hardware.pitot_hint">Pitot, IMU ile aynı I2C hattına bağlanır (adres 0x28); ayrı pini yoktur. Devre dışıyken hava hızı GPS'ten (sanal) hesaplanır.</small>
+            <small class="text-secondary d-block" data-i18n="hardware.pitot_hint">Pitot I2C sensör hattına bağlanır (adres 0x28); ayrı pini yoktur. Devre dışıyken hava hızı GPS'ten (sanal) hesaplanır.</small>
           </div>
         </div>
       </div>

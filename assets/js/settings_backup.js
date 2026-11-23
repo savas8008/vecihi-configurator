@@ -289,6 +289,7 @@ function _flattenConfig(s) {
             if (pn.imu_spi_miso !== undefined) push('out.pin_imu_miso', pn.imu_spi_miso);
             if (pn.imu_spi_mosi !== undefined) push('out.pin_imu_mosi', pn.imu_spi_mosi);
             if (pn.imu_spi_cs   !== undefined) push('out.pin_imu_cs',   pn.imu_spi_cs);
+            if (pn.baro_spi_cs  !== undefined) push('out.pin_baro_cs',  pn.baro_spi_cs);
             push('out.pin_adc_voltage', pn.adc_voltage);
             push('out.pin_adc_current', pn.adc_current);
             push('out.pin_adc_scale',   pn.adc_voltage_scale);

@@ -29,10 +29,13 @@ const HW_PROTO_LABEL = { 0: 'SBUS', 1: 'CRSF / ELRS', 2: 'MAVLink ELRS' };
 const HW_PIN_FIELDS = [
     ['i2c_sda',     'i2cSdaPin',     'c_i2c_sda', 'I2C SDA'],
     ['i2c_scl',     'i2cSclPin',     'c_i2c_scl', 'I2C SCL'],
-    ['imu_spi_sck',  'imuSpiSckPin',  'c_imu_sck',  'IMU SPI SCK'],
-    ['imu_spi_miso', 'imuSpiMisoPin', 'c_imu_miso', 'IMU SPI MISO'],
-    ['imu_spi_mosi', 'imuSpiMosiPin', 'c_imu_mosi', 'IMU SPI MOSI'],
+    // Sensör SPI hattı: SCK/MISO/MOSI ortak (anahtar adları tarihsel "imu_spi_*"),
+    // her cihazın kendi CS'si var.
+    ['imu_spi_sck',  'imuSpiSckPin',  'c_imu_sck',  'SPI SCK'],
+    ['imu_spi_miso', 'imuSpiMisoPin', 'c_imu_miso', 'SPI MISO'],
+    ['imu_spi_mosi', 'imuSpiMosiPin', 'c_imu_mosi', 'SPI MOSI'],
     ['imu_spi_cs',   'imuSpiCsPin',   'c_imu_cs',   'IMU SPI CS'],
+    ['baro_spi_cs',  'baroSpiCsPin',  'c_baro_cs',  'Barometre SPI CS'],
     ['gps_rx',      'gpsRxPin',      'c_gps_rx',  'GPS RX'],
     ['gps_tx',      'gpsTxPin',      'c_gps_tx',  'GPS TX'],
     ['rx_rx',       'rxRxPin',       'c_rx_rx',   'Alıcı RX'],
@@ -67,17 +70,36 @@ function requestHardwarePageData() {
     _hwCheckConflicts();
 }
 
+/** "MPU6500 (SPI)" → "MPU6500": rozet zaten hattın kartında duruyor. */
+function _hwChipName(name) {
+    return String(name || '').replace(/\s*\((I2C|SPI)\)\s*$/, '');
+}
+
+/**
+ * init_status'tan hat başına bulunan cihazlar. Eski firmware baro_name/baro_bus
+ * göndermez: o zaman baro I2C'de sayılır (eski firmware'de SPI barometre yoktu)
+ * ve adı bilinmediği için "BARO" yazılır.
+ */
+function _hwBusDevices(s) {
+    const i2c = [], spi = [];
+    if (s.gyro) (s.imu_spi ? spi : i2c).push(_hwChipName(s.imu) || 'IMU');
+    if (s.baro) (s.baro_bus === 'spi' ? spi : i2c).push(s.baro_name || 'BARO');
+    if (s.pitot) i2c.push('Pitot');
+    return { i2c, spi };
+}
+
 /** init_status geldiğinde (serial_communication.js) — sensör durum rozetleri. */
 function updateHardwareStatus(sensors) {
     if (!sensors) return;
     hwLastSensors = sensors;
-    if (sensors.gyro && sensors.imu_spi) {
-        // IMU SPI'da: I2C hattında yalnızca barometre/pitot kalır
-        _hwStatus('hwst-i2c', sensors.baro ? 'ok' : '', sensors.baro ? 'BARO' : '');
-    } else if (sensors.gyro) {
-        _hwStatus('hwst-i2c', 'ok', sensors.baro ? 'IMU + BARO' : 'IMU');
-    } else {
+    const { i2c } = _hwBusDevices(sensors);
+    if (i2c.length) {
+        _hwStatus('hwst-i2c', 'ok', i2c.join(' · '));
+    } else if (!sensors.gyro) {
+        // IMU hiçbir hatta yok — uçuş için zorunlu tek sensör
         _hwStatus('hwst-i2c', 'err', _hwT('st_imu_missing', 'IMU YOK'));
+    } else {
+        _hwStatus('hwst-i2c', '', '');   // IMU SPI'da, I2C hattında cihaz yok
     }
     _hwRenderSpiStatus();
     if (sensors.gps) _hwStatus('hwst-gps', 'ok', 'OK');
@@ -101,17 +123,32 @@ function onHardwarePageData(pageType, data) {
     }
 }
 
-/** IMU SPI rozeti: SPI'da bulunduysa çip adı; pinler atanmış ama bulunamadıysa uyarı. */
+/**
+ * SPI hattı rozeti: hatta bulunan cihazlar. CS'si atanmış ama SPI'da bulunamayan
+ * cihaz uyarı olarak gösterilir (kart onu I2C'de aramaya devam etmiş olabilir).
+ */
 function _hwRenderSpiStatus() {
     const s = hwLastSensors;
-    if (s && s.imu_spi) { _hwStatus('hwst-spi', 'ok', s.imu || 'IMU'); return; }
-    const ids = ['imuSpiSckPin', 'imuSpiMisoPin', 'imuSpiMosiPin', 'imuSpiCsPin'];
-    const allSet = ids.every(id => {
-        const el = document.getElementById(id);
-        return el && parseInt(el.value) >= 0;
-    });
-    if (allSet && s) _hwStatus('hwst-spi', 'warn', _hwT('st_spi_notfound', 'BULUNAMADI'));
-    else _hwStatus('hwst-spi', '', allSet ? '' : _hwT('st_spi_off', 'KULLANILMIYOR'));
+    const pin = id => { const el = document.getElementById(id); return el ? parseInt(el.value) : -1; };
+    const busSet = ['imuSpiSckPin', 'imuSpiMisoPin', 'imuSpiMosiPin'].every(id => pin(id) >= 0);
+    const found = s ? _hwBusDevices(s).spi : [];
+
+    // CS'si seçili ama hatta bulunmayanlar (yalnızca kart bilgisi varken söylenebilir)
+    const missing = [];
+    if (s && busSet) {
+        if (pin('imuSpiCsPin') >= 0 && !s.imu_spi) missing.push('IMU');
+        if (pin('baroSpiCsPin') >= 0 && s.baro_bus !== 'spi') missing.push(_hwT('lbl_baro', 'Barometre'));
+    }
+
+    if (missing.length) {
+        const txt = (found.length ? found.join(' · ') + ' — ' : '') +
+            _hwT('st_spi_missing', '{devs} BULUNAMADI', { devs: missing.join(', ') });
+        _hwStatus('hwst-spi', 'warn', txt);
+    } else if (found.length) {
+        _hwStatus('hwst-spi', 'ok', found.join(' · '));
+    } else {
+        _hwStatus('hwst-spi', '', busSet ? '' : _hwT('st_spi_off', 'KULLANILMIYOR'));
+    }
 }
 
 function _hwRenderRxStatus() {

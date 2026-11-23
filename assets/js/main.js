@@ -63,8 +63,8 @@ function populatePinSelectors() {
         // I2C
         'i2cSclPin', 'i2cSdaPin',
 
-        // IMU SPI (isteğe bağlı)
-        'imuSpiSckPin', 'imuSpiMisoPin', 'imuSpiMosiPin', 'imuSpiCsPin',
+        // Sensör SPI hattı (isteğe bağlı): ortak hat + IMU/baro CS
+        'imuSpiSckPin', 'imuSpiMisoPin', 'imuSpiMosiPin', 'imuSpiCsPin', 'baroSpiCsPin',
 
         // ADC
         'adcVoltagePin',
