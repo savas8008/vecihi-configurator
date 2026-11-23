@@ -24,16 +24,21 @@
  * @brief Select dropdown'larını GPIO pinleri ile doldurur
  */
 function populatePinSelectors() {
+    const isS3 = (typeof espChip !== 'undefined' && espChip === 'esp32s3');
+    // Açılış (strapping) pinleri: yanlış seviyede tutulursa kart açılmayabilir.
+    // ESP32: 0, 2 (5/12/15 de strapping ama yaygın kullanımda sorunsuz).
+    // ESP32-S3: 0, 3, 45 (flash gerilimi!), 46.
+    const bootPins = isS3 ? [0, 3, 45, 46] : [0, 2];
     const pinOptions = esp32Pins.map(pin => {
         if (pin === -1) return `<option value="-1">❌ Devre Dışı</option>`;
         
-        // ADC Pinleri için uyarı (Sadece INPUT)
-        if (pin >= 34 && pin <= 39) {
+        // ADC Pinleri için uyarı (Sadece INPUT) — yalnızca klasik ESP32
+        if (!isS3 && pin >= 34 && pin <= 39) {
             return `<option value="${pin}">GPIO ${pin} (Sadece INPUT/ADC)</option>`;
         }
         
         // Boot/Flash pinleri için uyarı
-        if (pin === 0 || pin === 2) {
+        if (bootPins.includes(pin)) {
             return `<option value="${pin}">GPIO ${pin} ⚠️ (Boot Pin)</option>`;
         }
         
@@ -58,6 +63,9 @@ function populatePinSelectors() {
         // I2C
         'i2cSclPin', 'i2cSdaPin',
 
+        // IMU SPI (isteğe bağlı)
+        'imuSpiSckPin', 'imuSpiMisoPin', 'imuSpiMosiPin', 'imuSpiCsPin',
+
         // ADC
         'adcVoltagePin',
 
@@ -68,7 +76,10 @@ function populatePinSelectors() {
     selects.forEach(id => { 
         const el = document.getElementById(id);
         if (el) {
+            // Çip değişince yeniden doldurulabilir: mevcut seçimi koru
+            const prev = el.value;
             el.innerHTML = pinOptions;
+            if (prev !== '' && el.querySelector(`option[value="${prev}"]`)) el.value = prev;
         } else {
             console.warn(`⚠️ Element bulunamadı: ${id}`);
         }
@@ -277,3 +288,15 @@ document.addEventListener('contextmenu', (e) => {
 document.addEventListener('copy',  (e) => { if (!e.target.matches('input, textarea')) e.preventDefault(); });
 document.addEventListener('cut',   (e) => { if (!e.target.matches('input, textarea')) e.preventDefault(); });
 document.addEventListener('paste',  (e) => { if (!e.target.matches('input, textarea')) e.preventDefault(); });
+
+/**
+ * @brief Kart init_status'ta çipini bildirince pin listesini ona göre seçer
+ *        ve seçim kutularını (mevcut seçimleri koruyarak) yeniden doldurur.
+ */
+function setEspChip(chip) {
+    if (typeof ESP_PIN_LISTS === 'undefined' || !ESP_PIN_LISTS[chip] || chip === espChip) return;
+    espChip = chip;
+    esp32Pins = ESP_PIN_LISTS[chip];
+    populatePinSelectors();
+}
+window.setEspChip = setEspChip;

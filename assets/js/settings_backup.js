@@ -285,6 +285,10 @@ function _flattenConfig(s) {
             push('out.pin_osd_tx',      pn.osd_tx);
             push('out.pin_i2c_sda',     pn.i2c_sda);
             push('out.pin_i2c_scl',     pn.i2c_scl);
+            if (pn.imu_spi_sck  !== undefined) push('out.pin_imu_sck',  pn.imu_spi_sck);
+            if (pn.imu_spi_miso !== undefined) push('out.pin_imu_miso', pn.imu_spi_miso);
+            if (pn.imu_spi_mosi !== undefined) push('out.pin_imu_mosi', pn.imu_spi_mosi);
+            if (pn.imu_spi_cs   !== undefined) push('out.pin_imu_cs',   pn.imu_spi_cs);
             push('out.pin_adc_voltage', pn.adc_voltage);
             push('out.pin_adc_current', pn.adc_current);
             push('out.pin_adc_scale',   pn.adc_voltage_scale);

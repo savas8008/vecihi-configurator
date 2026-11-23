@@ -487,6 +487,10 @@ function handleStandardJsonData(data) {
 
     // 2. ADIM: Sensör statüsü geldi mi?
     if (data.stream_data && data.stream_data.type === 'init_status') {
+        // Çipe göre pin listesi (ESP32 / ESP32-S3) — seçim kutuları yeniden doldurulur
+        if (data.stream_data.data && data.stream_data.data.chip && typeof setEspChip === 'function') {
+            setEspChip(data.stream_data.data.chip);
+        }
         const sensors = data.stream_data.data;
 
         // --- SÜRÜM UYUMLULUK KONTROLÜ ---

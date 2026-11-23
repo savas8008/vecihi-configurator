@@ -92,6 +92,12 @@ function handleOutputsPageData(data) {
         setVal('i2cSdaPin', pinConfig.i2c_sda);
         setVal('i2cSclPin', pinConfig.i2c_scl);
 
+        // IMU SPI (eski firmware göndermez → -1)
+        setVal('imuSpiSckPin',  pinConfig.imu_spi_sck  ?? -1);
+        setVal('imuSpiMisoPin', pinConfig.imu_spi_miso ?? -1);
+        setVal('imuSpiMosiPin', pinConfig.imu_spi_mosi ?? -1);
+        setVal('imuSpiCsPin',   pinConfig.imu_spi_cs   ?? -1);
+
         // ADC
         setVal('adcVoltagePin', pinConfig.adc_voltage);
         const scaleEl = document.getElementById('voltageAdcScale');
