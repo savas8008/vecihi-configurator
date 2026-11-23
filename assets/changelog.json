@@ -2,6 +2,8 @@
   {
     "date": "2026-11-23",
     "items": [
+      "Uçuş Modları sayfasında GPS gerektiren modlar (RTH, WAYPOINT, LAND ASSIST, LOITER) artık GPS takılı değilken kilitlenmiyor: GPS'i sonradan takacak ya da geçici olarak çıkaran kullanıcılar bu modları her zaman atayabiliyor. Bunun yerine kartın üzerinde, GPS özelliği kapalıysa veya GPS algılanmıyorsa modun uçuşta neden devreye girmeyeceğini anlatan bir uyarı notu gösteriliyor",
+      "Güvenlik (iNav 'navigation unsafe' kontrolü): RTH, WAYPOINT, LAND ASSIST veya LOITER switch'i açıkken GPS güvenilir değilse (GPS yok ya da kilit yok) arm artık reddediliyor; yerde OSD'de 'NAV MOD: GPS YOK' uyarısı çıkıyor. Önceden bu modlar havada sessizce ANGLE'a düşüyordu ve pilot eve dönüşün çalışacağını sanabiliyordu. Zorla arm (salla-bırak, GCS force arm) bu kontrolü bilinçli olarak atlar",
       "Uçuş modları kaydedilemiyordu ('MODES_SAVE yazma hatası: 0/629 byte') düzeltildi: kartın ayar belleği (NVS) dolmuştu. Ondalıklı (float) ayarlar bellekte gereğinden 3 kat fazla yer kaplıyordu; artık sıkıştırılmış biçimde saklanıyor ve yaklaşık 225 kayıtlık yer açılıyor. Güncellemeden sonraki ilk açılışta mevcut ayarlar otomatik ve kayıpsız olarak yeni biçime çevriliyor; ayarları yeniden girmeniz gerekmiyor",
       "Bellek dolduğunda verilen hata mesajı artık gerçekten kullanılabilir alanı ve gereken alanı gösteriyor (eski mesaj, hep boş tutulan yedek sayfayı da 'boş' sayarak yanıltıcı bir sayı veriyordu)",
       "Yeni teşhis komutu NVS_DUMP: Loglar sayfasındaki komut kutusuna yazılınca karttaki tüm kayıtlı ayar anahtarlarını, kapladıkları yeri ve bellek doluluğunu listeliyor. Uçak arm durumundayken çalışmaz"
