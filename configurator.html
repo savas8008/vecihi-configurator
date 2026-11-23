@@ -842,6 +842,10 @@
                 <select class="form-select form-select-sm pin-select" id="imuSpiCsPin" style="min-width:120px;"></select>
               </div>
             </div>
+            <button class="btn btn-outline-info btn-sm mb-2" data-scan-btn="spi" onclick="startPinScan('spi')">
+              <i class="bi bi-search me-1"></i> <span data-i18n="pin_scan.spi_btn">SPI Sırasını Bul</span>
+            </button>
+            <div class="small mb-2" data-scan-result="spi"></div>
             <div class="small text-secondary" data-i18n="hardware.spi_hint">MPU6500 / MPU9250 / MPU6000 için. Dört pin de seçiliyse kart açılışta önce SPI'yı dener; IMU bulunamazsa I2C'ye düşer. Barometre ve pitot I2C hattında kalır. Modül bağlantısı: SCL→SCK, SDA→MOSI, AD0→MISO, NCS→CS.</div>
           </div>
         </div>

@@ -477,6 +477,10 @@ function handleStandardJsonData(data) {
     // ==========================================
 
     // Pin taraması yanıtları (pin_scan.js)
+    if (data.scan_spi) {
+        if (typeof handlePinScanResult === 'function') handlePinScanResult('spi', data.scan_spi);
+        return;
+    }
     if (data.scan_i2c || data.scan_gps || data.scan_rx) {
         if (typeof handlePinScanResult === 'function') {
             const kind = data.scan_i2c ? 'i2c' : data.scan_gps ? 'gps' : 'rx';
